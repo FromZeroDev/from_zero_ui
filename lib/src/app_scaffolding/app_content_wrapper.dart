@@ -39,20 +39,21 @@ var fromZeroThemeParametersProvider = ChangeNotifierProvider<ThemeParametersFrom
   return ThemeParametersFromZero();
 });
 
-
 /// Override this for custom logging, including logs from from_zero
-void Function(LgLvl level, Object? msg, {
+void Function(LgLvl level, String? msg, {
   Object? type,
   Object? e,
   StackTrace? st,
+  Map<String, Object>? data,
   int extraTraceLineOffset,
   FlutterErrorDetails? details,
 }) log = defaultLog;
 
-void defaultLog(LgLvl level, Object? msg, {
+void defaultLog(LgLvl level, String? msg, {
   Object? type,
   Object? e,
   StackTrace? st,
+  Map<String, Object>? data,
   int extraTraceLineOffset = 0,
   FlutterErrorDetails? details,
 }) {
@@ -60,7 +61,7 @@ void defaultLog(LgLvl level, Object? msg, {
     type: type,
     e: e,
     st: st,
-    extraTraceLineOffset: extraTraceLineOffset,
+    extraTraceLineOffset: extraTraceLineOffset + 1,
     details: details,
   );
   if (message!=null) {
@@ -72,18 +73,19 @@ Map<String, dynamic>? defaultLogGetMap(JsonMessageBuilder builder, LgLvl level, 
   Object? type,
   Object? e,
   StackTrace? st,
+  Map<String, Object>? data,
   int extraTraceLineOffset = 0,
   FlutterErrorDetails? details,
 }) {
   if (level.value > LogOptions.instance.getLvlForType(type).value) {
     return null;
   }
-  final map = builder.mapBuilder(level, msg,
-    type: type,
-    e: e,
-    st: st,
-    extraTraceLineOffset: extraTraceLineOffset,
+  final message = messageBuilder(
+    LogBuilder(level).msg(msg != null ? "$msg" : null).error(e, st).type(type).add(data),
+    builder,
+    extraTraceLineOffset + 1,
   );
+  final map = jsonDecode(message) as Map<String, dynamic>;
   if (e is DioException) {
     map['data_dio_url'] = e.requestOptions.uri.toString();
     map['data_dio_error_type'] = e.type.toString();
@@ -100,10 +102,11 @@ Map<String, dynamic>? defaultLogGetMap(JsonMessageBuilder builder, LgLvl level, 
   return map;
 }
 
-String? defaultLogGetString(LgLvl level, Object? msg, {
+String? defaultLogGetString(LgLvl level, String? msg, {
   Object? type,
   Object? e,
   StackTrace? st,
+  Map<String, Object>? data,
   int extraTraceLineOffset = 0,
   Map<String, dynamic>? jsonMap,
   FlutterErrorDetails? details,
@@ -122,11 +125,9 @@ String? defaultLogGetString(LgLvl level, Object? msg, {
   if (jsonMap!=null) {
     message = json.encode(jsonMap);
   } else {
-    message = LogOptions.instance.builder.messageBuilder(level, msg,
-      type: type,
-      e: e,
-      st: st,
-      extraTraceLineOffset: extraTraceLineOffset,
+    message = messageBuilder(
+      LogBuilder(level).msg("$msg").error(e, st).type(type).add(data),
+      LogOptions.instance.builder,
     );
   }
   if (details!=null) {
