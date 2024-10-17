@@ -69,7 +69,7 @@ void defaultLog(LgLvl level, String? msg, {
   }
 }
 
-Map<String, dynamic>? defaultLogGetMap(JsonMessageBuilder builder, LgLvl level, Object? msg, {
+String? defaultLogGetMap(JsonMessageBuilder builder, LgLvl level, String msg, {
   Object? type,
   Object? e,
   StackTrace? st,
@@ -80,26 +80,44 @@ Map<String, dynamic>? defaultLogGetMap(JsonMessageBuilder builder, LgLvl level, 
   if (level.value > LogOptions.instance.getLvlForType(type).value) {
     return null;
   }
-  final message = messageBuilder(
-    LogBuilder(level).msg(msg != null ? "$msg" : null).error(e, st).type(type).add(data),
-    builder,
-    extraTraceLineOffset + 1,
-  );
-  final map = jsonDecode(message) as Map<String, dynamic>;
+
+  var logBuilder = LogBuilder(level)
+      // .msg(msg != null ? "$msg" : null)
+      .error(e, st)
+      .type(type)
+      .add(data);
+
   if (e is DioException) {
-    map['data_dio_url'] = e.requestOptions.uri.toString();
-    map['data_dio_error_type'] = e.type.toString();
+    msg += ' (${e.type})'
+          '\n  ${e.requestOptions.uri}'
+          '${
+            e.response==null 
+            ? '' 
+            : '  ${e.response!.statusCode} - ${_parseDioErrorResponse(e.response!.data)}'
+          }';
+
+    logBuilder = logBuilder
+        .set('data_dio_url', e.requestOptions.uri.toString())
+        .set('data_dio_error_type', e.type.toString());
+
     if (e.response!=null) {
       if (e.response!.statusCode!=null) {
-        map['data_dio_response_status_code'] = e.response!.statusCode;
+        logBuilder = logBuilder.set("data_dio_response_status_code", e.response!.statusCode!);
       }
-      map['data_dio_response_data'] = _parseDioErrorResponse(e.response!.data);
+      logBuilder = logBuilder.set('data_dio_response_data', _parseDioErrorResponse(e.response!.data));
     }
   }
   if (details!=null) {
-    map['data_flutter_error_details'] = getFlutterDetailsString(details);
+    logBuilder = logBuilder.set('data_flutter_error_details', getFlutterDetailsString(details));
   }
-  return map;
+  logBuilder = logBuilder.msg(msg);
+
+  final message = messageBuilder(
+    logBuilder,
+    builder,
+    extraTraceLineOffset + 1,
+  );
+  return message;
 }
 
 String? defaultLogGetString(LgLvl level, String? msg, {
