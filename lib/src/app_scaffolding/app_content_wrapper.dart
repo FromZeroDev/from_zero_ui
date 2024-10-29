@@ -69,7 +69,7 @@ void defaultLog(LgLvl level, String? msg, {
   }
 }
 
-String? defaultLogGetMap(JsonMessageBuilder builder, LgLvl level, String msg, {
+String? defaultLogGetMap(JsonMessageBuilder messageBuilder, LgLvl level, String msg, {
   Object? type,
   Object? e,
   StackTrace? st,
@@ -81,43 +81,42 @@ String? defaultLogGetMap(JsonMessageBuilder builder, LgLvl level, String msg, {
     return null;
   }
 
-  var logBuilder = LogBuilder(level)
-      // .msg(msg != null ? "$msg" : null)
-      .error(e, st)
-      .type(type)
-      .add(data);
+  final logBuilder = LogBuilder(
+    level: level,
+    message: msg,
+    error: e,
+    stackTrace: st,
+    type: type,
+    extra: data,
+    extraTraceLineOffset: extraTraceLineOffset + 1,
+    messageBuilder: messageBuilder,
+  );
 
   if (e is DioException) {
     msg += ' (${e.type})'
-          '\n  ${e.requestOptions.uri}'
-          '${
-            e.response==null 
+        '\n  ${e.requestOptions.uri}'
+        '${e.response==null
             ? '' 
             : '  ${e.response!.statusCode} - ${_parseDioErrorResponse(e.response!.data)}'
-          }';
+        }';
 
-    logBuilder = logBuilder
-        .set('data_dio_url', e.requestOptions.uri.toString())
-        .set('data_dio_error_type', e.type.toString());
+    logBuilder
+        ..setExtra('data_dio_url', e.requestOptions.uri.toString())
+        ..setExtra('data_dio_error_type', e.type.toString());
 
     if (e.response!=null) {
       if (e.response!.statusCode!=null) {
-        logBuilder = logBuilder.set("data_dio_response_status_code", e.response!.statusCode!);
+        logBuilder.setExtra("data_dio_response_status_code", e.response!.statusCode!);
       }
-      logBuilder = logBuilder.set('data_dio_response_data', _parseDioErrorResponse(e.response!.data));
+      logBuilder.setExtra('data_dio_response_data', _parseDioErrorResponse(e.response!.data));
     }
   }
   if (details!=null) {
-    logBuilder = logBuilder.set('data_flutter_error_details', getFlutterDetailsString(details));
+    logBuilder.setExtra('data_flutter_error_details', getFlutterDetailsString(details));
   }
-  logBuilder = logBuilder.msg(msg);
+  logBuilder.message = msg;
 
-  final message = messageBuilder(
-    logBuilder,
-    builder,
-    extraTraceLineOffset + 1,
-  );
-  return message;
+  return logBuilder.buildMessage();
 }
 
 String? defaultLogGetString(LgLvl level, String? msg, {
@@ -143,10 +142,15 @@ String? defaultLogGetString(LgLvl level, String? msg, {
   if (jsonMap!=null) {
     message = json.encode(jsonMap);
   } else {
-    message = messageBuilder(
-      LogBuilder(level).msg("$msg").error(e, st).type(type).add(data),
-      LogOptions.instance.builder,
-    );
+    message = LogBuilder(
+      level: level,
+      message: msg,
+      error: e,
+      stackTrace: st,
+      type: type,
+      extra: data,
+      extraTraceLineOffset: extraTraceLineOffset + 1,
+    ).buildMessage();
   }
   if (details!=null) {
     message = addFlutterDetailsToMlog(message, details);
