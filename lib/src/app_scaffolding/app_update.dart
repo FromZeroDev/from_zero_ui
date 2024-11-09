@@ -13,7 +13,6 @@ import 'package:intl/intl.dart';
 import 'package:mlog/mlog.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:r_upgrade/r_upgrade.dart';
 
 class UpdateFromZero{
 
@@ -241,7 +240,7 @@ class UpdateFromZero{
           if (await requestDefaultFilePermission(lgType: FzLgType.appUpdate)){
             // this requires adding the following permission to manifest, which causes problems with google play upload
             // <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"></uses-permission>
-            RUpgrade.installByPath(downloadPath);
+            // RUpgrade.installByPath(downloadPath);
             await Future<void>.delayed(const Duration(seconds: 1));
             // FromZeroAppContentWrapper.exitApp(0);
           } else {
