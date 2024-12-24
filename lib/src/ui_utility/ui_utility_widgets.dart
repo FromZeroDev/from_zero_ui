@@ -770,7 +770,11 @@ class ReturnToTopButtonState extends ConsumerState<ReturnToTopButton> {
                 currentScrollingAmount = 0; // reset scroll direction
               }
               currentScrollingAmount += diff;
-              isScrollingUp = currentScrollingAmount < -48;
+              if (!isScrollingUp) {
+                isScrollingUp = currentScrollingAmount < -48;
+              } else {
+                isScrollingUp = currentScrollingAmount <= 48;
+              }
             }
           }
           show = show && isScrollingUp;
