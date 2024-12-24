@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/util/copied_flutter_widgets/my_ensure_visible_when_focused.dart';
+import 'package:from_zero_ui/util/hack_focus_traversal.dart';
 
 
 class BoolComparable implements Comparable {
@@ -347,13 +348,6 @@ class BoolField extends Field<BoolComparable> {
     }
     return [result];
   }
-  Future<void> _focusNext(FocusNode focusNode, FocusNode node) async {
-    await Future.delayed(const Duration(milliseconds: 1)); // let the focus system cook
-    if (focusNode.hasFocus) {
-      focusNode.parent!.nextFocus();
-      _focusNext(focusNode, node);
-    }
-  }
   Widget _buildFieldEditorWidget(BuildContext context, {
     required FocusNode focusNode,
     bool addCard=false,
@@ -365,16 +359,7 @@ class BoolField extends Field<BoolComparable> {
     final theme = Theme.of(context);
     final isSizeNotHardRestricted = displayType==BoolFieldDisplayType.intrinsicHeightSwitchTile
         || displayType==BoolFieldDisplayType.intrinsicHeightCheckBoxTile;
-    final hackFocusTraversalPolicy = ReadingOrderTraversalPolicy( // hack to prevent switch/checkbox from interrupting traversal
-      requestFocusCallback: (node, {alignment, alignmentPolicy, curve, duration}) {
-        if (focusNode.hasFocus) {
-          focusNode.parent!.nextFocus();
-          _focusNext(focusNode, node);
-        } else {
-          node.requestFocus();
-        }
-      },
-    );
+    final hackFocusTraversalPolicy = SingleFocusTraversal(focusNode);
     Widget result = AnimatedBuilder(
       animation: this,
       builder: (context, child) {
@@ -465,47 +450,48 @@ class BoolField extends Field<BoolComparable> {
                     right: dense ? 0 : 8,
                     bottom: isSizeNotHardRestricted ? 0
                       : dense ? 22 : addCard ? 16 : 12,
-                ),
-                tileColor: dense && visibleValidationErrors.isNotEmpty
-                    ? ValidationMessage.severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!.withOpacity(0.2)
-                    : backgroundColor?.call(context, this, dao),
-                activeColor: selectedColor?.call(context, this, dao),
-                activeTrackColor: selectedColor?.call(context, this, dao)?.withOpacity(0.33),
-                title: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (!dense && showBothNeutralAndSpecificUiName==BoolFieldShowBothNeutralAndSpecificUiName.specificBelow)
+                  ),
+                  tileColor: dense && visibleValidationErrors.isNotEmpty
+                      ? ValidationMessage.severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!.withOpacity(0.2)
+                      : backgroundColor?.call(context, this, dao),
+                  activeColor: selectedColor?.call(context, this, dao),
+                  activeTrackColor: selectedColor?.call(context, this, dao)?.withOpacity(0.33),
+                  title: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (!dense && showBothNeutralAndSpecificUiName==BoolFieldShowBothNeutralAndSpecificUiName.specificBelow)
+                          Padding(
+                          padding: const EdgeInsets.only(bottom: 3),
+                          child: Text(uiName,
+                            style: theme.textTheme.bodySmall!.copyWith(
+                              color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                            ),
+                          ),
+                        ),
+                      Text(uiNameValue,
+                        style: theme.textTheme.titleMedium!.copyWith(
+                          color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                          height: 1.2,
+                        ),
+                      ),
+                      if (!dense && showBothNeutralAndSpecificUiName==BoolFieldShowBothNeutralAndSpecificUiName.specificAbove)
                         Padding(
-                        padding: const EdgeInsets.only(bottom: 3),
-                        child: Text(uiName,
-                          style: theme.textTheme.bodySmall!.copyWith(
-                            color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                          padding: const EdgeInsets.only(top: 3),
+                          child: Text(uiName,
+                            style: theme.textTheme.bodySmall!.copyWith(
+                              color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                            ),
                           ),
                         ),
-                      ),
-                    Text(uiNameValue,
-                      style: theme.textTheme.titleMedium!.copyWith(
-                        color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
-                        height: 1.2,
-                      ),
-                    ),
-                    if (!dense && showBothNeutralAndSpecificUiName==BoolFieldShowBothNeutralAndSpecificUiName.specificAbove)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 3),
-                        child: Text(uiName,
-                          style: theme.textTheme.bodySmall!.copyWith(
-                            color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
-                          ),
-                        ),
-                      ),
-                  ],
+                    ],
+                  ),
+                  onChanged: !enabled ? null : (value) {
+                    focusNode.requestFocus();
+                    userInteracted = true;
+                    this.value = value.comparable;
+                  },
                 ),
-                onChanged: !enabled ? null : (value) {
-                  focusNode.requestFocus();
-                  userInteracted = true;
-                  this.value = value.comparable;
-                },),
               ),
             );
           case BoolFieldDisplayType.compactCheckBox:
