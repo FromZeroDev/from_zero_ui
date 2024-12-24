@@ -380,6 +380,10 @@ class _DialogFromZeroState extends State<DialogFromZero> {
       context: context,
       child: result,
     );
+    result = CallbackShortcuts(
+      bindings: bindings,
+      child: result,
+    );
     return result;
   }
 
