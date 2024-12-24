@@ -5,6 +5,7 @@ import 'package:animations/animations.dart';
 import 'package:dartx/dartx.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
@@ -637,8 +638,17 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     );
   }
 
-  void addRow (T element, [int? insertIndex]) => addRows([element], insertIndex);
-  void addRows (Iterable<T> elements, [int? insertIndex, bool focusAdded = true]) {
+  void addRow (T element, {
+    int? insertIndex,
+    bool focusAdded = true,
+  }) => addRows([element],
+    insertIndex: insertIndex,
+    focusAdded: focusAdded,
+  );
+  void addRows (Iterable<T> elements, {
+    int? insertIndex,
+    bool focusAdded = true,
+  }) {
     if (elements.isEmpty) return;
     for (final e in elements) {
       e.addListener(notifyListeners);
@@ -659,8 +669,14 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     }
   }
 
-  bool replaceRow(T oldRow, T newRow) => replaceRows({oldRow: newRow});
-  bool replaceRows(Map<T, T> elements, [bool focusAdded = true]) {
+  bool replaceRow(T oldRow, T newRow,  {
+    bool focusAdded = true,
+  }) => replaceRows({oldRow: newRow},
+    focusAdded: focusAdded,
+  );
+  bool replaceRows(Map<T, T> elements, {
+    bool focusAdded = true,
+  }) {
     if (elements.isEmpty) return false;
     bool result = true;
     final newValue = value!.copyWith();
@@ -696,8 +712,14 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     return result;
   }
 
-  void duplicateRow(T element) => duplicateRows([element]);
-  void duplicateRows(Iterable<T> elements, [bool focusAdded = true]) {
+  void duplicateRow(T element, {
+    bool focusAdded = true,
+  }) => duplicateRows([element],
+    focusAdded: focusAdded,
+  );
+  void duplicateRows(Iterable<T> elements, {
+    bool focusAdded = true,
+  }) {
     if (elements.isEmpty) return;
     final newValue = value!.copyWith();
     for (final e in elements) {
@@ -959,9 +981,9 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
           for (final e in selected) {
             if (!objects.contains(e)) toAdd.add(e);
           }
-          addRows(toAdd, insertIndex);
+          addRows(toAdd, insertIndex: insertIndex);
         } else {
-          addRows(selected, insertIndex);
+          addRows(selected, insertIndex: insertIndex);
         }
         return selected;
       }
@@ -970,11 +992,11 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
       if (showEditDialogOnAdd) {
         result = await emptyDAO.maybeEdit(dao.contextForValidation ?? context, showDefaultSnackBars: showDefaultSnackBars);
         if (result!=null) {
-          addRow(emptyDAO, insertIndex);
+          addRow(emptyDAO, insertIndex: insertIndex);
           return emptyDAO;
         }
       } else {
-        addRow(emptyDAO, insertIndex);
+        addRow(emptyDAO, insertIndex: insertIndex);
         return emptyDAO;
       }
     }
@@ -2113,411 +2135,431 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     }
     actions.addAll(defaultActions);
     double rowHeight = this.rowHeight ?? (tableCellsEditable ? 48 : 36);
-    result = AnimatedBuilder(
-      key: fieldGlobalKey,
-      animation:  this,
-      builder: (context, child) {
-        _builtRows = {};
-        final Map<String, ColModel> columns = tableColumnsBuilder!=null
-            ? tableColumnsBuilder!(dao, this, objectTemplate)
-            : defaultTableColumnsBuilder(dao, this, objectTemplate);
-        for (final e in objects) {
-          final ValueChanged<RowModel<T>>? onRowTap;
-          if (this.onRowTap!=null) {
-            onRowTap = this.onRowTap;
-          } else {
-            switch(this.rowTapType) {
-              case RowTapType.view:
-                onRowTap = (row) {
-                  e.pushViewDialog(dao.contextForValidation ?? context,
-                    showDefaultSnackBars: showDefaultSnackBars,
+    result = CallbackShortcuts(
+      bindings: {
+        LogicalKeySet(LogicalKeyboardKey.shift, LogicalKeyboardKey.enter): () {
+          final objects = this.objects;
+          int index = 0;
+          while (index < objects.length) {
+            if (objects[index].hasFocus()) {
+              index++;
+              break;
+            }
+            index++;
+          }
+          final emptyObject = (objectTemplate.copyWith() as T)..id=null;
+          addRow(emptyObject,
+            insertIndex: index,
+            focusAdded: true,
+          );
+        },
+      },
+      child: AnimatedBuilder(
+        key: fieldGlobalKey,
+        animation:  this,
+        builder: (context, child) {
+          _builtRows = {};
+          final Map<String, ColModel> columns = tableColumnsBuilder!=null
+              ? tableColumnsBuilder!(dao, this, objectTemplate)
+              : defaultTableColumnsBuilder(dao, this, objectTemplate);
+          for (final e in objects) {
+            final ValueChanged<RowModel<T>>? onRowTap;
+            if (this.onRowTap!=null) {
+              onRowTap = this.onRowTap;
+            } else {
+              switch(this.rowTapType) {
+                case RowTapType.view:
+                  onRowTap = (row) {
+                    e.pushViewDialog(dao.contextForValidation ?? context,
+                      showDefaultSnackBars: showDefaultSnackBars,
+                    );
+                  };
+                case RowTapType.edit:
+                  onRowTap = (row) async {
+                    final copy = row.id.copyWith() as T;
+                    copy.parentDAO = null;
+                    copy.contextForValidation = dao.contextForValidation;
+                    final result = await copy.maybeEdit(dao.contextForValidation ?? context, showDefaultSnackBars: showDefaultSnackBars);
+                    if (result!=null) {
+                      replaceRow(row.id, copy);
+                      notifyListeners();
+                    }
+                  };
+                case RowTapType.none:
+                  onRowTap = null;
+              }
+            }
+            Widget? rowAddonWidget;
+            if (rowAddonField!=null) {
+              final rowAddonField = e.props[this.rowAddonField!];
+              if (rowAddonField!=null && rowAddonField.value!=null && rowAddonField.value.toString().isNotBlank) {
+                rowAddonWidget = Theme(
+                  data: Theme.of(context).copyWith(
+                    textTheme: Theme.of(context).textTheme.copyWith(
+                      titleMedium: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.w400),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: (tableHorizontalPadding-6).coerceAtLeast(0),
+                      right: (tableHorizontalPadding-6).coerceAtLeast(0),
+                      bottom: 12,
+                    ),
+                    child: IgnorePointer(
+                      ignoring: onRowTap!=null,
+                      child: Builder(
+                        builder: (context) {
+                          return rowAddonField.buildViewWidget(context,
+                            showViewButtons: false,
+                            linkToInnerDAOs: false,
+                            dense: false,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              }
+            }
+            final ValueChanged<RowModel<T>>? onRowTapFocused = onRowTap==null ? null : (value) {
+              value.focusNode.requestFocus();
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                onRowTap!(value);
+              });
+            };
+            if (tableRowBuilder!=null) {
+              _builtRows[e] = tableRowBuilder!(e, context, this, dao, columns, onRowTapFocused, rowAddonWidget);
+            } else {
+              _builtRows[e] = SimpleRowModel<T>(
+                id: e,
+                values: columns.map((key, value) => MapEntry(key, e.props[key])),
+                height: rowHeight,
+                onRowTap: onRowTapFocused,
+                selected: allowMultipleSelection ? (selectedObjects.value[e] ?? selectionDefault) : null,
+                // backgroundColor: selectedObjects.value[e]??false ? Theme.of(context).colorScheme.secondary.withOpacity(0.2) : null,
+                onCheckBoxSelected: allowMultipleSelection ? (row, focused) {
+                  selectedObjects.value[row.id] = focused??false;
+                  (row as SimpleRowModel).selected = focused??false;
+                  selectedObjects.notifyListeners();
+                  tableController.notifyListeners();
+                  notifyListeners();
+                  return true;
+                } : null,
+                rowAddon: rowAddonWidget,
+                rowAddonIsExpandable: true,
+                rowAddonIsSticky: false,
+                rowAddonIsCoveredByGestureDetector: true,
+                rowAddonIsCoveredByScrollable: false,
+                rowAddonIsCoveredByBackground: true,
+              );
+            }
+          }
+          double getMinWidth(Iterable currentColumnKeys) {
+            double width = 0;
+            for (final key in currentColumnKeys) {
+              final value = columns[key];
+              width += value?.width==null
+                  ? (value?.flex ?? 192)
+                  : (value!.width! * (1 + (1/columns.length))) ; // fixed widths weigh more because they wont shrink, this is an estimate, ideally it would be increase be the percentage this width represents of the total minWidth
+            }
+            return width;
+          }
+          double getMaxWidth(Iterable currentColumnKeys) {
+            return max(minWidth, 1.4 * getMinWidth(currentColumnKeys));
+          }
+          if (collapsed!) {
+            Widget result = SizedBox(
+              width: expandHorizontally ? null : maxWidth==double.infinity ? getMinWidth(columns.keys) : maxWidth,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (showTableHeaderAddon)
+                    _buildTableHeader(context,
+                      focusNode: focusNode!,
+                      collapsed: collapsed,
+                      collapsible: collapsible,
+                      actions: actions,
+                      asSliver: asSliver,
+                    ),
+                  InitiallyAnimatedWidget(
+                    duration: const Duration(milliseconds: 300),
+                    builder: (animationController, child) {
+                      return Container(
+                        color: backgroundColor?.call(context, this, dao) ?? Material.of(context).color ?? Theme.of(context).cardColor,
+                        height: 128*CurveTween(curve: Curves.easeInCubic).chain(Tween(begin: 1.0, end: 0.0,)).evaluate(animationController),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            );
+            if (asSliver) {
+              result = SliverToBoxAdapter(
+                child: result,
+              );
+            }
+            return result;
+          }
+          final extraRowActions = extraRowActionsBuilder?.call(dao.contextForValidation ?? context, this, dao) ?? [];
+          final defaultCellBuilder = tableCellsEditable
+              ? (BuildContext context, RowModel<T> row, dynamic colKey, ColModel? col) {
+                  final widgets = (row.values[colKey] as Field).buildFieldEditorWidgets(context,
+                    expandToFillContainer: false,
+                    addCard: false,
+                    asSliver: false,
+                    dense: true,
+                    ignoreHidden: true,
+                  );
+                  return SizedBox(
+                    height: row.height,
+                    child: OverflowBox(
+                      minHeight: rowHeight, maxHeight: double.infinity,
+                      alignment: const Alignment(0, -0.4),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: widgets,
+                      ),
+                    ),
+                  );
+                }
+              : (BuildContext context, RowModel<T> row, dynamic colKey, ColModel? col) {
+                  return (row.values[colKey] as Field).buildViewWidget(context,
+                    linkToInnerDAOs: false,
+                    showViewButtons: false,
+                    dense: true,
+                    hidden: false,
                   );
                 };
-              case RowTapType.edit:
-                onRowTap = (row) async {
+          Widget result = TableFromZero<T>(
+            scrollController: mainScrollController,
+            minWidthGetter: getMinWidth,
+            maxWidthGetter: asSliver ? getMaxWidth : null,
+            initialSortedColumn: initialSortedColumn,
+            sortNullOnTop: sortNullOnTop,
+            tableController: tableController,
+            allowCustomization: allowTableCustomization,
+            alternateRowBackgroundSmartly: false,
+            onFilter: onFilter,
+            onSort: onSort,
+            exportPathForExcel: exportPathForExcel ?? dao.defaultExportPath,
+            columns: columns,
+            showHeaders: showTableHeaders,
+            footerStickyOffset: tableFooterStickyOffset,
+            tableHorizontalPadding: tableHorizontalPadding,
+            rows: _builtRows.values.toList(),
+            rowBuilder: tableRowWidgetBuilder,
+            enableFixedHeightForListRows: rowAddonField==null,
+            cellPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
+            backgroundColor: backgroundColor?.call(context, this, dao),
+            ignoreWidthGettersIfEmpty: ignoreWidthGettersIfEmpty ?? !addCard,
+            emptyWidgetPadding: showBigAddButtonIfEmpty ? const EdgeInsets.only(top: 4) : EdgeInsets.zero,
+            rowDisabledValidator: rowDisabledValidator ?? (this.onRowTap==null && rowTapType==RowTapType.edit
+                ? (row) => row.id.canSave ? null : ''
+                : null),
+            rowTooltipGetter: rowTooltipGetter,
+            cellBuilder: tableCellBuilder==null
+                ? defaultCellBuilder
+                : (context, row, colKey, col) => tableCellBuilder!(context, row, colKey, col, defaultCellBuilder),
+            rowActions: [
+              ...extraRowActions,
+              if (extraRowActions.isNotEmpty)
+                RowAction.divider(),
+              if ((allowAddNew||hasAvailableObjectsPool))
+                RowAction<T>(
+                  title: '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate.uiName}',
+                  icon: Icon(Icons.add, color: Theme.of(context).colorScheme.secondary),
+                  breakpoints: {0: ActionState.popup,},
+                  onRowTap: (context, row) async {
+                    row.focusNode.requestFocus();
+                    final result = await maybeAddRow(dao.contextForValidation ?? context, insertIndex: objects.indexOf(row.id)+1);
+                    if (result!=null) {
+                      userInteracted = true;
+                    }
+                  },
+                ),
+              if ((allowAddNew||hasAvailableObjectsPool))
+                RowAction.divider(),
+              RowAction<T>(
+                icon: const Icon(Icons.info_outline),
+                title: FromZeroLocalizations.of(context).translate('view'),
+                breakpoints: actionViewBreakpoints,
+                onRowTap: (context, row) async {
+                  userInteracted = true; // can't know if the item was edited from within its view dialog
+                  row.focusNode.requestFocus();
+                  row.id.pushViewDialog(dao.contextForValidation ?? context);
+                },
+              ),
+              RowAction<T>(
+                icon: const Icon(Icons.edit_outlined),
+                title: FromZeroLocalizations.of(context).translate('edit'),
+                breakpoints: actionEditBreakpoints,
+                disablingErrorGetter: (context, row) => row.id.canSave ? null : '',
+                onRowTap: (context, row) async {
                   final copy = row.id.copyWith() as T;
                   copy.parentDAO = null;
                   copy.contextForValidation = dao.contextForValidation;
                   final result = await copy.maybeEdit(dao.contextForValidation ?? context, showDefaultSnackBars: showDefaultSnackBars);
                   if (result!=null) {
                     replaceRow(row.id, copy);
+                    userInteracted = true;
                     notifyListeners();
                   }
-                };
-              case RowTapType.none:
-                onRowTap = null;
-            }
-          }
-          Widget? rowAddonWidget;
-          if (rowAddonField!=null) {
-            final rowAddonField = e.props[this.rowAddonField!];
-            if (rowAddonField!=null && rowAddonField.value!=null && rowAddonField.value.toString().isNotBlank) {
-              rowAddonWidget = Theme(
-                data: Theme.of(context).copyWith(
-                  textTheme: Theme.of(context).textTheme.copyWith(
-                    titleMedium: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.w400),
-                  ),
+                },
+              ),
+              RowAction<T>(
+                icon: const Icon(MaterialCommunityIcons.content_duplicate, size: 21,),
+                title: FromZeroLocalizations.of(context).translate('duplicate'),
+                breakpoints: actionDuplicateBreakpoints,
+                onRowTap: (context, row) async {
+                  userInteracted = true;
+                  row.focusNode.requestFocus();
+                  duplicateRows([row.id]);
+                },
+              ),
+              if (objectTemplate.canDelete || hasAvailableObjectsPool)
+                RowAction<T>(
+                  icon: Icon(!hasAvailableObjectsPool ? Icons.delete_forever_outlined : Icons.clear),
+                  title: FromZeroLocalizations.of(context).translate('delete'),
+                  breakpoints: actionDeleteBreakpoints,
+                  disablingErrorGetter: (context, row) => hasAvailableObjectsPool || row.id.canDelete ? null : '',
+                  onRowTap: (context, row) async {
+                    row.focusNode.requestFocus();
+                    if (await maybeDelete(context, [row.id])) {
+                      focusNode!.requestFocus();
+                      userInteracted = true;
+                      passedFirstEdit = true;
+                      notifyListeners();
+                    }
+                  },
                 ),
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: (tableHorizontalPadding-6).coerceAtLeast(0),
-                    right: (tableHorizontalPadding-6).coerceAtLeast(0),
-                    bottom: 12,
+            ],
+            onAllSelected: allowMultipleSelection ? (value, rows) {
+              for (final row in rows) {
+                selectedObjects.value[row.id] = value??false;
+                (row as SimpleRowModel).selected = value??false;
+              }
+              selectedObjects.notifyListeners();
+              tableController.notifyListeners();
+              notifyListeners();
+            } : null,
+            emptyWidget: tableErrorWidget?.call(context, this, dao)
+               ?? Focus(
+                    focusNode: _errorWidgetFocusNode,
+                    skipTraversal: true,
+                    child: Material(
+                      color: enabled ? Theme.of(context).cardColor : Theme.of(context).canvasColor,
+                      child: (allowAddNew||hasAvailableObjectsPool)&&objects.isEmpty
+                          ? !showBigAddButtonIfEmpty ? const SizedBox.shrink() : ContextMenuFromZero(
+                              actions: actions,
+                              onShowMenu: () => _errorWidgetFocusNode.requestFocus(),
+                              child: buildAddAddon(context: context, collapsed: collapsed, objectTemplate: objectTemplate),
+                            )
+                          : TableEmptyWidget(
+                              tableController: tableController,
+                              actions: actions,
+                              onShowMenu: () => _errorWidgetFocusNode.requestFocus(),
+                            ),
+                    ),
                   ),
-                  child: IgnorePointer(
-                    ignoring: onRowTap!=null,
-                    child: Builder(
-                      builder: (context) {
-                        return rowAddonField.buildViewWidget(context,
-                          showViewButtons: false,
-                          linkToInnerDAOs: false,
-                          dense: false,
-                        );
-                      },
+            headerWidgetAddon: !showTableHeaderAddon ? null : _buildTableHeader(context,
+              actions: actions,
+              focusNode: focusNode!,
+              collapsed: collapsed,
+              collapsible: collapsible,
+              asSliver: asSliver,
+            ),
+          );
+          final visibleListFieldValidationErrors = passedFirstEdit
+              ? listFieldValidationErrors
+              : listFieldValidationErrors.where((e) => e.isBeforeEditing);
+          if (asSliver) {
+            if (!enabled) {
+              result = SliverStack(
+                children: [
+                  SliverIgnorePointer(sliver: result),
+                  SliverPositioned.fill(
+                    child: TooltipFromZero(
+                      message: (dense ? visibleListFieldValidationErrors : visibleListFieldValidationErrors.where((e) => e.severity==ValidationErrorSeverity.disabling)).fold('', (a, b) {
+                        return a.toString().trim().isEmpty ? b.toString()
+                            : b.toString().trim().isEmpty ? a.toString()
+                            : '$a\n$b';
+                      }),
+                      child: Center(
+                        child: Container(
+                          width: getMaxWidth(columns.keys),
+                          color: enabled ? Colors.transparent : Colors.black.withOpacity(0.25),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+          } else {
+            if (separateScrollableBreakpoint!=null && objects.length>separateScrollableBreakpoint!) {
+              final scrollController = ScrollController();
+              result = Material(
+                color: enabled
+                    ? (backgroundColor?.call(context, this, dao) ?? Theme.of(context).cardColor)
+                    : Theme.of(context).canvasColor,
+                child: Container(
+                  padding: addCard ? null : const EdgeInsets.only(right: 24),
+                  height: MediaQuery.sizeOf(context).height
+                      - MediaQuery.viewPaddingOf(context).vertical
+                      - MediaQuery.viewInsetsOf(context).vertical - 256,
+                  child: ScrollbarFromZero(
+                    controller: scrollController,
+                    child: CustomScrollView(
+                      controller: scrollController,
+                      slivers: [result],
                     ),
                   ),
                 ),
               );
-            }
-          }
-          final ValueChanged<RowModel<T>>? onRowTapFocused = onRowTap==null ? null : (value) {
-            value.focusNode.requestFocus();
-            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-              onRowTap!(value);
-            });
-          };
-          if (tableRowBuilder!=null) {
-            _builtRows[e] = tableRowBuilder!(e, context, this, dao, columns, onRowTapFocused, rowAddonWidget);
-          } else {
-            _builtRows[e] = SimpleRowModel<T>(
-              id: e,
-              values: columns.map((key, value) => MapEntry(key, e.props[key])),
-              height: rowHeight,
-              onRowTap: onRowTapFocused,
-              selected: allowMultipleSelection ? (selectedObjects.value[e] ?? selectionDefault) : null,
-              // backgroundColor: selectedObjects.value[e]??false ? Theme.of(context).colorScheme.secondary.withOpacity(0.2) : null,
-              onCheckBoxSelected: allowMultipleSelection ? (row, focused) {
-                selectedObjects.value[row.id] = focused??false;
-                (row as SimpleRowModel).selected = focused??false;
-                selectedObjects.notifyListeners();
-                tableController.notifyListeners();
-                notifyListeners();
-                return true;
-              } : null,
-              rowAddon: rowAddonWidget,
-              rowAddonIsExpandable: true,
-              rowAddonIsSticky: false,
-              rowAddonIsCoveredByGestureDetector: true,
-              rowAddonIsCoveredByScrollable: false,
-              rowAddonIsCoveredByBackground: true,
-            );
-          }
-        }
-        double getMinWidth(Iterable currentColumnKeys) {
-          double width = 0;
-          for (final key in currentColumnKeys) {
-            final value = columns[key];
-            width += value?.width==null
-                ? (value?.flex ?? 192)
-                : (value!.width! * (1 + (1/columns.length))) ; // fixed widths weigh more because they wont shrink, this is an estimate, ideally it would be increase be the percentage this width represents of the total minWidth
-          }
-          return width;
-        }
-        double getMaxWidth(Iterable currentColumnKeys) {
-          return max(minWidth, 1.4 * getMinWidth(currentColumnKeys));
-        }
-        if (collapsed!) {
-          Widget result = SizedBox(
-            width: expandHorizontally ? null : maxWidth==double.infinity ? getMinWidth(columns.keys) : maxWidth,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (showTableHeaderAddon)
-                  _buildTableHeader(context,
-                    focusNode: focusNode!,
-                    collapsed: collapsed,
-                    collapsible: collapsible,
-                    actions: actions,
-                    asSliver: asSliver,
-                  ),
-                InitiallyAnimatedWidget(
-                  duration: const Duration(milliseconds: 300),
-                  builder: (animationController, child) {
-                    return Container(
-                      color: backgroundColor?.call(context, this, dao) ?? Material.of(context).color ?? Theme.of(context).cardColor,
-                      height: 128*CurveTween(curve: Curves.easeInCubic).chain(Tween(begin: 1.0, end: 0.0,)).evaluate(animationController),
-                    );
-                  },
+            } else {
+              result = Material(
+                color: enabled
+                    ? (backgroundColor?.call(context, this, dao) ?? Theme.of(context).cardColor)
+                    : Theme.of(context).canvasColor,
+                child: CustomScrollView(
+                  shrinkWrap: !expandToFillContainer,
+                  physics: const NeverScrollableScrollPhysics(),
+                  slivers: [result],
                 ),
-              ],
-            ),
-          );
-          if (asSliver) {
-            result = SliverToBoxAdapter(
-              child: result,
+              );
+            }
+            if (!enabled) {
+              result = IgnorePointer(
+                child: result,
+              );
+              // result = MouseRegion(
+              //   cursor: SystemMouseCursors.forbidden,
+              //   child: result,
+              // );
+            }
+            result = SizedBox(
+              width: getMaxWidth(columns.keys),
+              child: TooltipFromZero(
+                message: (dense ? visibleListFieldValidationErrors : visibleListFieldValidationErrors.where((e) => e.severity==ValidationErrorSeverity.disabling)).fold('', (a, b) {
+                  return a.toString().trim().isEmpty ? b.toString()
+                      : b.toString().trim().isEmpty ? a.toString()
+                      : '$a\n$b';
+                }),
+                waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
+                child: result,
+              ),
             );
+            if (addCard) {
+              result = Card(
+                clipBehavior: Clip.hardEdge,
+                color: enabled ? null : Theme.of(context).canvasColor,
+                child: result,
+              );
+            }
           }
           return result;
-        }
-        final extraRowActions = extraRowActionsBuilder?.call(dao.contextForValidation ?? context, this, dao) ?? [];
-        final defaultCellBuilder = tableCellsEditable
-            ? (BuildContext context, RowModel<T> row, dynamic colKey, ColModel? col) {
-                final widgets = (row.values[colKey] as Field).buildFieldEditorWidgets(context,
-                  expandToFillContainer: false,
-                  addCard: false,
-                  asSliver: false,
-                  dense: true,
-                  ignoreHidden: true,
-                );
-                return SizedBox(
-                  height: row.height,
-                  child: OverflowBox(
-                    minHeight: rowHeight, maxHeight: double.infinity,
-                    alignment: const Alignment(0, -0.4),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: widgets,
-                    ),
-                  ),
-                );
-              }
-            : (BuildContext context, RowModel<T> row, dynamic colKey, ColModel? col) {
-                return (row.values[colKey] as Field).buildViewWidget(context,
-                  linkToInnerDAOs: false,
-                  showViewButtons: false,
-                  dense: true,
-                  hidden: false,
-                );
-              };
-        Widget result = TableFromZero<T>(
-          scrollController: mainScrollController,
-          minWidthGetter: getMinWidth,
-          maxWidthGetter: asSliver ? getMaxWidth : null,
-          initialSortedColumn: initialSortedColumn,
-          sortNullOnTop: sortNullOnTop,
-          tableController: tableController,
-          allowCustomization: allowTableCustomization,
-          alternateRowBackgroundSmartly: false,
-          onFilter: onFilter,
-          onSort: onSort,
-          exportPathForExcel: exportPathForExcel ?? dao.defaultExportPath,
-          columns: columns,
-          showHeaders: showTableHeaders,
-          footerStickyOffset: tableFooterStickyOffset,
-          tableHorizontalPadding: tableHorizontalPadding,
-          rows: _builtRows.values.toList(),
-          rowBuilder: tableRowWidgetBuilder,
-          enableFixedHeightForListRows: rowAddonField==null,
-          cellPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
-          backgroundColor: backgroundColor?.call(context, this, dao),
-          ignoreWidthGettersIfEmpty: ignoreWidthGettersIfEmpty ?? !addCard,
-          emptyWidgetPadding: showBigAddButtonIfEmpty ? const EdgeInsets.only(top: 4) : EdgeInsets.zero,
-          rowDisabledValidator: rowDisabledValidator ?? (this.onRowTap==null && rowTapType==RowTapType.edit
-              ? (row) => row.id.canSave ? null : ''
-              : null),
-          rowTooltipGetter: rowTooltipGetter,
-          cellBuilder: tableCellBuilder==null
-              ? defaultCellBuilder
-              : (context, row, colKey, col) => tableCellBuilder!(context, row, colKey, col, defaultCellBuilder),
-          rowActions: [
-            ...extraRowActions,
-            if (extraRowActions.isNotEmpty)
-              RowAction.divider(),
-            if ((allowAddNew||hasAvailableObjectsPool))
-              RowAction<T>(
-                title: '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate.uiName}',
-                icon: Icon(Icons.add, color: Theme.of(context).colorScheme.secondary),
-                breakpoints: {0: ActionState.popup,},
-                onRowTap: (context, row) async {
-                  row.focusNode.requestFocus();
-                  final result = await maybeAddRow(dao.contextForValidation ?? context, insertIndex: objects.indexOf(row.id)+1);
-                  if (result!=null) {
-                    userInteracted = true;
-                  }
-                },
-              ),
-            if ((allowAddNew||hasAvailableObjectsPool))
-              RowAction.divider(),
-            RowAction<T>(
-              icon: const Icon(Icons.info_outline),
-              title: FromZeroLocalizations.of(context).translate('view'),
-              breakpoints: actionViewBreakpoints,
-              onRowTap: (context, row) async {
-                userInteracted = true; // can't know if the item was edited from within its view dialog
-                row.focusNode.requestFocus();
-                row.id.pushViewDialog(dao.contextForValidation ?? context);
-              },
-            ),
-            RowAction<T>(
-              icon: const Icon(Icons.edit_outlined),
-              title: FromZeroLocalizations.of(context).translate('edit'),
-              breakpoints: actionEditBreakpoints,
-              disablingErrorGetter: (context, row) => row.id.canSave ? null : '',
-              onRowTap: (context, row) async {
-                final copy = row.id.copyWith() as T;
-                copy.parentDAO = null;
-                copy.contextForValidation = dao.contextForValidation;
-                final result = await copy.maybeEdit(dao.contextForValidation ?? context, showDefaultSnackBars: showDefaultSnackBars);
-                if (result!=null) {
-                  replaceRow(row.id, copy);
-                  userInteracted = true;
-                  notifyListeners();
-                }
-              },
-            ),
-            RowAction<T>(
-              icon: const Icon(MaterialCommunityIcons.content_duplicate, size: 21,),
-              title: FromZeroLocalizations.of(context).translate('duplicate'),
-              breakpoints: actionDuplicateBreakpoints,
-              onRowTap: (context, row) async {
-                userInteracted = true;
-                row.focusNode.requestFocus();
-                duplicateRows([row.id]);
-              },
-            ),
-            if (objectTemplate.canDelete || hasAvailableObjectsPool)
-              RowAction<T>(
-                icon: Icon(!hasAvailableObjectsPool ? Icons.delete_forever_outlined : Icons.clear),
-                title: FromZeroLocalizations.of(context).translate('delete'),
-                breakpoints: actionDeleteBreakpoints,
-                disablingErrorGetter: (context, row) => hasAvailableObjectsPool || row.id.canDelete ? null : '',
-                onRowTap: (context, row) async {
-                  row.focusNode.requestFocus();
-                  if (await maybeDelete(context, [row.id])) {
-                    focusNode!.requestFocus();
-                    userInteracted = true;
-                    passedFirstEdit = true;
-                    notifyListeners();
-                  }
-                },
-              ),
-          ],
-          onAllSelected: allowMultipleSelection ? (value, rows) {
-            for (final row in rows) {
-              selectedObjects.value[row.id] = value??false;
-              (row as SimpleRowModel).selected = value??false;
-            }
-            selectedObjects.notifyListeners();
-            tableController.notifyListeners();
-            notifyListeners();
-          } : null,
-          emptyWidget: tableErrorWidget?.call(context, this, dao)
-             ?? Focus(
-                  focusNode: _errorWidgetFocusNode,
-                  skipTraversal: true,
-                  child: Material(
-                    color: enabled ? Theme.of(context).cardColor : Theme.of(context).canvasColor,
-                    child: (allowAddNew||hasAvailableObjectsPool)&&objects.isEmpty
-                        ? !showBigAddButtonIfEmpty ? const SizedBox.shrink() : ContextMenuFromZero(
-                            actions: actions,
-                            onShowMenu: () => _errorWidgetFocusNode.requestFocus(),
-                            child: buildAddAddon(context: context, collapsed: collapsed, objectTemplate: objectTemplate),
-                          )
-                        : TableEmptyWidget(
-                            tableController: tableController,
-                            actions: actions,
-                            onShowMenu: () => _errorWidgetFocusNode.requestFocus(),
-                          ),
-                  ),
-                ),
-          headerWidgetAddon: !showTableHeaderAddon ? null : _buildTableHeader(context,
-            actions: actions,
-            focusNode: focusNode!,
-            collapsed: collapsed,
-            collapsible: collapsible,
-            asSliver: asSliver,
-          ),
-        );
-        final visibleListFieldValidationErrors = passedFirstEdit
-            ? listFieldValidationErrors
-            : listFieldValidationErrors.where((e) => e.isBeforeEditing);
-        if (asSliver) {
-          if (!enabled) {
-            result = SliverStack(
-              children: [
-                SliverIgnorePointer(sliver: result),
-                SliverPositioned.fill(
-                  child: TooltipFromZero(
-                    message: (dense ? visibleListFieldValidationErrors : visibleListFieldValidationErrors.where((e) => e.severity==ValidationErrorSeverity.disabling)).fold('', (a, b) {
-                      return a.toString().trim().isEmpty ? b.toString()
-                          : b.toString().trim().isEmpty ? a.toString()
-                          : '$a\n$b';
-                    }),
-                    child: Center(
-                      child: Container(
-                        width: getMaxWidth(columns.keys),
-                        color: enabled ? Colors.transparent : Colors.black.withOpacity(0.25),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }
-        } else {
-          if (separateScrollableBreakpoint!=null && objects.length>separateScrollableBreakpoint!) {
-            final scrollController = ScrollController();
-            result = Material(
-              color: enabled
-                  ? (backgroundColor?.call(context, this, dao) ?? Theme.of(context).cardColor)
-                  : Theme.of(context).canvasColor,
-              child: Container(
-                padding: addCard ? null : const EdgeInsets.only(right: 24),
-                height: MediaQuery.sizeOf(context).height
-                    - MediaQuery.viewPaddingOf(context).vertical
-                    - MediaQuery.viewInsetsOf(context).vertical - 256,
-                child: ScrollbarFromZero(
-                  controller: scrollController,
-                  child: CustomScrollView(
-                    controller: scrollController,
-                    slivers: [result],
-                  ),
-                ),
-              ),
-            );
-          } else {
-            result = Material(
-              color: enabled
-                  ? (backgroundColor?.call(context, this, dao) ?? Theme.of(context).cardColor)
-                  : Theme.of(context).canvasColor,
-              child: CustomScrollView(
-                shrinkWrap: !expandToFillContainer,
-                physics: const NeverScrollableScrollPhysics(),
-                slivers: [result],
-              ),
-            );
-          }
-          if (!enabled) {
-            result = IgnorePointer(
-              child: result,
-            );
-            // result = MouseRegion(
-            //   cursor: SystemMouseCursors.forbidden,
-            //   child: result,
-            // );
-          }
-          result = SizedBox(
-            width: getMaxWidth(columns.keys),
-            child: TooltipFromZero(
-              message: (dense ? visibleListFieldValidationErrors : visibleListFieldValidationErrors.where((e) => e.severity==ValidationErrorSeverity.disabling)).fold('', (a, b) {
-                return a.toString().trim().isEmpty ? b.toString()
-                    : b.toString().trim().isEmpty ? a.toString()
-                    : '$a\n$b';
-              }),
-              waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
-              child: result,
-            ),
-          );
-          if (addCard) {
-            result = Card(
-              clipBehavior: Clip.hardEdge,
-              color: enabled ? null : Theme.of(context).canvasColor,
-              child: result,
-            );
-          }
-        }
-        return result;
-      },
+        },
+      ),
     );
     List<Widget> resultList = [
       result,

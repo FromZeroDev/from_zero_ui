@@ -491,6 +491,15 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     } catch(_) {}
   }
 
+  bool hasFocus() {
+    for (final e in props.values) {
+      if (e.focusNode.hasFocus) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 
   Future<ModelType?> maybeSave(BuildContext context, {
     bool updateDbValuesAfterSuccessfulSave=true,
