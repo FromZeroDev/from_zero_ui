@@ -286,9 +286,11 @@ class NumField extends Field<num> {
                       duration: const Duration(milliseconds: 250),
                       color: dense && visibleValidationErrors.isNotEmpty
                           ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!.withOpacity(0.2)
-                          : focusNode.hasFocus  ? backgroundColor!=null ? Color.alphaBlend(focusColor, backgroundColor)
-                          : focusColor
-                          : focusColor.withOpacity(0),
+                          : focusNode.hasFocus
+                              ? backgroundColor!=null
+                                  ? Color.alphaBlend(focusColor, backgroundColor)
+                                  : focusColor
+                              : focusColor.withOpacity(0),
                       curve: Curves.easeOut,
                     );
                   },
@@ -296,19 +298,8 @@ class NumField extends Field<num> {
               ),
               KeyboardListener(
                 includeSemantics: false,
-                focusNode: FocusNode()..skipTraversal=true,
-                onKeyEvent: (value) {
-                  if (value is KeyDownEvent) {
-                    final selectionStart = controller.selection.start;
-                    if (value.logicalKey==LogicalKeyboardKey.arrowDown && selectionStart==controller.text.length) {
-                      // focusNode.focusInDirection(TraversalDirection.down);
-                      focusNode.nextFocus(); // because directional focus is REALLY buggy
-                    } else if (value.logicalKey==LogicalKeyboardKey.arrowUp && selectionStart==0) {
-                      // focusNode.focusInDirection(TraversalDirection.up);
-                      focusNode.previousFocus(); // because directional focus is REALLY buggy
-                    }
-                  }
-                },
+                focusNode: FocusNode(skipTraversal: true),
+                onKeyEvent: (value) => StringField.defaultOnKeyEvent(value, controller, focusNode, true),
                 child: Builder(
                   builder: (context) {
                     return StringField.buildDaoTextFormField(context,

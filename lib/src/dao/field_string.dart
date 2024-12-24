@@ -323,19 +323,8 @@ class StringField extends Field<String> {
               ),
               KeyboardListener(
                 includeSemantics: false,
-                focusNode: FocusNode()..skipTraversal=true,
-                onKeyEvent: (value) {
-                  if (value is KeyDownEvent) {
-                    final selectionStart = controller.selection.start;
-                    if (value.logicalKey==LogicalKeyboardKey.arrowDown && selectionStart==controller.text.length) {
-                      // focusNode.focusInDirection(TraversalDirection.down);
-                      focusNode.nextFocus(); // because directional focus is REALLY buggy
-                    } else if (value.logicalKey==LogicalKeyboardKey.arrowUp && selectionStart==0) {
-                      // focusNode.focusInDirection(TraversalDirection.up);
-                      focusNode.previousFocus(); // because directional focus is REALLY buggy
-                    }
-                  }
-                },
+                focusNode: FocusNode(skipTraversal: true),
+                onKeyEvent: (value) => defaultOnKeyEvent(value, controller, focusNode, maxLines!=null&&maxLines!<=1),
                 child: RawGestureDetector(
                   behavior: HitTestBehavior.translucent,
                   gestures: {
@@ -520,7 +509,7 @@ class StringField extends Field<String> {
                     ),
                     child: Text(uiName,
                       softWrap: false,
-                      overflow: TextOverflow.visible, // anything bu visible applies a Clip for some reason :(((
+                      overflow: TextOverflow.visible, // anything but visible applies a Clip for some reason :(((
                     ),
                   ),
                 ),
@@ -529,6 +518,7 @@ class StringField extends Field<String> {
             : !enabled ? (value==null||value.isEmpty) ? FloatingLabelBehavior.never : FloatingLabelBehavior.always
             : hint!=null ? FloatingLabelBehavior.always : FloatingLabelBehavior.auto,
         contentPadding: EdgeInsets.only(
+          // left: dense ? textAlign==TextAlign.right ? 8 : 0 : 16, // TODO 1 test in next flutter version if there is an assert thrown here when left=0
           left: dense ? 0 : 16,
           right: dense ? 0 : (16 + (context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length*40)),
           bottom: largeVertically ? 16 : dense ? 10 : 0,
@@ -552,6 +542,33 @@ class StringField extends Field<String> {
         );
       },
     );
+  }
+
+  static void defaultOnKeyEvent(KeyEvent value, TextEditingController controller, FocusNode focusNode, bool isSingleLine) {
+    if (value is KeyDownEvent) {
+      final selectionStart = controller.selection.start;
+      if (value.logicalKey==LogicalKeyboardKey.arrowDown) {
+        if (isSingleLine || selectionStart==controller.text.length) {
+          focusNode.focusInDirection(TraversalDirection.down);
+          // focusNode.nextFocus(); // because directional focus is REALLY buggy
+        }
+      } else if (value.logicalKey==LogicalKeyboardKey.arrowUp) {
+        if (isSingleLine || selectionStart==0) {
+          focusNode.focusInDirection(TraversalDirection.up);
+          // focusNode.previousFocus(); // because directional focus is REALLY buggy
+        }
+      } else if (value.logicalKey==LogicalKeyboardKey.arrowLeft) {
+        if (selectionStart==0) {
+          focusNode.focusInDirection(TraversalDirection.left);
+          // focusNode.previousFocus(); // because directional focus is REALLY buggy
+        }
+      } else if (value.logicalKey==LogicalKeyboardKey.arrowRight) {
+        if (selectionStart==controller.text.length) {
+          focusNode.focusInDirection(TraversalDirection.right);
+          // focusNode.nextFocus(); // because directional focus is REALLY buggy
+        }
+      }
+    }
   }
 
 }
