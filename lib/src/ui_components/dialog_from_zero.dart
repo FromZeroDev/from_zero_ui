@@ -7,10 +7,9 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:dartx/dartx.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:mlog/mlog.dart';
 import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';
-
 
 
 Future<T?> showModalFromZero<T>({
@@ -161,6 +160,8 @@ class DialogFromZero extends StatefulWidget {
   final ShapeBorder? shape;
   /// forwarded to Dialog widget
   final AlignmentGeometry? alignment;
+  /// for ctrl+enter shortcut, if not specified, it will be inferred as the last DialogButton found in dialogActions
+  final VoidCallback? acceptCallback;
 
   const DialogFromZero({
     this.title,
@@ -181,6 +182,7 @@ class DialogFromZero extends StatefulWidget {
     this.clipBehavior = Clip.none,
     this.shape,
     this.alignment = goldenRatioVerticalAlignment,
+    this.acceptCallback,
     super.key,
   }) :  assert(appBar==null || (title==null && appBarActions==null),
           'Setting appBar overrides title and appBarActions, no need to specify both',
@@ -286,7 +288,20 @@ class _DialogFromZeroState extends State<DialogFromZero> {
         actions: widget.appBarActions,
       );
     }
-    final dialogActions = widget.dialogActions.mapIndexed((i, e) {
+    var dialogActions = List<Widget>.from(widget.dialogActions);
+    VoidCallback? acceptCallback = widget.acceptCallback;
+    for (int i=dialogActions.lastIndex; i>=0; i--) {
+      final e = dialogActions[i];
+      if (e is DialogButton && e.onPressed!=null) {
+        acceptCallback ??= e.onPressed;
+        dialogActions[i] = DefaultDialogAction(
+          callback: e.onPressed,
+          child: e,
+        );
+        break;
+      }
+    }
+    dialogActions = dialogActions.mapIndexed((i, e) {
       return FillerRelayer(
         notifier: individualActionsSizeNotifiers[i],
         child: e,
@@ -380,14 +395,56 @@ class _DialogFromZeroState extends State<DialogFromZero> {
       context: context,
       child: result,
     );
-    result = CallbackShortcuts(
-      bindings: bindings,
-      child: result,
-    );
+    if (acceptCallback!=null) {
+      result = CallbackShortcuts(
+        bindings: {
+          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.enter): () {
+            acceptCallback?.call();
+          },
+        },
+        child: result,
+      );
+    }
     return result;
   }
 
 }
+
+
+class DefaultDialogAction extends StatefulWidget {
+
+  final Widget child;
+  final VoidCallback? callback;
+
+  const DefaultDialogAction({
+    required this.child,
+    this.callback,
+    super.key,
+  });
+
+  @override
+  State<DefaultDialogAction> createState() => _DefaultDialogActionState();
+}
+class _DefaultDialogActionState extends State<DefaultDialogAction> {
+  final focusNode = FocusNode();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      focusNode.requestFocus();
+      focusNode.previousFocus();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      focusNode: focusNode,
+      child: widget.child,
+    );
+  }
+}
+
 
 
 

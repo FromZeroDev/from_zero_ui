@@ -1453,30 +1453,47 @@ class FlexibleLayoutItemFromZero extends StatelessWidget {
 
 
 
-typedef TimedOverlayBuilder = Widget Function(BuildContext context, Duration elapsed, Duration remaining);
+typedef TimedBuilder = Widget Function(BuildContext context, {
+  required Duration elapsed,
+  required Duration remaining,
+});
+typedef TimedOverlayBuilder = Widget Function(BuildContext context, {
+  required Duration elapsed,
+  required Duration remaining,
+  BorderRadiusGeometry? borderRadius,
+});
 class TimedOverlay extends StatefulWidget {
 
   final Duration duration;
   final Duration rebuildInterval;
-  final TimedOverlayBuilder builder;
+  final TimedBuilder builder;
   final TimedOverlayBuilder overlayBuilder;
+  final BorderRadiusGeometry? borderRadius;
 
   const TimedOverlay({
     required this.duration,
     required this.builder,
     this.rebuildInterval = const Duration(seconds: 1),
     this.overlayBuilder = defaultOverlayBuilder,
+    this.borderRadius,
     super.key,
   });
 
   @override
   State<TimedOverlay> createState() => _TimedOverlayState();
 
-  static Widget defaultOverlayBuilder(BuildContext context, Duration elapsed, Duration remaining) {
+  static Widget defaultOverlayBuilder(BuildContext context, {
+    required Duration elapsed,
+    required Duration remaining,
+    BorderRadiusGeometry? borderRadius,
+  }) {
     final remainingSeconds = (remaining.inMicroseconds / Duration.microsecondsPerSecond).ceil();
     return Container(
-      color: Colors.black54,
       alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.black54,
+        borderRadius: borderRadius,
+      ),
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         child: Text(remainingSeconds.toString(),
@@ -1523,10 +1540,17 @@ class _TimedOverlayState extends State<TimedOverlay> {
     if (remaining.isNegative) remaining = Duration.zero;
     return Stack(
       children: [
-        widget.builder(context, elapsed, remaining),
+        widget.builder(context,
+          elapsed: elapsed,
+          remaining: remaining,
+        ),
         if (remaining > Duration.zero)
           Positioned.fill(
-            child: widget.overlayBuilder(context, elapsed, remaining),
+            child: widget.overlayBuilder(context,
+              elapsed: elapsed,
+              remaining: remaining,
+              borderRadius: widget.borderRadius,
+            ),
           ),
       ],
     );

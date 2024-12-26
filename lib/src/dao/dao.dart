@@ -6,6 +6,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dartx/dartx.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
@@ -585,9 +586,14 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                 }
                 String shownName = uiName;
                 if (shownName.isNullOrEmpty) shownName = classUiName;
+                Duration timedOverlayRemaining = Duration.zero; // hack to make ctrl+enter action also wait for TimedOverlay countdown
                 return DialogFromZero(
                   includeDialogWidget: false,
                   maxWidth: 512,
+                  acceptCallback: () {
+                    if (!ignoreBlockingErrors && (timedOverlayRemaining!=Duration.zero || !validation)) return;
+                    Navigator.of(context).pop(true);
+                  },
                   title: Text(validation
                       ? (saveConfirmationDialogTitle?.call(this) ?? FromZeroLocalizations.of(context).translate("confirm_save_title"))
                       : 'Error de Validación', // TODO 3 internationalize
@@ -616,14 +622,26 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                       duration: validationErrors.isEmpty || !validation
                           ? Duration.zero
                           : Duration(milliseconds: (1000 + 500*Set.from(validationErrors.where((e) => e.isVisibleAsSaveConfirmation).map((e) => e.error)).length).clamp(0, 10000)),
-                      builder: (context, elapsed, remaining) {
-                        return DialogButton.accept(
+                      borderRadius: const BorderRadius.all(Radius.circular(999)),
+                      builder: (context, {
+                        required Duration elapsed,
+                        required Duration remaining,
+                      }) {
+                        timedOverlayRemaining = remaining;
+                        final callback = !ignoreBlockingErrors && (remaining!=Duration.zero || !validation) ? null : () {
+                          Navigator.of(context).pop(true);
+                        };
+                        Widget result = DialogButton.accept(
                           tooltip: validation ? null : 'No se puede guardar hasta resolver los errores de validación', // TODO 3 internationalize
-                          onPressed: !ignoreBlockingErrors && (remaining!=Duration.zero || !validation) ? null : () {
-                            Navigator.of(context).pop(true); // Dismiss alert dialog
-                          },
+                          onPressed: callback,
                           child: Text((saveButtonTitle?.call(this).toUpperCase() ?? FromZeroLocalizations.of(context).translate("save_caps"))),
                         );
+                        if (remaining==Duration.zero) {
+                          result = DefaultDialogAction(
+                            child: result,
+                          );
+                        }
+                        return result;
                       },
                     ),
                   ],
@@ -1369,6 +1387,21 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       focusNode.requestFocus();
     });
+    content = CallbackShortcuts(
+      bindings: {
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.enter): () async {
+          if (!isEdited) return;
+          ModelType? result = await maybeSave(context,
+            showDefaultSnackBars: showDefaultSnackBars,
+            askForSaveConfirmation: askForSaveConfirmation!,
+          );
+          if (result!=null) {
+            Navigator.of(context).pop(result);
+          }
+        },
+      },
+      child: content,
+    );
     return FutureBuilderFromZero(
       animatedSwitcherType: AnimatedSwitcherType.none,
       future: initialValidation,
