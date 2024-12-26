@@ -547,6 +547,9 @@ class StringField extends Field<String> {
   static void defaultOnKeyEvent(KeyEvent value, TextEditingController controller, FocusNode focusNode, bool isSingleLine) {
     if (value is KeyDownEvent) {
       final selectionStart = controller.selection.start;
+      if (selectionStart!=controller.selection.end) {
+        return;
+      }
       if (value.logicalKey==LogicalKeyboardKey.arrowDown) {
         if (isSingleLine || selectionStart==controller.text.length) {
           focusNode.focusInDirection(TraversalDirection.down);
