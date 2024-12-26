@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -372,21 +373,41 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
       if (error.response!=null) {
         if (error.response!.statusCode==404) {
           return const Icon(Icons.error_outline);
-        } else if (error.response!.statusCode==400) {
-          return const Icon(Icons.do_disturb_on_outlined);
-        } else if (error.response!.statusCode==403) {
-          return const Icon(Icons.do_disturb_on_outlined);
-        } else if (error.response!.statusCode==515) {
-          return const Icon(Icons.timer_off_outlined);
-        } else {
-          return const Icon(Icons.report_problem_outlined);
         }
-      } else {
-        return const Icon(MaterialCommunityIcons.wifi_off);
+        if (error.response!.statusCode==400) {
+          return const Icon(Icons.do_disturb_on_outlined);
+        }
+        if (error.response!.statusCode==403) {
+          return const Icon(Icons.do_disturb_on_outlined);
+        }
+        if (error.response!.statusCode==515) {
+          return const Icon(Icons.timer_off_outlined);
+        }
+        return const Icon(Icons.report_problem_outlined);
       }
-    } else {
-      return const Icon(Icons.report_problem_outlined);
+      if (error.type==DioExceptionType.cancel) {
+        if (error.error.toString()=='TIMEOUT ON REQUEST PROCESSING') {
+          return const ComposedIcon(
+            icon: Icon(Icons.timer_off_outlined),
+            subicon: Icon(MaterialCommunityIcons.cancel),
+            subIconSize: 0.4,
+            clipSize: 1.2,
+            horizontalOffset: 0.8,
+            verticalOffset: 0.8,
+          );
+        }
+        return const ComposedIcon(
+          icon: Icon(MaterialCommunityIcons.wifi_off),
+          subicon: Icon(MaterialCommunityIcons.cancel),
+          subIconSize: 0.4,
+          clipSize: 1.2,
+          horizontalOffset: 0.8,
+          verticalOffset: 0.8,
+        );
+      }
+      return const Icon(MaterialCommunityIcons.wifi_off);
     }
+    return const Icon(Icons.report_problem_outlined);
   }
   static String getErrorTitle(BuildContext context, Object? error, StackTrace? stackTrace) {
     // TODO 3 internationalize
@@ -394,23 +415,29 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
       if (error.response!=null) {
         if (error.response!.statusCode==404) {
           return 'Recurso no encontrado';
-        } else if (error.response!.statusCode==400) {
+        }
+        if (error.response!.statusCode==400) {
           return error.response!.data is String
               ? error.response!.data.toString()
               : utf8.decode(error.response!.data);
-        } else if (error.response!.statusCode==403) {
-          return 'Error de Autorización';
-        } else if (error.response!.statusCode==515) {
-          return 'Tiempo de espera agotado';
-        } else {
-          return 'Error interno del servidor';
         }
-      } else {
+        if (error.response!.statusCode==403) {
+          return 'Error de Autorización';
+        }
+        if (error.response!.statusCode==515 ) {
+          return 'Tiempo de espera agotado';
+        }
+        return 'Error interno del servidor';
+      }
+      if (error.type==DioExceptionType.cancel) {
+        if (error.error.toString()=='TIMEOUT ON REQUEST PROCESSING') {
+          return 'Tiempo de espera agotado';
+        }
         return FromZeroLocalizations.of(context).translate("error_connection");
       }
-    } else {
-      return "Error Inesperado";
+      return FromZeroLocalizations.of(context).translate("error_connection");
     }
+    return "Error Inesperado";
   }
   static String? getErrorSubtitle(BuildContext context, Object? error, StackTrace? stackTrace) {
     // TODO 3 internationalize
@@ -418,63 +445,81 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
       if (error.response!=null) {
         if (error.response!.statusCode==404) {
           return 'Por favor, notifique a su administrador de sistema';
-        } else if (error.response!.statusCode==400) {
-          return null;
-        } else if (error.response!.statusCode==403) {
-          return 'Usted no tiene permiso para acceder al recurso solicitado';
-        } else if (error.response!.statusCode==515) {
-          return 'El procesamiento de la solucitud demoró demasiado\nIntente de nuevo más tarde o notifique a su administrador de sistema';
-        } else {
-          return 'Por favor, notifique a su administrador de sistema';
         }
-      } else {
+        if (error.response!.statusCode==400) {
+          return null;
+        }
+        if (error.response!.statusCode==403) {
+          return 'Usted no tiene permiso para acceder al recurso solicitado';
+        }
+        if (error.response!.statusCode==515) {
+          return 'El procesamiento de la solucitud demoró demasiado\nIntente de nuevo más tarde o notifique a su administrador de sistema';
+        }
+        return 'Por favor, notifique a su administrador de sistema';
+      }
+      if (error.type==DioExceptionType.cancel) {
+        if (error.error.toString()=='TIMEOUT ON REQUEST PROCESSING') {
+          return 'El procesamiento de la solucitud demoró demasiado\nIntente de nuevo más tarde o notifique a su administrador de sistema';
+        }
         return FromZeroLocalizations.of(context).translate("error_connection_details");
       }
-    } else {
-      return "Por favor, notifique a su administrador de sistema";
+      return FromZeroLocalizations.of(context).translate("error_connection_details");
     }
+    return "Por favor, notifique a su administrador de sistema";
   }
   static bool isErrorRetryable(Object? error, StackTrace? stackTrace) {
     if (error is DioException) {
       if (error.response!=null) {
         if (error.response!.statusCode==404) {
           return false;
-        } else if (error.response!.statusCode==400) {
-          return false;
-        } else if (error.response!.statusCode==403) {
-          return false;
-        } else if (error.response!.statusCode==515) {
-          return false;
-        } else {
-          return false; // TODO 1 WTF
         }
-      } else {
-        return true;
+        if (error.response!.statusCode==400) {
+          return false;
+        }
+        if (error.response!.statusCode==403) {
+          return false;
+        }
+        if (error.response!.statusCode==515) {
+          return false;
+        }
+        return false; // TODO 1 WTF
       }
-    } else {
-      return false;
+      if (error.type==DioExceptionType.cancel) {
+        if (error.error.toString()=='TIMEOUT ON REQUEST PROCESSING') {
+          return true;
+        }
+        return false;
+      }
+      return true;
     }
+    return false;
   }
   static bool shouldShowErrorDetails(BuildContext context, Object? error, StackTrace? stackTrace) {
     if (error is DioException) {
       if (error.response!=null) {
         if (error.response!.statusCode==404) {
           return false;
-        } else if (error.response!.statusCode==400) {
-          return false;
-        } else if (error.response!.statusCode==403) {
-          return false;
-        } else if (error.response!.statusCode==515) {
-          return false;
-        } else {
+        }
+        if (error.response!.statusCode==400) {
           return false;
         }
-      } else {
+        if (error.response!.statusCode==403) {
+          return false;
+        }
+        if (error.response!.statusCode==515) {
+          return false;
+        }
         return false;
       }
-    } else {
-      return true;
+      if (error.type==DioExceptionType.cancel) {
+        if (error.error.toString()=='TIMEOUT ON REQUEST PROCESSING') {
+          return false;
+        }
+        return true;
+      }
+      return false;
     }
+    return true;
   }
   static Widget buildErrorDetailsButton(BuildContext context, Object? error, StackTrace? stackTrace, [VoidCallback? onRetry]) {
     Widget result = DialogButton.cancel(
