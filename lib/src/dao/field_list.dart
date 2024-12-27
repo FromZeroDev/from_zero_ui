@@ -772,7 +772,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     });
   }
 
-  Future<dynamic> maybeAddRow(BuildContext context, {
+  Future<List<T>?> maybeAddRow(BuildContext context, {
     int? insertIndex,
     bool replaceAllRows = false,
   }) async {
@@ -993,11 +993,11 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         result = await emptyDAO.maybeEdit(dao.contextForValidation ?? context, showDefaultSnackBars: showDefaultSnackBars);
         if (result!=null) {
           addRow(emptyDAO, insertIndex: insertIndex);
-          return emptyDAO;
+          return [emptyDAO];
         }
       } else {
         addRow(emptyDAO, insertIndex: insertIndex);
-        return emptyDAO;
+        return [emptyDAO];
       }
     }
   }
@@ -1938,7 +1938,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
           child: ComboField.buttonContentBuilder(context, uiName, hint, name, enabled, false, dense: dense,),
         );
         Future<void> onTap() async {
-          return maybeAddRow(context,
+          await maybeAddRow(context,
             insertIndex: 0,
             replaceAllRows: hasAvailableObjectsPool,
           );
