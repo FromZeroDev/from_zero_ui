@@ -44,6 +44,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   bool allowDuplicateObjectsFromAvailablePool;
   bool allowAddMultipleFromAvailablePool;
   bool showObjectsFromAvailablePoolAsTable;
+  bool sortObjectsFromAvailablePool;
   AvailablePoolTransformerFunction<T>? transformSelectedFromAvailablePool; /// transformation applied to selected items from available pool before adding them to ListField rows
   ContextFulFieldValueGetter<List<ActionFromZero>, Field>? availablePoolTableActions;
   bool? _allowAddNew;
@@ -233,6 +234,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     this.availableObjectsPoolProvider,
     this.allowDuplicateObjectsFromAvailablePool = false,
     this.showObjectsFromAvailablePoolAsTable = false,
+    this.sortObjectsFromAvailablePool = true,
     this.transformSelectedFromAvailablePool,
     this.availablePoolTableActions,
     bool? allowAddNew,
@@ -498,6 +500,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     ContextFulFieldValueGetter<ApiProvider<List<T>>, ListField<T, U>>? availableObjectsPoolProvider,
     bool? allowDuplicateObjectsFromAvailablePool,
     bool? showObjectsFromAvailablePoolAsTable,
+    bool? sortObjectsFromAvailablePool,
     AvailablePoolTransformerFunction<T>? transformSelectedFromAvailablePool,
     ContextFulFieldValueGetter<List<ActionFromZero>, Field>? availablePoolTableActions,
     bool? allowAddNew,
@@ -599,6 +602,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
       validatorsGetter: validatorsGetter ?? this.validatorsGetter,
       validateOnlyOnConfirm: validateOnlyOnConfirm ?? this.validateOnlyOnConfirm,
       showObjectsFromAvailablePoolAsTable: showObjectsFromAvailablePoolAsTable ?? this.showObjectsFromAvailablePoolAsTable,
+      sortObjectsFromAvailablePool: sortObjectsFromAvailablePool ?? this.sortObjectsFromAvailablePool,
       transformSelectedFromAvailablePool: transformSelectedFromAvailablePool ?? this.transformSelectedFromAvailablePool,
       tableController: tableController ?? this.tableController,
       tableSortable: tableSortable ?? this.tableSortable,
@@ -1051,7 +1055,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
       actionsGetter: availablePoolTableActions,
       allowAddNew: allowAddNew && emptyDAO.canSave,
       tableSortable: tableSortable,
-      initialSortedColumn: initialSortedColumn,
+      initialSortedColumn: sortObjectsFromAvailablePool ? initialSortedColumn : null,
       onSort: onSort,
       tableFilterable: tableFilterable,
       onFilter: onFilter,
@@ -1104,6 +1108,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     return ComboFromZeroPopup<T>(
       possibleValues: data,
       showSearchBox: true,
+      sort: sortObjectsFromAvailablePool,
       title: '${FromZeroLocalizations.of(context).translate("add_add")} ${objectTemplate.classUiName}',
       extraWidget: allowAddNew ? (context, onSelected) {
         return Align(
