@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -363,130 +362,86 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
       title: getErrorTitle(context, error, stackTrace),
       subtitle: getErrorSubtitle(context, error, stackTrace),
       onRetry: !kReleaseMode || isRetryable ? onRetry : null,
-      retryButton: !kReleaseMode || (!isRetryable && shouldShowErrorDetails(context, error, stackTrace))
-              ? buildErrorDetailsButton(context, error, stackTrace, onRetry)
-              : null,
+      retryButton: !kReleaseMode || shouldShowErrorDetails(error, stackTrace)
+          ? buildErrorDetailsButton(context, error, stackTrace, !kReleaseMode || isRetryable ? onRetry : null)
+          : null,
     );
   }
-  static Widget getErrorIcon(BuildContext context, Object? error, StackTrace? stackTrace) {
+
+  static Widget Function(BuildContext context, Object? error, StackTrace? stackTrace) getErrorIcon = defaultGetErrorIcon;
+  static Widget defaultGetErrorIcon(BuildContext context, Object? error, StackTrace? stackTrace) {
     if (error is DioException) {
       if (error.response!=null) {
-        if (error.response!.statusCode==404) {
-          return const Icon(Icons.error_outline);
-        }
-        if (error.response!.statusCode==400) {
-          return const Icon(Icons.do_disturb_on_outlined);
-        }
         if (error.response!.statusCode==403) {
           return const Icon(Icons.do_disturb_on_outlined);
         }
-        if (error.response!.statusCode==515) {
-          return const Icon(Icons.timer_off_outlined);
+        if (error.response!.statusCode==404) {
+          return const Icon(Icons.error_outline);
+        }
+        if (error.response!.statusCode!<500) {
+          return const Icon(Icons.do_disturb_on_outlined);
         }
         return const Icon(Icons.report_problem_outlined);
-      }
-      if (error.type==DioExceptionType.cancel) {
-        if (error.error.toString()=='TIMEOUT ON REQUEST PROCESSING') {
-          return const ComposedIcon(
-            icon: Icon(Icons.timer_off_outlined),
-            subicon: Icon(MaterialCommunityIcons.cancel),
-            subIconSize: 0.4,
-            clipSize: 1.2,
-            horizontalOffset: 0.8,
-            verticalOffset: 0.8,
-          );
-        }
-        return const ComposedIcon(
-          icon: Icon(MaterialCommunityIcons.wifi_off),
-          subicon: Icon(MaterialCommunityIcons.cancel),
-          subIconSize: 0.4,
-          clipSize: 1.2,
-          horizontalOffset: 0.8,
-          verticalOffset: 0.8,
-        );
       }
       return const Icon(MaterialCommunityIcons.wifi_off);
     }
     return const Icon(Icons.report_problem_outlined);
   }
-  static String getErrorTitle(BuildContext context, Object? error, StackTrace? stackTrace) {
+
+  static String Function(BuildContext context, Object? error, StackTrace? stackTrace) getErrorTitle = defaultGetErrorTitle;
+  static String defaultGetErrorTitle(BuildContext context, Object? error, StackTrace? stackTrace) {
     // TODO 3 internationalize
     if (error is DioException) {
       if (error.response!=null) {
-        if (error.response!.statusCode==404) {
-          return 'Recurso no encontrado';
-        }
-        if (error.response!.statusCode==400) {
-          return error.response!.data is String
-              ? error.response!.data.toString()
-              : utf8.decode(error.response!.data);
-        }
         if (error.response!.statusCode==403) {
           return 'Error de Autorización';
         }
-        if (error.response!.statusCode==515 ) {
-          return 'Tiempo de espera agotado';
+        if (error.response!.statusCode==404) {
+          return 'Recurso no Encontrado';
         }
-        return 'Error interno del servidor';
-      }
-      if (error.type==DioExceptionType.cancel) {
-        if (error.error.toString()=='TIMEOUT ON REQUEST PROCESSING') {
-          return 'Tiempo de espera agotado';
+        if (error.response!.statusCode!<500) {
+          return 'Petición Rechazada por el servidor';
         }
-        return FromZeroLocalizations.of(context).translate("error_connection");
+        return 'Error Interno del Servidor';
       }
       return FromZeroLocalizations.of(context).translate("error_connection");
     }
     return "Error Inesperado";
   }
-  static String? getErrorSubtitle(BuildContext context, Object? error, StackTrace? stackTrace) {
+
+  static String? Function(BuildContext context, Object? error, StackTrace? stackTrace) getErrorSubtitle = defaultGetErrorSubtitle;
+  static String? defaultGetErrorSubtitle(BuildContext context, Object? error, StackTrace? stackTrace) {
     // TODO 3 internationalize
     if (error is DioException) {
       if (error.response!=null) {
-        if (error.response!.statusCode==404) {
-          return 'Por favor, notifique a su administrador de sistema';
-        }
-        if (error.response!.statusCode==400) {
-          return null;
-        }
         if (error.response!.statusCode==403) {
           return 'Usted no tiene permiso para acceder al recurso solicitado';
         }
-        if (error.response!.statusCode==515) {
-          return 'El procesamiento de la solucitud demoró demasiado\nIntente de nuevo más tarde o notifique a su administrador de sistema';
+        if (error.response!.statusCode==404) {
+          return 'Por favor, notifique a su administrador de sistema';
+        }
+        if (error.response!.statusCode!<500) {
+          return null;
         }
         return 'Por favor, notifique a su administrador de sistema';
-      }
-      if (error.type==DioExceptionType.cancel) {
-        if (error.error.toString()=='TIMEOUT ON REQUEST PROCESSING') {
-          return 'El procesamiento de la solucitud demoró demasiado\nIntente de nuevo más tarde o notifique a su administrador de sistema';
-        }
-        return FromZeroLocalizations.of(context).translate("error_connection_details");
       }
       return FromZeroLocalizations.of(context).translate("error_connection_details");
     }
     return "Por favor, notifique a su administrador de sistema";
   }
-  static bool isErrorRetryable(Object? error, StackTrace? stackTrace) {
+
+  static bool Function(Object? error, StackTrace? stackTrace) isErrorRetryable = defaultIsErrorRetryable;
+  static bool defaultIsErrorRetryable(Object? error, StackTrace? stackTrace) {
     if (error is DioException) {
       if (error.response!=null) {
-        if (error.response!.statusCode==404) {
-          return false;
-        }
-        if (error.response!.statusCode==400) {
-          return false;
-        }
         if (error.response!.statusCode==403) {
           return false;
         }
-        if (error.response!.statusCode==515) {
+        if (error.response!.statusCode==404) {
           return false;
         }
-        return false; // TODO 1 WTF
-      }
-      if (error.type==DioExceptionType.cancel) {
-        if (error.error.toString()=='TIMEOUT ON REQUEST PROCESSING') {
-          return true;
+        if (error.response!.statusCode!<500) {
+          return false;
         }
         return false;
       }
@@ -494,40 +449,35 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
     }
     return false;
   }
-  static bool shouldShowErrorDetails(BuildContext context, Object? error, StackTrace? stackTrace) {
+
+  static bool Function(Object? error, StackTrace? stackTrace) shouldShowErrorDetails = defaultShouldShowErrorDetails;
+  static bool defaultShouldShowErrorDetails(Object? error, StackTrace? stackTrace) {
     if (error is DioException) {
       if (error.response!=null) {
-        if (error.response!.statusCode==404) {
-          return false;
-        }
-        if (error.response!.statusCode==400) {
-          return false;
-        }
         if (error.response!.statusCode==403) {
           return false;
         }
-        if (error.response!.statusCode==515) {
+        if (error.response!.statusCode==404) {
+          return false;
+        }
+        if (error.response!.statusCode!<500) {
           return false;
         }
         return false;
       }
-      if (error.type==DioExceptionType.cancel) {
-        if (error.error.toString()=='TIMEOUT ON REQUEST PROCESSING') {
-          return false;
-        }
-        return true;
-      }
-      return false;
+      return true;
     }
     return true;
   }
-  static Widget buildErrorDetailsButton(BuildContext context, Object? error, StackTrace? stackTrace, [VoidCallback? onRetry]) {
+
+  static Widget Function(BuildContext context, Object? error, StackTrace? stackTrace, [VoidCallback? onRetry]) buildErrorDetailsButton = defaltBuildErrorDetailsButton;
+  static Widget defaltBuildErrorDetailsButton(BuildContext context, Object? error, StackTrace? stackTrace, [VoidCallback? onRetry]) {
     Widget result = DialogButton.cancel(
       leading: const Icon(Icons.info_outlined),
       child: const Text('Detalles del Error'), // TODO 3 internationalize
       onPressed: () => showErrorDetailsDialog(context, error, stackTrace),
     );
-    if (!kReleaseMode && onRetry!=null) {
+    if (onRetry!=null) {
       result = Column(
         mainAxisSize: MainAxisSize.min,
         children: [

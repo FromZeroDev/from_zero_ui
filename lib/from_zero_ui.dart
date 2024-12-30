@@ -4,6 +4,7 @@ export 'package:from_zero_ui/src/animations/exposed_transitions.dart';
 export 'package:from_zero_ui/src/animations/fixed_slide_transition.dart';
 export 'package:from_zero_ui/src/animations/heroes_from_zero.dart';
 export 'package:from_zero_ui/src/app_scaffolding/action_from_zero.dart';
+export 'package:from_zero_ui/src/app_scaffolding/api_snackbar.dart';
 export 'package:from_zero_ui/src/app_scaffolding/app_content_wrapper.dart';
 export 'package:from_zero_ui/src/app_scaffolding/app_update.dart';
 export 'package:from_zero_ui/src/app_scaffolding/appbar_from_zero.dart';

@@ -181,7 +181,9 @@ const goldenRatioVerticalAlignment = Alignment(0, -0.2360939431396786);
 class ErrorSign extends StatelessWidget {
 
   final String title;
+  final Widget? titleWidget;
   final String? subtitle;
+  final Widget? subtitleWidget;
   final VoidCallback? onRetry;
   final Widget? icon;
   final Widget? retryButton;
@@ -189,7 +191,9 @@ class ErrorSign extends StatelessWidget {
 
   const ErrorSign({
     required this.title,
+    this.titleWidget,
     this.subtitle,
+    this.subtitleWidget,
     this.icon,
     this.onRetry,
     this.retryButton,
@@ -199,17 +203,19 @@ class ErrorSign extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleWidget = Text(
+    final titleWidget = this.titleWidget ?? Text(
       title,
       style: Theme.of(context).textTheme.titleLarge,
       textAlign: TextAlign.center,
     );
-    final subtitleWidget = subtitle.isNullOrBlank ? null
-        : Text(
-            subtitle!,
-            style: Theme.of(context).textTheme.bodyLarge,
-            textAlign: TextAlign.center,
-          );
+    final subtitleWidget = this.subtitleWidget
+        ?? (subtitle.isNullOrBlank
+            ? null
+            : Text(
+                subtitle!,
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ));
     final retryWidget = retryButton==null && onRetry==null ? null
         : (retryButton ?? DialogButton.accept(
             leading: const Icon(Icons.refresh),
