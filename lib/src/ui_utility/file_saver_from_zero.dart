@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dartx/dartx.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -41,6 +42,9 @@ Future<bool> saveFileFromZero ({
   String? successTitle,
   String? successMessage,
   bool isHostContext = false,
+  List<FutureOr<List<int>> Function()>? multipleDownloads,
+  List<String>? multipleDownloadsNames,
+  int multipleDownloadsCurrentIndex = 0,
 }) async {
 
   final hashCode = Object.hashAll([pathAppend, name]);
@@ -90,6 +94,20 @@ Future<bool> saveFileFromZero ({
         backgroundColor: SnackBarFromZero.softColors[type],
       );
     }
+    if (multipleDownloads!=null) {
+      progressIndicator = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          LinearProgressIndicator(
+            valueColor: AlwaysStoppedAnimation(SnackBarFromZero.colors[type]),
+            backgroundColor: SnackBarFromZero.softColors[type],
+            value: multipleDownloadsCurrentIndex/multipleDownloads.length,
+          ),
+          const Divider(height: 1,),
+          progressIndicator,
+        ],
+      );
+    }
     // we're trusting that the parent SnackbarHost won't be disposed while waiting. SnackbarHost should live at the root of the widget tree for as long as the app lives.
     // ignore: use_build_context_synchronously
     downloadSnackBarController = SnackBarFromZero(
@@ -98,7 +116,8 @@ Future<bool> saveFileFromZero ({
       type: type,
       progressIndicator: progressIndicator,
       duration: null,
-      title: Text(localizations.translate('downloading')),
+      title: Text(localizations.translate('downloading')
+          + (multipleDownloads==null ? '' : ' (${multipleDownloadsCurrentIndex+1} / ${multipleDownloads.length})'),),
       onCancel: () {
         cancelled = true;
         onCancel?.call();
@@ -231,14 +250,17 @@ Future<bool> saveFileFromZero ({
   // show results snackBar
   bool retry = false;
   if (success && (autoOpenOnFinish??saveFileFromZeroDefaultAutoOpenOnFinish)) {
-    if (Platform.isAndroid){
-      await OpenFile.open(file!.absolute.path);
-    } else{
-      await launch(file!.absolute.path);
+    if (multipleDownloads==null) {
+      openFile(file!);
+    } else {
+      if (multipleDownloadsCurrentIndex==multipleDownloads.lastIndex) {
+        openFolder(file!);
+      }
     }
   }
   if (error!=null || (showSnackBars && showResultSnackBar)) {
-    if (success && uiPath!=null) {
+    if (success && uiPath!=null
+        && (multipleDownloads==null || multipleDownloadsCurrentIndex==multipleDownloads.lastIndex)) {
       // we're trusting that the parent SnackbarHost won't be disposed while waiting. SnackbarHost should live at the root of the widget tree for as long as the app lives.
       // ignore: use_build_context_synchronously
       await SnackBarFromZero(
@@ -249,17 +271,12 @@ Future<bool> saveFileFromZero ({
         title:  Text(successTitle ?? localizations.translate('download_success')),
         message: Text(successMessage ?? "${localizations.translate('downloaded_to')} $uiPath"),
         actions: [
-          SnackBarAction(
-            label: localizations.translate('open').toUpperCase(),
-            onPressed: () async {
-              if (Platform.isAndroid){
-                final res = await OpenFile.open(file!.absolute.path);
-              } else{
-                await launch(file!.absolute.path);
-              }
-            },
-          ),
-          if (Platform.isWindows)
+          if (multipleDownloads==null)
+            SnackBarAction(
+              label: localizations.translate('open').toUpperCase(),
+              onPressed: () => openFile(file!),
+            ),
+          if (Platform.isWindows && multipleDownloads==null)
             SnackBarAction(
               label: 'COPIAR', // TODO 3 internationalize
               onPressed: () async {
@@ -269,15 +286,7 @@ Future<bool> saveFileFromZero ({
             ),
           SnackBarAction(
             label: localizations.translate('open_folder').toUpperCase(),
-            onPressed: () async {
-              if (Platform.isAndroid) {
-                await OpenFile.open(file!.parent.absolute.path);
-              } else if (Platform.isWindows) {
-                await Process.run('explorer.exe /select,"${file!.absolute.path.replaceAll('/', r'\')}"', []);
-              } else {
-                await launch(file!.parent.absolute.path);
-              }
-            },
+            onPressed: () => openFolder(file!),
           ),
         ],
       ).show(isHostContext: true).closed;
@@ -313,7 +322,8 @@ Future<bool> saveFileFromZero ({
 
   _ongoingDownloads.remove(hashCode);
   if (retry) {
-    // we're trusting that the parent SnackbarHost won't be disposed while waiting. SnackbarHost should live at the root of the widget tree for as long as the app lives.
+    // we're trusting that the parent SnackbarHost won't be disposed while waiting.
+    // SnackbarHost should live at the root of the widget tree for as long as the app lives.
     // ignore: use_build_context_synchronously
     success = await saveFileFromZero(
       context: snackbarHostContext,
@@ -329,11 +339,64 @@ Future<bool> saveFileFromZero ({
       showSnackBars: showSnackBars,
       snackBarKey: snackBarKey ?? snackBarKey ?? ValueKey(data.hashCode),
       isHostContext: true,
+      successMessage: successMessage,
+      successTitle: successTitle,
+      autoOpenOnFinish: autoOpenOnFinish,
+      multipleDownloads: multipleDownloads,
+      multipleDownloadsNames: multipleDownloadsNames,
+      multipleDownloadsCurrentIndex: multipleDownloadsCurrentIndex,
+    );
+  }
+  if (success && multipleDownloads!=null && multipleDownloadsCurrentIndex<multipleDownloads.lastIndex) {
+    multipleDownloadsCurrentIndex++;
+    // we're trusting that the parent SnackbarHost won't be disposed while waiting.
+    // SnackbarHost should live at the root of the widget tree for as long as the app lives.
+    // ignore: use_build_context_synchronously
+    success = await saveFileFromZero(
+      context: snackbarHostContext,
+      data: multipleDownloads[multipleDownloadsCurrentIndex],
+      pathAppend: pathAppend,
+      name: multipleDownloadsNames![multipleDownloadsCurrentIndex],
+      downloadedAmount: downloadedAmount,
+      fileSize: fileSize,
+      onCancel: onCancel,
+      onRetry: onRetry==null ? null : multipleDownloads[multipleDownloadsCurrentIndex],
+      showDownloadSnackBar: showDownloadSnackBar,
+      showResultSnackBar: showResultSnackBar,
+      showSnackBars: showSnackBars,
+      snackBarKey: snackBarKey ?? ValueKey(data.hashCode),
+      isHostContext: true,
+      successMessage: successMessage,
+      successTitle: successTitle,
+      autoOpenOnFinish: autoOpenOnFinish,
+      multipleDownloads: multipleDownloads,
+      multipleDownloadsNames: multipleDownloadsNames,
+      multipleDownloadsCurrentIndex: multipleDownloadsCurrentIndex,
     );
   }
 
   return success;
 
+}
+
+
+Future<void> openFile(File file) async {
+  if (Platform.isAndroid){
+    await OpenFile.open(file.absolute.path);
+  } else{
+    await launch(file.absolute.path);
+  }
+}
+
+
+Future<void> openFolder(File file) async {
+  if (Platform.isAndroid) {
+    await OpenFile.open(file.parent.absolute.path);
+  } else if (Platform.isWindows) {
+    await Process.run('explorer.exe /select,"${file.absolute.path.replaceAll('/', r'\')}"', []);
+  } else {
+    await launch(file.parent.absolute.path);
+  }
 }
 
 
