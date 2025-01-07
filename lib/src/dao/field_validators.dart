@@ -12,10 +12,12 @@ enum ValidationErrorSeverity {
   nonBlockingError,
   error,
   disabling,
+  expired,
   invalidating,
 }
 Map<ValidationErrorSeverity, int> validationErrorSeverityWeights = {
   ValidationErrorSeverity.invalidating: 0,
+  ValidationErrorSeverity.expired: 5,
   ValidationErrorSeverity.error: 10,
   ValidationErrorSeverity.nonBlockingError: 100,
   ValidationErrorSeverity.warning: 1000,
