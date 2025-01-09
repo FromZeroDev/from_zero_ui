@@ -1000,7 +1000,8 @@ class DrawerMenuButtonFromZeroState extends State<DrawerMenuButtonFromZero> {
             color: dense
                 ? widget.selected ? selectedTextColor.withOpacity(0.75) : theme.textTheme.bodySmall!.color
                 : widget.selected ? selectedTextColor : theme.textTheme.bodyLarge!.color,
-            fontWeight: widget.selected ? FontWeight.w700 : null,
+            fontWeight: widget.selected ? FontWeight.w700
+                : dense ? FontWeight.w400 : null,
           ),
           child: Row(
             children: [
