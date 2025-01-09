@@ -522,6 +522,7 @@ class ValidationMessage extends StatelessWidget {
       ValidationErrorSeverity.warning: Colors.yellow.shade900,
       ValidationErrorSeverity.nonBlockingError: Colors.orange.shade900,
       ValidationErrorSeverity.error: Colors.red.shade900,
+      ValidationErrorSeverity.expired: Colors.red.shade900,
       ValidationErrorSeverity.invalidating: Colors.red.shade900,
     },
     Brightness.dark: {
@@ -530,6 +531,7 @@ class ValidationMessage extends StatelessWidget {
       ValidationErrorSeverity.warning: Colors.yellow.shade400,
       ValidationErrorSeverity.nonBlockingError: Colors.orange.shade400,
       ValidationErrorSeverity.error: Colors.red.shade400,
+      ValidationErrorSeverity.expired: Colors.red.shade400,
       ValidationErrorSeverity.invalidating: Colors.red.shade400,
     },
   };
