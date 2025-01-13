@@ -1004,6 +1004,7 @@ class DrawerMenuButtonFromZeroState extends State<DrawerMenuButtonFromZero> {
                 : dense ? FontWeight.w400 : null,
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: widget.titleWidget ?? Text(dense ? (widget.denseTitle??widget.title) : widget.title,
@@ -1036,6 +1037,7 @@ class DrawerMenuButtonFromZeroState extends State<DrawerMenuButtonFromZero> {
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 2),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Text(widget.subtitle!,
