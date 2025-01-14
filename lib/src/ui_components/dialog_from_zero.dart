@@ -144,6 +144,8 @@ class DialogFromZero extends StatefulWidget {
   final EdgeInsets contentPadding;
   final double? maxWidth;
   final WrapAlignment dialogActionsWrapAlignment;
+  final WrapAlignment dialogActionsWrapRunAlignment;
+  final WrapCrossAlignment dialogActionsWrapCrossAxisAlignment;
   /// only use if need to replace the whole AppBat, prefer using title and appBarActions
   final Widget? appBar;
   /// forwarded to Dialog widget
@@ -174,6 +176,8 @@ class DialogFromZero extends StatefulWidget {
     this.includeDialogWidget = true,
     this.maxWidth,
     this.dialogActionsWrapAlignment = WrapAlignment.end,
+    this.dialogActionsWrapRunAlignment = WrapAlignment.end,
+    this.dialogActionsWrapCrossAxisAlignment = WrapCrossAlignment.end,
     this.appBar,
     this.backgroundColor,
     this.elevation,
@@ -351,8 +355,9 @@ class _DialogFromZeroState extends State<DialogFromZero> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
                 child: Wrap(
-                  runAlignment: widget.dialogActionsWrapAlignment,
                   alignment: widget.dialogActionsWrapAlignment,
+                  runAlignment: widget.dialogActionsWrapRunAlignment,
+                  crossAxisAlignment: widget.dialogActionsWrapCrossAxisAlignment,
                   children: dialogActions,
                 ),
               ),
