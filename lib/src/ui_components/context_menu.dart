@@ -19,6 +19,7 @@ class ContextMenuFromZero extends ConsumerStatefulWidget {
   /// Default true. Set to false so menu will only be shown manually. Useful when stacking with a button.
   final bool addGestureDetector;
   final bool enabled;
+  final bool addAncestorContextMenuActions;
   final bool addOnTapDown; /// Default true. This blocks GestureDetectors behind it.
   final VoidCallback? onShowMenu;
 
@@ -32,12 +33,13 @@ class ContextMenuFromZero extends ConsumerStatefulWidget {
     this.popupAlignment = Alignment.bottomRight,
     this.offsetCorrection = Offset.zero,
     this.barrierColor,
+    bool? addAncestorContextMenuActions,
     this.useCursorLocation = true,
     this.addGestureDetector = true,
     this.onShowMenu,
     this.addOnTapDown = true,
     super.key,
-  }) {
+  }) : addAncestorContextMenuActions = addAncestorContextMenuActions ?? contextMenuWidget==null {
     for (int i=0; i<actions.length; i++) {
       if (actions[i].overflowBuilder==ActionFromZero.dividerOverflowBuilder
           && (i==0 || i==actions.lastIndex || actions[i+1].overflowBuilder==ActionFromZero.dividerOverflowBuilder)) {
@@ -135,7 +137,7 @@ class ContextMenuFromZeroState extends ConsumerState<ContextMenuFromZero> {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         didShowContextMenuThisFrame = false;
       });
-      final actions = widget.contextMenuWidget==null ? getAllContextActions() : widget.actions;
+      final actions = widget.addAncestorContextMenuActions ? getAllContextActions() : widget.actions;
       if (widget.enabled && (widget.contextMenuWidget!=null || actions.isNotEmpty)) {
         showContextMenuFromZero(context, ref,
           actions: actions,
@@ -224,6 +226,7 @@ class ContextMenuButton extends StatefulWidget {
   final Alignment popupAlignment;
   final Color? barrierColor;
   final bool useCursorLocation;
+  final bool addAncestorContextMenuActions;
   final Widget Function(BuildContext context, VoidCallback onTap) buttonBuilder;
 
   const ContextMenuButton({
@@ -235,6 +238,7 @@ class ContextMenuButton extends StatefulWidget {
     this.popupAlignment = Alignment.bottomRight,
     this.barrierColor,
     this.useCursorLocation = false,
+    this.addAncestorContextMenuActions = false,
     super.key,
   });
 
@@ -260,6 +264,7 @@ class _ContextMenuButtonState extends State<ContextMenuButton> {
             popupAlignment: widget.popupAlignment,
             barrierColor: widget.barrierColor,
             useCursorLocation: widget.useCursorLocation,
+            addAncestorContextMenuActions: widget.addAncestorContextMenuActions,
             child: Container(),
           ),
         ),
