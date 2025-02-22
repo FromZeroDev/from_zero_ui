@@ -51,7 +51,7 @@ dependencies:
   permission_handler: ^10.4.3  # if build window throws error, check https://github.com/Baseflow/flutter-permission-handler/issues/819#issuecomment-1673271795
   open_file_plus: ^3.4.1
   file_picker: ^5.5.0
-  desktop_drop: ^0.4.1
+  desktop_drop: ^0.4.1 # to support all platforms, try https://pub.dev/packages/super_drag_and_drop
   universal_html: ^2.2.3 # used for file_saver_from_zero download on web
   enough_convert: ^1.6.0 # used for reading window events on windows # ! replace with native converters if ever available on windows and web
   bitsdojo_window: ^0.1.5
@@ -75,9 +75,10 @@ dependencies:
       ref: 206d0671ac2a99b577f815353bf7ccb3873dca7f
       path: pdf
   date:
-    git:
-      url: https://github.com/ross96D/date
-      ref: 37f416dddd432578d035b6f080376e81d7ab3b50
+    path: ../date/
+#    git:
+#      url: https://github.com/ross96D/date
+#      ref: 37f416dddd432578d035b6f080376e81d7ab3b50
   mlog:
     git:
       url: https://github.com/ross96D/mlog
