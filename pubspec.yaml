@@ -81,7 +81,7 @@ dependencies:
   mlog:
     git:
       url: https://github.com/ross96D/mlog
-      ref: 79ba5cb791e2d75b0e8b8321ee58375a30c8dcee
+      ref: be8276f772bbc196c9c184b222ec74241aab1a82
 
 
 
