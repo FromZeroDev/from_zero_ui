@@ -75,10 +75,10 @@ dependencies:
       ref: 206d0671ac2a99b577f815353bf7ccb3873dca7f
       path: pdf
   date:
-    path: ../date/
-#    git:
-#      url: https://github.com/ross96D/date
-#      ref: 37f416dddd432578d035b6f080376e81d7ab3b50
+#    path: ../date/
+    git:
+      url: https://github.com/ross96D/date
+      ref: 447e873aa614c08eeda9c7e81b2de8b5027a91ae
   mlog:
     git:
       url: https://github.com/ross96D/mlog
