@@ -29,6 +29,7 @@ enum ListFieldDisplayType {
 }
 
 typedef AvailablePoolTransformerFunction<T> = T Function(T selected);
+typedef TableErrorWidgetBuilder<T, R extends Field> = T Function(BuildContext context, R field, DAO dao, List<ActionFromZero> actions);
 
 class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
 
@@ -86,7 +87,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   ContextFulFieldValueGetter<List<RowAction<T>>, ListField<T, U>>? extraRowActionsBuilder; //TODO 3 also allow global action builders
   bool showEditDialogOnAdd;
   bool showAddButtonAtEndOfTable;
-  ContextFulFieldValueGetter<Widget, ListField<T, U>>? tableErrorWidget;
+  TableErrorWidgetBuilder<Widget, ListField<T, U>>? tableErrorWidget;
   dynamic initialSortedColumn;
   final bool sortNullOnTop;
   ValueChanged<RowModel<T>>? onRowTap;
@@ -517,7 +518,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     ValueChanged<RowModel>? onRowTap,
     bool? showAddButtonAtEndOfTable,
     bool? showEditDialogOnAdd,
-    ContextFulFieldValueGetter<Widget, ListField<T, U>>? tableErrorWidget,
+    TableErrorWidgetBuilder<Widget, ListField<T, U>>? tableErrorWidget,
     bool? showDefaultSnackBars,
     FieldValueGetter<List<FieldValidator<ComparableList<T>>>, Field>? validatorsGetter,
     bool? validateOnlyOnConfirm,
@@ -2428,7 +2429,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
             tableController.notifyListeners();
             notifyListeners();
           } : null,
-          emptyWidget: tableErrorWidget?.call(context, this, dao)
+          emptyWidget: tableErrorWidget?.call(context, this, dao, actions)
              ?? Focus(
                   focusNode: _errorWidgetFocusNode,
                   skipTraversal: true,
