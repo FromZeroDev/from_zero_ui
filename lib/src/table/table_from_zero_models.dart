@@ -520,6 +520,8 @@ class SimpleColModel<T> extends ColModel<T>{
 
 class NumColModel<T> extends SimpleColModel<T> {
   NumberFormat? formatter;
+  bool metadataShowSum;
+  bool metadataShowAverage;
   NumColModel({
     required super.name,
     super.compactName,
@@ -543,6 +545,8 @@ class NumColModel<T> extends SimpleColModel<T> {
     super.initiallyHidden,
     super.initialValueFilters,
     super.initialValueFiltersExcludeAllElse,
+    this.metadataShowSum = true,
+    this.metadataShowAverage = true,
   });
   @override
   NumColModel<T> copyWith({
@@ -568,6 +572,8 @@ class NumColModel<T> extends SimpleColModel<T> {
     Map<Object?, bool>? initialValueFilters,
     bool? initialValueFiltersExcludeAllElse,
     bool? initiallyHidden,
+    bool? metadataShowSum,
+    bool? metadataShowAverage,
   }){
     return NumColModel<T>(
       name: name ?? this.name,
@@ -592,6 +598,8 @@ class NumColModel<T> extends SimpleColModel<T> {
       initiallyHidden: initiallyHidden ?? this.initiallyHidden,
       initialValueFilters: initialValueFilters ?? this.initialValueFilters,
       initialValueFiltersExcludeAllElse: initialValueFiltersExcludeAllElse ?? this.initialValueFiltersExcludeAllElse,
+      metadataShowSum: metadataShowSum ?? this.metadataShowSum,
+      metadataShowAverage: metadataShowAverage ?? this.metadataShowAverage,
     );
   }
   @override
@@ -621,9 +629,19 @@ class NumColModel<T> extends SimpleColModel<T> {
           ? filtered
           : filtered.where((e) => rowCountSelector!(e)).toList();
       if (reFiltered.isNotEmpty) {
-        final sum = _sumList(reFiltered.map((e) => getValue(e, key)));
-        final avg = sum / reFiltered.length;
-        return 'suma: ${_format(sum)}  promedio: ${_format(avg)}';
+        var result = '';
+        num? sum;
+        if (metadataShowSum) {
+          sum = _sumList(reFiltered.map((e) => getValue(e, key)));
+          result += 'suma: ${_format(sum)}';
+        }
+        if (metadataShowAverage) {
+          sum ??= _sumList(reFiltered.map((e) => getValue(e, key)));
+          final avg = sum / reFiltered.length;
+          if (result.isNotEmpty) result += '  ';
+          result += 'promedio: ${_format(avg)}';
+        }
+        return result;
       }
     }
     return '';
