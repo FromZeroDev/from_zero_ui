@@ -78,7 +78,7 @@ dependencies:
 #    path: ../date/
     git:
       url: https://github.com/ross96D/date
-      ref: 447e873aa614c08eeda9c7e81b2de8b5027a91ae
+      ref: 94343cf063712fd76ba026cada0a6c1540617ed8
   mlog:
     git:
       url: https://github.com/ross96D/mlog
