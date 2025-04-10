@@ -86,11 +86,13 @@ class ValueStringNum<T extends num> extends ValueString<T> {
 }
 
 
-class ValueStringReference<T> extends ValueString<T> {
+// TODO 2 this still takes memory for an empty string, it could be implemented better
+@deprecated
+class ValueStringLazy<T> extends ValueString<T> {
 
   String Function(T value) toStringFunction;
 
-  ValueStringReference(T value, this.toStringFunction)
+  ValueStringLazy(T value, this.toStringFunction)
       : super (value, '');
 
   @override
