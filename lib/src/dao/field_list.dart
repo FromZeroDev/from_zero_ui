@@ -1544,41 +1544,62 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   }) async {
     focusNode.requestFocus();
     final scrollController = ScrollController();
+    final previousTableControllerState = tableController.currentState;
+    final newFieldGlobalKey = GlobalKey();
+    final newHeaderGlobalKey = GlobalKey();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (value!.isEmpty) maybeAddRow(context);
+    });
     await showPopupFromZero<bool>(
       context: context,
       anchorKey: fieldGlobalKey,
       width: width,
+      anchorAlignment: Alignment.center,
+      popupAlignment: Alignment.center,
       builder: (context) {
         return AnimatedBuilder(
           animation: dao,
           builder: (context, child) {
             return ScrollbarFromZero(
               controller: scrollController,
-              child: CustomScrollView(
+              child: SingleChildScrollView(
                 controller: scrollController,
-                shrinkWrap: true,
-                slivers: [
-                  const SliverToBoxAdapter(child: SizedBox(height: 8,),),
-                  ...buildWidgetsAsTable(context,
-                    addCard: false,
-                    asSliver: true,
-                    expandToFillContainer: false,
-                    dense: false,
-                    focusNode: FocusNode(),
-                    collapsed: false,
-                    collapsible: false,
-                    fieldGlobalKey: const ValueKey('popup'),
-                    useGlobalKeys: false,
-                    isMaximizedInForm: true,
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 8,),),
-                ],
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 8,),
+                    ...buildWidgetsAsTable(context,
+                      addCard: false,
+                      asSliver: false, // TODO 3 performance build as slivers everything is supported in sliver form
+                      expandToFillContainer: false,
+                      dense: false,
+                      focusNode: FocusNode(),
+                      collapsed: false,
+                      collapsible: false,
+                      isMaximizedInForm: true,
+                      useGlobalKeys: false,
+                      fieldGlobalKey: newFieldGlobalKey,
+                      headerGlobalKey: newHeaderGlobalKey,
+                    ),
+                    const SizedBox(height: 8,),
+                  ],
+                ),
               ),
             );
           },
         );
       },
     );
+    // hack to allow the same TableController to be used in several tables
+    tableController.currentState = previousTableControllerState;
+    tableController.reInit();
+    // hack to reset textfields so the textEditingControllers don't get stuck
+    for (final obj in objects) {
+      for (final e in obj.props.values) {
+        e.fieldGlobalKey = GlobalKey();
+      }
+    }
+    notifyListeners();
   }
 
   ValueNotifier<int>? pageNotifier;
@@ -2155,15 +2176,19 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     bool? collapsible,
     bool? collapsed,
     Key? fieldGlobalKey,
+    Key? headerGlobalKey,
     ScrollController? mainScrollController,
     bool useGlobalKeys = true,
     bool isMaximizedInForm = false,
   }) {
     collapsible ??= this.collapsible;
     collapsed ??= this.collapsed;
-    fieldGlobalKey ??= this.fieldGlobalKey;
     focusNode ??= this.focusNode;
     T objectTemplate = this.objectTemplate;
+    if (useGlobalKeys) {
+      fieldGlobalKey ??= this.fieldGlobalKey;
+      headerGlobalKey ??= this.headerGlobalKey;
+    }
     if (transformSelectedFromAvailablePool!=null) {
       objectTemplate = transformSelectedFromAvailablePool!(objectTemplate);
       objectTemplate.parentDAO = dao;
@@ -2213,7 +2238,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
       }
     }
     result = AnimatedBuilder(
-      key: useGlobalKeys ? fieldGlobalKey : null,
+      key: fieldGlobalKey,
       animation:  this,
       builder: (context, child) {
         _builtRows = {};
@@ -2326,6 +2351,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                     actions: actions,
                     asSliver: asSliver,
                     useGlobalKeys: useGlobalKeys,
+                    headerGlobalKey: headerGlobalKey,
                   ),
                 InitiallyAnimatedWidget(
                   duration: const Duration(milliseconds: 300),
@@ -2515,6 +2541,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
             collapsible: collapsible,
             asSliver: asSliver,
             useGlobalKeys: useGlobalKeys,
+            headerGlobalKey: headerGlobalKey,
           ),
         );
         final visibleListFieldValidationErrors = passedFirstEdit
@@ -2812,6 +2839,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     required bool asSliver,
     required List<ActionFromZero> actions,
     bool useGlobalKeys = true,
+    Key? headerGlobalKey,
   }) {
     collapsible ??= this.collapsible;
     collapsed ??= this.collapsed;
@@ -2820,7 +2848,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
       focusNode: focusNode,
       child: Focus(
         focusNode: focusNode,
-        key: useGlobalKeys ? headerGlobalKey : null,
+        key: headerGlobalKey,
         skipTraversal: true,
         canRequestFocus: true,
         child: Padding(

@@ -76,6 +76,10 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
     _fieldGlobalKey ??= GlobalKey();
     return _fieldGlobalKey!;
   }
+  @protected
+  set fieldGlobalKey(GlobalKey key) {
+    _fieldGlobalKey = key;
+  }
 
   T? _value;
   @override
