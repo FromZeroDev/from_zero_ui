@@ -211,6 +211,7 @@ class StringField extends Field<String> {
     bool ignoreHidden = false,
     FocusNode? focusNode,
     ScrollController? mainScrollController,
+    bool useGlobalKeys = true,
   }) {
     focusNode ??= this.focusNode;
     Widget result;
@@ -233,6 +234,7 @@ class StringField extends Field<String> {
             focusNode: focusNode!,
             dense: dense,
             constraints: constraints,
+            useGlobalKeys: useGlobalKeys,
           );
         },
       );
@@ -244,6 +246,7 @@ class StringField extends Field<String> {
         focusNode: focusNode,
         largeVertically: maxLines!=1,
         dense: dense,
+        useGlobalKeys: useGlobalKeys,
       );
     }
     if (asSliver) {
@@ -262,6 +265,7 @@ class StringField extends Field<String> {
     bool largeHorizontally = false,
     bool dense = false,
     BoxConstraints? constraints,
+    bool useGlobalKeys = true,
   }) {
     focusNode.addListener(() {
       if (!focusNode.hasFocus) {
@@ -413,7 +417,7 @@ class StringField extends Field<String> {
     return EnsureVisibleWhenFocused(
       focusNode: focusNode,
       child: Padding(
-        key: fieldGlobalKey,
+        key: useGlobalKeys ? fieldGlobalKey : null,
         padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
         child: SizedBox(
           width: maxWidth,

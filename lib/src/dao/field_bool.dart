@@ -309,6 +309,7 @@ class BoolField extends Field<BoolComparable> {
     bool ignoreHidden = false,
     FocusNode? focusNode,
     ScrollController? mainScrollController,
+    bool useGlobalKeys = true,
   }) {
     focusNode ??= this.focusNode;
     Widget result;
@@ -329,6 +330,7 @@ class BoolField extends Field<BoolComparable> {
             largeHorizontally: constraints.maxWidth>=ScaffoldFromZero.screenSizeMedium,
             dense: dense,
             focusNode: focusNode!,
+            useGlobalKeys: useGlobalKeys,
           );
         },
       );
@@ -339,6 +341,7 @@ class BoolField extends Field<BoolComparable> {
         expandToFillContainer: expandToFillContainer,
         dense: dense,
         focusNode: focusNode,
+        useGlobalKeys: useGlobalKeys,
       );
     }
     if (asSliver) {
@@ -355,6 +358,7 @@ class BoolField extends Field<BoolComparable> {
     bool expandToFillContainer = true,
     bool largeHorizontally = false,
     bool dense = false,
+    bool useGlobalKeys = true,
   }) {
     final theme = Theme.of(context);
     final isSizeNotHardRestricted = displayType==BoolFieldDisplayType.intrinsicHeightSwitchTile
@@ -684,7 +688,7 @@ class BoolField extends Field<BoolComparable> {
     result = EnsureVisibleWhenFocused(
       focusNode: focusNode,
       child: Padding(
-        key: fieldGlobalKey,
+        key: useGlobalKeys ? fieldGlobalKey : null,
         padding: EdgeInsets.symmetric(horizontal: largeHorizontally ? 12 : 0),
         child: SizedBox(
           width: maxWidth,

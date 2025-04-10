@@ -162,6 +162,7 @@ class FileField extends StringField {
     bool ignoreHidden = false,
     FocusNode? focusNode,
     ScrollController? mainScrollController,
+    bool useGlobalKeys = true,
   }) {
     if (allowTyping) {
       bool addedFilePicker = !enableDragAndDrop;
@@ -217,6 +218,7 @@ class FileField extends StringField {
             focusNode: focusNode!,
             dense: dense,
             constraints: constraints,
+            useGlobalKeys: useGlobalKeys,
           );
         },
       );
@@ -227,6 +229,7 @@ class FileField extends StringField {
         expandToFillContainer: expandToFillContainer,
         focusNode: focusNode,
         dense: dense,
+        useGlobalKeys: useGlobalKeys,
       );
     }
     if (asSliver) {
@@ -244,6 +247,7 @@ class FileField extends StringField {
     bool largeHorizontally = false,
     bool dense = false,
     BoxConstraints? constraints,
+    bool useGlobalKeys = true,
   }) {
     String? initialDirectory;
     if (this.initialDirectory!=null) {
@@ -358,7 +362,7 @@ class FileField extends StringField {
     return EnsureVisibleWhenFocused(
       focusNode: focusNode,
       child: Padding(
-        key: fieldGlobalKey,
+        key: useGlobalKeys ? fieldGlobalKey : null,
         padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
         child: SizedBox(
           width: maxWidth,

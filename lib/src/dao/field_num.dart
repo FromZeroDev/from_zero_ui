@@ -185,6 +185,7 @@ class NumField extends Field<num> {
     bool ignoreHidden = false,
     FocusNode? focusNode,
     ScrollController? mainScrollController,
+    bool useGlobalKeys = true,
   }) {
     focusNode ??= this.focusNode;
     Widget result;
@@ -206,6 +207,7 @@ class NumField extends Field<num> {
             largeHorizontally: constraints.maxWidth>=ScaffoldFromZero.screenSizeMedium,
             focusNode: focusNode!,
             dense: dense,
+            useGlobalKeys: useGlobalKeys,
           );
         },
       );
@@ -217,6 +219,7 @@ class NumField extends Field<num> {
         focusNode: focusNode,
         largeVertically: false,
         dense: dense,
+        useGlobalKeys: useGlobalKeys,
       );
     }
     if (asSliver) {
@@ -234,6 +237,7 @@ class NumField extends Field<num> {
     bool largeVertically = false,
     bool largeHorizontally = false,
     bool dense = false,
+    bool useGlobalKeys = true,
   }) {
     focusNode.addListener(() {
       if (!focusNode.hasFocus) {
@@ -425,7 +429,7 @@ class NumField extends Field<num> {
     return EnsureVisibleWhenFocused(
       focusNode: focusNode,
       child: Padding(
-        key: fieldGlobalKey,
+        key: useGlobalKeys ? fieldGlobalKey : null,
         padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
         child: SizedBox(
           width: maxWidth,

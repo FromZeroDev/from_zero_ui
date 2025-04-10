@@ -137,6 +137,7 @@ class DateField extends Field<DateTime> {
     FocusNode? focusNode,
     bool ignoreHidden = false,
     ScrollController? mainScrollController,
+    bool useGlobalKeys = true,
   }) {
     focusNode ??= this.focusNode;
     Widget result;
@@ -158,6 +159,7 @@ class DateField extends Field<DateTime> {
             dense: dense,
             focusNode: focusNode!,
             constraints: constraints,
+            useGlobalKeys: useGlobalKeys,
           );
         },
       );
@@ -168,6 +170,7 @@ class DateField extends Field<DateTime> {
         expandToFillContainer: expandToFillContainer,
         dense: dense,
         focusNode: focusNode,
+        useGlobalKeys: useGlobalKeys,
       );
     }
     if (asSliver) {
@@ -185,6 +188,7 @@ class DateField extends Field<DateTime> {
     bool largeHorizontally = false,
     bool dense = false,
     BoxConstraints? constraints,
+    bool useGlobalKeys = true,
   }) {
     Widget result = AnimatedBuilder(
       animation: this,
@@ -289,7 +293,7 @@ class DateField extends Field<DateTime> {
     result = EnsureVisibleWhenFocused(
       focusNode: focusNode,
       child: Padding(
-        key: fieldGlobalKey,
+        key: useGlobalKeys ? fieldGlobalKey : null,
         padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
         child: SizedBox(
           width: maxWidth,

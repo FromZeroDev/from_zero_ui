@@ -108,6 +108,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   String? Function(RowModel<T> row)? rowDisabledValidator;
   String? Function(RowModel<T> row)? rowTooltipGetter;
   void Function(List<RowModel<T>> rows)? onSort;
+  bool enableMaximizeActionInForm;
 
   T get objectTemplate => objectTemplateGetter(this, dao)..parentDAO = dao;
   List<T> get objects {
@@ -317,6 +318,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     this.rowTooltipGetter,
     this.onSort,
     this.showBigAddButtonIfEmpty = true,
+    this.enableMaximizeActionInForm = false,
   }) :  assert(availableObjectsPoolGetter==null || availableObjectsPoolProvider==null),
         tableFilterable = tableFilterable ?? false,
         showEditDialogOnAdd = showEditDialogOnAdd ?? (displayType==ListFieldDisplayType.table && !tableCellsEditable),
@@ -553,6 +555,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     String? Function(RowModel<T> row)? rowTooltipGetter,
     void Function(List<RowModel<T>> rows)? onSort,
     bool? showBigAddButtonIfEmpty,
+    bool? enableMaximizeActionInForm,
   }) {
     return ListField<T, U>(
       uiNameGetter: uiNameGetter??this.uiNameGetter,
@@ -640,6 +643,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
       rowTooltipGetter: rowTooltipGetter ?? this.rowTooltipGetter,
       onSort: onSort ?? this.onSort,
       showBigAddButtonIfEmpty: showBigAddButtonIfEmpty ?? this.showBigAddButtonIfEmpty,
+      enableMaximizeActionInForm: enableMaximizeActionInForm ?? this.enableMaximizeActionInForm,
     );
   }
 
@@ -1342,6 +1346,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     bool ignoreHidden = false,
     FocusNode? focusNode,
     ScrollController? mainScrollController,
+    bool useGlobalKeys = true,
   }) {
     if (hiddenInForm && !ignoreHidden) {
       Widget result;
@@ -1354,7 +1359,6 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     var displayType = dense // TODO 2 maybe combo should also be allowed to build in dense if it has less than 2 elements
         ? ListFieldDisplayType.popupButton
         : this.displayType;
-    var objectTemplate = this.objectTemplate;
 
     return switch (displayType) {
       ListFieldDisplayType.table => buildWidgetsAsTable(context,
@@ -1364,6 +1368,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         dense: dense,
         focusNode: focusNode,
         mainScrollController: mainScrollController,
+        useGlobalKeys: useGlobalKeys,
       ),
       ListFieldDisplayType.combo => buildWidgetsAsCombo(context,
         addCard: addCard,
@@ -1372,6 +1377,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         dense: dense,
         focusNode: focusNode,
         mainScrollController: mainScrollController,
+        useGlobalKeys: useGlobalKeys,
       ),
       ListFieldDisplayType.popupButton => builWidgetsAsPopupButton(context,
         addCard: addCard,
@@ -1379,6 +1385,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         expandToFillContainer: expandToFillContainer,
         dense: dense,
         focusNode: focusNode,
+        useGlobalKeys: useGlobalKeys,
       ),
       ListFieldDisplayType.tabbedForm => builWidgetsAsTabbedForm(context,
         addCard: addCard,
@@ -1386,6 +1393,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         expandToFillContainer: expandToFillContainer,
         dense: dense,
         focusNode: focusNode,
+        useGlobalKeys: useGlobalKeys,
       ),
     };
   }
@@ -1396,6 +1404,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     bool expandToFillContainer = true,
     bool dense = false,
     FocusNode? focusNode,
+    bool useGlobalKeys = true,
   }) {
     focusNode ??= this.focusNode;
     Widget result;
@@ -1409,6 +1418,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
             largeHorizontally: constraints.maxWidth>=ScaffoldFromZero.screenSizeMedium,
             dense: dense,
             focusNode: focusNode!,
+            useGlobalKeys: useGlobalKeys,
           );
         },
       );
@@ -1419,6 +1429,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         expandToFillContainer: expandToFillContainer,
         dense: dense,
         focusNode: focusNode,
+        useGlobalKeys: useGlobalKeys,
       );
     }
     if (asSliver) {
@@ -1435,34 +1446,11 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     bool expandToFillContainer = true,
     bool largeHorizontally = false,
     bool dense = false,
+    bool useGlobalKeys = true,
   }) {
     Widget result = AnimatedBuilder(
       animation: this,
       builder: (context, child) {
-        final onPressed = () async {
-          focusNode.requestFocus();
-          await showPopupFromZero<bool>(
-            context: context,
-            anchorKey: fieldGlobalKey,
-            builder: (context) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ...buildWidgetsAsTable(context,
-                    addCard: false,
-                    asSliver: false, // TODO 3 try to do it as sliver for better performance
-                    expandToFillContainer: false,
-                    dense: false,
-                    focusNode: FocusNode(),
-                    collapsed: false,
-                    collapsible: false,
-                    fieldGlobalKey: const ValueKey('popup'),
-                  ),
-                ],
-              );
-            },
-          );
-        };
         Widget result = ComboField.buttonContentBuilder(context, uiName, hint ?? uiName, toString(), enabled, false,
           showDropdownIcon: false,
           dense: dense,
@@ -1470,7 +1458,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         if (addCard || dense) {
           result = InkWell(
             focusNode: focusNode,
-            onTap: onPressed,
+            onTap: () => showTableAsPopup(context),
             child: result,
           );
         } else {
@@ -1479,7 +1467,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
             // style: TextButton.styleFrom(
             //   padding: dense ? EdgeInsets.zero : null, // not needed since dense now uses InkWell
             // ),
-            onPressed: onPressed,
+            onPressed: () => showTableAsPopup(context),
             child: result,
           );
         }
@@ -1529,7 +1517,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     }
     result = EnsureVisibleWhenFocused(
       focusNode: focusNode,
-      key: fieldGlobalKey,
+      key: useGlobalKeys ? fieldGlobalKey : null,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
         child: SizedBox(
@@ -1551,6 +1539,47 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     );
     return result;
   }
+  Future<void> showTableAsPopup(BuildContext context, {
+    double? width,
+  }) async {
+    focusNode.requestFocus();
+    final scrollController = ScrollController();
+    await showPopupFromZero<bool>(
+      context: context,
+      anchorKey: fieldGlobalKey,
+      width: width,
+      builder: (context) {
+        return AnimatedBuilder(
+          animation: dao,
+          builder: (context, child) {
+            return ScrollbarFromZero(
+              controller: scrollController,
+              child: CustomScrollView(
+                controller: scrollController,
+                shrinkWrap: true,
+                slivers: [
+                  const SliverToBoxAdapter(child: SizedBox(height: 8,),),
+                  ...buildWidgetsAsTable(context,
+                    addCard: false,
+                    asSliver: true,
+                    expandToFillContainer: false,
+                    dense: false,
+                    focusNode: FocusNode(),
+                    collapsed: false,
+                    collapsible: false,
+                    fieldGlobalKey: const ValueKey('popup'),
+                    useGlobalKeys: false,
+                    isMaximizedInForm: true,
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 8,),),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   ValueNotifier<int>? pageNotifier;
   int? lastPage;
@@ -1560,6 +1589,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     bool expandToFillContainer = true,
     bool dense = false,
     FocusNode? focusNode,
+    bool useGlobalKeys = true,
   }) {
     T objectTemplate = this.objectTemplate;
     if (transformSelectedFromAvailablePool!=null) {
@@ -1833,7 +1863,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     );
     result = EnsureVisibleWhenFocused(
       focusNode: focusNode,
-      key: fieldGlobalKey,
+      key: useGlobalKeys ? fieldGlobalKey : null,
       child: SizedBox(
         width: maxWidth,
         child: Column(
@@ -1866,6 +1896,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     bool? collapsed,
     Key? fieldGlobalKey,
     ScrollController? mainScrollController,
+    bool useGlobalKeys = true,
   }) {
     focusNode ??= this.focusNode;
     List<Widget> result;
@@ -1897,6 +1928,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
             fieldGlobalKey: fieldGlobalKey,
             mainScrollController: mainScrollController,
             largeHorizontally: constraints.maxWidth>=ScaffoldFromZero.screenSizeMedium,
+            useGlobalKeys: useGlobalKeys,
           );
         },
       ),];
@@ -1911,6 +1943,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         collapsed: collapsed,
         fieldGlobalKey: fieldGlobalKey,
         mainScrollController: mainScrollController,
+        useGlobalKeys: useGlobalKeys,
       ),];
     }
     return result;
@@ -1926,6 +1959,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     Key? fieldGlobalKey,
     ScrollController? mainScrollController,
     bool largeHorizontally = false,
+    bool useGlobalKeys = true,
   }) {
     Widget result = AnimatedBuilder(
       animation: this,
@@ -1951,13 +1985,13 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         }
         if (addCard) {
           result = InkWell(
-            key: headerGlobalKey,
+            key: useGlobalKeys ? headerGlobalKey : null,
             onTap: onTap,
             child: result,
           );
         } else {
           result = TextButton(
-            key: headerGlobalKey,
+            key: useGlobalKeys ? headerGlobalKey : null,
             onPressed: onTap,
             child: result,
           );
@@ -2082,7 +2116,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     result = EnsureVisibleWhenFocused(
       focusNode: focusNode,
       child: Padding(
-        key: fieldGlobalKey,
+        key: useGlobalKeys ? fieldGlobalKey : null,
         padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
         child: SizedBox(
           width: maxWidth,
@@ -2122,6 +2156,8 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     bool? collapsed,
     Key? fieldGlobalKey,
     ScrollController? mainScrollController,
+    bool useGlobalKeys = true,
+    bool isMaximizedInForm = false,
   }) {
     collapsible ??= this.collapsible;
     collapsed ??= this.collapsed;
@@ -2141,12 +2177,47 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     }
     actions.addAll(defaultActions);
     double rowHeight = this.rowHeight ?? (tableCellsEditable ? 48 : 36);
+    Map<String, ColModel> columns = {};
+    double getMinWidth(Iterable currentColumnKeys) {
+      double width = 0;
+      for (final key in currentColumnKeys) {
+        final value = columns[key];
+        width += value?.width==null
+            ? (value?.flex ?? 192)
+            : (value!.width! * (1 + (1/columns.length))) ; // fixed widths weigh more because they wont shrink, this is an estimate, ideally it would be increase be the percentage this width represents of the total minWidth
+      }
+      return width;
+    }
+    double getMaxWidth(Iterable currentColumnKeys) {
+      return max(minWidth, 1.4 * getMinWidth(currentColumnKeys));
+    }
+    if (enableMaximizeActionInForm) {
+      if (isMaximizedInForm) {
+        actions.insert(0, ActionFromZero(
+          title: 'Minimizar tabla',
+          icon: const Icon(Icons.fullscreen_exit),
+          onTap: (_) {
+            Navigator.of(context).pop();
+          },
+        ),);
+      } else {
+        actions.insert(0, ActionFromZero(
+          title: 'Maximizar tabla',
+          icon: const Icon(Icons.fullscreen),
+          onTap: (_) {
+            showTableAsPopup(context,
+              width: getMaxWidth(columns.keys),
+            );
+          },
+        ),);
+      }
+    }
     result = AnimatedBuilder(
-      key: fieldGlobalKey,
+      key: useGlobalKeys ? fieldGlobalKey : null,
       animation:  this,
       builder: (context, child) {
         _builtRows = {};
-        final Map<String, ColModel> columns = tableColumnsBuilder!=null
+        columns = tableColumnsBuilder!=null
             ? tableColumnsBuilder!(dao, this, objectTemplate)
             : defaultTableColumnsBuilder(dao, this, objectTemplate);
         for (final e in objects) {
@@ -2241,19 +2312,6 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
             );
           }
         }
-        double getMinWidth(Iterable currentColumnKeys) {
-          double width = 0;
-          for (final key in currentColumnKeys) {
-            final value = columns[key];
-            width += value?.width==null
-                ? (value?.flex ?? 192)
-                : (value!.width! * (1 + (1/columns.length))) ; // fixed widths weigh more because they wont shrink, this is an estimate, ideally it would be increase be the percentage this width represents of the total minWidth
-          }
-          return width;
-        }
-        double getMaxWidth(Iterable currentColumnKeys) {
-          return max(minWidth, 1.4 * getMinWidth(currentColumnKeys));
-        }
         if (collapsed!) {
           Widget result = SizedBox(
             width: expandHorizontally ? null : maxWidth==double.infinity ? getMinWidth(columns.keys) : maxWidth,
@@ -2267,6 +2325,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                     collapsible: collapsible,
                     actions: actions,
                     asSliver: asSliver,
+                    useGlobalKeys: useGlobalKeys,
                   ),
                 InitiallyAnimatedWidget(
                   duration: const Duration(milliseconds: 300),
@@ -2296,6 +2355,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                   asSliver: false,
                   dense: true,
                   ignoreHidden: true,
+                  useGlobalKeys: useGlobalKeys,
                 );
                 return SizedBox(
                   height: row.height,
@@ -2454,6 +2514,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
             collapsed: collapsed,
             collapsible: collapsible,
             asSliver: asSliver,
+            useGlobalKeys: useGlobalKeys,
           ),
         );
         final visibleListFieldValidationErrors = passedFirstEdit
@@ -2750,6 +2811,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     required bool? collapsed,
     required bool asSliver,
     required List<ActionFromZero> actions,
+    bool useGlobalKeys = true,
   }) {
     collapsible ??= this.collapsible;
     collapsed ??= this.collapsed;
@@ -2758,7 +2820,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
       focusNode: focusNode,
       child: Focus(
         focusNode: focusNode,
-        key: headerGlobalKey,
+        key: useGlobalKeys ? headerGlobalKey : null,
         skipTraversal: true,
         canRequestFocus: true,
         child: Padding(

@@ -199,6 +199,7 @@ class ComboField<T extends DAO> extends Field<T> {
     bool ignoreHidden = false,
     FocusNode? focusNode,
     ScrollController? mainScrollController,
+    bool useGlobalKeys = true,
   }) {
     focusNode ??= this.focusNode;
     Widget result;
@@ -220,6 +221,7 @@ class ComboField<T extends DAO> extends Field<T> {
             dense: dense,
             focusNode: focusNode!,
             constraints: constraints,
+            useGlobalKeys: useGlobalKeys,
           );
         },
       );
@@ -230,6 +232,7 @@ class ComboField<T extends DAO> extends Field<T> {
         expandToFillContainer: expandToFillContainer,
         dense: dense,
         focusNode: focusNode,
+        useGlobalKeys: useGlobalKeys,
       );
     }
     if (asSliver) {
@@ -246,6 +249,7 @@ class ComboField<T extends DAO> extends Field<T> {
     bool largeHorizontally = false,
     bool dense = false,
     BoxConstraints? constraints,
+    bool useGlobalKeys = true,
   }) {
     ExtraWidgetBuilder<T>? extraWidget;
     final newObjectTemplate = this.newObjectTemplate;
@@ -439,7 +443,7 @@ class ComboField<T extends DAO> extends Field<T> {
     result = EnsureVisibleWhenFocused(
       focusNode: focusNode,
       child: Padding(
-        key: fieldGlobalKey,
+        key: useGlobalKeys ? fieldGlobalKey : null,
         padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
         child: SizedBox(
           width: maxWidth,
