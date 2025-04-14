@@ -68,7 +68,7 @@ dependencies:
 #    path: ../excel/
     git:
       url: https://github.com/Wishmater/excel
-      ref: a970b49aa6f8f69c978e644904f28bb174af1d03
+      ref: f4d529c3a8527fa0f37fb78264ff71f4e87272ba
   pdf: # 3.10.5
     git:
       url: https://github.com/Wishmater/dart_pdf
