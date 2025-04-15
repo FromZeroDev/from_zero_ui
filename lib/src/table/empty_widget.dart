@@ -7,7 +7,7 @@ import 'package:from_zero_ui/from_zero_ui.dart';
 
 class TableEmptyWidget<T> extends StatelessWidget {
 
-  final TableController<T> tableController;
+  final TableController<T>? tableController;
   final String? title;
   final String? subtitle;
   final List<ActionFromZero>? actions;
@@ -16,7 +16,7 @@ class TableEmptyWidget<T> extends StatelessWidget {
   final Widget? retryButton;
 
   const TableEmptyWidget({
-    required this.tableController,
+    this.tableController,
     this.title,
     this.subtitle,
     this.actions,
@@ -28,19 +28,19 @@ class TableEmptyWidget<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = tableController.currentState;
+    final state = tableController?.currentState;
     List<ActionFromZero> actions = this.actions ?? [];
-    if (tableController.currentState?.widget.allowCustomization??false) {
+    if (tableController!=null && (tableController!.currentState?.widget.allowCustomization??false)) {
       actions = TableFromZeroState.addManageActions(context,
         actions: actions,
-        controller: tableController,
+        controller: tableController!,
       );
     }
-    final exportPathForExcel = this.exportPathForExcel ?? tableController.currentState?.widget.exportPathForExcel;
-    if (exportPathForExcel!=null) {
+    final exportPathForExcel = this.exportPathForExcel ?? tableController?.currentState?.widget.exportPathForExcel;
+    if (tableController!=null && exportPathForExcel!=null) {
       actions = TableFromZeroState.addExportExcelAction(context,
         actions: actions,
-        tableController: tableController,
+        tableController: tableController!,
         exportPathForExcel: exportPathForExcel,
       );
     }
@@ -63,7 +63,7 @@ class TableEmptyWidget<T> extends StatelessWidget {
             subtitle: state!=null && (filtersApplied || state.widget.rows.isNotEmpty)
                 ? FromZeroLocalizations.of(context).translate('no_data_filters')
                 : FromZeroLocalizations.of(context).translate('no_data_desc'),
-            retryButton: retryButton ?? (state!=null && !filtersApplied ? null
+            retryButton: retryButton ?? (tableController==null || (state!=null && !filtersApplied) ? null
                 : TextButton(
                     onPressed: () {
                       state?.clearAllFilters();
