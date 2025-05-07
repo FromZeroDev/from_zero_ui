@@ -542,15 +542,15 @@ class APIActionFromZero<T> extends ActionFromZero {
               ],
             );
           },
-          errorBuilder: (context, error, stackTrace, onRetry) {
-            // TODO 1 this error will be completely buried
+          errorBuilder: (context, e, st, onRetry) {
             onTap = null;
             return ActionFromZero.defaultIconBuilder(
               context: context,
               title: title,
               icon: icon,
               onTap: null,
-              disablingError: '',
+              disablingError: '${ApiProviderBuilder.getErrorTitle(context, e, st)}'
+                  '\n${ApiProviderBuilder.getErrorSubtitle(context, e, st)}',
               color: color,
             );
           },

@@ -168,7 +168,7 @@ class InternalError extends ValidationError {
     required super.error,
     required this.e,
     this.st,
-    super.severity = ValidationErrorSeverity.error,
+    super.severity = ValidationErrorSeverity.invalidating,
     super.isVisibleAsSaveConfirmation,
     super.isVisibleAsHintMessage,
     super.isVisibleAsTooltip,
