@@ -1524,7 +1524,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
   }
 
 
-  Future<dynamic> pushViewDialog(BuildContext mainContext, {
+  Future<dynamic> pushViewDialog(BuildContext passedContext, {
     bool? showEditButton,
     bool? showDeleteButton,
     bool? useIntrinsicWidth,
@@ -1533,54 +1533,56 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     if (useIntrinsicWidth==null && props.values.where((e) => e is ListField && !e.hiddenInView && (e.buildViewWidgetAsTable || e.objects.length>50)).isNotEmpty) {
       useIntrinsicWidth = false;
     }
-    return showModalFromZero(context: mainContext,
+    return showModalFromZero(context: passedContext,
       builder: (context) {
-        if (!mainContext.mounted) return const SizedBox.shrink(); // hack to prevent error when getting Theme from a dirty context
-        return AnimatedBuilder(
-          animation: this,
-          builder: (context, child) {
-            if (!mainContext.mounted) return const SizedBox.shrink(); // hack to prevent error when getting Theme from a dirty context
-            final scrollController = ScrollController();
-            Widget result = SingleChildScrollView(
-              controller: scrollController,
-              child: buildViewWidget(mainContext,
-                mainScrollController: scrollController,
-              ),
-            );
-            if (useIntrinsicWidth ?? true) {
-              result = IntrinsicWidth(child: result,);
-            }
-            return DialogFromZero(
-              contentPadding: EdgeInsets.zero,
-              scrollController: scrollController,
-              content: result,
-              maxWidth: viewDialogWidth * ((useIntrinsicWidth ?? true) ? 1.5 : 1),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SelectableText(uiName,
-                    style: Theme.of(context).textTheme.titleLarge,
+        return Consumer(
+          builder: (mainContext, ref, child) {
+            return AnimatedBuilder(
+              animation: this,
+              builder: (context, child) {
+                final scrollController = ScrollController();
+                Widget result = SingleChildScrollView(
+                  controller: scrollController,
+                  child: buildViewWidget(mainContext,
+                    mainScrollController: scrollController,
                   ),
-                  if (uiName!=classUiName)
-                    SelectableText(classUiName,
-                      style: Theme.of(context).textTheme.titleSmall,
+                );
+                if (useIntrinsicWidth ?? true) {
+                  result = IntrinsicWidth(child: result,);
+                }
+                return DialogFromZero(
+                  contentPadding: EdgeInsets.zero,
+                  scrollController: scrollController,
+                  content: result,
+                  maxWidth: viewDialogWidth * ((useIntrinsicWidth ?? true) ? 1.5 : 1),
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SelectableText(uiName,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      if (uiName!=classUiName)
+                        SelectableText(classUiName,
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                    ],
+                  ),
+                  dialogActions: [
+                    DialogButton.cancel(
+                      child: Text(FromZeroLocalizations.of(context).translate("close_caps")),
                     ),
-                ],
-              ),
-              dialogActions: [
-                DialogButton.cancel(
-                  child: Text(FromZeroLocalizations.of(context).translate("close_caps")),
-                ),
-              ],
-              appBarActions: [
-                ...buildViewDialogDefaultActions(context,
-                  showEditButton: showEditButton,
-                  showDeleteButton: showDeleteButton,
-                  showDefaultSnackBars: showDefaultSnackBars,
-                ),
-                ...(viewDialogExtraActions?.call(mainContext, this) ?? []),
-              ],
+                  ],
+                  appBarActions: [
+                    ...buildViewDialogDefaultActions(context,
+                      showEditButton: showEditButton,
+                      showDeleteButton: showDeleteButton,
+                      showDefaultSnackBars: showDefaultSnackBars,
+                    ),
+                    ...(viewDialogExtraActions?.call(mainContext, this) ?? []),
+                  ],
+                );
+              },
             );
           },
         );
@@ -1622,7 +1624,6 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     bool applyAlternateBackground = true,
     bool initialAlternateBackground = false,
   }) {
-    if (!context.mounted) return const SizedBox.shrink(); // hack to prevent error when getting Theme from a dirty context
     if (useIntrinsicWidth==null && (titleMaxWidth!=null
         || dao.props.values.where((e) => e is ListField && e.buildViewWidgetAsTable).isNotEmpty)) {
       useIntrinsicWidth ??= false;
@@ -1634,7 +1635,6 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: fieldGroups.map((group) {
-        if (!context.mounted) return const SizedBox.shrink(); // hack to prevent error when getting Theme from a dirty context
         final fields = group.props.values.where((e) => !e.hiddenInView);
         Widget result;
         if (fields.isEmpty) {
@@ -1643,7 +1643,6 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         result = Column(
           mainAxisSize: MainAxisSize.min,
           children: fields.map((e) {
-            if (!context.mounted) return const SizedBox.shrink(); // hack to prevent error when getting Theme from a dirty context
             clear = !clear;
             if (e is ListField && e.buildViewWidgetAsTable) {
               clear = false;
