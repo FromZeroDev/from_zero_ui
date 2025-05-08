@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:from_zero_ui/src/app_scaffolding/api_snackbar.dart';
 import 'package:from_zero_ui/util/comparable_list.dart';
 import 'package:from_zero_ui/util/copied_flutter_widgets/my_ensure_visible_when_focused.dart';
 import 'package:mlog/mlog.dart';
@@ -1536,9 +1535,11 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     }
     return showModalFromZero(context: mainContext,
       builder: (context) {
+        if (!mainContext.mounted) return const SizedBox.shrink(); // hack to prevent error when getting Theme from a dirty context
         return AnimatedBuilder(
           animation: this,
           builder: (context, child) {
+            if (!mainContext.mounted) return const SizedBox.shrink(); // hack to prevent error when getting Theme from a dirty context
             final scrollController = ScrollController();
             Widget result = SingleChildScrollView(
               controller: scrollController,
