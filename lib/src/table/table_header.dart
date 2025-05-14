@@ -189,7 +189,7 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
             elevation: 0,
             actions: actions,
             initialExpandedAction: widget.addSearchAction && widget.searchActionExpandedByDefault
-                ? (actions.first as ActionFromZero) : null,
+                ? actions.first : null,
             onExpanded: (_) {
               autofocusSearchOnNextBuild = true;
             },

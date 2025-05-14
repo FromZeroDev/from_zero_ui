@@ -1706,7 +1706,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                                 actions: [
                                   if ((allowAddNew||hasAvailableObjectsPool))
                                     ActionFromZero(
-                                      title: '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate!.uiName}',
+                                      title: '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate.uiName}',
                                       icon: Icon(Icons.add, color: Theme.of(context).colorScheme.secondary),
                                       breakpoints: {0: ActionState.popup,},
                                       onTap: (context) async {
@@ -1744,7 +1744,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                                       duplicateRows([e]);
                                     },
                                   ),
-                                  if (objectTemplate!.canDelete || hasAvailableObjectsPool)
+                                  if (objectTemplate.canDelete || hasAvailableObjectsPool)
                                     ActionFromZero(
                                       icon: Icon(!hasAvailableObjectsPool ? Icons.delete_forever_outlined : Icons.clear),
                                       title: FromZeroLocalizations.of(context).translate('delete'),
