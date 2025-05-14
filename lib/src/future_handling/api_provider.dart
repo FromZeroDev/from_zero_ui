@@ -254,6 +254,12 @@ class ApiState<State> extends StateNotifier<AsyncValue<State>> {
     wholePercentageNotifier.value = result;
   }
 
+  // ease of use when calling updating ApiState from a DIO callback
+  void onReceiveProgress(int count, int total) {
+    selfTotalNotifier.value = total.toDouble();
+    selfProgressNotifier.value = count.toDouble();
+  }
+
 }
 
 
