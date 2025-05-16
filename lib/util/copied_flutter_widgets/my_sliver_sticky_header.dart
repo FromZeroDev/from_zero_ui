@@ -5,6 +5,8 @@ import 'package:flutter/rendering.dart';
 import 'package:value_layout_builder/value_layout_builder.dart';
 
 
+// TODO 1 try to solve this with sliver_tools package and delete this hack
+
 /// Signature used by [SliverStickyHeader.builder] to build the header
 /// when the sticky header state has changed.
 typedef SliverStickyHeaderWidgetBuilder = Widget Function(

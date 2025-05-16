@@ -2,7 +2,6 @@ import 'package:intl/intl.dart';
 import 'package:intl/number_symbols.dart';
 
 
-
 class ExtendedNumberFormat extends MyNumberFormat{
 
   static final emptyNumberFormatter = ExtendedNumberFormat(null);
@@ -48,7 +47,7 @@ class ExtendedNumberFormat extends MyNumberFormat{
   num parse(number) {
     return _formatter?.parse(number) ?? num.parse(number);
   }
-
+  @override
   num? tryParse(dynamic number) {
     try {
       return parse(number);
@@ -56,7 +55,13 @@ class ExtendedNumberFormat extends MyNumberFormat{
     return null;
   }
 
+  @override
+  R parseWith<R, P extends NumberParserBase<R>>(P Function(NumberFormat p1, String p2) parserGenerator, String text) => _formatter!.parseWith<R, P>(parserGenerator, text);
+  @override
+  R? tryParseWith<R, P extends NumberParserBase<R>>(P Function(NumberFormat p1, String p2) parserGenerator, String text)  => _formatter!.tryParseWith<R, P>(parserGenerator, text);
+
 }
+
 
 class EmptyNumberFormat extends MyNumberFormat{
 
@@ -75,10 +80,20 @@ class EmptyNumberFormat extends MyNumberFormat{
   num parse(number) {
     return _formatter.parse(number);
   }
+  @override
+  num? tryParse(dynamic number) {
+    try {
+      return parse(number);
+    } catch(_) {}
+    return null;
+  }
+
+  @override
+  R parseWith<R, P extends NumberParserBase<R>>(P Function(NumberFormat p1, String p2) parserGenerator, String text) => _formatter.parseWith<R, P>(parserGenerator, text);
+  @override
+  R? tryParseWith<R, P extends NumberParserBase<R>>(P Function(NumberFormat p1, String p2) parserGenerator, String text)  => _formatter.tryParseWith<R, P>(parserGenerator, text);
 
 }
-
-
 
 
 abstract class MyNumberFormat implements NumberFormat{
