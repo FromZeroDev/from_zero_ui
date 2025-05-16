@@ -53,7 +53,7 @@ dependencies:
   desktop_drop: ^0.6.0 # to support all platforms, try https://pub.dev/packages/super_drag_and_drop
   universal_html: ^2.2.4 # used for file_saver_from_zero download on web
   enough_convert: ^1.6.0 # used for reading window events on windows # ! replace with native converters if ever available on windows and web
-  bitsdojo_window: ^0.1.6 # ideally, we would remove this and only use window_manager, it would also fix some adjacent shit as well
+  bitsdojo_window: ^0.1.6 # ideally, we would do all window-related stuff with window_manager, and remove this dependency, but it's not worth the effort
   window_manager: ^0.4.3
   pasteboard: ^0.4.0
   r_upgrade: ^0.4.2 # used to programatically install de apk file in Android

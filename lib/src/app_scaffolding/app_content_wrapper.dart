@@ -900,37 +900,6 @@ class WindowEventListenerWindowManagerPackage with WindowListener {
     WindowBar.smartMultiPop(goRouter);
   }
 
-  // // as of version 3.2.2, windowed mode is no loger shipped, since bitsdojo seems to work on all PCs
-  // void readEventsTxt() async { // we still need to do this once to know if we are running in windowed mode
-  //   String scriptPath = Platform.script.path.substring(1, Platform.script.path.indexOf(Platform.script.pathSegments.last))
-  //       .replaceAll('%20', ' ');
-  //   File file = File(p.join(scriptPath, 'events.txt'));
-  //   final bytes8 = await file.readAsBytes();
-  //   final bytes = <int>[];
-  //   for (int i=0; i<bytes8.length; i+=2) {
-  //     bytes.add(bytes8[i]); // hack for utf16 encoding
-  //   }
-  //   String wholeString = (const Windows1252Codec(allowInvalid: true,)).decode(bytes);
-  //   List<String> events = wholeString.split("\r\n")..removeLast();
-  //   for (int i = 0; i<events.length; i++){
-  //     log ("Window event handled: ${events[i]}");
-  //     switch(events[i]){
-  //       case 'WM_CLOSE':
-  //         final goRouter = routerGetter();
-  //         WindowBar.smartMultiPop(goRouter);
-  //         break;
-  //       case 'WINDOW_INIT_ERROR':
-  //         windowsDesktopBitsdojoWorking = false;
-  //         break;
-  //     }
-  //   }
-  // }
-
-  // @override
-  // void onWindowEvent(String eventName) {
-  //   log ("Window event handled: $eventName");
-  // }
-
 }
 
 
