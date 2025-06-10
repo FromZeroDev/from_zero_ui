@@ -179,8 +179,8 @@ String addFlutterDetailsToMlog(String msg, FlutterErrorDetails details) {
 
 enum FzLgType {
   routing('fzRouting', '[FZ_ROUTING]'),
-  appUpdate('fzAppUpdate', ' [FZ_APP_UPDATE] '),
-  dao('fzDao', ' [FZ_DAO] '),
+  appUpdate('fzAppUpdate', '[FZ_APP_UPDATE]'),
+  dao('fzDao', '[FZ_DAO]'),
   network('network', '[NETWORK]');
 
   final String name;
