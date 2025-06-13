@@ -86,7 +86,7 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
       animation: animation,
       builder: (context, child) {
         double? value = _valueTween?.evaluate(animation);
-        if (value==0) value = null;
+        if (value!=null && (value<=0 || value>1)) value = null;
         return Container(
           padding: widget.padding,
           alignment: context.findAncestorWidgetOfExactType<Scaffold>()==null
