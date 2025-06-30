@@ -272,7 +272,7 @@ class ComboField<T extends DAO> extends Field<T> {
                      if (res!=null) {
                        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                          onSelected?.call(emptyDAO as T);
-                          navigator.pop(emptyDAO as T);
+                         navigator.pop(emptyDAO as T);
                        });
                      }
                   },

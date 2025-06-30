@@ -64,8 +64,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
   OnDidDeleteCallback<ModelType>? onDidDelete;
   late List<ValueChanged<DAO<ModelType>>> _selfUpdateListeners = [];
   DAOWidgetBuilder<ModelType>? viewWidgetBuilder;
-  List<Widget> Function(BuildContext context, DAO dao)? viewDialogExtraActions;
-  List<Widget> Function(BuildContext context, DAO dao)? formDialogExtraActions;
+  List<Widget> Function(BuildContext context, DAO<ModelType> dao)? viewDialogExtraActions;
+  List<Widget> Function(BuildContext context, DAO<ModelType> dao)? formDialogExtraActions;
   late double viewDialogWidth;
   late double formDialogWidth;
   late bool viewDialogLinksToInnerDAOs;
@@ -151,8 +151,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     OnDeleteAPICallback<ModelType>? onDeleteAPI,
     OnDidDeleteCallback<ModelType>? onDidDelete,
     DAOWidgetBuilder<ModelType>? viewWidgetBuilder,
-    List<Widget> Function(BuildContext context, DAO dao)? viewDialogExtraActions,
-    List<Widget> Function(BuildContext context, DAO dao)? formDialogExtraActions,
+    List<Widget> Function(BuildContext context, DAO<ModelType> dao)? viewDialogExtraActions,
+    List<Widget> Function(BuildContext context, DAO<ModelType> dao)? formDialogExtraActions,
     bool? wantsLinkToSelfFromOtherDAOs,
     double? viewDialogWidth,
     double? formDialogWidth,
