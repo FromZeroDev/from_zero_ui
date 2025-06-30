@@ -255,6 +255,7 @@ class ComboField<T extends DAO> extends Field<T> {
     final newObjectTemplate = this.newObjectTemplate;
     if (newObjectTemplate?.canSave ?? false) {
       extraWidget = (context, onSelected) {
+        final navigator = Navigator.of(context);
         final emptyDAO = newObjectTemplate!.copyWith();
         return Column (
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -271,9 +272,7 @@ class ComboField<T extends DAO> extends Field<T> {
                      if (res!=null) {
                        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                          onSelected?.call(emptyDAO as T);
-                         if (context.mounted) { // if it's already popped, we don't need to do it
-                           Navigator.of(context).pop(emptyDAO as T);
-                         }
+                          navigator.pop(emptyDAO as T);
                        });
                      }
                   },
