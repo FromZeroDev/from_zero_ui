@@ -165,10 +165,10 @@ class PopupFromZeroState extends State<PopupFromZero> {
                   + widget.offsetCorrection.dy;
               x = x.clamp(padding.left, maxWidthWithPaddingLeft);
               y = y.clamp(padding.top, maxHeightWithPaddingTop);
-              if (maxWidth-x < popupWidth) {
+              if (maxWidthWithPaddingLeft-x < popupWidth) {
                 x = maxWidthWithPaddingLeft - popupWidth;
               }
-              if (maxHeight-y < childSize.height) {
+              if (maxHeightWithPaddingTop-y < childSize.height) {
                 y = maxHeightWithPaddingTop - childSize.height;
               }
               final overlappingWidth = Rectangle(referencePosition.dx, 0, referenceSize.width, 1)
@@ -199,10 +199,10 @@ class PopupFromZeroState extends State<PopupFromZero> {
               }
               x = (x + overlappingCorrectionX).clamp(padding.left, maxWidthWithPaddingLeft);
               y = (y + overlappingCorrectionY).clamp(padding.top, maxHeightWithPaddingTop);
-              if (maxWidth-x < currentChildWidth) {
+              if (maxWidthWithPaddingLeft-x < currentChildWidth) {
                 x = (maxWidthWithPaddingLeft - currentChildWidth).clamp(padding.left, maxWidthWithPaddingLeft);
               }
-              if (maxHeight-y < currentChildHeight) {
+              if (maxHeightWithPaddingTop-y < currentChildHeight) {
                 y = (maxHeightWithPaddingTop - currentChildHeight).clamp(padding.top, maxHeightWithPaddingTop);
               }
             } else {
