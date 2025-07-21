@@ -17,7 +17,7 @@ class BoolComparable implements Comparable {
   String toString() => value ? 'SÍ': 'NO'; // TODO 3 internationalize
 
   @override
-  bool operator == (dynamic other) => other is BoolComparable && value==other.value;
+  bool operator == (Object other) => other is BoolComparable && value==other.value;
 
   @override
   int get hashCode => value.hashCode;

@@ -50,7 +50,7 @@ class ValueString<T> implements Comparable, ContainsValue<T> {
     return string.toString();
   }
   @override
-  bool operator == (dynamic other) => other is ValueString && this.value==other.value || value==other;
+  bool operator == (Object other) => other is ValueString && this.value==other.value || value==other;
   @override
   int get hashCode => value.hashCode;
   @override
@@ -127,7 +127,7 @@ class NumGroupComparingBySum implements ValueString<num>  {
     return formatter==null ? value.toString() : formatter!.format(value);
   }
   @override
-  bool operator == (dynamic other) => other is NumGroupComparingBySum && value==other.value || value==other;
+  bool operator == (Object other) => other is NumGroupComparingBySum && value==other.value || value==other;
   @override
   int get hashCode => value.hashCode;
   @override

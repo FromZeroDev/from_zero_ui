@@ -223,7 +223,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
   String toString() => uiName;
 
   @override
-  bool operator == (dynamic other) => (other is DAO)
+  bool operator == (Object other) => (other is DAO)
       && (id==null
           ? this.hashCode==other.hashCode
           : this.id==other.id);

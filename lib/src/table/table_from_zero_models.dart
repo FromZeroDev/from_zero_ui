@@ -94,7 +94,7 @@ abstract class RowModel<T> {
     this.depth = 0,
   });
   @override
-  bool operator == (dynamic other) => other is RowModel && this.id==other.id;
+  bool operator == (Object other) => other is RowModel && this.id==other.id;
   @override
   int get hashCode => Object.hashAll([RowModel, id]);
 

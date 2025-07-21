@@ -208,7 +208,7 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
   String toString() => value==null ? '' : value.toString();
 
   @override
-  bool operator == (dynamic other) => other is Field<T> && this.value==other.value;
+  bool operator == (Object other) => other is Field<T> && this.value==other.value;
 
   @override
   int get hashCode => value.hashCode;

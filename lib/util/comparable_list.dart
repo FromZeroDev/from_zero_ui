@@ -10,7 +10,7 @@ class DeepEqualityList<T> extends ComparableListBase<T> {
   });
 
   @override
-  bool operator == (dynamic other) => other is DeepEqualityList<T>
+  bool operator == (Object other) => other is DeepEqualityList<T>
       && const DeepCollectionEquality().equals(list, other.list);
 
   @override
@@ -50,7 +50,7 @@ class ComparableList<T extends Comparable> extends ComparableListBase<T> {
   }
 
   @override
-  bool operator == (dynamic other) => other is ComparableList<T>
+  bool operator == (Object other) => other is ComparableList<T>
       && (list.isEmpty&&other.list.isEmpty || other.list==list);
 
   @override
