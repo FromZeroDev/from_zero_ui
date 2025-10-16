@@ -16,7 +16,7 @@ dependencies:
     sdk: flutter
 
   # * Language Extensions
-  intl: ^0.18.1
+  intl: ^0.20.2
   dartx: ^1.2.0
   collection: ^1.17.2 # pinned to 1.17.2 by flutter ver.3.13.0
   email_validator: ^2.1.17
@@ -37,38 +37,37 @@ dependencies:
   extended_image: ^8.1.0
   google_fonts: ^6.0.0 # used in from_zero_logo
   sliver_tools: ^0.2.12
-  flutter_sticky_header: ^0.6.5 # ideally, we would always use sliver_tools and get rid of this dependency + our hacky copied code
   humanizer: ^2.2.0
 #  keframe: ^3.0.0 # unused for now, but very interesting package...
   preload_page_view: ^0.2.0
   multi_value_listenable_builder: ^0.0.2
 
   # * Plugins
-  url_launcher: 6.1.12
+  url_launcher: 6.3.1
   path_provider: ^2.1.0
   platform_detect: ^2.0.7
-  device_info_plus: ^9.0.3
-  permission_handler: ^10.4.3  # if build window throws error, check https://github.com/Baseflow/flutter-permission-handler/issues/819#issuecomment-1673271795
+  device_info_plus: ^11.4.0
+  permission_handler: ^12.0.0+1  # if build window throws error, check https://github.com/Baseflow/flutter-permission-handler/issues/819#issuecomment-1673271795
   open_file_plus: ^3.4.1
-  file_picker: ^5.5.0
+  file_picker: ^10.1.9
   desktop_drop: ^0.4.1 # to support all platforms, try https://pub.dev/packages/super_drag_and_drop
   universal_html: ^2.2.3 # used for file_saver_from_zero download on web
   enough_convert: ^1.6.0 # used for reading window events on windows # ! replace with native converters if ever available on windows and web
   bitsdojo_window: ^0.1.5
-  window_manager: ^0.3.5
+  window_manager: ^0.4.3
   pasteboard: ^0.2.0
   r_upgrade: ^0.4.2 # used to programatically install de apk file in Android
 
   # * Specific Utility
   dio: ^5.3.2
-  dio_smart_retry: ^5.0.0
+  dio_smart_retry: ^7.0.1
   sanitize_filename: ^1.0.5
-  archive: ^3.3.7 # used to unzip the update on Windows
+  archive: ^4.0.0 # used to unzip the update on Windows
   excel: # ^4.0.2
 #    path: ../excel/
     git:
       url: https://github.com/Wishmater/excel
-      ref: f4d529c3a8527fa0f37fb78264ff71f4e87272ba
+      ref: 6b1afaf4d33a5314ac33cecdfa9399f54dbf2481
   pdf: # 3.10.5
     git:
       url: https://github.com/Wishmater/dart_pdf
@@ -93,7 +92,8 @@ dev_dependencies:
 
 dependency_overrides:
   win32: ^5.0.6 # force older plugins (bitsdojo_window 0.1.5) to use a newer version, required by other plugins (file_picker>=5.3.2)
-
+  archive: 4.0.0 # pdf is still using an older version
+  intl: ^0.20.2 # date still depends on an older version
 
 
 flutter:

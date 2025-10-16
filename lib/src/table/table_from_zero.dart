@@ -1693,7 +1693,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
     final theme = Theme.of(context);
     final textStyle = theme.textTheme.titleSmall!.copyWith(
       color: theme.textTheme.bodyLarge!.color!
-          .withOpacity(theme.brightness==Brightness.light ? 0.7 : 0.8),
+          .withValues(alpha: theme.brightness==Brightness.light ? 0.7 : 0.8),
     );
     final alignment = getAlignment(colKey, col);
     Widget result = Align(
@@ -1788,7 +1788,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
                           selectedIcon: MaterialCommunityIcons.filter,
                           selectedColor: theme.colorScheme.secondary,
                           unselectedColor: theme.textTheme.bodyLarge!.color!
-                            .withOpacity(theme.brightness==Brightness.light ? 0.7 : 0.8),
+                            .withValues(alpha: theme.brightness==Brightness.light ? 0.7 : 0.8),
                           unselectedOffset: 0,
                           selectedOffset: 0,
                         ),
@@ -2007,12 +2007,12 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
             : Color.alphaBlend(backgroundColor, _getMaterialColor());
       }
       if (applyDarker) {
-        backgroundColor = Color.alphaBlend(backgroundColor.withOpacity(0.965), Colors.black);
+        backgroundColor = Color.alphaBlend(backgroundColor.withValues(alpha: 0.965), Colors.black);
       }
     }
     if (isDisabled) {
       backgroundColor ??= _getMaterialColor();
-      backgroundColor = Color.alphaBlend(backgroundColor.withOpacity(0.66), Theme.of(context).disabledColor);
+      backgroundColor = Color.alphaBlend(backgroundColor.withValues(alpha: 0.66), Theme.of(context).disabledColor);
       if (backgroundColor.opacity<1) {
         backgroundColor = Color.alphaBlend(backgroundColor, _getMaterialColor());
       }
@@ -2062,7 +2062,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
     if (isDisabled) {
       style ??= Theme.of(context).textTheme.bodyLarge;
       style = style!.copyWith(
-        color: Color.alphaBlend(style.color!.withOpacity(0.66), Theme.of(context).disabledColor),
+        color: Color.alphaBlend(style.color!.withValues(alpha: 0.66), Theme.of(context).disabledColor),
       );
     }
     return style;

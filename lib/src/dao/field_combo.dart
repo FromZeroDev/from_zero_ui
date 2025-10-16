@@ -378,7 +378,7 @@ class ComboField<T extends DAO> extends Field<T> {
         result = AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           color: dense && visibleValidationErrors.isNotEmpty
-              ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!.withOpacity(0.2)
+              ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!.withValues(alpha: 0.2)
               : backgroundColor?.call(context, this, dao),
           curve: Curves.easeOut,
           child: result,
@@ -505,7 +505,7 @@ class ComboField<T extends DAO> extends Field<T> {
                           style: Theme.of(context).textTheme.titleMedium!.copyWith(
                             fontWeight: FontWeight.w400,
                             height: 1.1,
-                            color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                            color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                           ),
                         ),
                       )
@@ -515,13 +515,13 @@ class ComboField<T extends DAO> extends Field<T> {
                         titleMaxLines: 1,
                         titleStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
                           height: 1,
-                          color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                          color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                         ),
                         value: showHintOrTitleInsteadOfValue ? (hint ?? '') : value.toString(),
                         valueMaxLines: 2,
                         valueStyle: Theme.of(context).textTheme.titleMedium!.copyWith(
                           height: 1,
-                          color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(enabled&&!showHintInsteadOfValue ? 1 : 0.75),
+                          color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled&&!showHintInsteadOfValue ? 1 : 0.75),
                         ),
                       ),
                 const SizedBox(height: 4,),

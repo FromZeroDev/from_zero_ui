@@ -285,16 +285,16 @@ class NumField extends Field<num> {
                   animation: focusNode,
                   builder: (context, child) {
                     final backgroundColor = this.backgroundColor?.call(context, this, dao);
-                    final focusColor = Theme.of(context).focusColor.withOpacity(Theme.of(context).focusColor.opacity*0.6);
+                    final focusColor = Theme.of(context).focusColor.withValues(alpha: Theme.of(context).focusColor.opacity*0.6);
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
                       color: dense && visibleValidationErrors.isNotEmpty
-                          ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!.withOpacity(0.2)
+                          ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!.withValues(alpha: 0.2)
                           : focusNode.hasFocus
                               ? backgroundColor!=null
                                   ? Color.alphaBlend(focusColor, backgroundColor)
                                   : focusColor
-                              : focusColor.withOpacity(0),
+                              : focusColor.withValues(alpha: 0),
                       curve: Curves.easeOut,
                     );
                   },

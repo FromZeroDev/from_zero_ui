@@ -38,7 +38,7 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 250)).then((value) {
+    Future<dynamic>.delayed(const Duration(milliseconds: 250)).then((value) {
       if (mounted) {
         setState((){
           passedInitialDelay = true;
@@ -73,9 +73,9 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
       );
     }
     Color color = widget.color ?? Theme.of(context).colorScheme.primary;
-    Color colorMedium = color.withOpacity(0.8);
-    Color colorMild = color.withOpacity(0.2);
-    Color colorTransparent = color.withOpacity(0);
+    Color colorMedium = color.withValues(alpha: 0.8);
+    Color colorMild = color.withValues(alpha: 0.2);
+    Color colorTransparent = color.withValues(alpha: 0);
     double fontSize = widget.size*0.3;
     double strokeWidth = widget.size*0.1;
     if (widget.size < 36) {
@@ -150,12 +150,12 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
                               Text((value*100).round().toString(),
                                 style: TextStyle(
                                   fontSize: fontSize,
-                                  color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.75),
+                                  color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75),
                                 ),
                               ),
                               Text('%', style: TextStyle(
                                 fontSize: fontSize,
-                                color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.75),
+                                color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75),
                               ),),
                             ],
                           ),
@@ -229,7 +229,7 @@ class ErrorSign extends StatelessWidget {
               size: 128,
               color: !compact
                   ? Theme.of(context).disabledColor
-                  : Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.1),),
+                  : Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.1),),
             child: icon!,
           );
     Widget result;

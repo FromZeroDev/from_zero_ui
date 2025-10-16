@@ -103,7 +103,7 @@ class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused>
   //   if (mounted) {
   //     final edgeInsets = MediaQuery.viewInsetsOf(context);
   //     while (mounted && MediaQuery.viewInsetsOf(context) == edgeInsets) {
-  //       await Future.delayed(const Duration(milliseconds: 10));
+  //       await Future<dynamic>.delayed(const Duration(milliseconds: 10));
   //     }
   //   }
   //
@@ -114,7 +114,7 @@ class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused>
 
     // Wait for the keyboard to come into view
     // await Future.any([
-    //   Future.delayed(const Duration(milliseconds: 300)),
+    //   Future<dynamic>.delayed(const Duration(milliseconds: 300)),
     //   _keyboardToggled()
     // ]);
 

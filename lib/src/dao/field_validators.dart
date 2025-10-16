@@ -299,7 +299,7 @@ class FieldDiffMessage<T extends Comparable> extends StatelessWidget {
           borderRadius: const BorderRadius.all(Radius.circular(16)),
           border: Border.all(
             width: 2,
-            color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.3),
+            color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.3),
           ),
         ),
         child: IntrinsicHeight(
@@ -445,7 +445,7 @@ class _ValidationMessageProxyState extends State<ValidationMessageProxy> {
         }
       }
       var color = ValidationMessage.severityColors[Theme.of(context).brightness]![maxSeverity!]!;
-      if (maxSeverity.weight>=100) color = color.withOpacity(0.6);
+      if (maxSeverity.weight>=100) color = color.withValues(alpha: 0.6);
       final double xAlignment = fieldStartingOffset<=itemSartingOffset ? -1
           : ((fieldStartingOffset - itemSartingOffset) / (itemWidth-fieldWidth)) * 2 - 1;
       children.add(Container(
@@ -472,7 +472,7 @@ class _ValidationMessageProxyState extends State<ValidationMessageProxy> {
           decoration: ShapeDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter, end: Alignment.bottomCenter,
-              colors: [color, color, color.withOpacity(0)],
+              colors: [color, color, color.withValues(alpha: 0)],
               stops: const [0, 0.5, 0.7],
             ),
             shape: const BeveledRectangleBorder(
@@ -659,7 +659,7 @@ class SingleValidationMessageState extends State<SingleValidationMessage> with S
           value = 1-value;
         }
         final color = ColorTween(
-          begin: baseColor.withOpacity(0),
+          begin: baseColor.withValues(alpha: 0),
           end: baseColor,
         ).transform(Curves.easeOutQuad.transform(value));
         Widget content = Text(error.toString(),
@@ -906,7 +906,7 @@ class ValidationRequiredOverlay extends StatelessWidget {
                   size: dense ? 11 : isEmpty ? 14 : 8,
                   color: isEmpty
                       ? Theme.of(context).colorScheme.error
-                      : Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.75),
+                      : Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75),
                 ),
               ),
             ),

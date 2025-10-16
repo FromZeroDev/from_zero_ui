@@ -257,8 +257,8 @@ class ComplicatedTableState extends State<ComplicatedTable> {
 //       columnNames: ["Col 1", "Col 2", "Col 3", "Col 4", "Very long column title 5"],
 //       rows: rows,
 //       rowIdsForAnimation: rowsIds,
-//       colBackgroundColors: [null, null, null, Colors.green.withOpacity(0.4), Colors.red.withOpacity(0.4)],
-//       rowBackgroundColors: [null, null, null, null, Colors.indigo.withOpacity(0.4)],
+//       colBackgroundColors: [null, null, null, Colors.green.withValues(alpha: 0.4), Colors.red.withValues(alpha: 0.4)],
+//       rowBackgroundColors: [null, null, null, null, Colors.indigo.withValues(alpha: 0.4)],
 //       rowTakesPriorityOverColumn: false,
 //       columnAlignments: [null, null, null, null, TextAlign.right],
 //       colStyles: [null, null, null, null, Theme.of(context).textTheme.bodySmall],
@@ -268,7 +268,7 @@ class ComplicatedTableState extends State<ComplicatedTable> {
 //         log("Row ${row.values[0]} tapped");
 //       },
 //       onCheckBoxSelected: (row, focused) {
-//         Future.delayed(Duration(seconds: 2)).then((value) {
+//         Future<dynamic>.delayed(Duration(seconds: 2)).then((value) {
 //           setState(() {
 //             selected[rowsIds.indexOf(row.id)] = focused;
 //           });

@@ -1654,7 +1654,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                 child: SelectableText(e.uiName,
                   style: Theme.of(context).textTheme.titleSmall!.copyWith(
                     color: Theme.of(context).textTheme.bodyLarge!.color!
-                        .withOpacity(Theme.of(context).brightness==Brightness.light ? 0.7 : 0.8),
+                        .withValues(alpha: Theme.of(context).brightness==Brightness.light ? 0.7 : 0.8),
                     wordSpacing: 0.4, // hack to fix soft-wrap bug with intrinsicHeight
                     height: 1.1,
                   ),
@@ -1716,7 +1716,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
               return Material(
                 color: !applyAlternateBackground ? Colors.transparent
                     : clear ? Theme.of(context).cardColor
-                    : Color.alphaBlend(Theme.of(context).cardColor.withOpacity(0.965), Colors.black),
+                    : Color.alphaBlend(Theme.of(context).cardColor.withValues(alpha: 0.965), Colors.black),
                 child: layout,
               );
             }
@@ -2081,7 +2081,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                           padding: const EdgeInsets.all(6.0),
                           child: Text(FromZeroLocalizations.of(context).translate("cancel_caps"),
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,
-                              color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.8),
+                              color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.8),
                             ),
                           ),
                         ),
@@ -2115,7 +2115,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: userInteracted
-                            ? Color.alphaBlend(Theme.of(context).colorScheme.secondary.withOpacity(0.2), Theme.of(context).cardColor)
+                            ? Color.alphaBlend(Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2), Theme.of(context).cardColor)
                             : Theme.of(context).canvasColor,
                         foregroundColor: userInteracted
                             ? Theme.of(context).textTheme.bodyLarge!.color

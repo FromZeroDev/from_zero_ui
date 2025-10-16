@@ -277,7 +277,7 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
         && (widget.behaviour==SnackBarFromZero.behaviourFixed
             || ref.watch(fromZeroScreenProvider.select((value) => value.isMobileLayout)));
     Color backgroundColor = type==null ? Theme.of(context).cardColor
-        : Color.alphaBlend(SnackBarFromZero.colors[type].withOpacity(0.066), Theme.of(context).cardColor);
+        : Color.alphaBlend(SnackBarFromZero.colors[type].withValues(alpha: 0.066), Theme.of(context).cardColor);
     if (fixed) {
       result = Material(
         color: backgroundColor,

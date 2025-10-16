@@ -29,10 +29,10 @@ class ThemeParameters extends ThemeParametersFromZero {
         secondary: Colors.orangeAccent.shade700,
       ),
       visualDensity: VisualDensity.compact,
-      focusColor: Colors.blue.withOpacity(0.1),
-      hoverColor: Colors.blue.withOpacity(0.05), // lighter
+      focusColor: Colors.blue.withValues(alpha: 0.1),
+      hoverColor: Colors.blue.withValues(alpha: 0.05), // lighter
       highlightColor: Colors.transparent,
-      splashColor: Colors.blue.withOpacity(0.1),
+      splashColor: Colors.blue.withValues(alpha: 0.1),
       appBarTheme: const AppBarTheme(
         color: Colors.white,
         titleTextStyle: TextStyle(
@@ -49,7 +49,7 @@ class ThemeParameters extends ThemeParametersFromZero {
       ),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: Colors.grey.shade700.withOpacity(0.9),
+          color: Colors.grey.shade700.withValues(alpha: 0.9),
           borderRadius: const BorderRadius.all(Radius.circular(16)),
         ),
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),
@@ -63,11 +63,11 @@ class ThemeParameters extends ThemeParametersFromZero {
         // showTrackOnHover: true,
         crossAxisMargin: 0,
         mainAxisMargin: 0,
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.dragged)) {
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.dragged)) {
             return Colors.black54;
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return Colors.black45;
           }
           return Colors.black38;
@@ -100,7 +100,7 @@ class ThemeParameters extends ThemeParametersFromZero {
       ),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: Colors.grey.shade700.withOpacity(0.9),
+          color: Colors.grey.shade700.withValues(alpha: 0.9),
           borderRadius: const BorderRadius.all(Radius.circular(16)),
         ),
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),
@@ -114,11 +114,11 @@ class ThemeParameters extends ThemeParametersFromZero {
         // showTrackOnHover: true,
         crossAxisMargin: 0,
         mainAxisMargin: 0,
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.dragged)) {
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.dragged)) {
             return Colors.black54;
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return Colors.black45;
           }
           return Colors.black38;
@@ -134,13 +134,13 @@ class ThemeParameters extends ThemeParametersFromZero {
         secondary: Colors.orangeAccent.shade700,
       ),
       visualDensity: VisualDensity.compact,
-      focusColor: Colors.blue.withOpacity(0.1),
-      hoverColor: Colors.blue.withOpacity(0.05),
+      focusColor: Colors.blue.withValues(alpha: 0.1),
+      hoverColor: Colors.blue.withValues(alpha: 0.05),
       highlightColor: Colors.transparent,
-      splashColor: Colors.blue.withOpacity(0.1),
+      splashColor: Colors.blue.withValues(alpha: 0.1),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
+          color: Colors.white.withValues(alpha: 0.9),
           borderRadius: const BorderRadius.all(Radius.circular(999999)),
         ),
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),

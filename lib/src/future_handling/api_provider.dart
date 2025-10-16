@@ -8,16 +8,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:mlog/mlog.dart';
 
-
 typedef ApiProvider<T> = AutoDisposeStateNotifierProvider<ApiState<T>, AsyncValue<T>>;
 typedef ApiProviderFamily<T, P> = AutoDisposeStateNotifierProviderFamily<ApiState<T>, AsyncValue<T>, P>;
 
-class ApiState<State> extends StateNotifier<AsyncValue<State>> {
-
+class ApiState<T> extends StateNotifier<AsyncValue<T>> {
   // StateNotifierProviderRef<ApiState<State>, AsyncValue<State>> _ref;
   AutoDisposeRef? _ref;
-  final Future<State> Function(ApiState<State>) _create;
-  late Future<State> future;
+  final Future<T> Function(ApiState<T>) _create;
+  late Future<T> future;
   bool _running = true;
   late final ValueNotifier<double?> selfTotalNotifier;
   late final ValueNotifier<double?> selfProgressNotifier;
@@ -30,16 +28,21 @@ class ApiState<State> extends StateNotifier<AsyncValue<State>> {
     _cancelTokens.add(ct);
   }
 
-  ApiState(AutoDisposeRef ref, this._create,)
-      : _ref = ref,
-        super(AsyncValue.loading()) { // ignore: prefer_const_constructors
-                                      // declaring const here breaks at runtime for some reason, at least on riverpod 2.0.0-dev.9
+  ApiState(
+    AutoDisposeRef ref,
+    this._create,
+  )   : _ref = ref,
+        super(AsyncValue.loading()) {
+    // ignore: prefer_const_constructors
+    // declaring const here breaks at runtime for some reason, at least on riverpod 2.0.0-dev.9
     init();
   }
 
-  ApiState.noProvider(this._create,)
-      : super(AsyncValue.loading()) { // ignore: prefer_const_constructors
-                                      // declaring const here breaks at runtime for some reason, at least on riverpod 2.0.0-dev.9
+  ApiState.noProvider(
+    this._create,
+  ) : super(AsyncValue.loading()) {
+    // ignore: prefer_const_constructors
+    // declaring const here breaks at runtime for some reason, at least on riverpod 2.0.0-dev.9
     init();
   }
 
@@ -57,7 +60,7 @@ class ApiState<State> extends StateNotifier<AsyncValue<State>> {
   }
 
   Future<T> watch<T>(ApiProvider<T> watchProvider) async {
-    assert(_ref!=null);
+    assert(_ref != null);
     if (!_watching.contains(watchProvider)) {
       _watching.add(watchProvider);
       final newApiState = _ref!.read(watchProvider.notifier);
@@ -74,21 +77,18 @@ class ApiState<State> extends StateNotifier<AsyncValue<State>> {
   // a new ref needs to be passed to read the watching notifiers. watch() won't be called on it.
   bool retry(WidgetRef? widgetRef, [ProviderBase? providerForInvalidationInsteadOfRefresh]) {
     bool refreshed = false;
-    if ((widgetRef??_ref) != null) {
+    if ((widgetRef ?? _ref) != null) {
       try {
         final watchingNotifiers = {
-          for (final e in _watching)
-            e: widgetRef==null
-                ? _ref!.read(e.notifier)
-                : widgetRef.read(e.notifier),
+          for (final e in _watching) e: widgetRef == null ? _ref!.read(e.notifier) : widgetRef.read(e.notifier),
         };
         for (final e in watchingNotifiers.keys) {
           refreshed = refreshed || watchingNotifiers[e]!.retry(widgetRef, e);
         }
-      } catch (_) { }
+      } catch (_) {}
     }
     if (!refreshed && state is AsyncError) {
-      if (widgetRef!=null && providerForInvalidationInsteadOfRefresh!=null) {
+      if (widgetRef != null && providerForInvalidationInsteadOfRefresh != null) {
         widgetRef.invalidate(providerForInvalidationInsteadOfRefresh);
       } else {
         _runFuture();
@@ -100,22 +100,19 @@ class ApiState<State> extends StateNotifier<AsyncValue<State>> {
 
   void refresh(WidgetRef? widgetRef, [ProviderBase? providerForInvalidationInsteadOfRefresh]) {
     bool refreshed = false;
-    if ((widgetRef??_ref) != null) {
+    if ((widgetRef ?? _ref) != null) {
       final watchingNotifiers = {
-        for (final e in _watching)
-          e: widgetRef==null
-              ? _ref!.read(e.notifier)
-              : widgetRef.read(e.notifier),
+        for (final e in _watching) e: widgetRef == null ? _ref!.read(e.notifier) : widgetRef.read(e.notifier),
       };
       for (final e in watchingNotifiers.keys) {
         try {
           watchingNotifiers[e]!.refresh(widgetRef, e);
           refreshed = true;
-        } catch (_) { }
+        } catch (_) {}
       }
     }
     if (!refreshed) {
-      if (widgetRef!=null && providerForInvalidationInsteadOfRefresh!=null) {
+      if (widgetRef != null && providerForInvalidationInsteadOfRefresh != null) {
         widgetRef.invalidate(providerForInvalidationInsteadOfRefresh);
       } else {
         _runFuture();
@@ -136,13 +133,13 @@ class ApiState<State> extends StateNotifier<AsyncValue<State>> {
     selfProgressNotifier.value = null;
     wholePercentageNotifier.value = null;
     state = AsyncValue.loading(); // ignore: prefer_const_constructors
-                                  // declaring const here breaks at runtime for some reason, at least on riverpod 2.0.0-dev.9
+    // declaring const here breaks at runtime for some reason, at least on riverpod 2.0.0-dev.9
     try {
       future = _create(this);
       try {
         final event = await future;
         if (_running) {
-          state = AsyncValue<State>.data(event);
+          state = AsyncValue<T>.data(event);
         }
       } catch (err, stack) {
         if (err is DioException) {
@@ -159,19 +156,24 @@ class ApiState<State> extends StateNotifier<AsyncValue<State>> {
           //   );
           // }
         } else {
-          log (LgLvl.error, 'Error caught in ApiState<$State> future',
+          log(
+            LgLvl.error,
+            'Error caught in ApiState<$T> future',
             e: err,
             st: stack,
           );
         }
         if (_running) {
-          state = AsyncValue<State>.error(err, stackTrace: stack);
+          state = AsyncValue<T>.error(err, stackTrace: stack);
         }
         cancel();
       }
     } catch (err, stack) {
-      log (LgLvl.error, 'Error caught before running ApiState<$State> future. This should never happen',
-        e: err, st: stack,
+      log(
+        LgLvl.error,
+        'Error caught before running ApiState<$T> future. This should never happen',
+        e: err,
+        st: stack,
       );
       state = AsyncValue.error(err, stackTrace: stack);
     }
@@ -179,19 +181,24 @@ class ApiState<State> extends StateNotifier<AsyncValue<State>> {
 
   void cancel() {
     for (final c in _cancelTokens) {
-      try { c.cancel('PROVIDER CANCELLED'); } catch (_) {}
+      try {
+        c.cancel('PROVIDER CANCELLED');
+      } catch (_) {}
     }
     _cancelTokens.clear();
   }
 
   void _computeTotal() {
     double? result = selfTotalNotifier.value;
-    if (result!=null && _ref!=null) {
+    if (result != null && _ref != null) {
       for (final e in _watching) {
-        final partial = _ref!.read(e.notifier).wholeTotalNotifier.value
-            ?? _ref!.read(e).maybeWhen<double?>(data:(_)=>0, orElse: ()=>null,);
-        if (partial!=null) {
-          result = (result??0) + partial;
+        final partial = _ref!.read(e.notifier).wholeTotalNotifier.value ??
+            _ref!.read(e).maybeWhen<double?>(
+                  data: (_) => 0,
+                  orElse: () => null,
+                );
+        if (partial != null) {
+          result = (result ?? 0) + partial;
         } else {
           result = null;
           break;
@@ -200,14 +207,18 @@ class ApiState<State> extends StateNotifier<AsyncValue<State>> {
     }
     wholeTotalNotifier.value = result;
   }
+
   void _computeProgress() {
     double? result = selfProgressNotifier.value;
-    if (result!=null && _ref!=null) {
+    if (result != null && _ref != null) {
       for (final e in _watching) {
-        final partial = _ref!.read(e.notifier).wholeProgressNotifier.value
-            ?? _ref!.read(e).maybeWhen<double?>(data:(_)=>0, orElse: ()=>null,);
-        if (partial!=null) {
-          result = (result??0) + partial;
+        final partial = _ref!.read(e.notifier).wholeProgressNotifier.value ??
+            _ref!.read(e).maybeWhen<double?>(
+                  data: (_) => 0,
+                  orElse: () => null,
+                );
+        if (partial != null) {
+          result = (result ?? 0) + partial;
         } else {
           result = null;
           break;
@@ -216,58 +227,57 @@ class ApiState<State> extends StateNotifier<AsyncValue<State>> {
     }
     wholeProgressNotifier.value = result;
   }
+
   void _computePercentage() {
     // Percentage calculated only from wholeNotifiers
     double? total = wholeTotalNotifier.value;
     double? progress = wholeProgressNotifier.value;
-    double? result = total==null||total==0 ? null
-        : (progress??0) / total;
-    if (result==null && _ref!=null) {
+    double? result = total == null || total == 0 ? null : (progress ?? 0) / total;
+    if (result == null && _ref != null) {
       // Percentage of all dependencies are used, asuming their totals are equal
       total = selfTotalNotifier.value;
       progress = selfProgressNotifier.value;
-      result = total==null ? null
-          : progress==null||total==0 ? 0
-          : progress/total;
+      result = total == null
+          ? null
+          : progress == null || total == 0
+              ? 0
+              : progress / total;
       final allWatching = List<ApiProvider>.from(_watching);
-      for (int i=0; i<allWatching.length; i++) {
+      for (int i = 0; i < allWatching.length; i++) {
         for (final e in _ref!.read(allWatching[i].notifier)._watching) {
           if (!allWatching.contains(e)) {
             allWatching.add(e);
           }
         }
       }
-      bool allNull = result==null;
+      bool allNull = result == null;
       for (final e in allWatching) {
         final notifier = _ref!.read(e.notifier);
         double? partialProgress = notifier.selfProgressNotifier.value;
         double? partialTotal = notifier.selfTotalNotifier.value;
-        double? partial = partialTotal==null ? null
-            : partialTotal==0||partialProgress==null ? 0
-            : partialProgress/partialTotal;
-        allNull = allNull && partial==null;
-        partial ??= notifier.state.maybeWhen<double>(data:(_)=>1, orElse: ()=>0,);
-        result = (result??0) + partial;
+        double? partial = partialTotal == null
+            ? null
+            : partialTotal == 0 || partialProgress == null
+                ? 0
+                : partialProgress / partialTotal;
+        allNull = allNull && partial == null;
+        partial ??= notifier.state.maybeWhen<double>(
+          data: (_) => 1,
+          orElse: () => 0,
+        );
+        result = (result ?? 0) + partial;
       }
-      result = result==null||allNull ? null : (result/(allWatching.length+1));
+      result = result == null || allNull ? null : (result / (allWatching.length + 1));
     }
     wholePercentageNotifier.value = result;
   }
-
 }
 
-
-
-
-
-
-
-
 typedef ApiLoadingBuilder = Widget Function(BuildContext context, ValueListenable<double?>? progress);
-typedef ApiErrorBuilder = Widget Function(BuildContext context, Object error, StackTrace? stackTrace, VoidCallback? onRetry);
+typedef ApiErrorBuilder = Widget Function(
+    BuildContext context, Object error, StackTrace? stackTrace, VoidCallback? onRetry);
 
 class ApiProviderBuilder<T> extends ConsumerWidget {
-
   final AutoDisposeStateNotifierProvider<ApiState<T>, AsyncValue<T>> provider;
   final DataBuilder<T> dataBuilder;
   final ApiLoadingBuilder loadingBuilder;
@@ -313,14 +323,15 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
     ApiState<T> stateNotifier = ref.watch(provider.notifier);
     AsyncValue<T> value = ref.watch(provider);
     return AsyncValueBuilder<T>(
-      asyncValue: stateNotifier.state, // using stateNotifier.state instead of value because value is kept when realoading, so loading state is never shown
+      asyncValue: stateNotifier
+          .state, // using stateNotifier.state instead of value because value is kept when realoading, so loading state is never shown
       dataBuilder: dataBuilder,
       alignment: alignment,
       loadingBuilder: (context) {
         return loadingBuilder(context, stateNotifier.wholePercentageNotifier);
       },
       errorBuilder: (context, error, stackTrace) {
-        return errorBuilder(context, error, stackTrace, ()=>stateNotifier.retry(ref));
+        return errorBuilder(context, error, stackTrace, () => stateNotifier.retry(ref));
       },
       transitionBuilder: transitionBuilder,
       transitionDuration: transitionDuration,
@@ -334,10 +345,12 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
     );
   }
 
-  static Widget defaultLoadingBuilder(BuildContext context, ValueListenable<double?>? progress, {
+  static Widget defaultLoadingBuilder(
+    BuildContext context,
+    ValueListenable<double?>? progress, {
     double? size,
   }) {
-    if (progress==null) {
+    if (progress == null) {
       return LoadingSign(
         size: size ?? 48,
       );
@@ -354,7 +367,8 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
     }
   }
 
-  static Widget defaultErrorBuilder(BuildContext context, Object? error, StackTrace? stackTrace, VoidCallback? onRetry) {
+  static Widget defaultErrorBuilder(
+      BuildContext context, Object? error, StackTrace? stackTrace, VoidCallback? onRetry) {
     final isRetryable = isErrorRetryable(error, stackTrace);
     return ErrorSign(
       key: ValueKey(error),
@@ -368,17 +382,18 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
     );
   }
 
-  static Widget Function(BuildContext context, Object? error, StackTrace? stackTrace) getErrorIcon = defaultGetErrorIcon;
+  static Widget Function(BuildContext context, Object? error, StackTrace? stackTrace) getErrorIcon =
+      defaultGetErrorIcon;
   static Widget defaultGetErrorIcon(BuildContext context, Object? error, StackTrace? stackTrace) {
     if (error is DioException) {
-      if (error.response!=null) {
-        if (error.response!.statusCode==403) {
+      if (error.response != null) {
+        if (error.response!.statusCode == 403) {
           return const Icon(Icons.do_disturb_on_outlined);
         }
-        if (error.response!.statusCode==404) {
+        if (error.response!.statusCode == 404) {
           return const Icon(Icons.error_outline);
         }
-        if (error.response!.statusCode!<500) {
+        if (error.response!.statusCode! < 500) {
           return const Icon(Icons.do_disturb_on_outlined);
         }
         return const Icon(Icons.report_problem_outlined);
@@ -388,18 +403,19 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
     return const Icon(Icons.report_problem_outlined);
   }
 
-  static String Function(BuildContext context, Object? error, StackTrace? stackTrace) getErrorTitle = defaultGetErrorTitle;
+  static String Function(BuildContext context, Object? error, StackTrace? stackTrace) getErrorTitle =
+      defaultGetErrorTitle;
   static String defaultGetErrorTitle(BuildContext context, Object? error, StackTrace? stackTrace) {
     // TODO 3 internationalize
     if (error is DioException) {
-      if (error.response!=null) {
-        if (error.response!.statusCode==403) {
+      if (error.response != null) {
+        if (error.response!.statusCode == 403) {
           return 'Error de Autorización';
         }
-        if (error.response!.statusCode==404) {
+        if (error.response!.statusCode == 404) {
           return 'Recurso no Encontrado';
         }
-        if (error.response!.statusCode!<500) {
+        if (error.response!.statusCode! < 500) {
           return 'Petición Rechazada por el servidor';
         }
         return 'Error Interno del Servidor';
@@ -409,18 +425,19 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
     return "Error Inesperado";
   }
 
-  static String? Function(BuildContext context, Object? error, StackTrace? stackTrace) getErrorSubtitle = defaultGetErrorSubtitle;
+  static String? Function(BuildContext context, Object? error, StackTrace? stackTrace) getErrorSubtitle =
+      defaultGetErrorSubtitle;
   static String? defaultGetErrorSubtitle(BuildContext context, Object? error, StackTrace? stackTrace) {
     // TODO 3 internationalize
     if (error is DioException) {
-      if (error.response!=null) {
-        if (error.response!.statusCode==403) {
+      if (error.response != null) {
+        if (error.response!.statusCode == 403) {
           return 'Usted no tiene permiso para acceder al recurso solicitado';
         }
-        if (error.response!.statusCode==404) {
+        if (error.response!.statusCode == 404) {
           return 'Por favor, notifique a su administrador de sistema';
         }
-        if (error.response!.statusCode!<500) {
+        if (error.response!.statusCode! < 500) {
           return null;
         }
         return 'Por favor, notifique a su administrador de sistema';
@@ -433,14 +450,14 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
   static bool Function(Object? error, StackTrace? stackTrace) isErrorRetryable = defaultIsErrorRetryable;
   static bool defaultIsErrorRetryable(Object? error, StackTrace? stackTrace) {
     if (error is DioException) {
-      if (error.response!=null) {
-        if (error.response!.statusCode==403) {
+      if (error.response != null) {
+        if (error.response!.statusCode == 403) {
           return false;
         }
-        if (error.response!.statusCode==404) {
+        if (error.response!.statusCode == 404) {
           return false;
         }
-        if (error.response!.statusCode!<500) {
+        if (error.response!.statusCode! < 500) {
           return false;
         }
         return false;
@@ -453,14 +470,14 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
   static bool Function(Object? error, StackTrace? stackTrace) shouldShowErrorDetails = defaultShouldShowErrorDetails;
   static bool defaultShouldShowErrorDetails(Object? error, StackTrace? stackTrace) {
     if (error is DioException) {
-      if (error.response!=null) {
-        if (error.response!.statusCode==403) {
+      if (error.response != null) {
+        if (error.response!.statusCode == 403) {
           return false;
         }
-        if (error.response!.statusCode==404) {
+        if (error.response!.statusCode == 404) {
           return false;
         }
-        if (error.response!.statusCode!<500) {
+        if (error.response!.statusCode! < 500) {
           return false;
         }
         return false;
@@ -470,19 +487,23 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
     return true;
   }
 
-  static Widget Function(BuildContext context, Object? error, StackTrace? stackTrace, [VoidCallback? onRetry]) buildErrorDetailsButton = defaltBuildErrorDetailsButton;
-  static Widget defaltBuildErrorDetailsButton(BuildContext context, Object? error, StackTrace? stackTrace, [VoidCallback? onRetry]) {
+  static Widget Function(BuildContext context, Object? error, StackTrace? stackTrace, [VoidCallback? onRetry])
+      buildErrorDetailsButton = defaltBuildErrorDetailsButton;
+  static Widget defaltBuildErrorDetailsButton(BuildContext context, Object? error, StackTrace? stackTrace,
+      [VoidCallback? onRetry]) {
     Widget result = DialogButton.cancel(
       leading: const Icon(Icons.info_outlined),
       child: const Text('Detalles del Error'), // TODO 3 internationalize
       onPressed: () => showErrorDetailsDialog(context, error, stackTrace),
     );
-    if (onRetry!=null) {
+    if (onRetry != null) {
       result = Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           result,
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           DialogButton.accept(
             leading: const Icon(Icons.refresh),
             onPressed: onRetry,
@@ -493,6 +514,7 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
     }
     return result;
   }
+
   static void showErrorDetailsDialog(BuildContext context, Object? error, StackTrace? stackTrace) {
     showModalFromZero(
       context: context,
@@ -509,11 +531,9 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
       },
     );
   }
-
 }
 
 class SliverApiProviderBuilder<T> extends ApiProviderBuilder<T> {
-
   const SliverApiProviderBuilder({
     required super.provider,
     required super.dataBuilder,
@@ -522,11 +542,13 @@ class SliverApiProviderBuilder<T> extends ApiProviderBuilder<T> {
     super.errorBuilder = SliverApiProviderBuilder.defaultErrorBuilder,
     super.transitionBuilder = SliverAsyncValueBuilder.defaultTransitionBuilder,
     super.layoutBuilder = AnimatedSwitcherImage.sliverLayoutBuilder,
-    super.animatedSwitcherType = AnimatedSwitcherType.normal, /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
+    super.animatedSwitcherType = AnimatedSwitcherType.normal,
+
+    /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-    applyAnimatedContainerFromChildSize: false,
-  );
+          applyAnimatedContainerFromChildSize: false,
+        );
 
   static Widget defaultLoadingBuilder(BuildContext context, ValueListenable<double?>? progress) {
     return SliverToBoxAdapter(
@@ -537,7 +559,8 @@ class SliverApiProviderBuilder<T> extends ApiProviderBuilder<T> {
     );
   }
 
-  static Widget defaultErrorBuilder(BuildContext context, Object? error, StackTrace? stackTrace, VoidCallback? onRetry) {
+  static Widget defaultErrorBuilder(
+      BuildContext context, Object? error, StackTrace? stackTrace, VoidCallback? onRetry) {
     return SliverToBoxAdapter(
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 256),
@@ -545,13 +568,9 @@ class SliverApiProviderBuilder<T> extends ApiProviderBuilder<T> {
       ),
     );
   }
-
 }
 
-
-
 class ApiProviderMultiBuilder<T> extends ConsumerWidget {
-
   final List<AutoDisposeStateNotifierProvider<ApiState<T>, AsyncValue<T>>> providers;
   final DataMultiBuilder<T> dataBuilder;
   final ApiLoadingBuilder loadingBuilder;
@@ -593,15 +612,16 @@ class ApiProviderMultiBuilder<T> extends ConsumerWidget {
       final stateNotifier = ref.watch(e.notifier);
       ref.watch(e);
       stateNotifiers.add(stateNotifier);
-      values.add(stateNotifier.state); // using stateNotifier.state instead of value because value is kept when realoading, so loading state is never shown
+      values.add(stateNotifier
+          .state); // using stateNotifier.state instead of value because value is kept when realoading, so loading state is never shown
     }
     final listenables = stateNotifiers.map((e) => e.wholePercentageNotifier);
     final unifiedListenable = UnitedValueListenable(listenables, (values) {
       double? percentage;
       try {
         final meaningfulValues = values.whereType<double>().toList();
-        percentage = meaningfulValues.isEmpty ? null
-            : meaningfulValues.reduce((v, e) => v+e) / meaningfulValues.length;
+        percentage =
+            meaningfulValues.isEmpty ? null : meaningfulValues.reduce((v, e) => v + e) / meaningfulValues.length;
       } catch (_) {}
       return percentage;
     });
@@ -630,7 +650,6 @@ class ApiProviderMultiBuilder<T> extends ConsumerWidget {
       animatedSwitcherType: animatedSwitcherType,
     );
   }
-
 }
 
 class SliverApiProviderMultiBuilder<T> extends ApiProviderMultiBuilder<T> {
@@ -642,14 +661,14 @@ class SliverApiProviderMultiBuilder<T> extends ApiProviderMultiBuilder<T> {
     super.errorBuilder = SliverApiProviderBuilder.defaultErrorBuilder,
     super.transitionBuilder = SliverAsyncValueBuilder.defaultTransitionBuilder,
     super.layoutBuilder = AnimatedSwitcherImage.sliverLayoutBuilder,
-    super.animatedSwitcherType = AnimatedSwitcherType.normal, /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
+    super.animatedSwitcherType = AnimatedSwitcherType.normal,
+
+    /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-    applyAnimatedContainerFromChildSize: false,
-  );
+          applyAnimatedContainerFromChildSize: false,
+        );
 }
-
-
 
 class MultiValueListenable<T> extends ChangeNotifier {
   final Iterable<ValueListenable<T>> _listenables;
@@ -665,8 +684,10 @@ class MultiValueListenable<T> extends ChangeNotifier {
     }
     super.dispose();
   }
+
   List<T> get values => _listenables.map((e) => e.value).toList();
 }
+
 class UnitedValueListenable<T> extends ChangeNotifier implements ValueListenable<T> {
   final Iterable<ValueListenable<T>> _listenables;
   final T Function(Iterable<T>) _unificator;
@@ -682,14 +703,12 @@ class UnitedValueListenable<T> extends ChangeNotifier implements ValueListenable
     }
     super.dispose();
   }
+
   @override
   T get value => _unificator(_listenables.map((e) => e.value));
 }
 
-
-
 class ApiStateBuilder<T> extends ConsumerStatefulWidget {
-
   final ApiState<T> stateNotifier;
   final DataBuilder<T> dataBuilder;
   final ApiLoadingBuilder loadingBuilder;
@@ -725,24 +744,25 @@ class ApiStateBuilder<T> extends ConsumerStatefulWidget {
 
   @override
   ApiStateBuilderState<T> createState() => ApiStateBuilderState<T>();
-
 }
 
 class ApiStateBuilderState<T> extends ConsumerState<ApiStateBuilder<T>> {
-
   late AsyncValue<T> value;
 
   @override
   void initState() {
     super.initState();
     value = widget.stateNotifier.state;
-    widget.stateNotifier.addListener((state) {
-      if (mounted) {
-        setState(() {
-          value = state;
-        });
-      }
-    }, fireImmediately: false,);
+    widget.stateNotifier.addListener(
+      (state) {
+        if (mounted) {
+          setState(() {
+            value = state;
+          });
+        }
+      },
+      fireImmediately: false,
+    );
   }
 
   @override
@@ -768,7 +788,6 @@ class ApiStateBuilderState<T> extends ConsumerState<ApiStateBuilder<T>> {
       animatedSwitcherType: widget.animatedSwitcherType,
     );
   }
-
 }
 
 class SliverApiStateBuilder<T> extends ApiStateBuilder<T> {
@@ -780,10 +799,11 @@ class SliverApiStateBuilder<T> extends ApiStateBuilder<T> {
     super.errorBuilder = SliverApiProviderBuilder.defaultErrorBuilder,
     super.transitionBuilder = SliverAsyncValueBuilder.defaultTransitionBuilder,
     super.layoutBuilder = AnimatedSwitcherImage.sliverLayoutBuilder,
-    super.animatedSwitcherType = AnimatedSwitcherType.normal, /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
+    super.animatedSwitcherType = AnimatedSwitcherType.normal,
+
+    /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-    applyAnimatedContainerFromChildSize: false,
-  );
+          applyAnimatedContainerFromChildSize: false,
+        );
 }
-

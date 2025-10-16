@@ -94,7 +94,7 @@ class FromZeroLogo extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               color: (Theme.of(context).brightness==Brightness.light ? Colors.white : Colors.black)
-                  .withOpacity(0.6),
+                  .withValues(alpha: 0.6),
               borderRadius: BorderRadius.all(Radius.circular(size/8)),
             ),
             height: size,
@@ -111,7 +111,7 @@ class FromZeroLogo extends StatelessWidget {
                   overflow: TextOverflow.visible,
                   style: GoogleFonts.libreCaslonDisplay(
                     fontSize: fontSize,
-                    color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.6),
+                    color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.6),
                     height: 0.78,
                     fontWeight: FontWeight.normal,
                   ),

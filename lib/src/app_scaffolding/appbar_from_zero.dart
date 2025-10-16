@@ -248,8 +248,8 @@ class AppbarFromZeroState extends State<AppbarFromZero> {
       if (overflows.isNotEmpty) {
         final iconButtonColor = Theme.of(context).appBarTheme.toolbarTextStyle?.color
             ?? Theme.of(context).textTheme.bodyLarge!.color!;
-        final iconButtonTransparentColor = iconButtonColor.withOpacity(0.05);
-        final iconButtonSemiTransparentColor = iconButtonColor.withOpacity(0.1);
+        final iconButtonTransparentColor = iconButtonColor.withValues(alpha: 0.05);
+        final iconButtonSemiTransparentColor = iconButtonColor.withValues(alpha: 0.1);
         actions.add(
           ContextMenuButton(
             actions: overflows,

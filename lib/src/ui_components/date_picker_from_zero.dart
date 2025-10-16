@@ -48,7 +48,7 @@ class DatePickerFromZero extends StatefulWidget {
     this.popupWidth,
     this.focusNode,
     this.buttonStyle = const ButtonStyle(
-      padding: MaterialStatePropertyAll(EdgeInsets.zero),
+      padding: WidgetStatePropertyAll(EdgeInsets.zero),
     ),
     this.type = DateTimePickerType.date,
     super.key,
@@ -302,7 +302,7 @@ class DatePickerFromZeroPopupState extends State<DatePickerFromZeroPopup> {
                 padding: const EdgeInsets.only(right: 16),
                 child: TextButton(
                   style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.9),
+                    foregroundColor: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.9),
                   ),
                   onPressed: () {
                     bool? pop = widget.onSelected?.call(null);

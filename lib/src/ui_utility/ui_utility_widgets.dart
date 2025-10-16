@@ -593,7 +593,7 @@ class OverflowScrollState extends State<OverflowScroll> {
 
   Future<void> _scroll([bool forward=true, Duration? waitDuration]) async{
     if (!mounted) return;
-    await Future.delayed(waitDuration ?? widget.autoscrollWaitTime);
+    await Future<dynamic>.delayed(waitDuration ?? widget.autoscrollWaitTime);
     if (!mounted) return;
     try {
       Duration duration = (1000*scrollController.position.maxScrollExtent/widget.autoscrollSpeed!).milliseconds;
@@ -915,10 +915,10 @@ class TitleTextBackground extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      backgroundColor.withOpacity(0),
-                      backgroundColor.withOpacity(0.8),
-                      backgroundColor.withOpacity(0.8),
-                      backgroundColor.withOpacity(0),
+                      backgroundColor.withValues(alpha: 0),
+                      backgroundColor.withValues(alpha: 0.8),
+                      backgroundColor.withValues(alpha: 0.8),
+                      backgroundColor.withValues(alpha: 0),
                     ],
                     stops: [0, stopPercentageLeft, stopPercentageRight, 1,],
                   ),
@@ -961,9 +961,9 @@ class IconButtonBackground extends StatelessWidget {
         gradient: RadialGradient(
           colors: [
             (Theme.of(context).brightness==Brightness.light
-                ? Colors.grey.shade100 : const Color.fromRGBO(55, 55, 55, 1)).withOpacity(0.8),
+                ? Colors.grey.shade100 : const Color.fromRGBO(55, 55, 55, 1)).withValues(alpha: 0.8),
             (Theme.of(context).brightness==Brightness.light
-                ? Colors.grey.shade100 : const Color.fromRGBO(55, 55, 55, 1)).withOpacity(0),
+                ? Colors.grey.shade100 : const Color.fromRGBO(55, 55, 55, 1)).withValues(alpha: 0),
           ],
           stops: const [
             0.5,

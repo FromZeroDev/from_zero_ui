@@ -97,8 +97,8 @@ class _FilePickerFromZeroState extends State<FilePickerFromZero> {
       result = AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         color: _dragging
-            ? Theme.of(context).colorScheme.secondary.withOpacity(0.2)
-            : Theme.of(context).colorScheme.secondary.withOpacity(0),
+            ? Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2)
+            : Theme.of(context).colorScheme.secondary.withValues(alpha: 0),
         child: result,
       );
       if (!widget.allowDragAndDropInWholeScreen) {

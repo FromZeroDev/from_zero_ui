@@ -219,14 +219,14 @@ class InkResponseTranslucent extends StatelessWidget {
   /// The cursor for a mouse pointer when it enters or is hovering over the
   /// widget.
   ///
-  /// If [mouseCursor] is a [MaterialStateProperty<MouseCursor>],
-  /// [MaterialStateProperty.resolve] is used for the following [MaterialState]s:
+  /// If [mouseCursor] is a [WidgetStateProperty<MouseCursor>],
+  /// [WidgetStateProperty.resolve] is used for the following [WidgetState]s:
   ///
-  ///  * [MaterialState.hovered].
-  ///  * [MaterialState.focused].
-  ///  * [MaterialState.disabled].
+  ///  * [WidgetState.hovered].
+  ///  * [WidgetState.focused].
+  ///  * [WidgetState.disabled].
   ///
-  /// If this property is null, [MaterialStateMouseCursor.clickable] will be used.
+  /// If this property is null, [WidgetStateMouseCursor.clickable] will be used.
   final MouseCursor? mouseCursor;
 
   /// Whether this ink response should be clipped its bounds.
@@ -335,12 +335,12 @@ class InkResponseTranslucent extends StatelessWidget {
   /// This default null property can be used as an alternative to
   /// [focusColor], [hoverColor], [highlightColor], and
   /// [splashColor]. If non-null, it is resolved against one of
-  /// [MaterialState.focused], [MaterialState.hovered], and
-  /// [MaterialState.pressed]. It's convenient to use when the parent
-  /// widget can pass along its own MaterialStateProperty value for
+  /// [WidgetState.focused], [WidgetState.hovered], and
+  /// [WidgetState.pressed]. It's convenient to use when the parent
+  /// widget can pass along its own WidgetStateProperty value for
   /// the overlay color.
   ///
-  /// [MaterialState.pressed] triggers a ripple (an ink splash), per
+  /// [WidgetState.pressed] triggers a ripple (an ink splash), per
   /// the current Material Design spec. The [overlayColor] doesn't map
   /// a state to [highlightColor] because a separate highlight is not
   /// used by the current design guidelines. See
@@ -354,7 +354,7 @@ class InkResponseTranslucent extends StatelessWidget {
   ///  * The Material Design specification for overlay colors and how they
   ///    match a component's state:
   ///    <https://material.io/design/interaction/states.html#anatomy>.
-  final MaterialStateProperty<Color?>? overlayColor;
+  final WidgetStateProperty<Color?>? overlayColor;
 
   /// The splash color of the ink response. If this property is null then the
   /// splash color of the theme, [ThemeData.splashColor], will be used.
@@ -431,16 +431,16 @@ class InkResponseTranslucent extends StatelessWidget {
 
   /// {@template flutter.material.InkWellTranslucent.statesController}
   /// Represents the interactive "state" of this widget in terms of
-  /// a set of [MaterialState]s, like [MaterialState.pressed] and
-  /// [MaterialState.focused].
+  /// a set of [WidgetState]s, like [WidgetState.pressed] and
+  /// [WidgetState.focused].
   ///
   /// Classes based on this one can provide their own
-  /// [MaterialStatesController] to which they've added listeners.
-  /// They can also update the controller's [MaterialStatesController.value]
+  /// [WidgetStatesController] to which they've added listeners.
+  /// They can also update the controller's [WidgetStatesController.value]
   /// however, this may only be done when it's safe to call
   /// [State.setState], like in an event handler.
   /// {@endtemplate}
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
 
   @override
   Widget build(BuildContext context) {
@@ -560,7 +560,7 @@ class _InkResponseTranslucentStateWidget extends StatefulWidget {
   final Color? focusColor;
   final Color? hoverColor;
   final Color? highlightColor;
-  final MaterialStateProperty<Color?>? overlayColor;
+  final WidgetStateProperty<Color?>? overlayColor;
   final Color? splashColor;
   final InteractiveInkFeatureFactory? splashFactory;
   final bool enableFeedback;
@@ -572,7 +572,7 @@ class _InkResponseTranslucentStateWidget extends StatefulWidget {
   final _ParentInkResponseTranslucentState? parentState;
   final _GetRectCallback? getRectCallback;
   final _CheckContext debugCheckContext;
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
 
   @override
   _InkResponseTranslucentState createState() => _InkResponseTranslucentState();
@@ -624,7 +624,7 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
     ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: simulateTap),
     ButtonActivateIntent: CallbackAction<ButtonActivateIntent>(onInvoke: simulateTap),
   };
-  MaterialStatesController? internalStatesController;
+  WidgetStatesController? internalStatesController;
 
   bool get highlightsExist => _highlights.values.where((InkHighlight? highlight) => highlight != null).isNotEmpty;
 
@@ -660,13 +660,13 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
     setState(() { });
   }
 
-  MaterialStatesController get statesController => widget.statesController ?? internalStatesController!;
+  WidgetStatesController get statesController => widget.statesController ?? internalStatesController!;
 
   void initStatesController() {
     if (widget.statesController == null) {
-      internalStatesController = MaterialStatesController();
+      internalStatesController = WidgetStatesController();
     }
-    statesController.update(MaterialState.disabled, !enabled);
+    statesController.update(WidgetState.disabled, !enabled);
     statesController.addListener(handleStatesControllerChange);
   }
 
@@ -706,9 +706,9 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
       _updateHighlightsAndSplashes();
     }
     if (enabled != isWidgetEnabled(oldWidget)) {
-      statesController.update(MaterialState.disabled, !enabled);
+      statesController.update(WidgetState.disabled, !enabled);
       if (!enabled) {
-        statesController.update(MaterialState.pressed, false);
+        statesController.update(WidgetState.pressed, false);
         // Remove the existing hover highlight immediately when enabled is false.
         // Do not rely on updateHighlight or InkHighlight.deactivate to not break
         // the expected lifecycle which is updating _hovering when the mouse exit.
@@ -755,10 +755,10 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
 
     switch (type) {
       case _HighlightType.pressed:
-        statesController.update(MaterialState.pressed, value);
+        statesController.update(WidgetState.pressed, value);
       case _HighlightType.hover:
         if (callOnHover) {
-          statesController.update(MaterialState.hovered, value);
+          statesController.update(WidgetState.hovered, value);
         }
       case _HighlightType.focus:
       // see handleFocusUpdate()
@@ -908,10 +908,10 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
   void handleFocusUpdate(bool hasFocus) {
     _hasFocus = hasFocus;
     // Set here rather than updateHighlight because this widget's
-    // (MaterialState) states include MaterialState.focused if
+    // (WidgetState) states include WidgetState.focused if
     // the InkWellTranslucent _has_ the focus, rather than if it's showing
     // the focus per FocusManager.instance.highlightMode.
-    statesController.update(MaterialState.focused, hasFocus);
+    statesController.update(WidgetState.focused, hasFocus);
     updateFocusHighlights();
     widget.onFocusChange?.call(hasFocus);
   }
@@ -952,7 +952,7 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
     } else {
       globalPosition = details!.globalPosition;
     }
-    statesController.update(MaterialState.pressed, true); // ... before creating the splash
+    statesController.update(WidgetState.pressed, true); // ... before creating the splash
     final InteractiveInkFeature splash = _createSplash(globalPosition);
     _splashes ??= HashSet<InteractiveInkFeature>();
     _splashes!.add(splash);
@@ -1088,9 +1088,9 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
     super.build(context); // See AutomaticKeepAliveClientMixin.
 
     Color getHighlightColorForType(_HighlightType type) {
-      const Set<MaterialState> pressed = <MaterialState>{MaterialState.pressed};
-      const Set<MaterialState> focused = <MaterialState>{MaterialState.focused};
-      const Set<MaterialState> hovered = <MaterialState>{MaterialState.hovered};
+      const Set<WidgetState> pressed = <WidgetState>{WidgetState.pressed};
+      const Set<WidgetState> focused = <WidgetState>{WidgetState.focused};
+      const Set<WidgetState> hovered = <WidgetState>{WidgetState.hovered};
 
       final ThemeData theme = Theme.of(context);
       switch (type) {
@@ -1111,8 +1111,8 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
 
     _currentSplash?.color = widget.overlayColor?.resolve(statesController.value) ?? widget.splashColor ?? Theme.of(context).splashColor;
 
-    final MouseCursor effectiveMouseCursor = MaterialStateProperty.resolveAs<MouseCursor>(
-      widget.mouseCursor ?? MaterialStateMouseCursor.clickable,
+    final MouseCursor effectiveMouseCursor = WidgetStateProperty.resolveAs<MouseCursor>(
+      widget.mouseCursor ?? WidgetStateMouseCursor.clickable,
       statesController.value,
     );
 

@@ -83,7 +83,7 @@ class PageFutureHandlingState extends State<PageFutureHandling> {
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: FutureBuilderFromZero(
-              future: Future.delayed(const Duration(seconds: 2)).then((value) => "Kappa"),
+              future: Future<dynamic>.delayed(const Duration(seconds: 2)).then((value) => "Kappa"),
               successBuilder: (context, result) {
                 return Center(child: Text("Succes :)\r\nValue: $result"));
               },
@@ -97,7 +97,7 @@ class PageFutureHandlingState extends State<PageFutureHandling> {
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: FutureBuilderFromZero(
-              future: Future.delayed(const Duration(seconds: 3)).then((value) => throw Exception()),
+              future: Future<dynamic>.delayed(const Duration(seconds: 3)).then((value) => throw Exception()),
               successBuilder: (context, result) {
                 return Center(child: Text("Succes :)\r\nValue: $result"));
               },
@@ -111,7 +111,7 @@ class PageFutureHandlingState extends State<PageFutureHandling> {
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: FutureBuilderFromZero(
-              future: Future.delayed(const Duration(milliseconds: 10)).then((value) => "instant"),
+              future: Future<dynamic>.delayed(const Duration(milliseconds: 10)).then((value) => "instant"),
               successBuilder: (context, result) {
                 return const FlutterLogo(size: 600,);
               },

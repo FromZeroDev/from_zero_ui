@@ -116,7 +116,7 @@ class ArrowPageIndicatorState extends State<ArrowPageIndicator> {
       Opacity(
         opacity: isNotVisible ? 0.0 : 1.0,
         child: Material(
-          color: Theme.of(context).canvasColor.withOpacity(0.75),
+          color: Theme.of(context).canvasColor.withValues(alpha: 0.75),
           shape: const CircleBorder(),
           child: IconButton(
             iconSize: widget.iconSize,

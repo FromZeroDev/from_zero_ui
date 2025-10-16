@@ -557,9 +557,9 @@ class WindowBar extends StatelessWidget {
                   }
                 },
                 colors: WindowButtonColors(
-                  mouseOver: iconColor.withOpacity(0.1),
-                  mouseDown: iconColor.withOpacity(0.2),
-                  iconNormal: iconColor.withOpacity(0.8),
+                  mouseOver: iconColor.withValues(alpha: 0.1),
+                  mouseDown: iconColor.withValues(alpha: 0.2),
+                  iconNormal: iconColor.withValues(alpha: 0.8),
                   iconMouseOver: iconColor,
                   iconMouseDown: iconColor,
                 ),
@@ -577,9 +577,9 @@ class WindowBar extends StatelessWidget {
                   }
                 },
                 colors: WindowButtonColors(
-                  mouseOver: iconColor.withOpacity(0.1),
-                  mouseDown: iconColor.withOpacity(0.2),
-                  iconNormal: iconColor.withOpacity(0.8),
+                  mouseOver: iconColor.withValues(alpha: 0.1),
+                  mouseDown: iconColor.withValues(alpha: 0.2),
+                  iconNormal: iconColor.withValues(alpha: 0.8),
                   iconMouseOver: iconColor,
                   iconMouseDown: iconColor,
                 ),
@@ -596,7 +596,7 @@ class WindowBar extends StatelessWidget {
                 colors: WindowButtonColors(
                   mouseOver: const Color(0xFFD32F2F),
                   mouseDown: const Color(0xFFB71C1C),
-                  iconNormal: iconColor.withOpacity(0.8),
+                  iconNormal: iconColor.withValues(alpha: 0.8),
                   iconMouseOver: Colors.white,
                   iconMouseDown: Colors.white,
                 ),

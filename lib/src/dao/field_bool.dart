@@ -394,7 +394,7 @@ class BoolField extends Field<BoolComparable> {
                       : dense ? 22 : addCard ? 16 : 12,
                 ),
                 tileColor: dense && visibleValidationErrors.isNotEmpty
-                    ? ValidationMessage.severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!.withOpacity(0.2)
+                    ? ValidationMessage.severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!.withValues(alpha: 0.2)
                     : backgroundColor?.call(context, this, dao),
                 checkColor: selectedColor?.call(context, this, dao),
                 onChanged: !enabled ? null : (value) {
@@ -411,13 +411,13 @@ class BoolField extends Field<BoolComparable> {
                         padding: const EdgeInsets.only(bottom: 3),
                         child: Text(uiName,
                           style: theme.textTheme.bodySmall!.copyWith(
-                            color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                            color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                           ),
                         ),
                       ),
                     Text(uiNameValue,
                       style: theme.textTheme.titleMedium!.copyWith(
-                        color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                        color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                         height: 1.2,
                       ),
                     ),
@@ -426,7 +426,7 @@ class BoolField extends Field<BoolComparable> {
                         padding: const EdgeInsets.only(top: 3),
                         child: Text(uiName,
                           style: theme.textTheme.bodySmall!.copyWith(
-                            color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                            color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                           ),
                         ),
                       ),
@@ -456,10 +456,10 @@ class BoolField extends Field<BoolComparable> {
                       : dense ? 22 : addCard ? 16 : 12,
                   ),
                   tileColor: dense && visibleValidationErrors.isNotEmpty
-                      ? ValidationMessage.severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!.withOpacity(0.2)
+                      ? ValidationMessage.severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!.withValues(alpha: 0.2)
                       : backgroundColor?.call(context, this, dao),
                   activeColor: selectedColor?.call(context, this, dao),
-                  activeTrackColor: selectedColor?.call(context, this, dao)?.withOpacity(0.33),
+                  activeTrackColor: selectedColor?.call(context, this, dao)?.withValues(alpha: 0.33),
                   title: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,13 +469,13 @@ class BoolField extends Field<BoolComparable> {
                           padding: const EdgeInsets.only(bottom: 3),
                           child: Text(uiName,
                             style: theme.textTheme.bodySmall!.copyWith(
-                              color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                              color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                             ),
                           ),
                         ),
                       Text(uiNameValue,
                         style: theme.textTheme.titleMedium!.copyWith(
-                          color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                          color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                           height: 1.2,
                         ),
                       ),
@@ -484,7 +484,7 @@ class BoolField extends Field<BoolComparable> {
                           padding: const EdgeInsets.only(top: 3),
                           child: Text(uiName,
                             style: theme.textTheme.bodySmall!.copyWith(
-                              color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                              color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                             ),
                           ),
                         ),
@@ -514,7 +514,7 @@ class BoolField extends Field<BoolComparable> {
                       controlAffinity: ListTileControlAffinity.leading,
                       contentPadding: EdgeInsets.only(left: ((maxWidth/2)-16).coerceAtLeast(0), top: dense ? 8 : 14),
                       tileColor: dense && visibleValidationErrors.isNotEmpty
-                          ? ValidationMessage.severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!.withOpacity(0.2)
+                          ? ValidationMessage.severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!.withValues(alpha: 0.2)
                           : backgroundColor?.call(context, this, dao),
                       checkColor: selectedColor?.call(context, this, dao),
                       onChanged: !enabled ? null : (value) {
@@ -534,14 +534,14 @@ class BoolField extends Field<BoolComparable> {
                               softWrap: false,
                               style: TextStyle(
                                 height: 1,
-                                color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                                color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                               ),
                               overflowReplacement: AutoSizeText(uiNameValue,
                                 textAlign: TextAlign.center,
                                 maxLines: 2,
                                 style: TextStyle(
                                   height: 1,
-                                  color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                                  color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                                 ),
                               ),
                             ),
@@ -560,7 +560,7 @@ class BoolField extends Field<BoolComparable> {
                   type: MaterialType.card,
                   elevation: 0,
                   color: dense && visibleValidationErrors.isNotEmpty
-                      ? ValidationMessage.severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!.withOpacity(0.2)
+                      ? ValidationMessage.severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!.withValues(alpha: 0.2)
                       : backgroundColor?.call(context, this, dao),
                   child: InkWell(
                     focusNode: focusNode,
@@ -580,7 +580,7 @@ class BoolField extends Field<BoolComparable> {
                             child: Switch(
                               value: value!.value,
                               activeColor: selectedColor?.call(context, this, dao),
-                              activeTrackColor: selectedColor?.call(context, this, dao)?.withOpacity(0.33),
+                              activeTrackColor: selectedColor?.call(context, this, dao)?.withValues(alpha: 0.33),
                               onChanged: !enabled ? null : (value) {
                                 focusNode.requestFocus();
                                 userInteracted = true;
@@ -604,14 +604,14 @@ class BoolField extends Field<BoolComparable> {
                           softWrap: false,
                           style: TextStyle(
                             height: 1,
-                            color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                            color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                           ),
                           overflowReplacement: AutoSizeText(uiNameValue,
                             textAlign: TextAlign.center,
                             maxLines: 2,
                             style: TextStyle(
                               height: 1,
-                              color: theme.textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+                              color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                             ),
                           ),
                         ),

@@ -54,7 +54,7 @@ class TableEmptyWidget<T> extends StatelessWidget {
             child: OverflowBox(
               maxHeight: double.infinity,
               child: Center(
-                child: Icon(MaterialCommunityIcons.clipboard_alert_outline, size: 88, color: Theme.of(context).disabledColor.withOpacity(0.04),),
+                child: Icon(MaterialCommunityIcons.clipboard_alert_outline, size: 88, color: Theme.of(context).disabledColor.withValues(alpha: 0.04),),
               ),
             ),
           ),

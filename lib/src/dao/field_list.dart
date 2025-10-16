@@ -857,7 +857,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Theme.of(context).cardColor.withOpacity(0),
+                              Theme.of(context).cardColor.withValues(alpha: 0),
                               Theme.of(context).cardColor,
                             ],
                           ),
@@ -947,7 +947,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Theme.of(context).cardColor.withOpacity(0),
+                              Theme.of(context).cardColor.withValues(alpha: 0),
                               Theme.of(context).cardColor,
                             ],
                           ),
@@ -1477,7 +1477,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         result = AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           color: dense && visibleListFieldValidationErrors.isNotEmpty
-              ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleListFieldValidationErrors.first.severity]!.withOpacity(0.2)
+              ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleListFieldValidationErrors.first.severity]!.withValues(alpha: 0.2)
               : backgroundColor?.call(context, this, dao),
           curve: Curves.easeOut,
           child: result,
@@ -1859,7 +1859,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
                   border: Border.all(
                     width: 2,
-                    color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.3),
+                    color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.3),
                   ),
                 ),
               ),
@@ -1874,7 +1874,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         result = AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           color: dense && visibleListFieldValidationErrors.isNotEmpty
-              ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleListFieldValidationErrors.first.severity]!.withOpacity(0.2)
+              ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleListFieldValidationErrors.first.severity]!.withValues(alpha: 0.2)
               : backgroundColor?.call(context, this, dao),
           curve: Curves.easeOut,
           child: result,
@@ -2058,7 +2058,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         result = AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           color: dense && visibleValidationErrors.isNotEmpty
-              ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!.withOpacity(0.2)
+              ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!.withValues(alpha: 0.2)
               : backgroundColor?.call(context, this, dao),
           curve: Curves.easeOut,
           child: result,
@@ -2319,7 +2319,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
               height: rowHeight,
               onRowTap: onRowTapFocused,
               selected: allowMultipleSelection ? (selectedObjects.value[e] ?? selectionDefault) : null,
-              // backgroundColor: selectedObjects.value[e]??false ? Theme.of(context).colorScheme.secondary.withOpacity(0.2) : null,
+              // backgroundColor: selectedObjects.value[e]??false ? Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2) : null,
               onCheckBoxSelected: allowMultipleSelection ? (row, focused) {
                 selectedObjects.value[row.id] = focused??false;
                 (row as SimpleRowModel).selected = focused??false;
@@ -2562,7 +2562,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                     child: Center(
                       child: Container(
                         width: getMaxWidth(columns.keys),
-                        color: enabled ? Colors.transparent : Colors.black.withOpacity(0.25),
+                        color: enabled ? Colors.transparent : Colors.black.withValues(alpha: 0.25),
                       ),
                     ),
                   ),
@@ -2694,7 +2694,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
           color: backgroundColor?.call(context, this, dao) ?? Material.of(context).color ?? Theme.of(context).cardColor,
           child: TextButton.icon(
             style: TextButton.styleFrom(
-              backgroundColor: Color.alphaBlend(Theme.of(context).colorScheme.secondary.withOpacity(0.1), Theme.of(context).cardColor),
+              backgroundColor: Color.alphaBlend(Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1), Theme.of(context).cardColor),
             ),
             onPressed: !addonEnabled ? null : (onPressed ?? () async {
               focusNode.requestFocus();

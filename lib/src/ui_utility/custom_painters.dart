@@ -34,7 +34,7 @@ class SimpleShadowPainter extends CustomPainter {
 //        ..addOval(Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)))
 //        ..fillType = PathFillType.evenOdd,
 //      Paint()
-//        ..color = color.withOpacity(shadowOpacity)
+//        ..color = color.withValues(alpha: shadowOpacity)
 //        ..maskFilter = MaskFilter.blur(BlurStyle.normal, convertRadiusToSigma(3)),
 //    );
 
@@ -70,7 +70,7 @@ class SimpleShadowPainter extends CustomPainter {
         )
         ..fillType = PathFillType.evenOdd,
       Paint()
-        ..color = color.withOpacity(shadowOpacity)
+        ..color = color.withValues(alpha: shadowOpacity)
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, convertRadiusToSigma(spread)),
     );
 
@@ -79,7 +79,7 @@ class SimpleShadowPainter extends CustomPainter {
 //        ..addRect(Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)))
 ////        ..addOval(Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)))
 //        ..fillType = PathFillType.evenOdd,
-//      color.withOpacity(shadowOpacity),
+//      color.withValues(alpha: shadowOpacity),
 //      elevation,
 //      true,
 //    );

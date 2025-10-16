@@ -60,7 +60,7 @@ class ComboFromZero<T> extends StatefulWidget {
     this.focusNode,
     this.popupWidgetBuilder,
     this.buttonStyle = const ButtonStyle(
-      padding: MaterialStatePropertyAll(EdgeInsets.zero),
+      padding: WidgetStatePropertyAll(EdgeInsets.zero),
     ),
     this.popupRowHeight = 38,
     this.useFixedPopupRowHeight = true,

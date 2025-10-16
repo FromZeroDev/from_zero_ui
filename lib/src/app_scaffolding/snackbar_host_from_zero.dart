@@ -121,7 +121,7 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
                             curve: Curves.ease,
                             color: blockUI
                                 ? Colors.black54
-                                : Colors.black.withOpacity(0),
+                                : Colors.black.withValues(alpha: 0),
                           ),
                         );
                       },

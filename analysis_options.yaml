@@ -92,5 +92,10 @@ linter:
     - use_if_null_to_convert_nulls_to_bools
 
 
+formatter:
+  page_width: 120
+  trailing_commas: preserve
+
+
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

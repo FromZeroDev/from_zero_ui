@@ -217,7 +217,7 @@ class ExportState extends State<Export> {
         if (first){
           first = false;
           WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
-            await Future.delayed(500.milliseconds);
+            await Future<dynamic>.delayed(500.milliseconds);
             if (mounted) {
               setState(() {});
             }
@@ -308,10 +308,10 @@ class ExportState extends State<Export> {
       );
     }
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
-      await Future.delayed(100.milliseconds);
+      await Future<dynamic>.delayed(100.milliseconds);
       if (!mounted) return;
       setState(() {});
-      await Future.delayed(400.milliseconds);
+      await Future<dynamic>.delayed(400.milliseconds);
       if (!mounted) return;
       await _executeExport(size, i, pdf);
       i++;
@@ -423,7 +423,7 @@ class ExportState extends State<Export> {
               if (i==-1){
                 backgroundColor = col?.backgroundColor;
                 if (backgroundColor!=null){
-                  backgroundColor = backgroundColor.withOpacity(backgroundColor.opacity*0.5);
+                  backgroundColor = backgroundColor.withValues(alpha: backgroundColor.opacity*0.5);
                 }
               } else{
                 if (value.currentState!.widget.rowStyleTakesPriorityOverColumn){
@@ -580,7 +580,7 @@ class ExportState extends State<Export> {
                   const SizedBox(height: 16,),
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor.withOpacity(0.8),
+                      color: Theme.of(context).cardColor.withValues(alpha: 0.8),
                       borderRadius: const BorderRadius.all(Radius.circular(4)),
                     ),
                     child: TextButton(
@@ -603,7 +603,7 @@ class ExportState extends State<Export> {
         doneExports = 0;
         _export(size);
         do {
-          await Future.delayed(500.milliseconds);
+          await Future<dynamic>.delayed(500.milliseconds);
         } while (doneExports<(widget.childrenCount?.call(currentSize, portrait, scale, format,)??1));
         if (mounted) {
           Navigator.of(context).pop();
@@ -703,7 +703,7 @@ class ExportState extends State<Export> {
                                 controller: textEditingControllers[value],
                                 decoration: InputDecoration(
                                   labelText: "Título", // TODO 3 internationalize
-                                  labelStyle: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.75)),
+                                  labelStyle: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75)),
                                   border: const OutlineInputBorder(),
                                   contentPadding: const EdgeInsets.only(left: 12, right: 34, top: 17, bottom: 18),
                                 ),

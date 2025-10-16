@@ -239,7 +239,7 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
           );
     result = IntrinsicHeight(
       child: Container(
-        color: Color.alphaBlend(SnackBarFromZero.colors[type].withOpacity(0.066), Theme.of(context).cardColor),
+        color: Color.alphaBlend(SnackBarFromZero.colors[type].withValues(alpha: 0.066), Theme.of(context).cardColor),
         constraints: const BoxConstraints(minHeight: 56,),
         child: Column(
           children: [
@@ -434,7 +434,7 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
     }
     result = IntrinsicHeight(
       child: Container(
-        color: Color.alphaBlend(SnackBarFromZero.colors[type].withOpacity(0.066), Theme.of(context).cardColor),
+        color: Color.alphaBlend(SnackBarFromZero.colors[type].withValues(alpha: 0.066), Theme.of(context).cardColor),
         constraints: const BoxConstraints(minHeight: 56,),
         child: Column(
           children: [

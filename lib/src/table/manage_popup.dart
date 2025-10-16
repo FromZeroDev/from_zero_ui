@@ -63,7 +63,7 @@ abstract class TableFromZeroManagePopup {
                                   Positioned.fill(
                                     child: FadeTransition(
                                       opacity: animation,
-                                      child: ColoredBox(color: Theme.of(context).colorScheme.primary.withOpacity(0.2)),
+                                      child: ColoredBox(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
                                     ),
                                   ),
                                   child,
@@ -233,7 +233,7 @@ abstract class TableFromZeroManagePopup {
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: [
-                                    Theme.of(context).cardColor.withOpacity(0),
+                                    Theme.of(context).cardColor.withValues(alpha: 0),
                                     Theme.of(context).cardColor,
                                   ],
                                 ),

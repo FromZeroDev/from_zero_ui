@@ -573,7 +573,7 @@ class _TooltipFromZeroState extends State<TooltipFromZero> with SingleTickerProv
         fontSize: _getDefaultFontSize(),
       );
       defaultDecoration = BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withValues(alpha: 0.9),
         borderRadius: const BorderRadius.all(Radius.circular(4)),
       );
     } else {
@@ -582,7 +582,7 @@ class _TooltipFromZeroState extends State<TooltipFromZero> with SingleTickerProv
         fontSize: _getDefaultFontSize(),
       );
       defaultDecoration = BoxDecoration(
-        color: Colors.grey[700]!.withOpacity(0.9),
+        color: Colors.grey[700]!.withValues(alpha: 0.9),
         borderRadius: const BorderRadius.all(Radius.circular(4)),
       );
     }
@@ -789,17 +789,17 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
                   data: Theme.of(context).copyWith(
                     scrollbarTheme: Theme.of(context).scrollbarTheme.copyWith(
                       crossAxisMargin: 4,
-                      trackColor: MaterialStateProperty.resolveWith((states) {
-                        return widget.textStyle?.color?.withOpacity(0.2);
+                      trackColor: WidgetStateProperty.resolveWith((states) {
+                        return widget.textStyle?.color?.withValues(alpha: 0.2);
                       }),
-                      thumbColor: MaterialStateProperty.resolveWith((states) {
-                        if (states.contains(MaterialState.dragged)) {
-                          return widget.textStyle?.color?.withOpacity(0.6);
+                      thumbColor: WidgetStateProperty.resolveWith((states) {
+                        if (states.contains(WidgetState.dragged)) {
+                          return widget.textStyle?.color?.withValues(alpha: 0.6);
                         }
-                        if (states.contains(MaterialState.hovered)) {
-                          return widget.textStyle?.color?.withOpacity(0.5);
+                        if (states.contains(WidgetState.hovered)) {
+                          return widget.textStyle?.color?.withValues(alpha: 0.5);
                         }
-                        return widget.textStyle?.color?.withOpacity(0.4);
+                        return widget.textStyle?.color?.withValues(alpha: 0.4);
                       }),
                     ),
                   ),

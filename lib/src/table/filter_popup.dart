@@ -351,7 +351,7 @@ abstract class TableFromZeroFilterPopup {
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  Theme.of(context).cardColor.withOpacity(0),
+                                  Theme.of(context).cardColor.withValues(alpha: 0),
                                   Theme.of(context).cardColor,
                                 ],
                               ),

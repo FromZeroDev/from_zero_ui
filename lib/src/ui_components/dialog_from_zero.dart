@@ -566,7 +566,7 @@ class DialogButton extends StatelessWidget {
   Color? _defaultColor(BuildContext context) {
     switch(_dialogButtonType) {
       case DialogButtonType.cancel:
-        return (Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.8));
+        return (Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.8));
       case DialogButtonType.accept:
         return Colors.blue;
       case DialogButtonType.other:

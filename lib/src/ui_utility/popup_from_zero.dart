@@ -23,7 +23,7 @@ Future<T?> showPopupFromZero<T>({
 }) async {
   return showDialog<T>(
     context: context,
-    barrierColor: barrierColor ?? Colors.black.withOpacity(0.2),
+    barrierColor: barrierColor ?? Colors.black.withValues(alpha: 0.2),
     barrierDismissible: barrierDismissible,
     useSafeArea: false,
     builder: (context) {

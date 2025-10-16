@@ -312,14 +312,14 @@ class StringField extends Field<String> {
                   animation: focusNode,
                   builder: (context, child) {
                     final backgroundColor = this.backgroundColor?.call(context, this, dao);
-                    final focusColor = Theme.of(context).focusColor.withOpacity(Theme.of(context).focusColor.opacity*0.6);
+                    final focusColor = Theme.of(context).focusColor.withValues(alpha: Theme.of(context).focusColor.opacity*0.6);
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
                       color: dense && visibleValidationErrors.isNotEmpty
-                          ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!.withOpacity(0.2)
+                          ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!.withValues(alpha: 0.2)
                           : focusNode.hasFocus  ? backgroundColor!=null ? Color.alphaBlend(focusColor, backgroundColor)
                                                                         : focusColor
-                                                : focusColor.withOpacity(0),
+                                                : focusColor.withValues(alpha: 0),
                       curve: Curves.easeOut,
                     );
                   },
@@ -478,17 +478,17 @@ class StringField extends Field<String> {
       textInputAction: largeVertically ? null : TextInputAction.next,
       style: Theme.of(context).textTheme.titleMedium!.copyWith(
         height: largeVertically ? 1.2 : 1.05,
-        color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+        color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
         fontWeight: largeVertically ? FontWeight.w500 : FontWeight.w600,
       ),
       decoration: inputDecoration??InputDecoration(
         hintText: hint,
         border: InputBorder.none,
         alignLabelWithHint: dense,
-        hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.75)),
+        hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75)),
         labelStyle: TextStyle(
           height: dense ? 0 : largeVertically ? 0.2 : 0.6,
-          color: Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(enabled ? 1 : 0.75),
+          color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
         ),
         label: largeVertically
             ? Padding(

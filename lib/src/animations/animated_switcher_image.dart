@@ -274,7 +274,7 @@ class _AnimatedSwitcherImageState extends State<AnimatedSwitcherImage> with Tick
     if (image!=null) {
       // print ('Setting image ${entry.hashCode}');
       await precacheImage(image, context);
-      await Future.delayed(const Duration(milliseconds: 1000)); // on success, let app breathe for a while before refreshing
+      await Future<dynamic>.delayed(const Duration(milliseconds: 1000)); // on success, let app breathe for a while before refreshing
       if (!mounted) return;
       entry.image = image;
     }

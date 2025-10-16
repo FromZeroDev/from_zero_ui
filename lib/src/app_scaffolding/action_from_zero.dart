@@ -170,8 +170,8 @@ class ActionFromZero extends StatelessWidget {
       color ??= Theme.of(context).appBarTheme.toolbarTextStyle?.color
           ?? Theme.of(context).textTheme.bodyLarge!.color!;
     }
-    final transparentColor = color.withOpacity(0.05);
-    final semiTransparentColor = color.withOpacity(0.1);
+    final transparentColor = color.withValues(alpha: 0.05);
+    final semiTransparentColor = color.withValues(alpha: 0.1);
     return TooltipFromZero(
       message: '$title${disablingError==null ? '' : '\n$disablingError'}',
       child: IconButton(

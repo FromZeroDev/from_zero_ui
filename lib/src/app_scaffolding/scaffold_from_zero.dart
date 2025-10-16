@@ -774,7 +774,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                             controller: widget.appbarController,
                             onExpanded: widget.onAppbarActionExpanded,
                             onUnexpanded: widget.onAppbarActionUnexpanded,
-                            backgroundColor: (Theme.of(context).appBarTheme.backgroundColor??Theme.of(context).primaryColor).withOpacity(0.9),
+                            backgroundColor: (Theme.of(context).appBarTheme.backgroundColor??Theme.of(context).primaryColor).withValues(alpha: 0.9),
                             elevation: 0,
                             titleSpacing: 0,
                             centerTitle: widget.centerTitle,
@@ -816,8 +816,8 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                   }
                                   final iconButtonColor = Theme.of(context).appBarTheme.toolbarTextStyle?.color
                                       ?? (Theme.of(context).textTheme.bodyLarge!.color!);
-                                  final iconButtonTransparentColor = iconButtonColor.withOpacity(0.05);
-                                  final iconButtonSemiTransparentColor = iconButtonColor.withOpacity(0.1);
+                                  final iconButtonTransparentColor = iconButtonColor.withValues(alpha: 0.05);
+                                  final iconButtonSemiTransparentColor = iconButtonColor.withValues(alpha: 0.1);
                                   result = TooltipFromZero(
                                     message: FromZeroLocalizations.of(context).translate("back"),
                                     child: IconButton(
@@ -833,8 +833,8 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                 } else{
                                   final iconButtonColor = Theme.of(context).appBarTheme.toolbarTextStyle?.color
                                       ?? (Theme.of(context).textTheme.bodyLarge!.color!);
-                                  final iconButtonTransparentColor = iconButtonColor.withOpacity(0.05);
-                                  final iconButtonSemiTransparentColor = iconButtonColor.withOpacity(0.1);
+                                  final iconButtonTransparentColor = iconButtonColor.withValues(alpha: 0.05);
+                                  final iconButtonSemiTransparentColor = iconButtonColor.withValues(alpha: 0.1);
                                   result = AnimatedBuilder(
                                     animation: ModalRoute.of(context)?.secondaryAnimation ?? kAlwaysDismissedAnimation,
                                     builder: (context, child) => TooltipFromZero(
@@ -1018,8 +1018,8 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                   }
                   final iconButtonColor = Theme.of(context).appBarTheme.toolbarTextStyle?.color
                       ?? (Theme.of(context).textTheme.bodyLarge!.color!);
-                  final iconButtonTransparentColor = iconButtonColor.withOpacity(0.05);
-                  final iconButtonSemiTransparentColor = iconButtonColor.withOpacity(0.1);
+                  final iconButtonTransparentColor = iconButtonColor.withValues(alpha: 0.05);
+                  final iconButtonSemiTransparentColor = iconButtonColor.withValues(alpha: 0.1);
                   return Stack(
                     fit: StackFit.expand,
                     children: [
@@ -1074,8 +1074,8 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                     }
                     final iconButtonColor = Theme.of(context).appBarTheme.toolbarTextStyle?.color
                         ?? (Theme.of(context).textTheme.bodyLarge!.color!);
-                    final iconButtonTransparentColor = iconButtonColor.withOpacity(0.05);
-                    final iconButtonSemiTransparentColor = iconButtonColor.withOpacity(0.1);
+                    final iconButtonTransparentColor = iconButtonColor.withValues(alpha: 0.05);
+                    final iconButtonSemiTransparentColor = iconButtonColor.withValues(alpha: 0.1);
                     return TooltipFromZero(
                       message: isDrawerOpen
                           ? FromZeroLocalizations.of(context).translate("menu_close")
@@ -1138,9 +1138,9 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                   curve: widget.appbarAnimationCurve,
                                   data: Theme.of(context).copyWith(
                                     scrollbarTheme: Theme.of(context).scrollbarTheme.copyWith(
-                                      thickness: MaterialStateProperty.resolveWith((states) {
+                                      thickness: WidgetStateProperty.resolveWith((states) {
                                         final baseThickness = Theme.of(context).scrollbarTheme.thickness?.resolve(states)
-                                            ?? (PlatformExtended.isMobile ? 4 : states.contains(MaterialState.hovered) ? 12.0 : 8.0);
+                                            ?? (PlatformExtended.isMobile ? 4 : states.contains(WidgetState.hovered) ? 12.0 : 8.0);
                                         final removable = PlatformExtended.isMobile ? 0 : 4;
                                         return baseThickness + (calculatedDrawerWidth - currentDrawerWidth - removable).coerceIn(0);
                                       }),
@@ -1364,7 +1364,7 @@ class AppbarChangeNotifier extends ChangeNotifier{
     if (appbarType==AppbarType.quickReturn && lastScrollUpdateTime == null){
       lastScrollUpdateTime = DateTime.now().millisecondsSinceEpoch;
       Future.doWhile(() async{
-        await Future.delayed(80.milliseconds);
+        await Future<dynamic>.delayed(80.milliseconds);
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
           if (!disposed && DateTime.now().millisecondsSinceEpoch - lastScrollUpdateTime! > 500){
             if (currentAppbarOffset>-(appbarHeight)/2) {

@@ -773,7 +773,7 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
                               width: 26.0, //(widget.depth+1)*20.0
                               decoration: BoxDecoration(
                                 borderRadius: const BorderRadius.only(topRight: Radius.circular(16)),
-                                color: Color.alphaBlend(theme.dividerColor.withOpacity(theme.dividerColor.opacity*0.5), Material.maybeOf(context)?.color ?? theme.cardColor),
+                                color: Color.alphaBlend(theme.dividerColor.withValues(alpha: theme.dividerColor.opacity*0.5), Material.maybeOf(context)?.color ?? theme.cardColor),
                                 // color: Color.alphaBlend(
                                 //   selected!=i
                                 //       ? theme.dividerColor
@@ -998,7 +998,7 @@ class DrawerMenuButtonFromZeroState extends State<DrawerMenuButtonFromZero> {
                 ? widget.selected ? 17 : 14
                 : widget.selected ? 17 : 16,
             color: dense
-                ? widget.selected ? selectedTextColor.withOpacity(0.75) : theme.textTheme.bodySmall!.color
+                ? widget.selected ? selectedTextColor.withValues(alpha: 0.75) : theme.textTheme.bodySmall!.color
                 : widget.selected ? selectedTextColor : theme.textTheme.bodyLarge!.color,
             fontWeight: widget.selected ? FontWeight.w700
                 : dense ? FontWeight.w400 : null,
@@ -1031,7 +1031,7 @@ class DrawerMenuButtonFromZeroState extends State<DrawerMenuButtonFromZero> {
             : AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 100),
               style: TextStyle(
-                color: widget.selected ? selectedTextColor.withOpacity(0.75) : theme.textTheme.bodySmall!.color,
+                color: widget.selected ? selectedTextColor.withValues(alpha: 0.75) : theme.textTheme.bodySmall!.color,
                 fontWeight: widget.selected ? FontWeight.w600 : null,
               ),
               child: Padding(
