@@ -271,6 +271,12 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
     }
     wholePercentageNotifier.value = result;
   }
+
+  /// utility to use with dio request onReceiveProgress callback
+  void onReceiveProgress(int count, int total) {
+    selfTotalNotifier.value = total.toDouble();
+    selfProgressNotifier.value = count.toDouble();
+  }
 }
 
 typedef ApiLoadingBuilder = Widget Function(BuildContext context, ValueListenable<double?>? progress);
