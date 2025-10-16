@@ -1,12 +1,12 @@
 name: from_zero_ui
 description: UI generalizations and utility classes for working with flutter.
 
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'none'
 
-version: 0.0.7
+version: 0.1.0
 
 environment:
-  sdk: "^3.0.0"
+  sdk: "^3.5.0"
 
 
 dependencies:
@@ -18,13 +18,13 @@ dependencies:
   # * Language Extensions
   intl: ^0.20.2
   dartx: ^1.2.0
-  collection: ^1.17.2 # pinned to 1.17.2 by flutter ver.3.13.0
-  email_validator: ^2.1.17
-  cancelable_compute: ^1.3.0
+  collection: ^1.19.1
+  email_validator: ^3.0.0
+  cancelable_compute: ^2.1.1
 
   # * State Management
-  go_router: 10.0.0
-  flutter_riverpod: 2.0.0-dev.9 # can't update until cacheTime is re-added, lots of potential bugs to be fixed with this update
+  go_router: 10.0.0 # it will be a lot of work to update this because our routing solution is tightly coupled to it
+  flutter_riverpod: 2.0.0-dev.9 # can't update until cacheTime is re-added, lots of potential bugs to be fixed with this update, when updating, also try https://pub.dev/packages/riverpod_lint
   hive: ^2.2.3
   hive_flutter: ^1.1.0
 
@@ -33,9 +33,9 @@ dependencies:
   page_view_indicators: ^2.0.0
 #  implicitly_animated_reorderable_list: ^0.4.2 # discontinued and unused for now, use animated_list_plus if needed again
   flutter_font_icons : ^2.2.5
-  animations: ^2.0.7
-  extended_image: ^8.1.0
-  google_fonts: ^6.0.0 # used in from_zero_logo
+  animations: ^2.0.11
+  extended_image: ^8.1.0  # it might be a lot of work to update this because our routing solution is tightly coupled to it
+  google_fonts: ^6.2.1 # used in from_zero_logo
   sliver_tools: ^0.2.12
   humanizer: ^2.2.0
 #  keframe: ^3.0.0 # unused for now, but very interesting package...
@@ -53,16 +53,16 @@ dependencies:
   desktop_drop: ^0.4.1 # to support all platforms, try https://pub.dev/packages/super_drag_and_drop
   universal_html: ^2.2.3 # used for file_saver_from_zero download on web
   enough_convert: ^1.6.0 # used for reading window events on windows # ! replace with native converters if ever available on windows and web
-  bitsdojo_window: ^0.1.5
+  bitsdojo_window: ^0.1.6 # ideally, we would do all window-related stuff with window_manager, and remove this dependency, but it's not worth the effort
   window_manager: ^0.4.3
-  pasteboard: ^0.2.0
+  pasteboard: ^0.4.0
   r_upgrade: ^0.4.2 # used to programatically install de apk file in Android
 
   # * Specific Utility
-  dio: ^5.3.2
+  dio: ^5.8.0+1
   dio_smart_retry: ^7.0.1
   sanitize_filename: ^1.0.5
-  archive: ^4.0.0 # used to unzip the update on Windows
+  archive: ^4.0.7 # used to unzip the update on Windows
   excel: # ^4.0.2
 #    path: ../excel/
     git:
@@ -84,16 +84,14 @@ dependencies:
       ref: cfaa25769cc81583e0b3c538bcb3450dac2d6044
 
 
-
 dev_dependencies:
-  flutter_lints: ^2.0.3
-
+  flutter_lints: ^5.0.0
 
 
 dependency_overrides:
-  win32: ^5.0.6 # force older plugins (bitsdojo_window 0.1.5) to use a newer version, required by other plugins (file_picker>=5.3.2)
-  archive: 4.0.0 # pdf is still using an older version
-  intl: ^0.20.2 # date still depends on an older version
+  intl: ^0.20.2    # apparently packages before 1.0 break on every minor version, which makes it pretty much unusable
+  archive: ^4.0.7  # old excel fork forces 3.3.7 which has security issues, we should if features implemented by us are already available in excel package and migrate
+#  win32: ^5.0.6    # force older plugins (bitsdojo_window 0.1.5) to use a newer version, required by other plugins (file_picker>=5.3.2)
 
 
 flutter:

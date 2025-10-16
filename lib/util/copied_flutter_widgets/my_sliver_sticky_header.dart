@@ -7,6 +7,8 @@ import 'package:value_layout_builder/value_layout_builder.dart';
 // this file is copied from flutter_sticky_header: ^0.6.5
 // ideally, we would always use sliver_tools and get rid of this
 
+// TODO 1 try to solve this with sliver_tools package and delete this hack
+
 /// Signature used by [SliverStickyHeader.builder] to build the header
 /// when the sticky header state has changed.
 typedef SliverStickyHeaderWidgetBuilder = Widget Function(

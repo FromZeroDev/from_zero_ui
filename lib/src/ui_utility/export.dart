@@ -19,7 +19,6 @@ import 'package:page_view_indicators/page_view_indicators.dart';
 import 'package:path/path.dart' as p;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:permission_handler/permission_handler.dart';
 
 enum FileAutoOpenType {
   none,
@@ -454,7 +453,7 @@ class ExportState extends State<Export> {
                 cellStyle.horizontalAlignment = HorizontalAlign.Right;
               }
               if (backgroundColor!=null){
-                cellStyle.backgroundColor = backgroundColor.toHex(includeAlpha: false);
+                cellStyle.backgroundColor = ExcelColor.fromHexString(backgroundColor.toHex(includeAlpha: false));
               }
               cellStyle.fontSize = 12;
               final dynamic cellValue;
