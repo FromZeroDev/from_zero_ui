@@ -69,12 +69,12 @@ class FadeThroughPageTransitionsBuilder extends PageTransitionsBuilder {
 
   @override
   Widget buildTransitions<T>(
-      PageRoute<T> route,
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child,
-      ) {
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     return FadeThroughTransition(
       animation: animation,
       secondaryAnimation: secondaryAnimation,
@@ -226,20 +226,20 @@ class _ZoomedFadeInFadeOut extends StatelessWidget {
     return DualTransitionBuilder(
       animation: animation,
       forwardBuilder: (
-          BuildContext context,
-          Animation<double> animation,
-          Widget? child,
-          ) {
+        BuildContext context,
+        Animation<double> animation,
+        Widget? child,
+      ) {
         return _ZoomedFadeIn(
           animation: animation,
           child: child!,
         );
       },
       reverseBuilder: (
-          BuildContext context,
-          Animation<double> animation,
-          Widget? child,
-          ) {
+        BuildContext context,
+        Animation<double> animation,
+        Widget? child,
+      ) {
         return _FadeOut(
           animation: animation,
           child: child!,
@@ -296,7 +296,6 @@ class _FadeOut extends StatelessWidget {
   // static final CurveTween _outCurve = CurveTween(
   //   curve: const Cubic(0.4, 0.0, 1.0, 1.0),
   // );
-
 
   @override
   Widget build(BuildContext context) {

@@ -2,20 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:go_router/go_router.dart';
 
-
 import '../../router.dart';
 
 class PageScaffold extends StatefulWidget {
-
   const PageScaffold({super.key});
 
   @override
   PageScaffoldState createState() => PageScaffoldState();
-
 }
 
 class PageScaffoldState extends State<PageScaffold> {
-
   ScrollController scrollController = ScrollController();
 
   @override
@@ -26,7 +22,10 @@ class PageScaffoldState extends State<PageScaffold> {
           Text("Scaffold FromZero"),
           Hero(
             tag: 'title-hero',
-            child: Icon(Icons.ac_unit, color: Colors.white,),
+            child: Icon(
+              Icons.ac_unit,
+              color: Colors.white,
+            ),
           ),
         ],
       ),
@@ -41,7 +40,7 @@ class PageScaffoldState extends State<PageScaffold> {
             return ActionFromZero(
               title: "Action 1",
               icon: const Icon(Icons.looks_one),
-              onTap: (appbarContext){
+              onTap: (appbarContext) {
                 SnackBarFromZero(
                   context: context,
                   type: SnackBarFromZero.info,
@@ -51,7 +50,7 @@ class PageScaffoldState extends State<PageScaffold> {
                   actions: [
                     SnackBarAction(
                       label: "Action",
-                      onPressed: (){
+                      onPressed: () {
                         SnackBarFromZero(
                           context: context,
                           type: SnackBarFromZero.info,
@@ -85,16 +84,15 @@ class PageScaffoldState extends State<PageScaffold> {
             );
           },
         ),
-        Builder(builder: (context) => ActionFromZero(
-          title: "Action 2",
-          breakpoints: {
-            ScaffoldFromZero.screenSizeMedium: ActionState.button,
-          },
-          onTap: (appbarContext){
-
-          },
-        ),),
-
+        Builder(
+          builder: (context) => ActionFromZero(
+            title: "Action 2",
+            breakpoints: {
+              ScaffoldFromZero.screenSizeMedium: ActionState.button,
+            },
+            onTap: (appbarContext) {},
+          ),
+        ),
         ActionFromZero(
           title: "Search",
           icon: const Icon(Icons.search),
@@ -116,7 +114,7 @@ class PageScaffoldState extends State<PageScaffold> {
     );
   }
 
-  Widget _getPage(BuildContext context){
+  Widget _getPage(BuildContext context) {
     return ScrollbarFromZero(
       controller: scrollController,
       child: SingleChildScrollView(
@@ -126,15 +124,22 @@ class PageScaffoldState extends State<PageScaffold> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 12,),
+                const SizedBox(
+                  height: 12,
+                ),
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Page Transitions", style: Theme.of(context).textTheme.headlineMedium,),
-                        const SizedBox(height: 32,),
+                        Text(
+                          "Page Transitions",
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        const SizedBox(
+                          height: 32,
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(left: 16),
                           child: ElevatedButton(
@@ -142,7 +147,9 @@ class PageScaffoldState extends State<PageScaffold> {
                             onPressed: () => GoRouter.of(context).pushNamed("scaffold_same"),
                           ),
                         ),
-                        const SizedBox(height: 16,),
+                        const SizedBox(
+                          height: 16,
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(left: 16),
                           child: ElevatedButton(
@@ -150,7 +157,9 @@ class PageScaffoldState extends State<PageScaffold> {
                             onPressed: () => GoRouter.of(context).pushNamed("scaffold_inner"),
                           ),
                         ),
-                        const SizedBox(height: 16,),
+                        const SizedBox(
+                          height: 16,
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(left: 16),
                           child: ElevatedButton(
@@ -158,12 +167,16 @@ class PageScaffoldState extends State<PageScaffold> {
                             onPressed: () => GoRouter.of(context).pushNamed("scaffold_other"),
                           ),
                         ),
-                        const SizedBox(height: 8,),
+                        const SizedBox(
+                          height: 8,
+                        ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 12,),
+                const SizedBox(
+                  height: 12,
+                ),
               ],
             ),
           ),
@@ -171,5 +184,4 @@ class PageScaffoldState extends State<PageScaffold> {
       ),
     );
   }
-
 }

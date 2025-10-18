@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-
 import '../../router.dart';
 
 class PageNormalHero extends StatefulWidget {
-
   const PageNormalHero({super.key});
 
   @override
   PageHeroesState createState() => PageHeroesState();
-
 }
 
 class PageHeroesState extends State<PageNormalHero> {
-
   @override
   Widget build(BuildContext context) {
     return ScaffoldFromZero(
@@ -27,7 +23,7 @@ class PageHeroesState extends State<PageNormalHero> {
     );
   }
 
-  Widget _getPage(BuildContext context){
+  Widget _getPage(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Card(
@@ -43,9 +39,14 @@ class PageHeroesState extends State<PageNormalHero> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    child: Text("Heroes Test", style: Theme.of(context).textTheme.displaySmall,),
+                    child: Text(
+                      "Heroes Test",
+                      style: Theme.of(context).textTheme.displaySmall,
+                    ),
                   ),
-                  const FlutterLogo(size: 512,),
+                  const FlutterLogo(
+                    size: 512,
+                  ),
                 ],
               ),
             ),
@@ -54,5 +55,4 @@ class PageHeroesState extends State<PageNormalHero> {
       ),
     );
   }
-
 }

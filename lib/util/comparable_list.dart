@@ -1,17 +1,15 @@
 import 'package:collection/collection.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-
 /// for passing lists into a provider familiy and maintaining equality of arguments
 class DeepEqualityList<T> extends ComparableListBase<T> {
-
   DeepEqualityList({
     super.list,
   });
 
   @override
-  bool operator == (Object other) => other is DeepEqualityList<T>
-      && const DeepCollectionEquality().equals(list, other.list);
+  bool operator ==(Object other) =>
+      other is DeepEqualityList<T> && const DeepCollectionEquality().equals(list, other.list);
 
   @override
   int get hashCode => Object.hashAll(list);
@@ -19,16 +17,12 @@ class DeepEqualityList<T> extends ComparableListBase<T> {
   @override
   int compareTo(other) {
     if (other is! DeepEqualityList) return -1;
-    return const DeepCollectionEquality().equals(list, other.list) ? 0
-        : list.length.compareTo(other.list.length);
+    return const DeepCollectionEquality().equals(list, other.list) ? 0 : list.length.compareTo(other.list.length);
   }
-
 }
-
 
 /// for use in ListField, elements have to also be Comparable
 class ComparableList<T extends Comparable> extends ComparableListBase<T> {
-
   ComparableList({
     super.list,
   });
@@ -38,20 +32,21 @@ class ComparableList<T extends Comparable> extends ComparableListBase<T> {
     bool deepCopy = false,
   }) {
     return ComparableList<T>(
-      list: list ?? (!deepCopy
-                        ? List.from(this.list)
-                        : this.list.map((dynamic e) {
-                          try {
-                            return e.copyWith() as T;
-                          } catch(_) {}
-                          return e as T;
-                        }).toList()),
+      list: list ??
+          (!deepCopy
+              ? List.from(this.list)
+              : this.list.map((dynamic e) {
+                  try {
+                    return e.copyWith() as T;
+                  } catch (_) {}
+                  return e as T;
+                }).toList()),
     );
   }
 
   @override
-  bool operator == (Object other) => other is ComparableList<T>
-      && (list.isEmpty&&other.list.isEmpty || other.list==list);
+  bool operator ==(Object other) =>
+      other is ComparableList<T> && (list.isEmpty && other.list.isEmpty || other.list == list);
 
   @override
   int get hashCode => list.hashCode;
@@ -65,19 +60,16 @@ class ComparableList<T extends Comparable> extends ComparableListBase<T> {
   ComparableList<T> clone() {
     return ComparableList<T>(list: List.from(list));
   }
-
 }
 
-
 abstract class ComparableListBase<T> implements Comparable, ContainsValue<List<T>> {
-
   final List<T> list;
   @override
   List<T>? get value => list;
 
   ComparableListBase({
     List<T>? list,
-  })  : list = list ?? [];
+  }) : list = list ?? [];
 
   @override
   String toString() {
@@ -117,5 +109,4 @@ abstract class ComparableListBase<T> implements Comparable, ContainsValue<List<T
   Iterable<T> where(bool Function(T element) test) => list.where(test);
 
   int indexOf(T element) => list.indexOf(element);
-
 }

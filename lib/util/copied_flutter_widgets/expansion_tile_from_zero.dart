@@ -1,13 +1,9 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/util/copied_flutter_widgets/my_ensure_visible_when_focused.dart';
-
-
-
 
 const Duration _kExpand = Duration(milliseconds: 200);
 
@@ -55,15 +51,13 @@ class ExpansionTileFromZero extends StatefulWidget {
     this.titleBuilder,
     this.borderRadius,
     super.key,
-  }) :  assert(title!=null || titleBuilder!=null, 'Must specify a title'),
-        assert(title==null || titleBuilder==null, 'Only 1 title must be specified'),
+  })  : assert(title != null || titleBuilder != null, 'Must specify a title'),
+        assert(title == null || titleBuilder == null, 'Only 1 title must be specified'),
         assert(
-        expandedCrossAxisAlignment != CrossAxisAlignment.baseline,
-        'CrossAxisAlignment.baseline is not supported since the expanded children '
-            'are aligned in a column, not a row. Try to use another constant.',
+          expandedCrossAxisAlignment != CrossAxisAlignment.baseline,
+          'CrossAxisAlignment.baseline is not supported since the expanded children '
+          'are aligned in a column, not a row. Try to use another constant.',
         );
-
-
 
   final bool? expanded;
   final void Function(bool)? onPostExpansionChanged;
@@ -194,7 +188,7 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
   @override
   void initState() {
     super.initState();
-    _halfTween = widget.style==DrawerMenuFromZero.styleDrawerMenu
+    _halfTween = widget.style == DrawerMenuFromZero.styleDrawerMenu
         ? Tween<double>(begin: 0.0, end: 0.5)
         : Tween<double>(begin: -0.25, end: 0.0);
 
@@ -225,7 +219,7 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
   @override
   void didUpdateWidget(ExpansionTileFromZero oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.expanded!=null) {
+    if (widget.expanded != null) {
       setExpanded(widget.expanded!);
     }
   }
@@ -237,17 +231,18 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
   }
 
   Future<void> _handleTap() async {
-    if (widget.onExpansionChanged == null){
+    if (widget.onExpansionChanged == null) {
       setExpanded(!_isExpanded);
-    } else{
-      if (await widget.onExpansionChanged!(_isExpanded)){
+    } else {
+      if (await widget.onExpansionChanged!(_isExpanded)) {
         setExpanded(!_isExpanded);
       }
     }
   }
-  void setExpanded(bool expanded, [force=false]) {
+
+  void setExpanded(bool expanded, [force = false]) {
 //    if (widget.expanded!=null) expanded=widget.expanded;
-    if (widget.enabled && _isExpanded != expanded){
+    if (widget.enabled && _isExpanded != expanded) {
       setState(() {
         _isExpanded = expanded;
         if (_isExpanded) {
@@ -287,41 +282,57 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
           ),
           if (widget.trailing is! SizedBox && widget.children.isNotEmpty)
             Positioned(
-              top: 0, bottom: 0,
-              right: widget.style==DrawerMenuFromZero.styleDrawerMenu ? 4 : null,
-              left: widget.style==DrawerMenuFromZero.styleTree ? 0 : null,
+              top: 0,
+              bottom: 0,
+              right: widget.style == DrawerMenuFromZero.styleDrawerMenu ? 4 : null,
+              left: widget.style == DrawerMenuFromZero.styleTree ? 0 : null,
               child: Padding(
                 padding: widget.actionPadding,
-                child: widget.leading ?? IconButton(
-                  icon: SizedBox(
-                    width: 8,
-                    child: OverflowBox(
-                      maxWidth: double.infinity, maxHeight: double.infinity,
-                      child: widget.trailing ?? (widget.enabled ? RotationTransition(
-                        turns: _iconTurns,
-                        child: Icon(Icons.expand_more, color: _iconColor.value, size: 26,),
-                      ) : const SizedBox.shrink()),
+                child: widget.leading ??
+                    IconButton(
+                      icon: SizedBox(
+                        width: 8,
+                        child: OverflowBox(
+                          maxWidth: double.infinity,
+                          maxHeight: double.infinity,
+                          child: widget.trailing ??
+                              (widget.enabled
+                                  ? RotationTransition(
+                                      turns: _iconTurns,
+                                      child: Icon(
+                                        Icons.expand_more,
+                                        color: _iconColor.value,
+                                        size: 26,
+                                      ),
+                                    )
+                                  : const SizedBox.shrink()),
+                        ),
+                      ),
+                      iconSize: 26,
+                      onPressed: !widget.enabled
+                          ? null
+                          : () {
+                              setExpanded(!_isExpanded);
+                            },
+                      splashRadius: 28,
                     ),
-                  ),
-                  iconSize: 26,
-                  onPressed: !widget.enabled ? null : () {
-                    setExpanded(!_isExpanded);
-                  },
-                  splashRadius: 28,
-                ),
               ),
             ),
-          if (widget.style==DrawerMenuFromZero.styleTree && _isExpanded) // && widget.trailing==null
+          if (widget.style == DrawerMenuFromZero.styleTree && _isExpanded) // && widget.trailing==null
             Positioned(
-              left: 10, right: 0, bottom: -1, top: this.context.findAncestorWidgetOfExactType<ExpansionTileFromZero>()==null ? -20 : -1,
+              left: 10,
+              right: 0,
+              bottom: -1,
+              top: this.context.findAncestorWidgetOfExactType<ExpansionTileFromZero>() == null ? -20 : -1,
               child: FractionallySizedBox(
                 heightFactor: 0.5,
                 alignment: Alignment.bottomLeft,
                 child: Container(
-                  padding: EdgeInsets.only(top: 8, left: widget.actionPadding.left+10),
+                  padding: EdgeInsets.only(top: 8, left: widget.actionPadding.left + 10),
                   alignment: Alignment.bottomLeft,
                   child: const VerticalDivider(
-                    thickness: 2, width: 2,
+                    thickness: 2,
+                    width: 2,
                   ),
                 ),
               ),
@@ -330,55 +341,68 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
       ),
     );
     // if (widget.contextMenuActions.isNotEmpty || widget.addExpandCollapseContextMenuAction) { // always add this, so child tree isn't rebuilt on compact/decompact drawer
-      final prevTitle = title;
-      VoidCallback onNextFrame = (){};
-      if (widget.addExpandCollapseContextMenuAction) {
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          if (mounted) {
-            onNextFrame();
-          }
-        });
-      }
-      title = StatefulBuilder(
-        builder: (context, setState) {
-          onNextFrame = () {setState((){});};
-          bool expandChildren = widget.childrenKeysForExpandCollapse!=null
-              &&  widget.childrenKeysForExpandCollapse!.where((e) => !(e.currentState?.isExpanded ?? false)).isNotEmpty;
-          return ContextMenuFromZero(
-            actions: [
-              ...widget.contextMenuActions,
-              if (((widget.enabled && widget.addExpandCollapseContextMenuAction && widget.trailing is! SizedBox)
-                  || (_isExpanded && widget.childrenKeysForExpandCollapse!=null && widget.childrenKeysForExpandCollapse!.isNotEmpty))
-                  && widget.contextMenuActions.isNotEmpty
-                  &&  widget.children.isNotEmpty)
-                ActionFromZero.divider(),
-              if (widget.enabled && widget.children.isNotEmpty && widget.addExpandCollapseContextMenuAction && widget.trailing is! SizedBox)
-                ActionFromZero(
-                  icon: Icon(_isExpanded ? MaterialCommunityIcons.arrow_collapse_up : MaterialCommunityIcons.arrow_expand_down,),
-                  title: _isExpanded ? 'Colapsar' : 'Expandir', // TODO 3 internationalize
-                  onTap: (context) {
-                    setExpanded(!_isExpanded);
-                  },
+    final prevTitle = title;
+    VoidCallback onNextFrame = () {};
+    if (widget.addExpandCollapseContextMenuAction) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        if (mounted) {
+          onNextFrame();
+        }
+      });
+    }
+    title = StatefulBuilder(
+      builder: (context, setState) {
+        onNextFrame = () {
+          setState(() {});
+        };
+        bool expandChildren = widget.childrenKeysForExpandCollapse != null &&
+            widget.childrenKeysForExpandCollapse!.where((e) => !(e.currentState?.isExpanded ?? false)).isNotEmpty;
+        return ContextMenuFromZero(
+          actions: [
+            ...widget.contextMenuActions,
+            if (((widget.enabled && widget.addExpandCollapseContextMenuAction && widget.trailing is! SizedBox) ||
+                    (_isExpanded &&
+                        widget.childrenKeysForExpandCollapse != null &&
+                        widget.childrenKeysForExpandCollapse!.isNotEmpty)) &&
+                widget.contextMenuActions.isNotEmpty &&
+                widget.children.isNotEmpty)
+              ActionFromZero.divider(),
+            if (widget.enabled &&
+                widget.children.isNotEmpty &&
+                widget.addExpandCollapseContextMenuAction &&
+                widget.trailing is! SizedBox)
+              ActionFromZero(
+                icon: Icon(
+                  _isExpanded ? MaterialCommunityIcons.arrow_collapse_up : MaterialCommunityIcons.arrow_expand_down,
                 ),
-              if (_isExpanded && widget.childrenKeysForExpandCollapse!=null
-                  && widget.childrenKeysForExpandCollapse!.isNotEmpty)
-                ActionFromZero(
-                  icon: Icon(expandChildren ? MaterialCommunityIcons.arrow_expand_down : MaterialCommunityIcons.arrow_collapse_up),
-                  title: expandChildren ? 'Expandir Descendientes' : 'Colapsar Descendientes', // TODO 3 internationalize
-                  onTap: (context) {
-                    bool expand = widget.childrenKeysForExpandCollapse!
-                        .where((e) => !(e.currentState?.isExpanded ?? false)).isNotEmpty;
-                    for (final e in widget.childrenKeysForExpandCollapse!) {
-                      e.currentState!.setExpanded(expand);
-                    }
-                    setState((){});
-                  },
-                ),
-            ],
-            child: prevTitle,
-          );
-        },
-      );
+                title: _isExpanded ? 'Colapsar' : 'Expandir', // TODO 3 internationalize
+                onTap: (context) {
+                  setExpanded(!_isExpanded);
+                },
+              ),
+            if (_isExpanded &&
+                widget.childrenKeysForExpandCollapse != null &&
+                widget.childrenKeysForExpandCollapse!.isNotEmpty)
+              ActionFromZero(
+                icon: Icon(expandChildren
+                    ? MaterialCommunityIcons.arrow_expand_down
+                    : MaterialCommunityIcons.arrow_collapse_up),
+                title: expandChildren ? 'Expandir Descendientes' : 'Colapsar Descendientes', // TODO 3 internationalize
+                onTap: (context) {
+                  bool expand = widget.childrenKeysForExpandCollapse!
+                      .where((e) => !(e.currentState?.isExpanded ?? false))
+                      .isNotEmpty;
+                  for (final e in widget.childrenKeysForExpandCollapse!) {
+                    e.currentState!.setExpanded(expand);
+                  }
+                  setState(() {});
+                },
+              ),
+          ],
+          child: prevTitle,
+        );
+      },
+    );
     // }
     return Material(
       type: MaterialType.transparency,
@@ -445,17 +469,17 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
     final bool shouldRemoveChildren = closed && !widget.maintainState;
 
     final Widget result = Offstage(
-        offstage: closed,
-        child: TickerMode(
-          enabled: !closed,
-          child: Padding(
-            padding: widget.childrenPadding ?? EdgeInsets.zero,
-            child: Column(
-              crossAxisAlignment: widget.expandedCrossAxisAlignment ?? CrossAxisAlignment.center,
-              children: widget.children,
-            ),
+      offstage: closed,
+      child: TickerMode(
+        enabled: !closed,
+        child: Padding(
+          padding: widget.childrenPadding ?? EdgeInsets.zero,
+          child: Column(
+            crossAxisAlignment: widget.expandedCrossAxisAlignment ?? CrossAxisAlignment.center,
+            children: widget.children,
           ),
         ),
+      ),
     );
 
     return AnimatedBuilder(

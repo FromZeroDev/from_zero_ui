@@ -5,13 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 // import 'package:wave/config.dart';
 // import 'package:wave/wave.dart';
 
-
 class FromZeroBanner extends StatelessWidget {
-
   final double logoSizePercentage;
 
-
-  const FromZeroBanner({super.key, this.logoSizePercentage=0.6});
+  const FromZeroBanner({super.key, this.logoSizePercentage = 0.6});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +60,10 @@ class FromZeroBanner extends StatelessWidget {
 //                   ),
                 ),
               ),
-              Expanded(flex: 1,child: Container(),),
+              Expanded(
+                flex: 1,
+                child: Container(),
+              ),
             ],
           ),
           FractionallySizedBox(
@@ -75,27 +75,24 @@ class FromZeroBanner extends StatelessWidget {
       ),
     );
   }
-
 }
-
 
 class FromZeroLogo extends StatelessWidget {
   const FromZeroLogo({super.key});
-
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         double size = min(constraints.maxWidth, constraints.maxHeight);
-        double fontSize = size*0.45;
+        double fontSize = size * 0.45;
         return Align(
           alignment: Alignment.center,
           child: Container(
             decoration: BoxDecoration(
-              color: (Theme.of(context).brightness==Brightness.light ? Colors.white : Colors.black)
+              color: (Theme.of(context).brightness == Brightness.light ? Colors.white : Colors.black)
                   .withValues(alpha: 0.6),
-              borderRadius: BorderRadius.all(Radius.circular(size/8)),
+              borderRadius: BorderRadius.all(Radius.circular(size / 8)),
             ),
             height: size,
             width: size,
@@ -104,8 +101,11 @@ class FromZeroLogo extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: size/12,),
-                Text("From",
+                SizedBox(
+                  height: size / 12,
+                ),
+                Text(
+                  "From",
                   maxLines: 1,
                   softWrap: false,
                   overflow: TextOverflow.visible,
@@ -116,7 +116,8 @@ class FromZeroLogo extends StatelessWidget {
                     fontWeight: FontWeight.normal,
                   ),
                 ),
-                Text("Zero",
+                Text(
+                  "Zero",
                   maxLines: 1,
                   softWrap: false,
                   overflow: TextOverflow.visible,
@@ -124,7 +125,7 @@ class FromZeroLogo extends StatelessWidget {
                     fontSize: fontSize,
                     color: Theme.of(context).textTheme.bodyLarge!.color,
                     height: 0.78,
-                      fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -133,7 +134,5 @@ class FromZeroLogo extends StatelessWidget {
         );
       },
     );
-
   }
-
 }

@@ -4,9 +4,7 @@ import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-
 class TableHeaderFromZero<T> extends StatefulWidget {
-
   final TableController<T> controller;
   final Widget? title;
   final List<ActionFromZero>? actions;
@@ -16,7 +14,9 @@ class TableHeaderFromZero<T> extends StatefulWidget {
   final FutureOr<String>? exportPathForExcel;
   final bool addSearchAction;
   final bool searchActionExpandedByDefault;
-  final bool? showColumnMetadata; /// defaults to Table.showHeaders
+  final bool? showColumnMetadata;
+
+  /// defaults to Table.showHeaders
   final Color? defaultActionsColor;
   final Color? backgroundColor;
   final double titleLeftPadding;
@@ -40,11 +40,9 @@ class TableHeaderFromZero<T> extends StatefulWidget {
 
   @override
   TableHeaderFromZeroState<T> createState() => TableHeaderFromZeroState();
-
 }
 
 class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
-
   bool autofocusSearchOnNextBuild = false;
   String? searchQuery;
   late final FocusNode searchTextfieldFocusNode = FocusNode();
@@ -72,15 +70,18 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
       animation: widget.controller,
       builder: (context, child) {
         List<ActionFromZero> actions = widget.actions ?? [];
-        if (widget.controller.currentState?.widget.allowCustomization??false) {
-          actions = TableFromZeroState.addManageActions(context,
+        if (widget.controller.currentState?.widget.allowCustomization ?? false) {
+          actions = TableFromZeroState.addManageActions(
+            context,
             actions: actions,
             controller: widget.controller,
           );
         }
-        final exportPathForExcel = widget.exportPathForExcel ?? widget.controller.currentState?.widget.exportPathForExcel;
-        if (exportPathForExcel!=null) {
-          actions = TableFromZeroState.addExportExcelAction(context,
+        final exportPathForExcel =
+            widget.exportPathForExcel ?? widget.controller.currentState?.widget.exportPathForExcel;
+        if (exportPathForExcel != null) {
+          actions = TableFromZeroState.addExportExcelAction(
+            context,
             actions: actions,
             tableController: widget.controller,
             exportPathForExcel: exportPathForExcel,
@@ -93,24 +94,28 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
         try {
           filtered = widget.controller.filtered;
         } catch (_) {}
-        int selectedCount = filtered==null ? 0
-            : filtered.where((e) => e.onCheckBoxSelected!=null && e.selected==true).length;
+        int selectedCount =
+            filtered == null ? 0 : filtered.where((e) => e.onCheckBoxSelected != null && e.selected == true).length;
         Widget subtitle;
-        if (selectedCount==0) {
-          if (filtered!=null && widget.showElementCount) {
+        if (selectedCount == 0) {
+          if (filtered != null && widget.showElementCount) {
             final column = widget.controller.columns?[widget.controller.sortedColumn];
             String subtitleText;
-            if (column!=null) {
-              subtitleText = column.getSubtitleText(context, filtered, widget.controller.sortedColumn,
+            if (column != null) {
+              subtitleText = column.getSubtitleText(
+                context,
+                filtered,
+                widget.controller.sortedColumn,
                 addMetadata: widget.showColumnMetadata ?? widget.controller.currentState!.widget.showHeaders,
               );
             } else {
               final count = filtered.length;
-              subtitleText = count==0 ? FromZeroLocalizations.of(context).translate('no_elements')
-                  : '$count ${count>1 ? FromZeroLocalizations.of(context).translate('element_plur')
-                  : FromZeroLocalizations.of(context).translate('element_sing')}';
+              subtitleText = count == 0
+                  ? FromZeroLocalizations.of(context).translate('no_elements')
+                  : '$count ${count > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')}';
             }
-            subtitle = Text(subtitleText,
+            subtitle = Text(
+              subtitleText,
               // key: ValueKey('normal'),
               style: Theme.of(context).textTheme.bodySmall,
             );
@@ -118,9 +123,9 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
             subtitle = const SizedBox.shrink();
           }
         } else {
-          final count = filtered!.where((e) => e.onCheckBoxSelected!=null).length;
-          subtitle = Text('$selectedCount/$count ${selectedCount>1 ? FromZeroLocalizations.of(context).translate('selected_plur')
-              : FromZeroLocalizations.of(context).translate('selected_sing')}',
+          final count = filtered!.where((e) => e.onCheckBoxSelected != null).length;
+          subtitle = Text(
+            '$selectedCount/$count ${selectedCount > 1 ? FromZeroLocalizations.of(context).translate('selected_plur') : FromZeroLocalizations.of(context).translate('selected_sing')}',
             // key: ValueKey('selected'),
             style: Theme.of(context).textTheme.bodySmall,
           );
@@ -140,30 +145,37 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
         return Theme(
           data: Theme.of(context).copyWith(
             appBarTheme: Theme.of(context).appBarTheme.copyWith(
-              color: widget.backgroundColor ?? Material.of(context).color ?? Theme.of(context).cardColor, // Colors.transparent
-              iconTheme: Theme.of(context).iconTheme,
-              actionsIconTheme: widget.defaultActionsColor==null
-                  ? Theme.of(context).iconTheme
-                  : Theme.of(context).iconTheme.copyWith(color: widget.defaultActionsColor),
-              titleTextStyle: Theme.of(context).textTheme.titleMedium,
-              toolbarTextStyle: widget.defaultActionsColor==null
-                  ? Theme.of(context).textTheme.titleMedium
-                  : Theme.of(context).textTheme.titleMedium!.copyWith(color: widget.defaultActionsColor),
-            ),
+                  color: widget.backgroundColor ??
+                      Material.of(context).color ??
+                      Theme.of(context).cardColor, // Colors.transparent
+                  iconTheme: Theme.of(context).iconTheme,
+                  actionsIconTheme: widget.defaultActionsColor == null
+                      ? Theme.of(context).iconTheme
+                      : Theme.of(context).iconTheme.copyWith(color: widget.defaultActionsColor),
+                  titleTextStyle: Theme.of(context).textTheme.titleMedium,
+                  toolbarTextStyle: widget.defaultActionsColor == null
+                      ? Theme.of(context).textTheme.titleMedium
+                      : Theme.of(context).textTheme.titleMedium!.copyWith(color: widget.defaultActionsColor),
+                ),
           ),
           child: AppbarFromZero(
             titleSpacing: 0,
             onShowContextMenu: widget.onShowAppbarContextMenu,
             title: Row(
               children: [
-                if (widget.leading==null)
-                  SizedBox(width: 4 + widget.titleLeftPadding,),
-                if (widget.leading!=null)
-                  ... [
-                    SizedBox(width: widget.titleLeftPadding,),
-                    widget.leading!,
-                    const SizedBox(width: 9,),
-                  ],
+                if (widget.leading == null)
+                  SizedBox(
+                    width: 4 + widget.titleLeftPadding,
+                  ),
+                if (widget.leading != null) ...[
+                  SizedBox(
+                    width: widget.titleLeftPadding,
+                  ),
+                  widget.leading!,
+                  const SizedBox(
+                    width: 9,
+                  ),
+                ],
                 Expanded(
                   child: OverflowScroll(
                     autoscrollSpeed: null,
@@ -171,15 +183,14 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (widget.title!=null)
+                        if (widget.title != null)
                           DefaultTextStyle(
                             style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                              fontSize: Theme.of(context).textTheme.titleLarge!.fontSize!*0.85,
-                            ),
+                                  fontSize: Theme.of(context).textTheme.titleLarge!.fontSize! * 0.85,
+                                ),
                             child: widget.title!,
                           ),
-                        if (filtered!=null)
-                          subtitle,
+                        if (filtered != null) subtitle,
                       ],
                     ),
                   ),
@@ -188,8 +199,8 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
             ),
             elevation: 0,
             actions: actions,
-            initialExpandedAction: widget.addSearchAction && widget.searchActionExpandedByDefault
-                ? actions.first : null,
+            initialExpandedAction:
+                widget.addSearchAction && widget.searchActionExpandedByDefault ? actions.first : null,
             onExpanded: (_) {
               autofocusSearchOnNextBuild = true;
             },
@@ -229,7 +240,11 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
                 initialValue: searchQuery,
                 focusNode: searchTextfieldFocusNode,
                 decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.only(left: 8, right: 8+28, bottom: 12,),
+                  contentPadding: EdgeInsets.only(
+                    left: 8,
+                    right: 8 + 28,
+                    bottom: 12,
+                  ),
                   labelText: "Buscar...",
                 ),
                 textAlignVertical: TextAlignVertical.center,
@@ -240,7 +255,7 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
                 },
                 onFieldSubmitted: (value) {
                   final filtered = widget.controller.filtered;
-                  if (filtered.isNotEmpty){
+                  if (filtered.isNotEmpty) {
                     submitSearch();
                   }
                 },
@@ -252,7 +267,9 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
                     padding: const EdgeInsets.only(top: 1, right: 4),
                     child: IconButton(
                       icon: const Icon(Icons.search),
-                      color: Theme.of(context).brightness==Brightness.light ? Theme.of(context).primaryColor : Colors.white,
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? Theme.of(context).primaryColor
+                          : Colors.white,
                       onPressed: submitSearch,
                     ),
                   ),
@@ -264,10 +281,11 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
       },
     );
   }
+
   void submitSearch() {
     final filtered = widget.controller.filtered;
     searchTextfieldFocusNode.unfocus();
-    if (searchQuery.isNotNullOrBlank && filtered.length==1) {
+    if (searchQuery.isNotNullOrBlank && filtered.length == 1) {
       filtered.first.onRowTap?.call(filtered.first);
     }
   }
@@ -275,7 +293,7 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
   List<RowModel<T>> defaultOnFilter(List<RowModel<T>> rows) {
     List<RowModel<T>> starts = [];
     List<RowModel<T>> contains = [];
-    if (searchQuery==null || searchQuery!.isEmpty) {
+    if (searchQuery == null || searchQuery!.isEmpty) {
       return rows;
     } else {
       final q = this.searchQuery!.trim().toUpperCase();
@@ -305,7 +323,5 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
       }
       return [...starts, ...contains];
     }
-
   }
-
 }

@@ -8,8 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'change_notifiers/theme_parameters.dart';
 import 'router.dart';
 
-
-void main() async{
+void main() async {
   initAppConfigWebSensitive();
   WidgetsFlutterBinding.ensureInitialized();
   await initHive();
@@ -27,11 +26,9 @@ void main() async{
   });
 }
 
-
 final initChangeNotifier = DefaultInitChangeNotifier();
 
 class MyApp extends StatelessWidget {
-
   final _router = GoRouter(
     routes: GoRouteFromZero.getCleanRoutes([
       initRoute,
@@ -66,7 +63,7 @@ class MyApp extends StatelessWidget {
             theme: themeParameters.lightTheme,
             darkTheme: themeParameters.darkTheme,
             locale: const Locale('ES'), //themeParameters.appLocale
-            supportedLocales: List.from(themeParameters.supportedLocales.where((e) => e!=null)),
+            supportedLocales: List.from(themeParameters.supportedLocales.where((e) => e != null)),
             localizationsDelegates: const [
               FromZeroLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
@@ -88,5 +85,4 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-
 }

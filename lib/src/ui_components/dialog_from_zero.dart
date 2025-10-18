@@ -11,7 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';
 
-
 Future<T?> showModalFromZero<T>({
   required BuildContext context,
   required WidgetBuilder builder,
@@ -27,14 +26,18 @@ Future<T?> showModalFromZero<T>({
     useRootNavigator: useRootNavigator,
     routeSettings: routeSettings,
     filter: filter,
-    configuration: configuration ?? FromZeroModalConfiguration(
-      showWindowBarOnDesktop: showWindowBarOnDesktop ?? useRootNavigator,
-    ),
+    configuration: configuration ??
+        FromZeroModalConfiguration(
+          showWindowBarOnDesktop: showWindowBarOnDesktop ?? useRootNavigator,
+        ),
   );
 }
+
 class FromZeroModalConfiguration extends FadeScaleTransitionConfiguration {
   final bool showWindowBarOnDesktop;
-  final Color _myBarrierColor; /// hack to handle coloring barrier myself
+  final Color _myBarrierColor;
+
+  /// hack to handle coloring barrier myself
   const FromZeroModalConfiguration({
     Color barrierColor = Colors.black54,
     super.barrierDismissible = true,
@@ -46,11 +49,11 @@ class FromZeroModalConfiguration extends FadeScaleTransitionConfiguration {
         super(barrierColor: Colors.transparent);
   @override
   Widget transitionBuilder(
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child,
-      ) {
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     Widget result = Stack(
       alignment: Alignment.bottomCenter, // Alignment.center
       fit: StackFit.expand,
@@ -72,18 +75,19 @@ class FromZeroModalConfiguration extends FadeScaleTransitionConfiguration {
               weight: 0.2,
             ),
           ]).animate(animation),
-          child: FixedSlideTransition( // flutter's default SlideTransition causes an assertion when scrolling in a ListView.builder inside it
+          child: FixedSlideTransition(
+            // flutter's default SlideTransition causes an assertion when scrolling in a ListView.builder inside it
             position: Tween<Offset>(
               begin: const Offset(0.0, 128),
               end: Offset.zero,
-            ).animate(animation), // flutter's default SlideTransition causes an assertion when scrolling in a ListView.builder inside it
+            ).animate(
+                animation), // flutter's default SlideTransition causes an assertion when scrolling in a ListView.builder inside it
             child: child,
           ),
         ),
       ],
     );
-    if (showWindowBarOnDesktop && !kIsWeb && Platform.isWindows
-        && windowsDesktopBitsdojoWorking) {
+    if (showWindowBarOnDesktop && !kIsWeb && Platform.isWindows && windowsDesktopBitsdojoWorking) {
       bool didSetIsMouseOverWindowBar = false;
       result = Column(
         children: [
@@ -127,18 +131,17 @@ class FromZeroModalConfiguration extends FadeScaleTransitionConfiguration {
   }
 }
 
-
-
 class DialogFromZero extends StatefulWidget {
-
   final Widget? title;
   final Widget? content;
   final List<Widget> dialogActions;
   final List<Widget>? appBarActions;
+
   /// if this is passed, we assume scrolling is handled outside
   /// if null, a SingleChildScrollView is built around the content
   final ScrollController? scrollController;
   final bool useReponsiveInsets;
+
   /// set to false is useful to include AnimatedSwitcher below Dialog
   final bool includeDialogWidget;
   final EdgeInsets contentPadding;
@@ -146,22 +149,31 @@ class DialogFromZero extends StatefulWidget {
   final WrapAlignment dialogActionsWrapAlignment;
   final WrapAlignment dialogActionsWrapRunAlignment;
   final WrapCrossAlignment dialogActionsWrapCrossAxisAlignment;
+
   /// only use if need to replace the whole AppBat, prefer using title and appBarActions
   final Widget? appBar;
+
   /// forwarded to Dialog widget
   final Color? backgroundColor;
+
   /// forwarded to Dialog widget
   final double? elevation;
+
   /// forwarded to Dialog widget
   final Color? shadowColor;
+
   /// forwarded to Dialog widget
   final Color? surfaceTintColor;
+
   /// forwarded to Dialog widget
   final Clip clipBehavior;
+
   /// forwarded to Dialog widget
   final ShapeBorder? shape;
+
   /// forwarded to Dialog widget
   final AlignmentGeometry? alignment;
+
   /// for ctrl+enter shortcut, if not specified, it will be inferred as the last DialogButton found in dialogActions
   final VoidCallback? acceptCallback;
 
@@ -188,21 +200,21 @@ class DialogFromZero extends StatefulWidget {
     this.alignment = goldenRatioVerticalAlignment,
     this.acceptCallback,
     super.key,
-  }) :  assert(appBar==null || (title==null && appBarActions==null),
+  })  : assert(
+          appBar == null || (title == null && appBarActions == null),
           'Setting appBar overrides title and appBarActions, no need to specify both',
         ),
-        assert(appBarActions==null || title!=null,
+        assert(
+          appBarActions == null || title != null,
           'If setting appBarActions, a title must also be specified',
         );
 
   @override
   State<DialogFromZero> createState() => _DialogFromZeroState();
-
 }
 
 class _DialogFromZeroState extends State<DialogFromZero> {
-
-  late final appBarSizeNotifier = ValueNotifier<Size>(Size(0, widget.appBar==null ? 0 : 56));
+  late final appBarSizeNotifier = ValueNotifier<Size>(Size(0, widget.appBar == null ? 0 : 56));
   late final appBarTitleSizeNotifier = ValueNotifier<Size>(Size.zero);
   late final actionsSizeNotifier = ValueNotifier<Size>(Size(0, widget.dialogActions.isEmpty ? 0 : 61));
   late final individualActionsSizeNotifiers = <ValueNotifier<Size>>[];
@@ -211,7 +223,8 @@ class _DialogFromZeroState extends State<DialogFromZero> {
   @override
   void initState() {
     super.initState();
-    assert(widget.title!=null || widget.content!=null || widget.dialogActions.isNotEmpty,
+    assert(
+      widget.title != null || widget.content != null || widget.dialogActions.isNotEmpty,
       'Dialog can\'t be completely empty...',
     );
     updateIndividualActionsSizeNotifier();
@@ -239,14 +252,14 @@ class _DialogFromZeroState extends State<DialogFromZero> {
       padding: widget.contentPadding,
       child: widget.content,
     );
-    if (widget.scrollController==null) {
+    if (widget.scrollController == null) {
       content = SingleChildScrollView(
         controller: scrollController,
         child: content,
       );
     }
     Widget? appBar;
-    if (widget.appBar!=null) {
+    if (widget.appBar != null) {
       appBar = Theme(
         data: Theme.of(context).copyWith(
           appBarTheme: const AppBarTheme(
@@ -257,7 +270,7 @@ class _DialogFromZeroState extends State<DialogFromZero> {
         ),
         child: widget.appBar!,
       );
-    } else if (widget.title!=null) {
+    } else if (widget.title != null) {
       appBar = AppbarFromZero(
         key: appBarGlobalKey,
         useFlutterAppbar: false,
@@ -270,7 +283,8 @@ class _DialogFromZeroState extends State<DialogFromZero> {
             child: ValueListenableBuilder<Size>(
               valueListenable: appBarTitleSizeNotifier,
               builder: (context, value, child) {
-                if (value.width==0) { // Hack to messure full size of Text in the first frame
+                if (value.width == 0) {
+                  // Hack to messure full size of Text in the first frame
                   return OverflowScroll(child: child!);
                 } else {
                   return child!;
@@ -294,9 +308,9 @@ class _DialogFromZeroState extends State<DialogFromZero> {
     }
     var dialogActions = List<Widget>.from(widget.dialogActions);
     VoidCallback? acceptCallback = widget.acceptCallback;
-    for (int i=dialogActions.lastIndex; i>=0; i--) {
+    for (int i = dialogActions.lastIndex; i >= 0; i--) {
       final e = dialogActions[i];
-      if (e is DialogButton && e.onPressed!=null) {
+      if (e is DialogButton && e.onPressed != null) {
         acceptCallback ??= e.onPressed;
         dialogActions[i] = DefaultDialogAction(
           callback: e.onPressed,
@@ -325,14 +339,13 @@ class _DialogFromZeroState extends State<DialogFromZero> {
             final actionsSize = values[1] as Size;
             final appBarTitleSize = values[2] as Size;
             final individualActionsSizeNotifiers = values.sublist(3).cast<Size>();
-            final minSizeFromAppbar = appBarTitleSize.width + 48
-                + ((appBarGlobalKey.currentState?.actions.length??0)*40);
-            final minSizeFromDialogActions = individualActionsSizeNotifiers
-                .sumBy((e) => e.width) + 48;
+            final minSizeFromAppbar =
+                appBarTitleSize.width + 48 + ((appBarGlobalKey.currentState?.actions.length ?? 0) * 40);
+            final minSizeFromDialogActions = individualActionsSizeNotifiers.sumBy((e) => e.width) + 48;
             final minSize = max(minSizeFromAppbar, minSizeFromDialogActions);
             return Container(
               constraints: BoxConstraints(
-                minWidth: min(minSize, (widget.maxWidth??double.infinity)),
+                minWidth: min(minSize, (widget.maxWidth ?? double.infinity)),
                 maxWidth: widget.maxWidth ?? double.infinity,
               ),
               padding: EdgeInsets.only(
@@ -349,7 +362,9 @@ class _DialogFromZeroState extends State<DialogFromZero> {
         ),
         if (dialogActions.isNotEmpty)
           Positioned(
-            bottom: 0, left: 0, right: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
             child: FillerRelayer(
               notifier: actionsSizeNotifier,
               child: Padding(
@@ -363,9 +378,11 @@ class _DialogFromZeroState extends State<DialogFromZero> {
               ),
             ),
           ),
-        if (appBar!=null)
+        if (appBar != null)
           Positioned(
-            top: 0, left: 0, right: 0,
+            top: 0,
+            left: 0,
+            right: 0,
             child: FillerRelayer(
               notifier: appBarSizeNotifier,
               child: appBar,
@@ -400,7 +417,7 @@ class _DialogFromZeroState extends State<DialogFromZero> {
       context: context,
       child: result,
     );
-    if (acceptCallback!=null) {
+    if (acceptCallback != null) {
       result = CallbackShortcuts(
         bindings: {
           LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.enter): () {
@@ -412,12 +429,9 @@ class _DialogFromZeroState extends State<DialogFromZero> {
     }
     return result;
   }
-
 }
 
-
 class DefaultDialogAction extends StatefulWidget {
-
   final Widget child;
   final VoidCallback? callback;
 
@@ -430,6 +444,7 @@ class DefaultDialogAction extends StatefulWidget {
   @override
   State<DefaultDialogAction> createState() => _DefaultDialogActionState();
 }
+
 class _DefaultDialogActionState extends State<DefaultDialogAction> {
   final focusNode = FocusNode();
   @override
@@ -450,16 +465,13 @@ class _DefaultDialogActionState extends State<DefaultDialogAction> {
   }
 }
 
-
-
-
 enum DialogButtonType {
   cancel,
   accept,
   other,
 }
-class DialogButton extends StatelessWidget {
 
+class DialogButton extends StatelessWidget {
   final DialogButtonType _dialogButtonType;
   final Widget? child;
   final VoidCallback? onPressed;
@@ -467,7 +479,9 @@ class DialogButton extends StatelessWidget {
   final Color? color;
   final EdgeInsets? padding;
   final FocusNode? focusNode;
-  final ButtonStyle? style; /// this overrides color and padding
+  final ButtonStyle? style;
+
+  /// this overrides color and padding
   final String? tooltip;
 
   const DialogButton({
@@ -493,7 +507,7 @@ class DialogButton extends StatelessWidget {
     this.style,
     this.tooltip,
     super.key,
-})  : _dialogButtonType = DialogButtonType.cancel;
+  }) : _dialogButtonType = DialogButtonType.cancel;
 
   const DialogButton.accept({
     required this.onPressed,
@@ -505,32 +519,33 @@ class DialogButton extends StatelessWidget {
     this.style,
     this.tooltip,
     super.key,
-  })  : _dialogButtonType = DialogButtonType.accept;
+  }) : _dialogButtonType = DialogButtonType.accept;
 
   @override
   Widget build(BuildContext context) {
     Widget child = this.child ?? _defaultChild(context);
-    if (leading!=null) {
+    if (leading != null) {
       child = Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           leading!,
-          const SizedBox(width: 6,),
+          const SizedBox(
+            width: 6,
+          ),
           child,
         ],
       );
     }
     final onPressed = this.onPressed ?? _defaultOnPressed(context);
-    Color? color = onPressed==null
-        ? Theme.of(context).disabledColor
-        : (this.color ?? _defaultColor(context));
+    Color? color = onPressed == null ? Theme.of(context).disabledColor : (this.color ?? _defaultColor(context));
     Widget result = TextButton(
       onPressed: onPressed,
       focusNode: focusNode,
-      style: style ?? TextButton.styleFrom(
-        foregroundColor: color,
-        padding: padding,
-      ),
+      style: style ??
+          TextButton.styleFrom(
+            foregroundColor: color,
+            padding: padding,
+          ),
       child: DefaultTextStyle(
         style: TextStyle(
           fontSize: 16,
@@ -543,7 +558,7 @@ class DialogButton extends StatelessWidget {
         ),
       ),
     );
-    if (tooltip!=null) {
+    if (tooltip != null) {
       result = TooltipFromZero(
         message: tooltip,
         child: result,
@@ -553,7 +568,7 @@ class DialogButton extends StatelessWidget {
   }
 
   Widget _defaultChild(BuildContext context) {
-    switch(_dialogButtonType) {
+    switch (_dialogButtonType) {
       case DialogButtonType.cancel:
         return Text(FromZeroLocalizations.of(context).translate("cancel_caps"));
       case DialogButtonType.accept:
@@ -564,7 +579,7 @@ class DialogButton extends StatelessWidget {
   }
 
   Color? _defaultColor(BuildContext context) {
-    switch(_dialogButtonType) {
+    switch (_dialogButtonType) {
       case DialogButtonType.cancel:
         return (Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.8));
       case DialogButtonType.accept:
@@ -575,7 +590,7 @@ class DialogButton extends StatelessWidget {
   }
 
   VoidCallback? _defaultOnPressed(BuildContext context) {
-    switch(_dialogButtonType) {
+    switch (_dialogButtonType) {
       case DialogButtonType.cancel:
         return () {
           Navigator.of(context).pop(null); // Dismiss alert dialog
@@ -586,19 +601,16 @@ class DialogButton extends StatelessWidget {
         return null;
     }
   }
-
 }
-
-
-
-
 
 class RelayedFiller extends StatelessWidget {
   final ValueNotifier<Size?> notifier;
   final Widget? child;
   final bool applyWidth;
   final bool applyHeight;
-  final Duration? duration; /// if null, no animation is apllied
+  final Duration? duration;
+
+  /// if null, no animation is apllied
   final Curve curve;
   final bool animateFromZero;
   const RelayedFiller({
@@ -617,7 +629,7 @@ class RelayedFiller extends StatelessWidget {
       valueListenable: notifier,
       child: child,
       builder: (context, value, child) {
-        if (duration==null || value==Size.zero) {
+        if (duration == null || value == Size.zero) {
           return SizedBox(
             width: applyWidth ? value?.width : null,
             height: applyHeight ? value?.height : null,
@@ -648,26 +660,27 @@ class FillerRelayer extends StatefulWidget {
   @override
   State<FillerRelayer> createState() => _FillerRelayerState();
 }
+
 class _FillerRelayerState extends State<FillerRelayer> {
   int _currentCallbackId = 0;
   void _addCallback(BuildContext context) {
     final callbackId = ++_currentCallbackId;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (callbackId!=_currentCallbackId) return;
+      if (callbackId != _currentCallbackId) return;
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        if (callbackId!=_currentCallbackId) return;
+        if (callbackId != _currentCallbackId) return;
         try {
           widget.notifier.value = context.size;
         } catch (_) {}
       });
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return NotificationListener(
       onNotification: (notification) {
-        if (notification is ScrollMetricsNotification
-            || notification is SizeChangedLayoutNotification) {
+        if (notification is ScrollMetricsNotification || notification is SizeChangedLayoutNotification) {
           _addCallback(context);
         }
         return false;
@@ -684,10 +697,7 @@ class _FillerRelayerState extends State<FillerRelayer> {
   }
 }
 
-
-
 class DialogTitle extends StatelessWidget {
-
   final Widget child;
   final EdgeInsets padding;
 
@@ -707,5 +717,4 @@ class DialogTitle extends StatelessWidget {
       ),
     );
   }
-
 }

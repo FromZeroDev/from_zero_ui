@@ -1,5 +1,1 @@
-
-
-void initAppConfigWebSensitive() {
-
-}
+void initAppConfigWebSensitive() {}

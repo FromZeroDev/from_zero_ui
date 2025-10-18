@@ -1,15 +1,9 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/src/app_scaffolding/app_content_wrapper.dart';
 import 'package:from_zero_ui/src/app_scaffolding/snackbar_host_from_zero.dart';
 
-
-
-
 class SnackBarFromZero extends ConsumerStatefulWidget {
-
   static const info = 0;
   static const success = 1;
   static const error = 2;
@@ -31,7 +25,8 @@ class SnackBarFromZero extends ConsumerStatefulWidget {
     const Icon(Icons.check_circle),
     const Icon(Icons.warning),
     SizedBox(
-      width: 32, height: 32,
+      width: 32,
+      height: 32,
       child: CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation(Colors.blue.shade500),
       ),
@@ -47,18 +42,21 @@ class SnackBarFromZero extends ConsumerStatefulWidget {
   final Widget? icon;
   final Widget? title;
   final Widget? message;
-  final Widget? content; /// Overrides title and message
+  final Widget? content;
+
+  /// Overrides title and message
   final Widget? progressIndicator;
   final bool showProgressIndicatorForRemainingTime;
   final List<Widget>? actions;
   final double? width;
-  final Widget? widget; /// Overrides everything else
+  final Widget? widget;
+
+  /// Overrides everything else
   final VoidCallback? onCancel;
   final ValueNotifier<bool> blockUI;
   final bool dismissable;
   final bool pushScreen;
   late final SnackBarControllerFromZero? controller;
-
 
   SnackBarFromZero({
     required this.context,
@@ -79,14 +77,14 @@ class SnackBarFromZero extends ConsumerStatefulWidget {
     this.pushScreen = false,
     bool blockUI = false,
     super.key,
-  })  : blockUI = ValueNotifier(blockUI);
+  }) : blockUI = ValueNotifier(blockUI);
 
   @override
   ConsumerState<SnackBarFromZero> createState() => SnackBarFromZeroState();
 
-  SnackBarControllerFromZero show({BuildContext? context, bool isHostContext = false}){
+  SnackBarControllerFromZero show({BuildContext? context, bool isHostContext = false}) {
     try {
-      if (controller!=null) {
+      if (controller != null) {
         throw Exception('Already showed this SnackBar');
       }
     } catch (_) {}
@@ -101,29 +99,27 @@ class SnackBarFromZero extends ConsumerStatefulWidget {
     return controller!;
   }
 
-  void dismiss(){
+  void dismiss() {
     try {
       controller?.dismiss();
     } catch (_) {}
   }
-
 }
 
 class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerProviderStateMixin {
-
   AnimationController? animationController;
 
   @override
   void initState() {
     super.initState();
     widget.controller?.setState = setState;
-    if (widget.duration!=null) {
+    if (widget.duration != null) {
       animationController = AnimationController(
         vsync: this,
         duration: widget.duration,
       );
       animationController!.addStatusListener((status) {
-        if (status==AnimationStatus.completed) {
+        if (status == AnimationStatus.completed) {
           widget.dismiss();
         }
       });
@@ -140,46 +136,60 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
   @override
   Widget build(BuildContext context) {
     int? type = widget.controller?.type ?? widget.type;
-    if (widget.widget!=null) {
+    if (widget.widget != null) {
       return widget.widget!;
     }
-    Color actionColor = type==null
-        ? Theme.of(context).brightness==Brightness.light
+    Color actionColor = type == null
+        ? Theme.of(context).brightness == Brightness.light
             ? Theme.of(context).primaryColor
             : Theme.of(context).colorScheme.secondary
         : SnackBarFromZero.colors[type];
     Widget result = Row(
       children: [
-        const SizedBox(width: 10,),
-        if (widget.icon!=null || type!=null)
-          widget.icon ?? SnackBarFromZero.icons[type!],
-        const SizedBox(width: 8,),
-        Expanded(
-          child: widget.content ?? Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 6,),
-              if (widget.title!=null)
-                DefaultTextStyle(
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 16),
-                  child: widget.title!,
-                ),
-              if (widget.message!=null)
-                const SizedBox(height: 2,),
-              if (widget.message!=null)
-                DefaultTextStyle(
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 12),
-                  child: widget.message!,
-                ),
-              if (widget.message!=null)
-                const SizedBox(height: 2,),
-              const SizedBox(height: 6,),
-            ],
-          ),
+        const SizedBox(
+          width: 10,
         ),
-        const SizedBox(width: 8,),
-        if (widget.actions!=null)
+        if (widget.icon != null || type != null) widget.icon ?? SnackBarFromZero.icons[type!],
+        const SizedBox(
+          width: 8,
+        ),
+        Expanded(
+          child: widget.content ??
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 6,
+                  ),
+                  if (widget.title != null)
+                    DefaultTextStyle(
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(fontSize: 16),
+                      child: widget.title!,
+                    ),
+                  if (widget.message != null)
+                    const SizedBox(
+                      height: 2,
+                    ),
+                  if (widget.message != null)
+                    DefaultTextStyle(
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 12),
+                      child: widget.message!,
+                    ),
+                  if (widget.message != null)
+                    const SizedBox(
+                      height: 2,
+                    ),
+                  const SizedBox(
+                    height: 6,
+                  ),
+                ],
+              ),
+        ),
+        const SizedBox(
+          width: 8,
+        ),
+        if (widget.actions != null)
           ButtonTheme(
             textTheme: ButtonTextTheme.accent,
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
@@ -192,10 +202,12 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (widget.actions!.length>1)
-                      const SizedBox(height: 6,),
+                    if (widget.actions!.length > 1)
+                      const SizedBox(
+                        height: 6,
+                      ),
                     ...widget.actions!.map((e) {
-                      if (e is SnackBarAction){
+                      if (e is SnackBarAction) {
                         SnackBarAction action = e;
                         return Expanded(
                           child: TextButton(
@@ -208,7 +220,8 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               padding: const EdgeInsets.symmetric(horizontal: 6),
                             ),
-                            child: Text(action.label.toUpperCase(),
+                            child: Text(
+                              action.label.toUpperCase(),
                               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, height: 1.1),
                               textAlign: TextAlign.center,
                             ),
@@ -217,8 +230,10 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
                       }
                       return e;
                     }),
-                    if (widget.actions!.length>1)
-                      const SizedBox(height: 6,),
+                    if (widget.actions!.length > 1)
+                      const SizedBox(
+                        height: 6,
+                      ),
                   ],
                 ),
               ),
@@ -226,7 +241,8 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
           ),
         if (widget.dismissable)
           SizedBox(
-            width: 42, height: double.infinity,
+            width: 42,
+            height: double.infinity,
             child: TextButton(
               onPressed: () {
                 widget.onCancel?.call();
@@ -236,21 +252,24 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
                 foregroundColor: Theme.of(context).textTheme.bodyLarge!.color,
                 padding: const EdgeInsets.only(right: 10),
               ),
-              child: const Icon(Icons.close, size: 24,),
+              child: const Icon(
+                Icons.close,
+                size: 24,
+              ),
             ),
           ),
       ],
     );
     Widget progressIndicator;
-    if (widget.progressIndicator!=null) {
+    if (widget.progressIndicator != null) {
       progressIndicator = widget.progressIndicator!;
-    } else if (!widget.showProgressIndicatorForRemainingTime){
+    } else if (!widget.showProgressIndicatorForRemainingTime) {
       progressIndicator = const SizedBox.shrink();
     } else {
-      if (animationController==null) {
+      if (animationController == null) {
         progressIndicator = LinearProgressIndicator(
           valueColor: AlwaysStoppedAnimation(actionColor),
-          backgroundColor: type==null ? null : SnackBarFromZero.softColors[type],
+          backgroundColor: type == null ? null : SnackBarFromZero.softColors[type],
         );
       } else {
         progressIndicator = AnimatedBuilder(
@@ -259,7 +278,7 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
             return LinearProgressIndicator(
               value: 1 - animationController!.value,
               valueColor: AlwaysStoppedAnimation(actionColor),
-              backgroundColor: type==null ? null : SnackBarFromZero.softColors[type],
+              backgroundColor: type == null ? null : SnackBarFromZero.softColors[type],
             );
           },
         );
@@ -273,10 +292,11 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
         ],
       ),
     );
-    final fixed = widget.behaviour!=SnackBarFromZero.behaviourFloating
-        && (widget.behaviour==SnackBarFromZero.behaviourFixed
-            || ref.watch(fromZeroScreenProvider.select((value) => value.isMobileLayout)));
-    Color backgroundColor = type==null ? Theme.of(context).cardColor
+    final fixed = widget.behaviour != SnackBarFromZero.behaviourFloating &&
+        (widget.behaviour == SnackBarFromZero.behaviourFixed ||
+            ref.watch(fromZeroScreenProvider.select((value) => value.isMobileLayout)));
+    Color backgroundColor = type == null
+        ? Theme.of(context).cardColor
         : Color.alphaBlend(SnackBarFromZero.colors[type].withValues(alpha: 0.066), Theme.of(context).cardColor);
     if (fixed) {
       result = Material(
@@ -296,7 +316,7 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
         child: result,
       );
     }
-    if (animationController!=null) {
+    if (animationController != null) {
       result = MouseRegion(
         child: result,
         onEnter: (event) {
@@ -308,21 +328,24 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
       );
     }
     result = Container(
-      width: fixed ? double.infinity : (widget.width ?? (512 + ((widget.actions?.length??0)==0 ? 0 : 128))),
-      padding: EdgeInsets.only(bottom: fixed ? 0 : 48,),
+      width: fixed ? double.infinity : (widget.width ?? (512 + ((widget.actions?.length ?? 0) == 0 ? 0 : 128))),
+      padding: EdgeInsets.only(
+        bottom: fixed ? 0 : 48,
+      ),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 64,),
+        constraints: const BoxConstraints(
+          minHeight: 64,
+        ),
         child: result,
       ),
     );
     result = IconTheme(
       data: Theme.of(context).iconTheme.copyWith(
-        color: actionColor,
-        size: 32,
-      ),
+            color: actionColor,
+            size: 32,
+          ),
       child: result,
     );
     return result;
   }
-
 }

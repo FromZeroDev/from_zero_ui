@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
 class ContextMenuFromZero extends ConsumerStatefulWidget {
-
   final Widget child;
   final List<ActionFromZero> actions;
+
   /// overrides everything else and is used as context menu widget
   final Widget? contextMenuWidget;
   final double contextMenuWidth;
@@ -16,11 +16,14 @@ class ContextMenuFromZero extends ConsumerStatefulWidget {
   final Offset offsetCorrection;
   final Color? barrierColor;
   final bool useCursorLocation;
+
   /// Default true. Set to false so menu will only be shown manually. Useful when stacking with a button.
   final bool addGestureDetector;
   final bool enabled;
   final bool addAncestorContextMenuActions;
-  final bool addOnTapDown; /// Default true. This blocks GestureDetectors behind it.
+  final bool addOnTapDown;
+
+  /// Default true. This blocks GestureDetectors behind it.
   final VoidCallback? onShowMenu;
 
   ContextMenuFromZero({
@@ -39,27 +42,29 @@ class ContextMenuFromZero extends ConsumerStatefulWidget {
     this.onShowMenu,
     this.addOnTapDown = true,
     super.key,
-  }) : addAncestorContextMenuActions = addAncestorContextMenuActions ?? contextMenuWidget==null {
-    for (int i=0; i<actions.length; i++) {
-      if (actions[i].overflowBuilder==ActionFromZero.dividerOverflowBuilder
-          && (i==0 || i==actions.lastIndex || actions[i+1].overflowBuilder==ActionFromZero.dividerOverflowBuilder)) {
-        actions.removeAt(i); i--;
+  }) : addAncestorContextMenuActions = addAncestorContextMenuActions ?? contextMenuWidget == null {
+    for (int i = 0; i < actions.length; i++) {
+      if (actions[i].overflowBuilder == ActionFromZero.dividerOverflowBuilder &&
+          (i == 0 ||
+              i == actions.lastIndex ||
+              actions[i + 1].overflowBuilder == ActionFromZero.dividerOverflowBuilder)) {
+        actions.removeAt(i);
+        i--;
       }
     }
   }
 
   @override
   ConsumerState<ContextMenuFromZero> createState() => ContextMenuFromZeroState();
-
 }
 
-
 class ContextMenuFromZeroState extends ConsumerState<ContextMenuFromZero> {
-
   final GlobalKey anchorKey = GlobalKey();
   static bool didShowContextMenuThisFrame = false;
 
-  static void showContextMenuFromZero(BuildContext context, WidgetRef ref, {
+  static void showContextMenuFromZero(
+    BuildContext context,
+    WidgetRef ref, {
     required List<ActionFromZero> actions,
     required GlobalKey anchorKey,
     VoidCallback? onShowMenu,
@@ -76,26 +81,28 @@ class ContextMenuFromZeroState extends ConsumerState<ContextMenuFromZero> {
     onShowMenu?.call();
     Offset? mousePosition;
     if (useCursorLocation) {
-      if ((ref.read(fromZeroScreenProvider).scale??MediaQuery.textScaleFactorOf(context))==1) {
+      if ((ref.read(fromZeroScreenProvider).scale ?? MediaQuery.textScaleFactorOf(context)) == 1) {
         mousePosition = tapDownDetails?.globalPosition;
       } else {
         try {
           // hack to support UI scale
           RenderBox box = context.findRenderObject()! as RenderBox;
-          final referencePosition = box.localToGlobal(Offset.zero,
+          final referencePosition = box.localToGlobal(
+            Offset.zero,
             ancestor: context.findAncestorStateOfType<SnackBarHostFromZeroState>()?.context.findRenderObject(),
           ); //this is global position
-          mousePosition = tapDownDetails==null ? null : referencePosition + tapDownDetails.localPosition;
+          mousePosition = tapDownDetails == null ? null : referencePosition + tapDownDetails.localPosition;
         } catch (_) {
           mousePosition = tapDownDetails?.globalPosition;
         }
       }
     }
-    showPopupFromZero<dynamic>( // TODO 3 find a way to show a non-blocking popup (an overlay)
+    showPopupFromZero<dynamic>(
+      // TODO 3 find a way to show a non-blocking popup (an overlay)
       context: context,
-      anchorKey: mousePosition==null ? anchorKey : null,
+      anchorKey: mousePosition == null ? anchorKey : null,
       referencePosition: mousePosition,
-      referenceSize: mousePosition==null ? null : const Size(1, 1),
+      referenceSize: mousePosition == null ? null : const Size(1, 1),
       width: contextMenuWidth,
       popupAlignment: popupAlignment,
       anchorAlignment: anchorAlignment,
@@ -103,7 +110,7 @@ class ContextMenuFromZeroState extends ConsumerState<ContextMenuFromZero> {
       barrierColor: barrierColor,
       builder: (popupContext) {
         final scrollController = ScrollController();
-        if (contextMenuWidget!=null) {
+        if (contextMenuWidget != null) {
           return contextMenuWidget;
         } else {
           return ScrollbarFromZero(
@@ -115,12 +122,16 @@ class ContextMenuFromZeroState extends ConsumerState<ContextMenuFromZero> {
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemBuilder: (itemContext, index) {
                 final action = actions[index];
-                return action.copyWith(
-                  onTap: action.onTap==null ? null : (context) {
-                    Navigator.of(context).pop();
-                    action.onTap?.call(context);
-                  },
-                ).buildOverflow(context, forceIconSpace: actions.where((e) => e.icon!=null).isNotEmpty);
+                return action
+                    .copyWith(
+                      onTap: action.onTap == null
+                          ? null
+                          : (context) {
+                              Navigator.of(context).pop();
+                              action.onTap?.call(context);
+                            },
+                    )
+                    .buildOverflow(context, forceIconSpace: actions.where((e) => e.icon != null).isNotEmpty);
               },
             ),
           );
@@ -128,7 +139,6 @@ class ContextMenuFromZeroState extends ConsumerState<ContextMenuFromZero> {
       },
     );
   }
-
 
   void onTapDown(TapDownDetails details) => tapDownDetails = details;
   void showContextMenu() {
@@ -138,8 +148,10 @@ class ContextMenuFromZeroState extends ConsumerState<ContextMenuFromZero> {
         didShowContextMenuThisFrame = false;
       });
       final actions = widget.addAncestorContextMenuActions ? getAllContextActions() : widget.actions;
-      if (widget.enabled && (widget.contextMenuWidget!=null || actions.isNotEmpty)) {
-        showContextMenuFromZero(context, ref,
+      if (widget.enabled && (widget.contextMenuWidget != null || actions.isNotEmpty)) {
+        showContextMenuFromZero(
+          context,
+          ref,
           actions: actions,
           anchorKey: anchorKey,
           contextMenuWidth: widget.contextMenuWidth,
@@ -156,14 +168,13 @@ class ContextMenuFromZeroState extends ConsumerState<ContextMenuFromZero> {
     }
   }
 
-
   List<ActionFromZero> getAllContextActions() {
     final previousContextMenu = context.findAncestorStateOfType<ContextMenuFromZeroState>();
     final result = List<ActionFromZero>.from(widget.actions);
-    if (previousContextMenu!=null) {
+    if (previousContextMenu != null) {
       final newActions = <ActionFromZero>[];
       for (final e in previousContextMenu.getAllContextActions()) {
-        if (!result.any((f) => e.uniqueId==f.uniqueId)) {
+        if (!result.any((f) => e.uniqueId == f.uniqueId)) {
           newActions.add(e);
         }
       }
@@ -174,7 +185,6 @@ class ContextMenuFromZeroState extends ConsumerState<ContextMenuFromZero> {
     }
     return result;
   }
-
 
   TapDownDetails? tapDownDetails;
   @override
@@ -190,8 +200,7 @@ class ContextMenuFromZeroState extends ConsumerState<ContextMenuFromZero> {
         () => TransparentTapGestureRecognizer(debugOwner: this),
         (TapGestureRecognizer instance) {
           if (widget.addOnTapDown) {
-            instance
-              .onTapDown = onTapDown;
+            instance.onTapDown = onTapDown;
           }
           instance
             ..onSecondaryTapDown = onTapDown
@@ -211,14 +220,11 @@ class ContextMenuFromZeroState extends ConsumerState<ContextMenuFromZero> {
     }
     return result;
   }
-
 }
 
-
-
 class ContextMenuButton extends StatefulWidget {
-
   final List<ActionFromZero> actions;
+
   /// overrides everything else and is used as context menu widget
   final Widget? contextMenuWidget;
   final double contextMenuWidth;
@@ -245,6 +251,7 @@ class ContextMenuButton extends StatefulWidget {
   @override
   State<ContextMenuButton> createState() => _ContextMenuButtonState();
 }
+
 class _ContextMenuButtonState extends State<ContextMenuButton> {
   final GlobalKey<ContextMenuFromZeroState> contextMenuKey = GlobalKey();
 
@@ -260,7 +267,8 @@ class _ContextMenuButtonState extends State<ContextMenuButton> {
             actions: widget.actions,
             contextMenuWidget: widget.contextMenuWidget,
             contextMenuWidth: widget.contextMenuWidth,
-            anchorAlignment: widget.anchorAlignment ?? (PlatformExtended.isMobile ? Alignment.topLeft : Alignment.bottomLeft),
+            anchorAlignment:
+                widget.anchorAlignment ?? (PlatformExtended.isMobile ? Alignment.topLeft : Alignment.bottomLeft),
             popupAlignment: widget.popupAlignment,
             barrierColor: widget.barrierColor,
             useCursorLocation: widget.useCursorLocation,
@@ -275,8 +283,6 @@ class _ContextMenuButtonState extends State<ContextMenuButton> {
     );
   }
 }
-
-
 
 class TransparentTapGestureRecognizer extends TapGestureRecognizer {
   TransparentTapGestureRecognizer({

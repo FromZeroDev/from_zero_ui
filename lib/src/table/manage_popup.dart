@@ -2,9 +2,7 @@ import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-
 abstract class TableFromZeroManagePopup {
-
   static Future<ManagePopupResult> showDefaultManagePopup<T>({
     required BuildContext context,
     required TableController<T> controller,
@@ -12,12 +10,10 @@ abstract class TableFromZeroManagePopup {
     final columns = controller.columns!;
     final columnKeys = List.from(controller.columnKeys!);
     final columnVisibility = {
-      for (final e in columnKeys)
-        e: controller.currentColumnKeys!.contains(e),
+      for (final e in columnKeys) e: controller.currentColumnKeys!.contains(e),
     };
     final filterButtonGlobalKeys = {
-      for (final e in columnKeys)
-        e: GlobalKey(),
+      for (final e in columnKeys) e: GlobalKey(),
     };
     bool modified = false;
     bool modifiedFilters = false;
@@ -28,7 +24,7 @@ abstract class TableFromZeroManagePopup {
         return ResponsiveInsetsDialog(
           clipBehavior: Clip.hardEdge,
           child: SizedBox(
-            width: 128*3,
+            width: 128 * 3,
             child: ScrollbarFromZero(
               controller: scrollController,
               child: StatefulBuilder(
@@ -55,7 +51,9 @@ abstract class TableFromZeroManagePopup {
                         controller: scrollController,
                         shrinkWrap: true,
                         slivers: [
-                          const SliverToBoxAdapter(child: SizedBox(height: 64+12),),
+                          const SliverToBoxAdapter(
+                            child: SizedBox(height: 64 + 12),
+                          ),
                           SliverReorderableList(
                             proxyDecorator: (child, index, animation) {
                               return Stack(
@@ -63,7 +61,8 @@ abstract class TableFromZeroManagePopup {
                                   Positioned.fill(
                                     child: FadeTransition(
                                       opacity: animation,
-                                      child: ColoredBox(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
+                                      child: ColoredBox(
+                                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
                                     ),
                                   ),
                                   child,
@@ -95,17 +94,16 @@ abstract class TableFromZeroManagePopup {
                                     );
                                   }
                                   final subtitleText = col.getMetadataText(context, controller.filtered, key);
-                                  final dividerColor = Color.alphaBlend(Theme.of(context).dividerColor, Theme.of(context).cardColor);
+                                  final dividerColor =
+                                      Color.alphaBlend(Theme.of(context).dividerColor, Theme.of(context).cardColor);
                                   final dividerIndent = isDesktop ? 48.0 : 0.0;
                                   Widget result = Column(
                                     children: [
-                                      if (index==0)
-                                        Divider(height: 1, color: dividerColor, indent: dividerIndent),
+                                      if (index == 0) Divider(height: 1, color: dividerColor, indent: dividerIndent),
                                       Divider(height: 0, color: dividerColor, indent: dividerIndent),
                                       ListTile(
                                         title: Text(col.name),
-                                        subtitle: subtitleText.isBlank ? null
-                                            : Text(subtitleText),
+                                        subtitle: subtitleText.isBlank ? null : Text(subtitleText),
                                         leading: leading,
                                         trailing: IntrinsicHeight(
                                           child: Row(
@@ -116,12 +114,16 @@ abstract class TableFromZeroManagePopup {
                                                 builder: (context, actionSetState) {
                                                   final visible = columnVisibility[key]!;
                                                   return ActionFromZero(
-                                                    title: visible ? 'Ocultar Columna' : 'Mostrar Columna', // TODO 3 internationalize
+                                                    title: visible
+                                                        ? 'Ocultar Columna'
+                                                        : 'Mostrar Columna', // TODO 3 internationalize
                                                     icon: SelectableIcon(
                                                       selected: visible,
                                                       selectedIcon: Icons.visibility,
                                                       icon: Icons.visibility_off,
-                                                      selectedColor: Theme.of(context).brightness==Brightness.light ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.secondary,
+                                                      selectedColor: Theme.of(context).brightness == Brightness.light
+                                                          ? Theme.of(context).primaryColor
+                                                          : Theme.of(context).colorScheme.secondary,
                                                       unselectedOffset: 0,
                                                       selectedOffset: 0,
                                                     ),
@@ -139,7 +141,8 @@ abstract class TableFromZeroManagePopup {
                                                 builder: (context, child) {
                                                   return Container(
                                                     key: filterButtonGlobalKeys[key],
-                                                    child: TableFromZeroState.getOpenFilterPopupAction(context,
+                                                    child: TableFromZeroState.getOpenFilterPopupAction(
+                                                      context,
                                                       controller: controller,
                                                       col: col,
                                                       colKey: key,
@@ -149,10 +152,13 @@ abstract class TableFromZeroManagePopup {
                                                         modifiedFilters = modifiedFilters || value;
                                                         if (value) {
                                                           // itemSetState(() {});
-                                                          setState(() {}); // need to setState for the whole widget to update clearAllFilters button
+                                                          setState(
+                                                              () {}); // need to setState for the whole widget to update clearAllFilters button
                                                         }
                                                       },
-                                                    ).buildIcon(context,),
+                                                    ).buildIcon(
+                                                      context,
+                                                    ),
                                                   );
                                                 },
                                               ),
@@ -161,7 +167,7 @@ abstract class TableFromZeroManagePopup {
                                         ),
                                       ),
                                       Divider(height: 0, color: dividerColor, indent: dividerIndent),
-                                      if (index==columnKeys.lastIndex)
+                                      if (index == columnKeys.lastIndex)
                                         Divider(height: 1, color: dividerColor, indent: dividerIndent),
                                     ],
                                   );
@@ -182,13 +188,20 @@ abstract class TableFromZeroManagePopup {
                               return result;
                             },
                           ),
-                          const SliverToBoxAdapter(child: SizedBox(height: 24+42,),),
+                          const SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: 24 + 42,
+                            ),
+                          ),
                         ],
                       ),
                       Positioned(
-                        top: 0, left: 0, right: 0,
+                        top: 0,
+                        left: 0,
+                        right: 0,
                         child: AppbarFromZero(
-                          title: Text('Personalizar Tabla',
+                          title: Text(
+                            'Personalizar Tabla',
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           backgroundColor: Theme.of(context).cardColor,
@@ -202,7 +215,9 @@ abstract class TableFromZeroManagePopup {
                                 selected: isAnyColHidden,
                                 selectedIcon: Icons.visibility,
                                 icon: Icons.visibility_off,
-                                selectedColor: Theme.of(context).brightness==Brightness.light ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.secondary,
+                                selectedColor: Theme.of(context).brightness == Brightness.light
+                                    ? Theme.of(context).primaryColor
+                                    : Theme.of(context).colorScheme.secondary,
                                 unselectedColor: Theme.of(context).textTheme.bodyLarge!.color,
                                 unselectedOffset: 0,
                                 selectedOffset: 0,
@@ -216,13 +231,14 @@ abstract class TableFromZeroManagePopup {
                                 });
                               },
                             ),
-                            if (clearFiltersAction!=null)
-                              clearFiltersAction,
+                            if (clearFiltersAction != null) clearFiltersAction,
                           ],
                         ),
                       ),
                       Positioned(
-                        bottom: 0, left: 0, right: 0,
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -241,19 +257,22 @@ abstract class TableFromZeroManagePopup {
                             ),
                             Container(
                               alignment: Alignment.centerRight,
-                              padding: const EdgeInsets.only(bottom: 8, right: 16,),
+                              padding: const EdgeInsets.only(
+                                bottom: 8,
+                                right: 16,
+                              ),
                               color: Theme.of(context).cardColor,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   const DialogButton.cancel(),
                                   DialogButton.accept(
-                                    tooltip: visibleColumns.isEmpty
-                                        ? 'Debe haber al menos 1 columna visible'
-                                        : null,
-                                    onPressed: visibleColumns.isEmpty ? null : () {
-                                      Navigator.of(context).pop(true);
-                                    },
+                                    tooltip: visibleColumns.isEmpty ? 'Debe haber al menos 1 columna visible' : null,
+                                    onPressed: visibleColumns.isEmpty
+                                        ? null
+                                        : () {
+                                            Navigator.of(context).pop(true);
+                                          },
                                   ),
                                 ],
                               ),
@@ -274,12 +293,11 @@ abstract class TableFromZeroManagePopup {
       controller.columnKeys = columnKeys;
       controller.currentColumnKeys = columnKeys.where((e) => columnVisibility[e]!).toList();
     }
-    return ManagePopupResult(modified||modifiedFilters, modifiedFilters);
+    return ManagePopupResult(modified || modifiedFilters, modifiedFilters);
   }
-
 }
 
-class ManagePopupResult{
+class ManagePopupResult {
   final bool modified;
   final bool filtersModified;
   ManagePopupResult(this.modified, this.filtersModified);

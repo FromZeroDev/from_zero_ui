@@ -1,6 +1,5 @@
 part of 'dao.dart';
 
-
 enum DAOBuildLogType {
   none,
   simple,
@@ -9,30 +8,31 @@ enum DAOBuildLogType {
 
 /// receives a model and a function to turn it into a DAO, only calls said function when necessary
 abstract class LazyDAO<ModelType> extends DAO<ModelType> {
-
   ModelType? originalModel;
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
-  void ensureInitialized()  {
+  void ensureInitialized() {
     if (!isInitialized) {
       buildDAO();
       try {
         log(LgLvl.finer, 'Building dao $runtimeType: $classUiName -- $uiName', type: FzLgType.dao);
-      } catch(e, st) {
+      } catch (e, st) {
         log(LgLvl.finer, 'Building dao: Error logging name $runtimeType', e: e, st: st, type: FzLgType.dao);
       }
     }
   }
 
   @override
-  dynamic get id => isInitialized ? super.id :
-      originalModel==null ? null
-          : originalModel is int ? originalModel
-          : (originalModel as dynamic).id;
-
+  dynamic get id => isInitialized
+      ? super.id
+      : originalModel == null
+          ? null
+          : originalModel is int
+              ? originalModel
+              : (originalModel as dynamic).id;
 
   LazyDAO(this.originalModel) : super._uninitialized();
-  
+
   void initialize({
     required DAOValueGetter<String, ModelType> classUiNameGetter,
     required DAOValueGetter<String, ModelType> uiNameGetter,
@@ -64,10 +64,10 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     // DAO? parentDAO,  // i don't see the case where .initialize() will need to set parrent DAO, and removing it allows for better performance, by not having to force initialization when parentDAO set
     DAOValueGetter<DoubleColumnLayoutType, ModelType>? enableDoubleColumnLayout,
     DAOValueGetter<String, ModelType>? searchNameGetter,
-    DAOValueGetter<String, ModelType>?  editDialogTitle,
-    DAOValueGetter<String, ModelType>?  saveConfirmationDialogTitle,
-    DAOValueGetter<String, ModelType>?  saveButtonTitle,
-    DAOValueGetter<Widget, ModelType>?  saveConfirmationDialogDescription,
+    DAOValueGetter<String, ModelType>? editDialogTitle,
+    DAOValueGetter<String, ModelType>? saveConfirmationDialogTitle,
+    DAOValueGetter<String, ModelType>? saveButtonTitle,
+    DAOValueGetter<Widget, ModelType>? saveConfirmationDialogDescription,
   }) {
     // assert(!_isInitialized, 'Attempted to initialize DAO twice: ${this.runtimeType}: ${this.classUiName}');
     _isInitialized = true;
@@ -115,13 +115,13 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     });
   }
 
-
   // functions required to be overriden
   //
   void buildDAO();
 
   @override
-  LazyDAO<ModelType> copyWith({ // force child classes to override copyWith
+  LazyDAO<ModelType> copyWith({
+    // force child classes to override copyWith
     DAOValueGetter<String, ModelType>? classUiNameGetter,
     DAOValueGetter<String, ModelType>? classUiNamePluralGetter,
     DAOValueGetter<String, ModelType>? uiNameGetter,
@@ -157,70 +157,71 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     DAOValueGetter<Widget, ModelType>? saveConfirmationDialogDescription,
   }) {
     final result = copyWithLazyData();
-    if (id!=null
-        || classUiNameGetter!=null
-        || classUiNamePluralGetter!=null
-        || uiNameGetter!=null
-        || uiNameDenseGetter!=null
-        || fieldGroups!=null
-        || onSave!=null
-        || onSaveAPI!=null
-        || onDidSave!=null
-        || onDelete!=null
-        || onDeleteAPI!=null
-        || onDidDelete!=null
-        || viewWidgetBuilder!=null
-        || viewDialogExtraActions!=null
-        || formDialogExtraActions!=null
-        || useIntrinsicHeightForViewDialog!=null
-        || wantsLinkToSelfFromOtherDAOs!=null
-        || viewDialogWidth!=null
-        || formDialogWidth!=null
-        || viewDialogLinksToInnerDAOs!=null
-        || viewDialogShowsViewButtons!=null
-        || viewDialogShowsEditButton!=null
-        || viewDialogShowsDeleteButton!=null
-        || undoRecord!=null
-        || redoRecord!=null
-        || showConfirmDialogWithBlockingErrors!=null
-        || parentDAO!=null
-        || enableDoubleColumnLayout!=null
-        || searchNameGetter!=null
-        || editDialogTitle!=null
-        || saveConfirmationDialogTitle!=null
-        || saveButtonTitle!=null
-        || saveConfirmationDialogDescription!=null) {
+    if (id != null ||
+        classUiNameGetter != null ||
+        classUiNamePluralGetter != null ||
+        uiNameGetter != null ||
+        uiNameDenseGetter != null ||
+        fieldGroups != null ||
+        onSave != null ||
+        onSaveAPI != null ||
+        onDidSave != null ||
+        onDelete != null ||
+        onDeleteAPI != null ||
+        onDidDelete != null ||
+        viewWidgetBuilder != null ||
+        viewDialogExtraActions != null ||
+        formDialogExtraActions != null ||
+        useIntrinsicHeightForViewDialog != null ||
+        wantsLinkToSelfFromOtherDAOs != null ||
+        viewDialogWidth != null ||
+        formDialogWidth != null ||
+        viewDialogLinksToInnerDAOs != null ||
+        viewDialogShowsViewButtons != null ||
+        viewDialogShowsEditButton != null ||
+        viewDialogShowsDeleteButton != null ||
+        undoRecord != null ||
+        redoRecord != null ||
+        showConfirmDialogWithBlockingErrors != null ||
+        parentDAO != null ||
+        enableDoubleColumnLayout != null ||
+        searchNameGetter != null ||
+        editDialogTitle != null ||
+        saveConfirmationDialogTitle != null ||
+        saveButtonTitle != null ||
+        saveConfirmationDialogDescription != null) {
       ensureInitialized();
     }
     if (isInitialized) {
       result.initialize(
-        id: id??this.id,
-        classUiNameGetter: classUiNameGetter??this.classUiNameGetter,
-        fieldGroups: fieldGroups??this.fieldGroups.map((e) => e.copyWith()).toList(),
-        classUiNamePluralGetter: classUiNamePluralGetter??this.classUiNamePluralGetter,
-        uiNameGetter: uiNameGetter??this.uiNameGetter,
-        uiNameDenseGetter: uiNameDenseGetter??this.uiNameDenseGetter,
-        onSave: onSave??this.onSave,
-        onSaveAPI: onSaveAPI??this.onSaveAPI,
-        onDidSave: onDidSave??this.onDidSave,
-        onDelete: onDelete??this.onDelete,
-        onDeleteAPI: onDeleteAPI??this.onDeleteAPI,
-        onDidDelete: onDidDelete??this.onDidDelete,
-        viewWidgetBuilder: viewWidgetBuilder??this.viewWidgetBuilder,
-        viewDialogExtraActions: viewDialogExtraActions??this.viewDialogExtraActions,
-        formDialogExtraActions: formDialogExtraActions??this.formDialogExtraActions,
-        viewDialogWidth: viewDialogWidth??this.viewDialogWidth,
-        formDialogWidth: formDialogWidth??this.formDialogWidth,
-        viewDialogLinksToInnerDAOs: viewDialogLinksToInnerDAOs??this.viewDialogLinksToInnerDAOs,
-        viewDialogShowsViewButtons: viewDialogShowsViewButtons??this.viewDialogShowsViewButtons,
-        viewDialogShowsEditButton: viewDialogShowsEditButton??this.viewDialogShowsEditButton,
-        viewDialogShowsDeleteButton: viewDialogShowsDeleteButton??this.viewDialogShowsDeleteButton,
-        wantsLinkToSelfFromOtherDAOs: wantsLinkToSelfFromOtherDAOs??this.wantsLinkToSelfFromOtherDAOs,
+        id: id ?? this.id,
+        classUiNameGetter: classUiNameGetter ?? this.classUiNameGetter,
+        fieldGroups: fieldGroups ?? this.fieldGroups.map((e) => e.copyWith()).toList(),
+        classUiNamePluralGetter: classUiNamePluralGetter ?? this.classUiNamePluralGetter,
+        uiNameGetter: uiNameGetter ?? this.uiNameGetter,
+        uiNameDenseGetter: uiNameDenseGetter ?? this.uiNameDenseGetter,
+        onSave: onSave ?? this.onSave,
+        onSaveAPI: onSaveAPI ?? this.onSaveAPI,
+        onDidSave: onDidSave ?? this.onDidSave,
+        onDelete: onDelete ?? this.onDelete,
+        onDeleteAPI: onDeleteAPI ?? this.onDeleteAPI,
+        onDidDelete: onDidDelete ?? this.onDidDelete,
+        viewWidgetBuilder: viewWidgetBuilder ?? this.viewWidgetBuilder,
+        viewDialogExtraActions: viewDialogExtraActions ?? this.viewDialogExtraActions,
+        formDialogExtraActions: formDialogExtraActions ?? this.formDialogExtraActions,
+        viewDialogWidth: viewDialogWidth ?? this.viewDialogWidth,
+        formDialogWidth: formDialogWidth ?? this.formDialogWidth,
+        viewDialogLinksToInnerDAOs: viewDialogLinksToInnerDAOs ?? this.viewDialogLinksToInnerDAOs,
+        viewDialogShowsViewButtons: viewDialogShowsViewButtons ?? this.viewDialogShowsViewButtons,
+        viewDialogShowsEditButton: viewDialogShowsEditButton ?? this.viewDialogShowsEditButton,
+        viewDialogShowsDeleteButton: viewDialogShowsDeleteButton ?? this.viewDialogShowsDeleteButton,
+        wantsLinkToSelfFromOtherDAOs: wantsLinkToSelfFromOtherDAOs ?? this.wantsLinkToSelfFromOtherDAOs,
         // undoRecord: undoRecord??this._undoRecord, // cannot reach _undoRecord and _redoRecord since they're private, surely its fine :)
         // redoRecord: redoRecord??this._redoRecord,
-        showConfirmDialogWithBlockingErrors: showConfirmDialogWithBlockingErrors??this.showConfirmDialogWithBlockingErrors,
+        showConfirmDialogWithBlockingErrors:
+            showConfirmDialogWithBlockingErrors ?? this.showConfirmDialogWithBlockingErrors,
         // parentDAO: parentDAO??this.parentDAO,
-        enableDoubleColumnLayout: enableDoubleColumnLayout??doubleColumnLayoutType,
+        enableDoubleColumnLayout: enableDoubleColumnLayout ?? doubleColumnLayoutType,
         searchNameGetter: searchNameGetter ?? this.searchNameGetter,
         editDialogTitle: editDialogTitle ?? this.editDialogTitle,
         saveConfirmationDialogTitle: saveConfirmationDialogTitle ?? this.saveConfirmationDialogTitle,
@@ -230,41 +231,45 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     }
     return result;
   }
-  LazyDAO<ModelType> copyWithLazyData();
 
+  LazyDAO<ModelType> copyWithLazyData();
 
   // DAO methods that should be overriden, to delay build as much as possible
   //
   /// @mustOverride
   @override
   String get classUiName;
+
   /// @mustOverride
   @override
   String get uiName;
+
   /// @mustOverride
   @override
   bool get wantsLinkToSelfFromOtherDAOs {
     ensureInitialized();
     return super.wantsLinkToSelfFromOtherDAOs;
   }
+
   @override
   set wantsLinkToSelfFromOtherDAOs(bool value) {
     ensureInitialized();
     super.wantsLinkToSelfFromOtherDAOs = value;
   }
+
   /// @mustOverride ???
   @override
   bool get canSave {
     ensureInitialized();
     return super.canSave;
   }
+
   /// @mustOverride ???
   @override
   bool get canDelete {
     ensureInitialized();
     return super.canDelete;
   }
-
 
   // DAO methods that should be overriden if also changed in dao
   //
@@ -278,6 +283,7 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
       rethrow;
     }
   }
+
   /// @mustOverride
   @override
   String get searchName {
@@ -289,29 +295,29 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     }
   }
 
-
   // DAO methods that were modified, but don't need to be overridden
   //
   @override
-  Future<ModelType?> save(context, {
+  Future<ModelType?> save(
+    context, {
     bool updateDbValuesAfterSuccessfulSave = true,
     bool showDefaultSnackBar = true,
     bool? snackBarCancellable,
     bool skipValidation = false,
   }) async {
     ensureInitialized();
-    final result = await super.save(context,
+    final result = await super.save(
+      context,
       updateDbValuesAfterSuccessfulSave: updateDbValuesAfterSuccessfulSave,
       showDefaultSnackBar: showDefaultSnackBar,
       snackBarCancellable: snackBarCancellable,
       skipValidation: skipValidation,
     );
-    if (updateDbValuesAfterSuccessfulSave && result!=null) {
+    if (updateDbValuesAfterSuccessfulSave && result != null) {
       originalModel = result;
     }
     return result;
   }
-
 
   // DAO fields, forwarded to it
   //
@@ -348,6 +354,7 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     ensureInitialized();
     return super.fieldGroups;
   }
+
   @override
   set fieldGroups(List<FieldGroup> value) {
     ensureInitialized();
@@ -454,7 +461,6 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
   //   super.viewWidgetBuilder = value;
   // }
 
-
   // DAO methods, forwarded to it
   //
   // bool get hasListeners => super.hasListeners;
@@ -476,6 +482,7 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     ensureInitialized();
     return super.delete(context, showDefaultSnackBar: showDefaultSnackBar);
   }
+
   // void dispose() => super.dispose();
   // void focusError(ValidationError error) => super.focusError(error);
   // void focusFirstBlockingError() => super.focusFirstBlockingError();
@@ -485,6 +492,7 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     ensureInitialized();
     return super.maybeDelete(context, showDefaultSnackBars: showDefaultSnackBars);
   }
+
   // void maybeRevertChanges(BuildContext context)  => super.maybeRevertChanges(context);
   // void notifyListeners()  => super.notifyListeners();
   // void redo() => super.redo();
@@ -515,22 +523,26 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
   //   );
   // }
   @override
-  Widget buildEditModalWidget(BuildContext context, {
+  Widget buildEditModalWidget(
+    BuildContext context, {
     bool showDefaultSnackBars = true,
     bool showRevertChanges = false,
     bool? askForSaveConfirmation,
     bool showUndoRedo = true,
   }) {
     ensureInitialized();
-    return super.buildEditModalWidget(context,
+    return super.buildEditModalWidget(
+      context,
       showDefaultSnackBars: showDefaultSnackBars,
       showRevertChanges: showRevertChanges,
       askForSaveConfirmation: askForSaveConfirmation,
       showUndoRedo: showUndoRedo,
     );
   }
+
   @override
-  List<Widget> buildFormWidgets(BuildContext context, {
+  List<Widget> buildFormWidgets(
+    BuildContext context, {
     Map<String, Field<Comparable>>? props,
     ScrollController? mainScrollController,
     bool asSlivers = true,
@@ -545,7 +557,8 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     FocusNode? focusNode,
   }) {
     ensureInitialized();
-    return super.buildFormWidgets(context,
+    return super.buildFormWidgets(
+      context,
       props: props,
       mainScrollController: mainScrollController,
       asSlivers: asSlivers,
@@ -560,6 +573,7 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
       focusNode: focusNode,
     );
   }
+
   @override
   Widget buildGroupWidget({
     required BuildContext context,
@@ -595,8 +609,10 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
       wrapInLayoutFromZeroItem: wrapInLayoutFromZeroItem,
     );
   }
+
   @override
-  Widget buildViewWidget(BuildContext context, {
+  Widget buildViewWidget(
+    BuildContext context, {
     List<FieldGroup>? fieldGroups,
     ScrollController? mainScrollController,
     bool? useIntrinsicWidth,
@@ -608,7 +624,8 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     bool initialAlternateBackground = false,
   }) {
     ensureInitialized();
-    return super.buildViewWidget(context,
+    return super.buildViewWidget(
+      context,
       mainScrollController: mainScrollController,
       applyAlternateBackground: applyAlternateBackground,
       initialAlternateBackground: initialAlternateBackground,
@@ -619,23 +636,28 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
       valueFlex: valueFlex,
     );
   }
+
   @override
-  Future<ModelType?> maybeEdit(BuildContext context, {
+  Future<ModelType?> maybeEdit(
+    BuildContext context, {
     bool showDefaultSnackBars = true,
     bool showRevertChanges = false,
     bool? askForSaveConfirmation,
     bool showUndoRedo = true,
   }) {
     ensureInitialized();
-    return super.maybeEdit(context,
+    return super.maybeEdit(
+      context,
       showRevertChanges: showRevertChanges,
       askForSaveConfirmation: askForSaveConfirmation,
       showDefaultSnackBars: showDefaultSnackBars,
       showUndoRedo: showUndoRedo,
     );
   }
+
   @override
-  Future pushViewDialog(BuildContext mainContext, {
+  Future pushViewDialog(
+    BuildContext mainContext, {
     bool? showEditButton,
     bool? showDeleteButton,
     bool? useIntrinsicWidth,
@@ -643,15 +665,18 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     bool showDefaultSnackBars = true,
   }) {
     ensureInitialized();
-    return super.pushViewDialog(mainContext,
+    return super.pushViewDialog(
+      mainContext,
       showDefaultSnackBars: showDefaultSnackBars,
       useIntrinsicWidth: useIntrinsicWidth,
       showEditButton: showEditButton,
       showDeleteButton: showDeleteButton,
     );
   }
+
   @override
-  Future<ModelType?> maybeSave(BuildContext context, {
+  Future<ModelType?> maybeSave(
+    BuildContext context, {
     bool updateDbValuesAfterSuccessfulSave = true,
     bool showDefaultSnackBars = true,
     bool? snackBarCancellable,
@@ -659,7 +684,8 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     bool skipValidation = false,
   }) {
     ensureInitialized();
-    return super.maybeSave(context,
+    return super.maybeSave(
+      context,
       showDefaultSnackBars: showDefaultSnackBars,
       snackBarCancellable: snackBarCancellable,
       askForSaveConfirmation: askForSaveConfirmation,
@@ -667,7 +693,4 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
       skipValidation: skipValidation,
     );
   }
-
-
 }
-

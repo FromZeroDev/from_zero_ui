@@ -1,22 +1,16 @@
-
 import 'package:flutter/material.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-
 import '../../router.dart';
 
-
 class PageHeroes extends StatefulWidget {
-
   const PageHeroes({super.key});
 
   @override
   PageHeroesState createState() => PageHeroesState();
-
 }
 
 class PageHeroesState extends State<PageHeroes> {
-
   late Widget widgetToExport;
   HeroFlightShuttleBuilder? shuttleBuilder;
 
@@ -60,7 +54,7 @@ class PageHeroesState extends State<PageHeroes> {
     );
   }
 
-  Widget _getPage(BuildContext context){
+  Widget _getPage(BuildContext context) {
     widgetToExport = Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -69,7 +63,9 @@ class PageHeroesState extends State<PageHeroes> {
           children: [
             Column(
               children: [
-                const SizedBox(height: 8,),
+                const SizedBox(
+                  height: 8,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(left: 16),
                   child: ElevatedButton(
@@ -84,7 +80,9 @@ class PageHeroesState extends State<PageHeroes> {
                     },
                   ),
                 ),
-                const SizedBox(height: 16,),
+                const SizedBox(
+                  height: 16,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(left: 16),
                   child: ElevatedButton(
@@ -99,10 +97,13 @@ class PageHeroesState extends State<PageHeroes> {
                     },
                   ),
                 ),
-                const SizedBox(height: 16,),
+                const SizedBox(
+                  height: 16,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(left: 16),
-                  child: ElevatedButton( //TODO 3- implement custom trransitionBuilderHero
+                  child: ElevatedButton(
+                    //TODO 3- implement custom trransitionBuilderHero
                     child: const Text("Custom transionBuilder Hero"),
                     onPressed: () {
                       setState(() {
@@ -114,7 +115,9 @@ class PageHeroesState extends State<PageHeroes> {
                     },
                   ),
                 ),
-                const SizedBox(height: 16,),
+                const SizedBox(
+                  height: 16,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(left: 16),
                   child: ElevatedButton(
@@ -129,10 +132,14 @@ class PageHeroesState extends State<PageHeroes> {
                     },
                   ),
                 ),
-                const SizedBox(height: 8,),
+                const SizedBox(
+                  height: 8,
+                ),
               ],
             ),
-            const SizedBox(width: 32,),
+            const SizedBox(
+              width: 32,
+            ),
             Hero(
               tag: "hero_test",
               flightShuttleBuilder: shuttleBuilder,
@@ -145,9 +152,14 @@ class PageHeroesState extends State<PageHeroes> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                      child: Text("Heroes Test", style: Theme.of(context).textTheme.titleMedium,),
+                      child: Text(
+                        "Heroes Test",
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                     ),
-                    const FlutterLogo(size: 192,),
+                    const FlutterLogo(
+                      size: 192,
+                    ),
                   ],
                 ),
               ),
@@ -161,5 +173,4 @@ class PageHeroesState extends State<PageHeroes> {
       child: widgetToExport,
     );
   }
-
 }

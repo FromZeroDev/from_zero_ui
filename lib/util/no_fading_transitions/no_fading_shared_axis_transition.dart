@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 
-
 /// Determines which type of shared axis transition is used.
 enum SharedAxisTransitionType {
   /// Creates a shared axis vertical (y-axis) page transition.
@@ -89,12 +88,12 @@ class SharedAxisPageTransitionsBuilder extends PageTransitionsBuilder {
 
   @override
   Widget buildTransitions<T>(
-      PageRoute<T> route,
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child,
-      ) {
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     return SharedAxisTransition(
       animation: animation,
       secondaryAnimation: secondaryAnimation,
@@ -235,10 +234,10 @@ class SharedAxisTransition extends StatelessWidget {
     return DualTransitionBuilder(
       animation: animation,
       forwardBuilder: (
-          BuildContext context,
-          Animation<double> animation,
-          Widget? child,
-          ) {
+        BuildContext context,
+        Animation<double> animation,
+        Widget? child,
+      ) {
         return _EnterTransition(
           animation: animation,
           transitionType: transitionType,
@@ -246,10 +245,10 @@ class SharedAxisTransition extends StatelessWidget {
         );
       },
       reverseBuilder: (
-          BuildContext context,
-          Animation<double> animation,
-          Widget? child,
-          ) {
+        BuildContext context,
+        Animation<double> animation,
+        Widget? child,
+      ) {
         return _ExitTransition(
           animation: animation,
           transitionType: transitionType,
@@ -261,10 +260,10 @@ class SharedAxisTransition extends StatelessWidget {
       child: DualTransitionBuilder(
         animation: ReverseAnimation(secondaryAnimation),
         forwardBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Widget? child,
-            ) {
+          BuildContext context,
+          Animation<double> animation,
+          Widget? child,
+        ) {
           return _EnterTransition(
             animation: animation,
             transitionType: transitionType,
@@ -273,10 +272,10 @@ class SharedAxisTransition extends StatelessWidget {
           );
         },
         reverseBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Widget? child,
-            ) {
+          BuildContext context,
+          Animation<double> animation,
+          Widget? child,
+        ) {
           return _ExitTransition(
             animation: animation,
             transitionType: transitionType,
@@ -350,8 +349,7 @@ class _EnterTransition extends StatelessWidget {
         );
       case SharedAxisTransitionType.scaled:
         return ScaleTransition(
-          scale: (!reverse ? _scaleUpTransition : _scaleDownTransition)
-              .animate(animation),
+          scale: (!reverse ? _scaleUpTransition : _scaleDownTransition).animate(animation),
           child: child,
         );
     }
@@ -428,8 +426,7 @@ class _ExitTransition extends StatelessWidget {
         return ColoredBox(
           color: fillColor,
           child: ScaleTransition(
-            scale: (!reverse ? _scaleUpTransition : _scaleDownTransition)
-                .animate(animation),
+            scale: (!reverse ? _scaleUpTransition : _scaleDownTransition).animate(animation),
             child: child,
           ),
         );

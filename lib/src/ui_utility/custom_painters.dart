@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class SimpleShadowPainter extends CustomPainter {
-
   static const int up = 1;
   static const int down = 2;
   static const int left = 3;
@@ -19,15 +18,13 @@ class SimpleShadowPainter extends CustomPainter {
     this.spreadPercentage = 1,
   });
 
-
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return false;
   }
 
   @override
-  void paint (Canvas canvas, Size size){
-
+  void paint(Canvas canvas, Size size) {
 //    canvas.drawPath(
 //      Path()
 //        ..addRect(Rect.fromPoints(Offset(-15, -15), Offset(size.width+15, size.height+15)))
@@ -38,35 +35,33 @@ class SimpleShadowPainter extends CustomPainter {
 //        ..maskFilter = MaskFilter.blur(BlurStyle.normal, convertRadiusToSigma(3)),
 //    );
 
-
     canvas.clipRect(
-        Rect.fromPoints(
-            Offset(
-              direction==left ? -size.width*spreadPercentage : 0,
-              direction==up ? -size.height*spreadPercentage : 0,
-            ),
-            Offset(
-                direction==right ? size.width*(1+spreadPercentage) : size.width,
-                direction==down ? size.height*(1+spreadPercentage) : size.height,
-            ),
+      Rect.fromPoints(
+        Offset(
+          direction == left ? -size.width * spreadPercentage : 0,
+          direction == up ? -size.height * spreadPercentage : 0,
         ),
+        Offset(
+          direction == right ? size.width * (1 + spreadPercentage) : size.width,
+          direction == down ? size.height * (1 + spreadPercentage) : size.height,
+        ),
+      ),
     );
-    double spread = direction==down||direction==up
-        ? size.height*spreadPercentage
-        : size.width*spreadPercentage;
+    double spread =
+        direction == down || direction == up ? size.height * spreadPercentage : size.width * spreadPercentage;
     canvas.drawPath(
       Path()
         ..addRect(
-            Rect.fromPoints(
-                Offset(
-                  direction==left ? 0 : -spread,
-                  direction==up ? 0 : -spread,
-                ),
-                Offset(
-                    direction==right ? size.width : size.width+spread,
-                    direction==down ? size.height : size.height+spread,
-                ),
+          Rect.fromPoints(
+            Offset(
+              direction == left ? 0 : -spread,
+              direction == up ? 0 : -spread,
             ),
+            Offset(
+              direction == right ? size.width : size.width + spread,
+              direction == down ? size.height : size.height + spread,
+            ),
+          ),
         )
         ..fillType = PathFillType.evenOdd,
       Paint()
@@ -83,11 +78,9 @@ class SimpleShadowPainter extends CustomPainter {
 //      elevation,
 //      true,
 //    );
-
   }
 
-  static double convertRadiusToSigma(double radius){
+  static double convertRadiusToSigma(double radius) {
     return radius * 0.57735 + 0.5;
   }
-
 }

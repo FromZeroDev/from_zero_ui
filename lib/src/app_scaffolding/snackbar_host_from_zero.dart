@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:math';
 
@@ -7,17 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/src/app_scaffolding/api_snackbar.dart';
 
-
-
 var fromZeroSnackBarHostControllerProvider = ChangeNotifierProvider<SnackBarHostControllerFromZero>((ref) {
   return SnackBarHostControllerFromZero();
 });
 
-
-
-
 class SnackBarControllerFromZero {
-
   SnackBarControllerFromZero({
     required this.host,
     required this.snackBar,
@@ -34,12 +27,9 @@ class SnackBarControllerFromZero {
   void dismiss() {
     host.dismiss(snackBar);
   }
-
 }
 
-
 class SnackBarHostControllerFromZero extends ChangeNotifier {
-
   final List<SnackBarFromZero> _snackBarQueue = [];
 
   void show(SnackBarFromZero o) {
@@ -49,13 +39,13 @@ class SnackBarHostControllerFromZero extends ChangeNotifier {
 
   void dismiss(SnackBarFromZero o) {
     _snackBarQueue.remove(o);
-    if (o.controller?._closedCompleter.isCompleted==false) {
+    if (o.controller?._closedCompleter.isCompleted == false) {
       o.controller?._closedCompleter.complete();
       notifyListeners();
     }
   }
 
-  void dismissFirst(){
+  void dismissFirst() {
     if (_snackBarQueue.isNotEmpty) {
       dismiss(_snackBarQueue.first);
     }
@@ -66,12 +56,9 @@ class SnackBarHostControllerFromZero extends ChangeNotifier {
       dismiss(_snackBarQueue[i]);
     }
   }
-
 }
 
-
 class SnackBarHostFromZero extends ConsumerStatefulWidget {
-
   final Widget child;
 
   const SnackBarHostFromZero({
@@ -81,21 +68,19 @@ class SnackBarHostFromZero extends ConsumerStatefulWidget {
 
   @override
   SnackBarHostFromZeroState createState() => SnackBarHostFromZeroState();
-
 }
 
 class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
-
   SnackBarFromZero? lastShownSnackBar;
 
   @override
   Widget build(BuildContext context) {
     final controller = ref.watch(fromZeroSnackBarHostControllerProvider);
-    SnackBarFromZero? currentSnackBar = controller._snackBarQueue.isEmpty
-        ? null : controller._snackBarQueue.first;
-    bool isSameSnackBar = currentSnackBar?.key!=null && lastShownSnackBar?.key!=null
-        && currentSnackBar?.key==lastShownSnackBar?.key;
-    if (currentSnackBar!=null && !isSameSnackBar && currentSnackBar is APISnackBar) {
+    SnackBarFromZero? currentSnackBar = controller._snackBarQueue.isEmpty ? null : controller._snackBarQueue.first;
+    bool isSameSnackBar = currentSnackBar?.key != null &&
+        lastShownSnackBar?.key != null &&
+        currentSnackBar?.key == lastShownSnackBar?.key;
+    if (currentSnackBar != null && !isSameSnackBar && currentSnackBar is APISnackBar) {
       currentSnackBar.updateBlockUI(currentSnackBar.stateNotifier.state);
     }
     final viewPadding = MediaQuery.viewPaddingOf(context);
@@ -119,9 +104,7 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 250),
                             curve: Curves.ease,
-                            color: blockUI
-                                ? Colors.black54
-                                : Colors.black.withValues(alpha: 0),
+                            color: blockUI ? Colors.black54 : Colors.black.withValues(alpha: 0),
                           ),
                         );
                       },
@@ -134,9 +117,9 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
               child: controller._snackBarQueue.isEmpty || !controller._snackBarQueue.first.pushScreen
                   ? const SizedBox.shrink()
                   : Container(
-                    key: ValueKey(controller._snackBarQueue.first.hashCode),
-                    child: controller._snackBarQueue.first,
-                  ),
+                      key: ValueKey(controller._snackBarQueue.first.hashCode),
+                      child: controller._snackBarQueue.first,
+                    ),
             ),
           ],
         ),
@@ -147,8 +130,12 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
           child: AnimatedSwitcher(
             switchInCurve: Curves.easeOutCubic,
             switchOutCurve: Curves.easeInCubic,
-            duration: const Duration(milliseconds: 500,),
-            reverseDuration: const Duration(milliseconds: 300,),
+            duration: const Duration(
+              milliseconds: 500,
+            ),
+            reverseDuration: const Duration(
+              milliseconds: 300,
+            ),
             transitionBuilder: (child, animation) {
               if (isSameSnackBar) {
                 return FadeTransition(
@@ -157,11 +144,23 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
                 );
               } else {
                 return SlideTransition(
-                  position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero,).animate(animation),
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 1),
+                    end: Offset.zero,
+                  ).animate(animation),
                   child: FadeTransition(
-                    opacity: CurvedAnimation(parent: animation, curve: const Interval(0, 0.5,),),
+                    opacity: CurvedAnimation(
+                      parent: animation,
+                      curve: const Interval(
+                        0,
+                        0.5,
+                      ),
+                    ),
                     child: ScaleTransition(
-                      scale: Tween<double>(begin: 0.66, end: 1,).animate(animation),
+                      scale: Tween<double>(
+                        begin: 0.66,
+                        end: 1,
+                      ).animate(animation),
                       child: child,
                     ),
                   ),
@@ -171,9 +170,9 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
             child: controller._snackBarQueue.isEmpty || controller._snackBarQueue.first.pushScreen
                 ? const SizedBox.shrink()
                 : Container(
-                  key: ValueKey(controller._snackBarQueue.first.hashCode),
-                  child: controller._snackBarQueue.first,
-                ),
+                    key: ValueKey(controller._snackBarQueue.first.hashCode),
+                    child: controller._snackBarQueue.first,
+                  ),
           ),
         ),
       ],
@@ -181,5 +180,4 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
     lastShownSnackBar = currentSnackBar;
     return result;
   }
-
 }

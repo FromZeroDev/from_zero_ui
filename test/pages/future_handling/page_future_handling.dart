@@ -1,21 +1,16 @@
-
 import 'package:flutter/material.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
-
 
 import '../../router.dart';
 
 class PageFutureHandling extends StatefulWidget {
-
   const PageFutureHandling({super.key});
 
   @override
   PageFutureHandlingState createState() => PageFutureHandlingState();
-
 }
 
 class PageFutureHandlingState extends State<PageFutureHandling> {
-
   late Widget widgetToExport;
   final scrollController = ScrollController();
 
@@ -66,18 +61,20 @@ class PageFutureHandlingState extends State<PageFutureHandling> {
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: (){},
+        onPressed: () {},
       ),
     );
   }
 
   // GlobalKey widgetToExportKey;
-  Widget _getPage(context){
+  Widget _getPage(context) {
     widgetToExport = Column(
       // key: widgetToExportKey,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 12,),
+        const SizedBox(
+          height: 12,
+        ),
         Card(
           clipBehavior: Clip.hardEdge,
           child: Padding(
@@ -91,7 +88,9 @@ class PageFutureHandlingState extends State<PageFutureHandling> {
             ),
           ),
         ),
-        const SizedBox(height: 12,),
+        const SizedBox(
+          height: 12,
+        ),
         Card(
           clipBehavior: Clip.hardEdge,
           child: Padding(
@@ -105,7 +104,9 @@ class PageFutureHandlingState extends State<PageFutureHandling> {
             ),
           ),
         ),
-        const SizedBox(height: 12,),
+        const SizedBox(
+          height: 12,
+        ),
         Card(
           clipBehavior: Clip.hardEdge,
           child: Padding(
@@ -113,13 +114,17 @@ class PageFutureHandlingState extends State<PageFutureHandling> {
             child: FutureBuilderFromZero(
               future: Future<dynamic>.delayed(const Duration(milliseconds: 10)).then((value) => "instant"),
               successBuilder: (context, result) {
-                return const FlutterLogo(size: 600,);
+                return const FlutterLogo(
+                  size: 600,
+                );
               },
               applyAnimatedContainerFromChildSize: true,
             ),
           ),
         ),
-        const SizedBox(height: 500,),
+        const SizedBox(
+          height: 500,
+        ),
       ],
     );
     return SingleChildScrollView(
@@ -129,5 +134,4 @@ class PageFutureHandlingState extends State<PageFutureHandling> {
       ),
     );
   }
-
 }

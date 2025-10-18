@@ -6,12 +6,7 @@ import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/util/comparable_list.dart';
 import 'package:intl/intl.dart';
 
-
-
-
-
 class RowAction<T> extends ActionFromZero {
-
   final void Function(BuildContext context, RowModel<T> row)? onRowTap;
   final String? Function(BuildContext context, RowModel<T> row)? disablingErrorGetter;
   final Map<double, ActionState>? Function(BuildContext context, RowModel<T> row)? breakpointsGetter;
@@ -29,12 +24,14 @@ class RowAction<T> extends ActionFromZero {
     super.centerExpanded,
     super.key,
     this.disablingErrorGetter,
-  }) :  assert(breakpointsGetter==null || breakpoints!=null, 'Please specify default breakpoints, that should be the max that a column can get'),
+  })  : assert(breakpointsGetter == null || breakpoints != null,
+            'Please specify default breakpoints, that should be the max that a column can get'),
         super(
           onTap: (context) {},
         );
 
-  RowAction.divider({super.key, 
+  RowAction.divider({
+    super.key,
     Map<double, ActionState>? breakpoints,
     super.overflowBuilder = ActionFromZero.dividerOverflowBuilder,
     super.iconBuilder = ActionFromZero.dividerIconBuilder,
@@ -45,14 +42,12 @@ class RowAction<T> extends ActionFromZero {
         super(
           onTap: null,
           title: '',
-          breakpoints: breakpoints ?? {
-            0: ActionState.popup,
-          },
+          breakpoints: breakpoints ??
+              {
+                0: ActionState.popup,
+              },
         );
-
 }
-
-
 
 abstract class RowModel<T> {
   T get id;
@@ -94,29 +89,31 @@ abstract class RowModel<T> {
     this.depth = 0,
   });
   @override
-  bool operator == (Object other) => other is RowModel && this.id==other.id;
+  bool operator ==(Object other) => other is RowModel && this.id == other.id;
   @override
   int get hashCode => Object.hashAll([RowModel, id]);
 
-  bool get isExpandable => children.isNotEmpty || (rowAddon!=null && rowAddonIsExpandable);
+  bool get isExpandable => children.isNotEmpty || (rowAddon != null && rowAddonIsExpandable);
   List<RowModel<T>> get visibleRows => [this, if (expanded) ...children.map((e) => e.visibleRows).flatten()];
-  List<RowModel<T>> get visibleFilteredRows => [this, if (expanded) ...filteredChildren.map((e) => e.visibleFilteredRows).flatten()];
+  List<RowModel<T>> get visibleFilteredRows =>
+      [this, if (expanded) ...filteredChildren.map((e) => e.visibleFilteredRows).flatten()];
   List<RowModel<T>> get visibleChildren => visibleRows..removeAt(0);
   List<RowModel<T>> get allRows => [this, ...children.map((e) => e.allRows).flatten()];
   List<RowModel<T>> get allChildren => allRows..removeAt(0);
-  List<RowModel<T>> get allFilteredChildren => filteredChildren.map((e) => [e, ...e.allFilteredChildren]).flatten().toList();
+  List<RowModel<T>> get allFilteredChildren =>
+      filteredChildren.map((e) => [e, ...e.allFilteredChildren]).flatten().toList();
   int get length => 1 + (expanded ? children.sumBy((e) => e.length) : 0);
   int get filteredLength => 1 + (expanded ? filteredChildren.sumBy((e) => e.filteredLength) : 0);
   void calculateDepth() {
     for (final e in children) {
-      e.depth = depth+1;
+      e.depth = depth + 1;
       e.calculateDepth();
     }
   }
 }
 
 ///The widget assumes columns will be constant, so bugs may happen when changing columns
-abstract class ColModel<T>{
+abstract class ColModel<T> {
   String get name;
   String? get compactName;
   String? get tooltip;
@@ -134,10 +131,12 @@ abstract class ColModel<T>{
   bool? get filterEnabled => null;
   bool Function(RowModel<T> row)? get rowCountSelector;
   ShowFilterPopupCallback? get showFilterPopupCallback;
+
   /// exhaustive list of all possible values cells of this column can take
   /// if a row has a value not declared here, the row will be filtered out,
   /// because the valueFilter for said value will be treated as false.
   Iterable<dynamic>? get possibleValues;
+
   /// same as TableController.initialValueFilters, both shouldn't be specified,
   /// but if they do, the values in TableController take priority
   Map<Object?, bool>? get initialValueFilters;
@@ -147,30 +146,35 @@ abstract class ColModel<T>{
   Object? getValue(RowModel row, dynamic key) {
     return row.values[key];
   }
+
   String getValueString(RowModel row, dynamic key) {
     final value = getValue(row, key);
     if (value is List || value is ComparableList) {
-      final List list = value is List ? value
-          : value is ComparableList ? value.list : [];
+      final List list = value is List
+          ? value
+          : value is ComparableList
+              ? value.list
+              : [];
       return ListField.listToStringAll(list);
     } else {
-      return value!=null ? value.toString() : "";
+      return value != null ? value.toString() : "";
     }
   }
 
-  String getSubtitleText(BuildContext context, List<RowModel<T>>? filtered, dynamic key, {
+  String getSubtitleText(
+    BuildContext context,
+    List<RowModel<T>>? filtered,
+    dynamic key, {
     bool addMetadata = true,
   }) {
-    if (filtered==null) {
+    if (filtered == null) {
       return '';
     } else {
-      final reFiltered = rowCountSelector==null
-          ? filtered
-          : filtered.where((e) => rowCountSelector!(e)).toList();
+      final reFiltered = rowCountSelector == null ? filtered : filtered.where((e) => rowCountSelector!(e)).toList();
       final count = reFiltered.length;
-      String result = count==0 ? FromZeroLocalizations.of(context).translate('no_elements')
-          : '$count ${count>1 ? FromZeroLocalizations.of(context).translate('element_plur')
-          : FromZeroLocalizations.of(context).translate('element_sing')}';
+      String result = count == 0
+          ? FromZeroLocalizations.of(context).translate('no_elements')
+          : '$count ${count > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')}';
       if (addMetadata) {
         final metadata = getMetadataText(context, filtered, key, reFiltered: reFiltered);
         if (metadata.isNotBlank) {
@@ -180,24 +184,27 @@ abstract class ColModel<T>{
       return result;
     }
   }
-  String getMetadataText(BuildContext context, List<RowModel<T>>? filtered, dynamic key, {
+
+  String getMetadataText(
+    BuildContext context,
+    List<RowModel<T>>? filtered,
+    dynamic key, {
     List<RowModel<T>>? reFiltered,
   }) {
-    if (filtered!=null) {
-      reFiltered ??= rowCountSelector==null
-          ? filtered
-          : filtered.where((e) => rowCountSelector!(e)).toList();
+    if (filtered != null) {
+      reFiltered ??= rowCountSelector == null ? filtered : filtered.where((e) => rowCountSelector!(e)).toList();
       if (reFiltered.isNotEmpty) {
         final Set<dynamic> unique = {};
         for (final row in reFiltered) {
           final value = getValue(row, key);
           addValueToSet(unique, value);
         }
-        return unique.length==1 ? '1 valor único' : '${unique.length} valores únicos';
+        return unique.length == 1 ? '1 valor único' : '${unique.length} valores únicos';
       }
     }
     return '';
   }
+
   static void addValueToSet(Set<dynamic> set, dynamic value) {
     if (value is ContainsValue) {
       addValueToSet(set, value.value);
@@ -209,39 +216,45 @@ abstract class ColModel<T>{
       set.add(value);
     }
   }
+
   Widget? buildSortedIcon(BuildContext context, bool ascending) => null;
   List<ConditionFilter> getAvailableConditionFilters() => [
-    // FilterIsEmpty(),
-    // FilterTextExactly(),
-    FilterTextContains(),
-    FilterTextStartsWith(),
-    FilterTextEndsWith(),
-    // FilterNumberEqualTo(),
-    // FilterNumberGreaterThan(),
-    // FilterNumberLessThan(),
-    // FilterDateExactDay(),
-    // FilterDateAfter(),
-    // FilterDateBefore(),
-  ];
+        // FilterIsEmpty(),
+        // FilterTextExactly(),
+        FilterTextContains(),
+        FilterTextStartsWith(),
+        FilterTextEndsWith(),
+        // FilterNumberEqualTo(),
+        // FilterNumberGreaterThan(),
+        // FilterNumberLessThan(),
+        // FilterDateExactDay(),
+        // FilterDateAfter(),
+        // FilterDateBefore(),
+      ];
 
   static Object? getRowValue(RowModel row, dynamic key, ColModel? col) {
     return col?.getValue(row, key) ?? row.values[key];
   }
+
   static String getRowValueString(RowModel row, dynamic key, ColModel? col) {
-    if (col!=null) {
+    if (col != null) {
       return col.getValueString(row, key);
     }
     final value = getRowValue(row, key, col);
     if (value is List || value is ComparableList) {
-      final List list = value is List ? value
-          : value is ComparableList ? value.list : [];
+      final List list = value is List
+          ? value
+          : value is ComparableList
+              ? value.list
+              : [];
       return ListField.listToStringAll(list);
     } else {
-      return value!=null ? value.toString() : "";
+      return value != null ? value.toString() : "";
     }
   }
 
-  List<RowModel> buildFilterPopupRowModels(List<dynamic> availableFilters, Map<dynamic, Map<Object?, bool>> valueFilters, dynamic colKey, ValueNotifier<bool> modified) {
+  List<RowModel> buildFilterPopupRowModels(List<dynamic> availableFilters,
+      Map<dynamic, Map<Object?, bool>> valueFilters, dynamic colKey, ValueNotifier<bool> modified) {
     return availableFilters.map((e) {
       return SimpleRowModel(
         id: e,
@@ -257,8 +270,6 @@ abstract class ColModel<T>{
     }).toList();
   }
 }
-
-
 
 class SimpleRowModel<T> extends RowModel<T> {
   @override
@@ -401,7 +412,7 @@ class SimpleRowModel<T> extends RowModel<T> {
   }
 }
 
-class SimpleColModel<T> extends ColModel<T>{
+class SimpleColModel<T> extends ColModel<T> {
   @override
   String name;
   @override
@@ -489,7 +500,7 @@ class SimpleColModel<T> extends ColModel<T>{
     Map<Object?, bool>? initialValueFilters,
     bool? initialValueFiltersExcludeAllElse,
     bool? initiallyHidden,
-  }){
+  }) {
     return SimpleColModel<T>(
       name: name ?? this.name,
       tooltip: tooltip ?? this.tooltip,
@@ -515,8 +526,6 @@ class SimpleColModel<T> extends ColModel<T>{
     );
   }
 }
-
-
 
 class NumColModel<T> extends SimpleColModel<T> {
   NumberFormat? formatter;
@@ -574,7 +583,7 @@ class NumColModel<T> extends SimpleColModel<T> {
     bool? initiallyHidden,
     bool? metadataShowSum,
     bool? metadataShowAverage,
-  }){
+  }) {
     return NumColModel<T>(
       name: name ?? this.name,
       tooltip: tooltip ?? this.tooltip,
@@ -602,32 +611,42 @@ class NumColModel<T> extends SimpleColModel<T> {
       metadataShowAverage: metadataShowAverage ?? this.metadataShowAverage,
     );
   }
+
   @override
   String getValueString(RowModel row, dynamic key) {
     final value = getValue(row, key);
     if (value is List || value is ComparableList) {
-      final List list = value is List ? value
-          : value is ComparableList ? value.list : [];
-      return ListField.listToStringAll(list,
+      final List list = value is List
+          ? value
+          : value is ComparableList
+              ? value.list
+              : [];
+      return ListField.listToStringAll(
+        list,
         converter: _format,
       );
     } else {
       return _format(value);
     }
   }
+
   String _format(dynamic value) {
-    return value==null ? ''
-        : (formatter!=null && value is num) ? formatter!.format(value)
-        : value.toString();
+    return value == null
+        ? ''
+        : (formatter != null && value is num)
+            ? formatter!.format(value)
+            : value.toString();
   }
+
   @override
-  String getMetadataText(BuildContext context, List<RowModel<T>>? filtered, dynamic key, {
+  String getMetadataText(
+    BuildContext context,
+    List<RowModel<T>>? filtered,
+    dynamic key, {
     List<RowModel<T>>? reFiltered,
   }) {
-    if (filtered!=null) {
-      reFiltered ??= rowCountSelector==null
-          ? filtered
-          : filtered.where((e) => rowCountSelector!(e)).toList();
+    if (filtered != null) {
+      reFiltered ??= rowCountSelector == null ? filtered : filtered.where((e) => rowCountSelector!(e)).toList();
       if (reFiltered.isNotEmpty) {
         var result = '';
         num? sum;
@@ -646,6 +665,7 @@ class NumColModel<T> extends SimpleColModel<T> {
     }
     return '';
   }
+
   num _sumList(Iterable list) {
     return list.sumBy((value) {
       if (value is num) {
@@ -663,27 +683,27 @@ class NumColModel<T> extends SimpleColModel<T> {
       return 0;
     });
   }
+
   @override
   Widget? buildSortedIcon(BuildContext context, bool ascending) {
     return Icon(
-      ascending
-          ? MaterialCommunityIcons.sort_numeric_ascending
-          : MaterialCommunityIcons.sort_numeric_descending,
+      ascending ? MaterialCommunityIcons.sort_numeric_ascending : MaterialCommunityIcons.sort_numeric_descending,
       key: ValueKey(ascending),
       size: 20,
-      color: Theme.of(context).brightness==Brightness.light ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.secondary,
+      color: Theme.of(context).brightness == Brightness.light
+          ? Theme.of(context).primaryColor
+          : Theme.of(context).colorScheme.secondary,
     );
   }
+
   @override
   List<ConditionFilter> getAvailableConditionFilters() => [
-    // FilterIsEmpty(),
-    FilterNumberEqualTo(),
-    FilterNumberGreaterThan(),
-    FilterNumberLessThan(),
-  ];
+        // FilterIsEmpty(),
+        FilterNumberEqualTo(),
+        FilterNumberGreaterThan(),
+        FilterNumberLessThan(),
+      ];
 }
-
-
 
 class BoolColModel<T> extends SimpleColModel<T> {
   String trueValue;
@@ -738,7 +758,7 @@ class BoolColModel<T> extends SimpleColModel<T> {
     Map<Object?, bool>? initialValueFilters,
     bool? initialValueFiltersExcludeAllElse,
     bool? initiallyHidden,
-  }){
+  }) {
     return BoolColModel<T>(
       name: name ?? this.name,
       tooltip: tooltip ?? this.tooltip,
@@ -765,26 +785,30 @@ class BoolColModel<T> extends SimpleColModel<T> {
       initialValueFiltersExcludeAllElse: initialValueFiltersExcludeAllElse ?? this.initialValueFiltersExcludeAllElse,
     );
   }
+
   @override
   String getValueString(RowModel row, dynamic key) {
     final value = getValue(row, key);
     if (value is bool) {
       return value ? trueValue : falseValue;
     } else {
-      return value==null ? '' : value.toString();
+      return value == null ? '' : value.toString();
     }
   }
+
   @override
-  String getMetadataText(BuildContext context, List<RowModel<T>>? filtered, dynamic key, {
+  String getMetadataText(
+    BuildContext context,
+    List<RowModel<T>>? filtered,
+    dynamic key, {
     List<RowModel<T>>? reFiltered,
   }) {
     return '';
   }
+
   @override
   List<ConditionFilter> getAvailableConditionFilters() => [];
 }
-
-
 
 class DateColModel<T> extends SimpleColModel<T> {
   DateFormat? formatter;
@@ -836,7 +860,7 @@ class DateColModel<T> extends SimpleColModel<T> {
     Map<Object?, bool>? initialValueFilters,
     bool? initialValueFiltersExcludeAllElse,
     bool? initiallyHidden,
-  }){
+  }) {
     return DateColModel<T>(
       name: name ?? this.name,
       tooltip: tooltip ?? this.tooltip,
@@ -862,38 +886,54 @@ class DateColModel<T> extends SimpleColModel<T> {
       initialValueFiltersExcludeAllElse: initialValueFiltersExcludeAllElse ?? this.initialValueFiltersExcludeAllElse,
     );
   }
+
   @override
-  String getMetadataText(BuildContext context, List<RowModel<T>>? filtered, dynamic key, {
+  String getMetadataText(
+    BuildContext context,
+    List<RowModel<T>>? filtered,
+    dynamic key, {
     List<RowModel<T>>? reFiltered,
-  }) => '';
+  }) =>
+      '';
   @override
   String getValueString(RowModel row, dynamic key) {
     final value = getValue(row, key);
     if (value is List || value is ComparableList) {
-      final List list = value is List ? value
-          : value is ComparableList ? value.list : [];
-      return ListField.listToStringAll(list,
+      final List list = value is List
+          ? value
+          : value is ComparableList
+              ? value.list
+              : [];
+      return ListField.listToStringAll(
+        list,
         converter: _format,
       );
     } else {
       return _format(value);
     }
   }
+
   String _format(dynamic value) {
-    return value==null ? ''
-        : (formatter!=null && value is DateTime) ? formatter!.format(value)
-        : (formatter!=null && value is Date) ? formatter!.format(value.toDateTime())
-        : value is DateField && value.value!=null ? value.formatterDense.format(value.value!)
-        : value.toString();
+    return value == null
+        ? ''
+        : (formatter != null && value is DateTime)
+            ? formatter!.format(value)
+            : (formatter != null && value is Date)
+                ? formatter!.format(value.toDateTime())
+                : value is DateField && value.value != null
+                    ? value.formatterDense.format(value.value!)
+                    : value.toString();
   }
+
   @override
   List<ConditionFilter> getAvailableConditionFilters() => [
-    // FilterDateExactDay(),
-    FilterDateAfter(),
-    FilterDateBefore(),
-  ];
+        // FilterDateExactDay(),
+        FilterDateAfter(),
+        FilterDateBefore(),
+      ];
   @override
-  List<RowModel> buildFilterPopupRowModels(List<dynamic> availableFilters, Map<dynamic, Map<Object?, bool>> valueFilters, dynamic colKey, ValueNotifier<bool> modified) {
+  List<RowModel> buildFilterPopupRowModels(List<dynamic> availableFilters,
+      Map<dynamic, Map<Object?, bool>> valueFilters, dynamic colKey, ValueNotifier<bool> modified) {
     final Map<int, Map<int, List<Object>>> grouped = {};
     final List<dynamic> other = [];
     for (final e in availableFilters) {
@@ -905,7 +945,7 @@ class DateColModel<T> extends SimpleColModel<T> {
       } else if (e is ContainsValue<DateTime>) {
         value = e.value;
       }
-      if (value!=null) {
+      if (value != null) {
         if (!grouped.containsKey(value.year)) grouped[value.year] = {};
         if (!grouped[value.year]!.containsKey(value.month)) grouped[value.year]![value.month] = [];
         grouped[value.year]![value.month]!.add(e);
@@ -915,47 +955,53 @@ class DateColModel<T> extends SimpleColModel<T> {
     }
     final List<RowModel> result = [];
     for (final e in other) {
-      result.add(SimpleRowModel(
-        id: e,
-        values: {colKey: e},
-        selected: valueFilters[colKey]![e] ?? false,
-        alwaysOnTop: true,
-        onCheckBoxSelected: (row, selected) {
-          modified.value = true;
-          valueFilters[colKey]![row.id] = selected!;
-          (row as SimpleRowModel).selected = selected;
-          return true;
-        },
-      ),);
+      result.add(
+        SimpleRowModel(
+          id: e,
+          values: {colKey: e},
+          selected: valueFilters[colKey]![e] ?? false,
+          alwaysOnTop: true,
+          onCheckBoxSelected: (row, selected) {
+            modified.value = true;
+            valueFilters[colKey]![row.id] = selected!;
+            (row as SimpleRowModel).selected = selected;
+            return true;
+          },
+        ),
+      );
     }
     for (final year in grouped.keys) {
-      result.add(SimpleRowModel(
-        id: year,
-        values: {colKey: year},
-        expanded: grouped.length==1,
-        children: [
-          for (final month in grouped[year]!.keys)
-            SimpleRowModel(
-              id: month,
-              values: {colKey: ValueString(month, DateFormat("MMMM", "es").format(DateTime(year, month)))}, // TODO 3 internationalize
-              expanded: grouped[year]!.length==1,
-              children: [
-                for (final date in grouped[year]![month]!)
-                  SimpleRowModel(
-                    id: date,
-                    values: {colKey: date},
-                    selected: valueFilters[colKey]![date] ?? false,
-                    onCheckBoxSelected: (row, selected) {
-                      modified.value = true;
-                      valueFilters[colKey]![row.id] = selected!;
-                      (row as SimpleRowModel).selected = selected;
-                      return true;
-                    },
-                  ),
-              ],
-            ),
-        ],
-      ),);
+      result.add(
+        SimpleRowModel(
+          id: year,
+          values: {colKey: year},
+          expanded: grouped.length == 1,
+          children: [
+            for (final month in grouped[year]!.keys)
+              SimpleRowModel(
+                id: month,
+                values: {
+                  colKey: ValueString(month, DateFormat("MMMM", "es").format(DateTime(year, month)))
+                }, // TODO 3 internationalize
+                expanded: grouped[year]!.length == 1,
+                children: [
+                  for (final date in grouped[year]![month]!)
+                    SimpleRowModel(
+                      id: date,
+                      values: {colKey: date},
+                      selected: valueFilters[colKey]![date] ?? false,
+                      onCheckBoxSelected: (row, selected) {
+                        modified.value = true;
+                        valueFilters[colKey]![row.id] = selected!;
+                        (row as SimpleRowModel).selected = selected;
+                        return true;
+                      },
+                    ),
+                ],
+              ),
+          ],
+        ),
+      );
     }
     return result;
   }

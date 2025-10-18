@@ -1,20 +1,16 @@
-
 import 'package:flutter/material.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
 import '../../router.dart';
 
 class PageLightweightTable extends StatefulWidget {
-
   const PageLightweightTable({super.key});
 
   @override
   PageLightweightTableState createState() => PageLightweightTableState();
-
 }
 
 class PageLightweightTableState extends State<PageLightweightTable> {
-
   late Widget col1;
   late Widget col2;
   late Widget col3;
@@ -29,7 +25,6 @@ class PageLightweightTableState extends State<PageLightweightTable> {
     null,
     TextEditingController(text: "CustomScrollController"),
   ];
-
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +94,7 @@ class PageLightweightTableState extends State<PageLightweightTable> {
     );
   }
 
-  Widget _getPage(BuildContext context){
+  Widget _getPage(BuildContext context) {
     col1 = const Card(
       child: Padding(
         padding: EdgeInsets.all(16),
@@ -111,23 +106,36 @@ class PageLightweightTableState extends State<PageLightweightTable> {
       enableStickyHeaders: false,
       minWidthGetter: (currentColumnKeys) => 640,
       alternateRowBackgroundBrightness: true,
-      rows: List.generate(100, (index) => ["Dummy data $index", "Dummy data", "Dummy data", "Dummy data", "Dummy data",]).map((e) {
+      rows: List.generate(
+          100,
+          (index) => [
+                "Dummy data $index",
+                "Dummy data",
+                "Dummy data",
+                "Dummy data",
+                "Dummy data",
+              ]).map((e) {
         return SimpleRowModel<dynamic>(
           id: e,
           values: e.asMap(),
           rowAddon: const Text('ADDON ASDFG fsgfad gadfsgkadfs glasdnfgklanfsgAFSG DAFG AFSD GADSF GADFGA DFSG'),
-          onRowTap: (row){},
-          onCellTap: (row,) {},
+          onRowTap: (row) {},
+          onCellTap: (
+            row,
+          ) {},
           // actions: [
           //   Container(width: 32, height: 32, color: Colors.red,),
           // ],
         );
       }).toList(),
-      columns: ["Col 1", "Col 2", "Col 3", "Col 4", "Col 5"].map((e) {
-        return SimpleColModel(
-          name: e,
-        );
-      }).toList().asMap(),
+      columns: ["Col 1", "Col 2", "Col 3", "Col 4", "Col 5"]
+          .map((e) {
+            return SimpleColModel(
+              name: e,
+            );
+          })
+          .toList()
+          .asMap(),
     );
     col2 = Card(
       clipBehavior: Clip.hardEdge,
@@ -156,19 +164,27 @@ class PageLightweightTableState extends State<PageLightweightTable> {
           child: ResponsiveHorizontalInsets(
             child: Column(
               children: [
-                const SizedBox(height: 12,),
+                const SizedBox(
+                  height: 12,
+                ),
                 col1,
-                const SizedBox(height: 12,),
+                const SizedBox(
+                  height: 12,
+                ),
                 SizedBox(
-                  height: constraints.maxHeight-24,
+                  height: constraints.maxHeight - 24,
                   child: col2,
                 ),
-                const SizedBox(height: 12,),
+                const SizedBox(
+                  height: 12,
+                ),
                 SizedBox(
-                  height: constraints.maxHeight-24,
+                  height: constraints.maxHeight - 24,
                   child: col3,
                 ),
-                const SizedBox(height: 12,),
+                const SizedBox(
+                  height: 12,
+                ),
               ],
             ),
           ),
@@ -179,24 +195,38 @@ class PageLightweightTableState extends State<PageLightweightTable> {
   }
 
   List<GlobalKey> col3RowKeys = List.generate(100, (index) => GlobalKey());
-  Widget _getCol3(BuildContext context, ScrollController controller, [List<Key>? rowKeys]){
+  Widget _getCol3(BuildContext context, ScrollController controller, [List<Key>? rowKeys]) {
     rowKeys ??= List.generate(100, ValueKey.new);
     table3 = TableFromZero(
       horizontalDivider: null,
       verticalDivider: null,
       alternateRowBackgroundBrightness: true,
-      columns: ["Col 1", "Col 2", "Col 3", "Col 4", "Col 5"].map((e) => SimpleColModel(
-        name: e,
-        filterEnabled: true,
-        width: e=="Col 1" ? 128 : null,
-        alignment: e=="Col 3" ? TextAlign.right : null,
-      ),).toList().asMap(),
-      rows: List.generate(100, (index) => SimpleRowModel<dynamic>(
-        id: index,
-        height: 36,
-        rowKey: rowKeys![index],
-        values: ["Dummy data$index", "Dummy data", "Dummy data", "Dummy data", "Dummy data",].asMap(),
-      ),),
+      columns: ["Col 1", "Col 2", "Col 3", "Col 4", "Col 5"]
+          .map(
+            (e) => SimpleColModel(
+              name: e,
+              filterEnabled: true,
+              width: e == "Col 1" ? 128 : null,
+              alignment: e == "Col 3" ? TextAlign.right : null,
+            ),
+          )
+          .toList()
+          .asMap(),
+      rows: List.generate(
+        100,
+        (index) => SimpleRowModel<dynamic>(
+          id: index,
+          height: 36,
+          rowKey: rowKeys![index],
+          values: [
+            "Dummy data$index",
+            "Dummy data",
+            "Dummy data",
+            "Dummy data",
+            "Dummy data",
+          ].asMap(),
+        ),
+      ),
     );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -207,46 +237,78 @@ class PageLightweightTableState extends State<PageLightweightTable> {
             child: Padding(
               padding: const EdgeInsets.only(left: 16, top: 16),
               child: ValueListenableBuilder(
-                  valueListenable: textControllers[2]!,
-                  builder: (context, TextEditingValue value, child) {
-                    var v = value.text;
-                    if (context.findAncestorWidgetOfExactType<Export>()==null) {
-                      v = "CustomScrollController";
-                    }
-                    return Text(v, style: Theme.of(context).textTheme.displaySmall,);
-                  },
+                valueListenable: textControllers[2]!,
+                builder: (context, TextEditingValue value, child) {
+                  var v = value.text;
+                  if (context.findAncestorWidgetOfExactType<Export>() == null) {
+                    v = "CustomScrollController";
+                  }
+                  return Text(
+                    v,
+                    style: Theme.of(context).textTheme.displaySmall,
+                  );
+                },
               ),
             ),
           ),
           table3,
-          const SliverToBoxAdapter(child: SizedBox(height: 16,),),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 16,
+            ),
+          ),
         ],
       ),
     );
   }
-
 }
 
-
 class ComplicatedTable extends StatefulWidget {
-
   const ComplicatedTable({super.key});
 
   @override
   ComplicatedTableState createState() => ComplicatedTableState();
-
 }
 
 class ComplicatedTableState extends State<ComplicatedTable> {
-
   List<bool> selected = List.generate(5, (index) => false);
   List<int> rowsIds = List.generate(5, (index) => index);
   List<List<String>> rows = [
-    ["Dummy data 0", "Dummy data", "Dummy data", "Dummy data", "Dummy data",],
-    ["Dummy data 1", "Dummy data", "Dummy data", "Dummy data", "Dummy data",],
-    ["Dummy data 2", "Dummy data", "Dummy data", "Dummy data", "Dummy data",],
-    ["Dummy data 3", "Dummy data", "Dummy data", "Dummy data", "Dummy data",],
-    ["Dummy data 4", "Dummy data", "Dummy data", "Dummy data", "Dummy data 64",],
+    [
+      "Dummy data 0",
+      "Dummy data",
+      "Dummy data",
+      "Dummy data",
+      "Dummy data",
+    ],
+    [
+      "Dummy data 1",
+      "Dummy data",
+      "Dummy data",
+      "Dummy data",
+      "Dummy data",
+    ],
+    [
+      "Dummy data 2",
+      "Dummy data",
+      "Dummy data",
+      "Dummy data",
+      "Dummy data",
+    ],
+    [
+      "Dummy data 3",
+      "Dummy data",
+      "Dummy data",
+      "Dummy data",
+      "Dummy data",
+    ],
+    [
+      "Dummy data 4",
+      "Dummy data",
+      "Dummy data",
+      "Dummy data",
+      "Dummy data 64",
+    ],
   ];
 
   @override
@@ -300,5 +362,4 @@ class ComplicatedTableState extends State<ComplicatedTable> {
 //       ],
 //     );
   }
-
 }

@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/scheduler/ticker.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-
 /// extends default scroll controller by notifying listeners in extra cases
 /// for example, on attach/detach scroll position. This means it is slightly
 /// less porformant, but solves a number of edge case bugs
 class ScrollControllerFromZero extends ScrollController {
-
   ScrollControllerFromZero({
     super.initialScrollOffset = 0.0,
     super.keepScrollOffset = true,
@@ -31,12 +29,9 @@ class ScrollControllerFromZero extends ScrollController {
       notifyListeners();
     });
   }
-
 }
 
-
 class ScrollbarFromZero extends StatefulWidget {
-
   final ScrollController? controller;
   final Widget child;
   final ScrollNotificationPredicate? notificationPredicate;
@@ -65,11 +60,9 @@ class ScrollbarFromZero extends StatefulWidget {
 
   @override
   ScrollbarFromZeroState createState() => ScrollbarFromZeroState();
-
 }
 
 class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
-
   late AlwaysAttachedScrollController alwaysAttachedScrollController;
 
   @override
@@ -81,7 +74,7 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
   @override
   void didUpdateWidget(covariant ScrollbarFromZero oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller!=widget.controller) {
+    if (oldWidget.controller != widget.controller) {
       alwaysAttachedScrollController.parent = widget.controller;
     }
   }
@@ -93,7 +86,7 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
 
   void _listenToControllerAttached(ScrollController controller) {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (!mounted || widget.controller!=controller) {
+      if (!mounted || widget.controller != controller) {
         return;
       }
       if (controller.hasClients) {
@@ -106,28 +99,29 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
 
   @override
   Widget build(BuildContext context) {
-
-    if (widget.controller==null) {
+    if (widget.controller == null) {
       return widget.child;
     }
 
     Widget child = widget.child;
     bool wantsAlwaysShown = Theme.of(context).scrollbarTheme.thumbVisibility?.resolve({}) ?? PlatformExtended.isDesktop;
-    bool supportsAlwaysShown = widget.controller!=null && (widget.controller!.hasClients || alwaysAttachedScrollController.lastPosition!=null);
-    if (widget.controller!=null && wantsAlwaysShown && !supportsAlwaysShown) {
+    bool supportsAlwaysShown = widget.controller != null &&
+        (widget.controller!.hasClients || alwaysAttachedScrollController.lastPosition != null);
+    if (widget.controller != null && wantsAlwaysShown && !supportsAlwaysShown) {
       // Listen until the controller has clients
       _listenToControllerAttached(widget.controller!);
     }
 
-    if (widget.applyOpacityGradientToChildren ?? widget.controller!=null){
-      if (widget.controller!=null) {
+    if (widget.applyOpacityGradientToChildren ?? widget.controller != null) {
+      if (widget.controller != null) {
         child = ScrollOpacityGradient(
           scrollController: alwaysAttachedScrollController,
-          direction: widget.opacityGradientDirection ?? (widget.controller!.hasClients
-              ? widget.controller!.position.axis==Axis.vertical
-                  ? OpacityGradient.vertical
-                  : OpacityGradient.horizontal
-              : OpacityGradient.vertical),
+          direction: widget.opacityGradientDirection ??
+              (widget.controller!.hasClients
+                  ? widget.controller!.position.axis == Axis.vertical
+                      ? OpacityGradient.vertical
+                      : OpacityGradient.horizontal
+                  : OpacityGradient.vertical),
           maxSize: widget.opacityGradientSize,
           child: child,
         );
@@ -140,10 +134,8 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
       }
     }
 
-
     Widget result;
     if (widget.mainScrollbar) {
-
       final theme = Theme.of(context);
       result = Theme(
         key: ValueKey(PlatformExtended.appWindow?.isMaximized ?? true),
@@ -168,14 +160,11 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
           child: result,
         );
       }
-
     } else {
-
       result = buildScrollbar(
         context: context,
         child: child,
       );
-
     }
 
     return NotificationListener(
@@ -188,7 +177,6 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
       },
       child: result,
     );
-
   }
 
   Widget buildScrollbar({
@@ -198,32 +186,21 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
   }) {
     return Scrollbar(
       key: key,
-      controller: widget.controller==null ? null : alwaysAttachedScrollController,
+      controller: widget.controller == null ? null : alwaysAttachedScrollController,
       notificationPredicate: widget.notificationPredicate,
       child: child,
     );
   }
-
 }
 
-
-
-
-
-
-
-
 class DummyTickerProvider extends TickerProvider {
-
   @override
   Ticker createTicker(TickerCallback onTick) {
     return Ticker((time) {});
   }
-
 }
 
 class DummyScrollContext extends ScrollContext {
-
   BuildContext context;
 
   DummyScrollContext(this.context);
@@ -255,20 +232,17 @@ class DummyScrollContext extends ScrollContext {
 
   @override
   double get devicePixelRatio => 1;
-
 }
 
 class DummyScrollPosition extends ScrollPositionWithSingleContext {
-
-  DummyScrollPosition(BuildContext context) : super(
-    context: DummyScrollContext(context),
-    physics: const NeverScrollableScrollPhysics(),
-  );
-
+  DummyScrollPosition(BuildContext context)
+      : super(
+          context: DummyScrollContext(context),
+          physics: const NeverScrollableScrollPhysics(),
+        );
 }
 
 class AlwaysAttachedScrollController implements ScrollController {
-
   BuildContext context;
   ScrollController? parent;
   DummyScrollPosition dummyScrollPosition;
@@ -276,7 +250,7 @@ class AlwaysAttachedScrollController implements ScrollController {
   AlwaysAttachedScrollController({
     required this.parent,
     required this.context,
-  })  : dummyScrollPosition = DummyScrollPosition(context);
+  }) : dummyScrollPosition = DummyScrollPosition(context);
 
   @override
   bool get hasClients => true;
@@ -284,7 +258,7 @@ class AlwaysAttachedScrollController implements ScrollController {
   ScrollPosition? lastPosition;
   @override
   ScrollPosition get position {
-    if (parent==null || parent!.positions.isEmpty) {
+    if (parent == null || parent!.positions.isEmpty) {
       return lastPosition ?? dummyScrollPosition;
     } else {
       lastPosition = parent!.positions.first;
@@ -293,8 +267,11 @@ class AlwaysAttachedScrollController implements ScrollController {
   }
 
   @override
-  Iterable<ScrollPosition> get positions => parent==null ? []
-      : parent!.positions.isEmpty ? [] : [parent!.positions.first];
+  Iterable<ScrollPosition> get positions => parent == null
+      ? []
+      : parent!.positions.isEmpty
+          ? []
+          : [parent!.positions.first];
 
   @override
   void addListener(VoidCallback listener) {
@@ -314,7 +291,7 @@ class AlwaysAttachedScrollController implements ScrollController {
 
   @override
   ScrollPosition createScrollPosition(ScrollPhysics physics, ScrollContext context, ScrollPosition? oldPosition) {
-    if (parent==null) {
+    if (parent == null) {
       return DummyScrollPosition(this.context);
     } else {
       return parent!.createScrollPosition(physics, context, oldPosition);
@@ -362,7 +339,6 @@ class AlwaysAttachedScrollController implements ScrollController {
   @override
   double get offset => parent?.offset ?? 0;
 
-
   @override
   void removeListener(VoidCallback listener) {
     parent?.removeListener(listener);
@@ -373,6 +349,4 @@ class AlwaysAttachedScrollController implements ScrollController {
 
   @override
   ScrollControllerCallback? get onDetach => parent?.onDetach;
-
 }
-

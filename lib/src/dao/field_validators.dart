@@ -5,7 +5,6 @@ import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/util/comparable_list.dart';
 
-
 enum ValidationErrorSeverity {
   warning,
   unfinished,
@@ -15,6 +14,7 @@ enum ValidationErrorSeverity {
   expired,
   invalidating,
 }
+
 Map<ValidationErrorSeverity, int> validationErrorSeverityWeights = {
   ValidationErrorSeverity.invalidating: 0,
   ValidationErrorSeverity.expired: 5,
@@ -24,10 +24,10 @@ Map<ValidationErrorSeverity, int> validationErrorSeverityWeights = {
   ValidationErrorSeverity.unfinished: 10000,
   ValidationErrorSeverity.disabling: 100000,
 };
+
 extension SeverityWeight on ValidationErrorSeverity {
   int get weight => validationErrorSeverityWeights[this]!;
 }
-
 
 class ValidationError {
   Field field;
@@ -35,15 +35,17 @@ class ValidationError {
   String error;
   AnimationController? animationController;
   final bool? _isVisibleAsSaveConfirmation;
-  bool get isVisibleAsSaveConfirmation => _isVisibleAsSaveConfirmation ?? severity!=ValidationErrorSeverity.disabling;
+  bool get isVisibleAsSaveConfirmation => _isVisibleAsSaveConfirmation ?? severity != ValidationErrorSeverity.disabling;
   final bool? _isVisibleAsHintMessage;
-  bool get isVisibleAsHintMessage => _isVisibleAsHintMessage ?? severity!=ValidationErrorSeverity.disabling && severity!=ValidationErrorSeverity.unfinished;
+  bool get isVisibleAsHintMessage =>
+      _isVisibleAsHintMessage ??
+      severity != ValidationErrorSeverity.disabling && severity != ValidationErrorSeverity.unfinished;
   final bool? _isVisibleAsTooltip;
-  bool get isVisibleAsTooltip => _isVisibleAsTooltip ?? severity==ValidationErrorSeverity.disabling;
+  bool get isVisibleAsTooltip => _isVisibleAsTooltip ?? severity == ValidationErrorSeverity.disabling;
   ValidationError({
     required this.field,
     required this.error,
-    this.severity=ValidationErrorSeverity.error,
+    this.severity = ValidationErrorSeverity.error,
     bool? isVisibleAsSaveConfirmation,
     bool? isVisibleAsHintMessage,
     bool? isVisibleAsTooltip,
@@ -53,8 +55,9 @@ class ValidationError {
 
   @override
   String toString() => error;
-  bool get isBlocking => severity==ValidationErrorSeverity.error || severity==ValidationErrorSeverity.invalidating;
-  bool get isBeforeEditing => severity==ValidationErrorSeverity.disabling || severity==ValidationErrorSeverity.invalidating;
+  bool get isBlocking => severity == ValidationErrorSeverity.error || severity == ValidationErrorSeverity.invalidating;
+  bool get isBeforeEditing =>
+      severity == ValidationErrorSeverity.disabling || severity == ValidationErrorSeverity.invalidating;
 
   ValidationError copyWith({
     String? error,
@@ -69,7 +72,7 @@ class ValidationError {
       isVisibleAsSaveConfirmation: isVisibleAsSaveConfirmation ?? this.isVisibleAsSaveConfirmation,
       isVisibleAsHintMessage: isVisibleAsHintMessage ?? this.isVisibleAsHintMessage,
       isVisibleAsTooltip: isVisibleAsTooltip ?? this.isVisibleAsTooltip,
-    )..animationController=animationController;
+    )..animationController = animationController;
   }
 }
 
@@ -112,7 +115,7 @@ class InvalidatingError<T extends Comparable> extends ValidationError {
       isVisibleAsSaveConfirmation: isVisibleAsSaveConfirmation ?? this.isVisibleAsSaveConfirmation,
       isVisibleAsHintMessage: isVisibleAsHintMessage ?? this.isVisibleAsHintMessage,
       isVisibleAsTooltip: isVisibleAsTooltip ?? this.isVisibleAsTooltip,
-    )..animationController=animationController;
+    )..animationController = animationController;
   }
 }
 
@@ -127,13 +130,13 @@ class ForcedValueError<T extends Comparable> extends InvalidatingError<T> {
     super.isVisibleAsHintMessage,
     super.isVisibleAsTooltip,
     this.comparator,
-  })  : super(
+  }) : super(
           field: field,
           defaultValue: defaultValue,
           allowSetThisFieldToDefaultValue: true,
           allowUndoInvalidatingChange: true,
         ) {
-    severity = (comparator?.call(field.value, defaultValue) ?? field.value==defaultValue)
+    severity = (comparator?.call(field.value, defaultValue) ?? field.value == defaultValue)
         ? ValidationErrorSeverity.disabling
         : ValidationErrorSeverity.invalidating;
   }
@@ -155,7 +158,7 @@ class ForcedValueError<T extends Comparable> extends InvalidatingError<T> {
       isVisibleAsHintMessage: isVisibleAsHintMessage ?? this.isVisibleAsHintMessage,
       isVisibleAsTooltip: isVisibleAsTooltip ?? this.isVisibleAsTooltip,
       comparator: comparator ?? this.comparator,
-    )..animationController=animationController;
+    )..animationController = animationController;
   }
 }
 
@@ -173,7 +176,6 @@ class InternalError extends ValidationError {
     super.isVisibleAsHintMessage,
     super.isVisibleAsTooltip,
   });
-
 }
 
 class MultiValidationError extends ValidationError {
@@ -182,90 +184,106 @@ class MultiValidationError extends ValidationError {
   MultiValidationError({
     required super.field,
     required this.errors,
-  })  : super(error: '',);
+  }) : super(
+          error: '',
+        );
 }
 
-
-
-ValidationError? fieldValidatorRequired<T extends Comparable>(BuildContext context, DAO dao, Field<T> field, {
+ValidationError? fieldValidatorRequired<T extends Comparable>(
+  BuildContext context,
+  DAO dao,
+  Field<T> field, {
   String? errorMessage,
   ValidationErrorSeverity severity = ValidationErrorSeverity.error,
   bool? isVisibleAsHintMessage,
 }) {
-  return field.value==null||field.value!.toString().trim().isEmpty
+  return field.value == null || field.value!.toString().trim().isEmpty
       ? ValidationError(
           field: field,
-          error: errorMessage ?? ('${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_required")}'),
+          error: errorMessage ??
+              ('${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_required")}'),
           severity: severity,
         )
       : null;
 }
 
-ValidationError? fieldValidatorListNotEmpty<T extends Comparable>(BuildContext context, DAO dao, Field<T> field, {
+ValidationError? fieldValidatorListNotEmpty<T extends Comparable>(
+  BuildContext context,
+  DAO dao,
+  Field<T> field, {
   String? errorMessage,
   ValidationErrorSeverity severity = ValidationErrorSeverity.error,
 }) {
   return field is ListField && (field.value! as ComparableList).list.isEmpty
       ? ValidationError(
           field: field,
-          error: errorMessage ?? 'At least one ${(field as ListField).objectTemplate.classUiName} required', // TODO 3 internationalize
+          error: errorMessage ??
+              'At least one ${(field as ListField).objectTemplate.classUiName} required', // TODO 3 internationalize
           severity: severity,
         )
       : null;
 }
 
-ValidationError? fieldValidatorNumberNotNegative(BuildContext context, DAO dao, Field<num> field, {
+ValidationError? fieldValidatorNumberNotNegative(
+  BuildContext context,
+  DAO dao,
+  Field<num> field, {
   String? errorMessage,
   ValidationErrorSeverity severity = ValidationErrorSeverity.error,
 }) {
-  return field.value==null
+  return field.value == null
       ? null
-      : field.value!<0
+      : field.value! < 0
           ? ValidationError(
-            field: field,
-            error: errorMessage ?? ('${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_not_negative")}'),
-            severity: severity,
-          )
+              field: field,
+              error: errorMessage ??
+                  ('${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_not_negative")}'),
+              severity: severity,
+            )
           : null;
 }
 
-ValidationError? fieldValidatorNumberNotZero(BuildContext context, DAO dao, Field<num> field, {
+ValidationError? fieldValidatorNumberNotZero(
+  BuildContext context,
+  DAO dao,
+  Field<num> field, {
   String? errorMessage,
   ValidationErrorSeverity severity = ValidationErrorSeverity.error,
 }) {
-  return field.value==null
+  return field.value == null
       ? null
-      : field.value==0
+      : field.value == 0
           ? ValidationError(
-            field: field,
-            error: errorMessage ?? ('${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_not_zero")}'),
-            severity: severity,
-          )
+              field: field,
+              error: errorMessage ??
+                  ('${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_not_zero")}'),
+              severity: severity,
+            )
           : null;
 }
 
-ValidationError? fieldValidatorStringIsEmail(BuildContext context, DAO dao, Field<String> field, {
+ValidationError? fieldValidatorStringIsEmail(
+  BuildContext context,
+  DAO dao,
+  Field<String> field, {
   String? errorMessage,
   ValidationErrorSeverity severity = ValidationErrorSeverity.error,
 }) {
-  return field.value==null
+  return field.value == null
       ? null
-      : EmailValidator.validate(field.value!.trim(),)
+      : EmailValidator.validate(
+          field.value!.trim(),
+        )
           ? null
           : ValidationError(
-            field: field,
-            error: errorMessage ??
-                '${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_email")}',
-            severity: severity,
-          );
+              field: field,
+              error: errorMessage ??
+                  '${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_email")}',
+              severity: severity,
+            );
 }
 
-
-
-
-
 class FieldDiffMessage<T extends Comparable> extends StatelessWidget {
-
   final Field<T> field;
   final T? oldValue;
   final T? newValue;
@@ -278,13 +296,14 @@ class FieldDiffMessage<T extends Comparable> extends StatelessWidget {
     required this.newValue,
     super.key,
   }) {
-    final dummyDao = DAO(uiNameGetter: (dao) => 'Dummy', classUiNameGetter: (dao) => 'Dummy',);
-    oldValueField = field.copyWith()
-      ..onValueChanged = null;
+    final dummyDao = DAO(
+      uiNameGetter: (dao) => 'Dummy',
+      classUiNameGetter: (dao) => 'Dummy',
+    );
+    oldValueField = field.copyWith()..onValueChanged = null;
     oldValueField.dao = dummyDao;
     oldValueField.value = oldValue;
-    newdValueField = field.copyWith()
-      ..onValueChanged = null;
+    newdValueField = field.copyWith()..onValueChanged = null;
     newdValueField.dao = dummyDao;
     newdValueField.value = newValue;
   }
@@ -336,14 +355,9 @@ class FieldDiffMessage<T extends Comparable> extends StatelessWidget {
       ),
     );
   }
-
 }
 
-
-
-
 class ValidationMessageProxy extends StatefulWidget {
-
   final Map<String, Field> fields;
   final Widget child;
   final bool hideNotVisibleAsHintMessage;
@@ -358,8 +372,8 @@ class ValidationMessageProxy extends StatefulWidget {
   @override
   State<ValidationMessageProxy> createState() => _ValidationMessageProxyState();
 }
-class _ValidationMessageProxyState extends State<ValidationMessageProxy> {
 
+class _ValidationMessageProxyState extends State<ValidationMessageProxy> {
   final fieldWeights = <String, double>{};
   final fieldOffsets = <String, double>{};
   double maxWidth = 0;
@@ -373,18 +387,21 @@ class _ValidationMessageProxyState extends State<ValidationMessageProxy> {
       final field = entry.value;
       context.findRenderObject();
       final fieldContext = field.fieldGlobalKey.currentContext;
-      if (fieldContext==null) return;
+      if (fieldContext == null) return;
       final size = fieldContext.size;
-      if (size==null) return;
-      if (size.width!=fieldWeights[key]) {
+      if (size == null) return;
+      if (size.width != fieldWeights[key]) {
         setState(() {
           fieldWeights[key] = size.width;
         });
       }
       final box = fieldContext.findRenderObject() as RenderBox?;
-      if (box==null) return;
-      final position = box.localToGlobal(Offset.zero, ancestor: renderObject,);
-      if (position.dx!=fieldOffsets[key]) {
+      if (box == null) return;
+      final position = box.localToGlobal(
+        Offset.zero,
+        ancestor: renderObject,
+      );
+      if (position.dx != fieldOffsets[key]) {
         setState(() {
           fieldOffsets[key] = position.dx;
         });
@@ -400,15 +417,17 @@ class _ValidationMessageProxyState extends State<ValidationMessageProxy> {
     for (final entry in widget.fields.entries) {
       final key = entry.key;
       final field = entry.value;
-      final visibleErrors = field.validationErrors.where((e) {
-        return (e.isBeforeEditing || field.passedFirstEdit)
-            && (!widget.hideNotVisibleAsHintMessage || e.isVisibleAsHintMessage);
-      },).toList();
+      final visibleErrors = field.validationErrors.where(
+        (e) {
+          return (e.isBeforeEditing || field.passedFirstEdit) &&
+              (!widget.hideNotVisibleAsHintMessage || e.isVisibleAsHintMessage);
+        },
+      ).toList();
       if (visibleErrors.isEmpty) continue;
       final weight = fieldWeights[key];
-      if (weight==null) continue;
+      if (weight == null) continue;
       var fieldOffset = fieldOffsets[key];
-      if (fieldOffset==null) continue;
+      if (fieldOffset == null) continue;
       totalWeight += weight;
     }
     double partialWeight = 0;
@@ -416,16 +435,18 @@ class _ValidationMessageProxyState extends State<ValidationMessageProxy> {
     for (final entry in widget.fields.entries) {
       final key = entry.key;
       final field = entry.value;
-      final visibleErrors = field.validationErrors.where((e) {
-        return (e.isBeforeEditing || field.passedFirstEdit)
-            && (!widget.hideNotVisibleAsHintMessage || e.isVisibleAsHintMessage);
-      },).toList();
+      final visibleErrors = field.validationErrors.where(
+        (e) {
+          return (e.isBeforeEditing || field.passedFirstEdit) &&
+              (!widget.hideNotVisibleAsHintMessage || e.isVisibleAsHintMessage);
+        },
+      ).toList();
       if (visibleErrors.isEmpty) continue;
       needsUpdate = true;
       final fieldWidth = fieldWeights[key];
-      if (fieldWidth==null) continue;
+      if (fieldWidth == null) continue;
       final fieldStartingOffset = fieldOffsets[key];
-      if (fieldStartingOffset==null) continue;
+      if (fieldStartingOffset == null) continue;
       // final fieldEndingOffset = fieldStartingOffset + fieldWidth;
       // final fieldCenter = fieldStartingOffset + (fieldWidth / 2);
       final itemSartingOffset = maxWidth * (partialWeight / totalWeight);
@@ -433,57 +454,63 @@ class _ValidationMessageProxyState extends State<ValidationMessageProxy> {
       final itemEndingOffset = maxWidth * (partialWeight / totalWeight);
       final itemWidth = maxWidth * (fieldWidth / totalWeight);
       // final itemCenter = itemSartingOffset + (itemWidth / 2);
-      var arrowOffset = fieldStartingOffset + (fieldWidth/2).coerceAtMost(32);
+      var arrowOffset = fieldStartingOffset + (fieldWidth / 2).coerceAtMost(32);
       if (arrowOffset < itemSartingOffset) arrowOffset = itemSartingOffset + 32;
       const double arrowWidth = 24;
       const double arrowHeight = 24;
       ValidationErrorSeverity? maxSeverity;
       for (final err in visibleErrors) {
         final severity = err.severity;
-        if (maxSeverity==null || maxSeverity.weight > severity.weight) {
+        if (maxSeverity == null || maxSeverity.weight > severity.weight) {
           maxSeverity = severity;
         }
       }
       var color = ValidationMessage.severityColors[Theme.of(context).brightness]![maxSeverity!]!;
-      if (maxSeverity.weight>=100) color = color.withValues(alpha: 0.6);
-      final double xAlignment = fieldStartingOffset<=itemSartingOffset ? -1
-          : ((fieldStartingOffset - itemSartingOffset) / (itemWidth-fieldWidth)) * 2 - 1;
-      children.add(Container(
-        width: maxWidth,
-        padding: EdgeInsets.only(
-          left: itemSartingOffset,
-          right: maxWidth - itemEndingOffset,
-        ),
-        alignment: Alignment(xAlignment.clamp(-1, 1), -1),
-        child: IntrinsicWidth(
-          child: ValidationMessage(
-            errors: visibleErrors,
-            passedFirstEdit: field.passedFirstEdit,
-            checkForProxyAbove: false,
+      if (maxSeverity.weight >= 100) color = color.withValues(alpha: 0.6);
+      final double xAlignment = fieldStartingOffset <= itemSartingOffset
+          ? -1
+          : ((fieldStartingOffset - itemSartingOffset) / (itemWidth - fieldWidth)) * 2 - 1;
+      children.add(
+        Container(
+          width: maxWidth,
+          padding: EdgeInsets.only(
+            left: itemSartingOffset,
+            right: maxWidth - itemEndingOffset,
+          ),
+          alignment: Alignment(xAlignment.clamp(-1, 1), -1),
+          child: IntrinsicWidth(
+            child: ValidationMessage(
+              errors: visibleErrors,
+              passedFirstEdit: field.passedFirstEdit,
+              checkForProxyAbove: false,
+            ),
           ),
         ),
-      ),);
-      arrows.add(Positioned(
-        height: arrowHeight,
-        width: arrowWidth,
-        top: - arrowHeight / 2,
-        left: arrowOffset - arrowWidth / 2,
-        child: DecoratedBox(
-          decoration: ShapeDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter, end: Alignment.bottomCenter,
-              colors: [color, color, color.withValues(alpha: 0)],
-              stops: const [0, 0.5, 0.7],
-            ),
-            shape: const BeveledRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.elliptical(arrowWidth / 2, arrowHeight),
-                topRight: Radius.elliptical(arrowWidth / 2, arrowHeight),
+      );
+      arrows.add(
+        Positioned(
+          height: arrowHeight,
+          width: arrowWidth,
+          top: -arrowHeight / 2,
+          left: arrowOffset - arrowWidth / 2,
+          child: DecoratedBox(
+            decoration: ShapeDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [color, color, color.withValues(alpha: 0)],
+                stops: const [0, 0.5, 0.7],
+              ),
+              shape: const BeveledRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.elliptical(arrowWidth / 2, arrowHeight),
+                  topRight: Radius.elliptical(arrowWidth / 2, arrowHeight),
+                ),
               ),
             ),
           ),
         ),
-      ),);
+      );
     }
     if (needsUpdate) {
       WidgetsBinding.instance.addPostFrameCallback(updateDataForField);
@@ -496,7 +523,9 @@ class _ValidationMessageProxyState extends State<ValidationMessageProxy> {
       children: [
         widget.child,
         if (children.isNotEmpty)
-          const SizedBox(height: 6,),
+          const SizedBox(
+            height: 6,
+          ),
         if (children.isNotEmpty)
           Stack(
             clipBehavior: Clip.none,
@@ -512,9 +541,7 @@ class _ValidationMessageProxyState extends State<ValidationMessageProxy> {
   }
 }
 
-
 class ValidationMessage extends StatelessWidget {
-
   static final Map<Brightness, Map<ValidationErrorSeverity, Color>> severityColors = {
     Brightness.light: {
       ValidationErrorSeverity.disabling: Colors.grey.shade800,
@@ -537,7 +564,7 @@ class ValidationMessage extends StatelessWidget {
   };
 
   static const int animationCount = 5;
-  static const double animationCountRate = 1/animationCount;
+  static const double animationCountRate = 1 / animationCount;
   final List<ValidationError> errors;
   final bool passedFirstEdit;
   final TextStyle? errorTextStyle;
@@ -559,38 +586,44 @@ class ValidationMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (checkForProxyAbove) {
       final proxy = context.findAncestorWidgetOfExactType<ValidationMessageProxy>();
-      if (proxy!=null) { // TODO 2 maybe check that this specific field is in the proxy
+      if (proxy != null) {
+        // TODO 2 maybe check that this specific field is in the proxy
         return const SizedBox.shrink();
       }
     }
     final children = <Widget>[];
     final seenStrings = <String>[];
     for (final e in errors) {
-      if ((e.isBeforeEditing || passedFirstEdit)
-          && (!hideNotVisibleAsHintMessage || e.isVisibleAsHintMessage)
-          && !seenStrings.contains(e.error)) {
+      if ((e.isBeforeEditing || passedFirstEdit) &&
+          (!hideNotVisibleAsHintMessage || e.isVisibleAsHintMessage) &&
+          !seenStrings.contains(e.error)) {
         seenStrings.add(e.error);
-        children.add(InitiallyAnimatedWidget(
-          duration: Duration(milliseconds: animate ? 300 : 0),
-          curve: Curves.easeOutCubic,
-          builder: (animationController, child) {
-            return SizeTransition(
-              sizeFactor: animationController,
-              axis: Axis.vertical,
-              axisAlignment: -1,
-              child: child,
-            );
-          },
-          child: SingleValidationMessage(
-            error: e,
-            errorTextStyle: errorTextStyle,
-            animate: animate,
+        children.add(
+          InitiallyAnimatedWidget(
+            duration: Duration(milliseconds: animate ? 300 : 0),
+            curve: Curves.easeOutCubic,
+            builder: (animationController, child) {
+              return SizeTransition(
+                sizeFactor: animationController,
+                axis: Axis.vertical,
+                axisAlignment: -1,
+                child: child,
+              );
+            },
+            child: SingleValidationMessage(
+              error: e,
+              errorTextStyle: errorTextStyle,
+              animate: animate,
+            ),
           ),
-        ),);
+        );
       }
     }
     return Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10,),
+      padding: const EdgeInsets.only(
+        left: 10,
+        right: 10,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -598,11 +631,9 @@ class ValidationMessage extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class SingleValidationMessage extends StatefulWidget {
-
   final ValidationError error;
   final TextStyle? errorTextStyle;
   final bool animate;
@@ -616,11 +647,9 @@ class SingleValidationMessage extends StatefulWidget {
 
   @override
   SingleValidationMessageState createState() => SingleValidationMessageState();
-
 }
 
 class SingleValidationMessageState extends State<SingleValidationMessage> with SingleTickerProviderStateMixin {
-
   late AnimationController animationController;
 
   @override
@@ -628,9 +657,12 @@ class SingleValidationMessageState extends State<SingleValidationMessage> with S
     super.initState();
     animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: widget.animate ? 2000 : 0,),
+      duration: Duration(
+        milliseconds: widget.animate ? 2000 : 0,
+      ),
     );
-    widget.error.animationController = animationController; // this is necessary because a context is needed for instanciating the AnimationController
+    widget.error.animationController =
+        animationController; // this is necessary because a context is needed for instanciating the AnimationController
     animationController.value = 1;
   }
 
@@ -651,23 +683,22 @@ class SingleValidationMessageState extends State<SingleValidationMessage> with S
         final baseColor = ValidationMessage.severityColors[Theme.of(context).brightness]![error.severity]!;
         double value = animationController.value;
         int i;
-        for (i=0; i<=ValidationMessage.animationCount && value>ValidationMessage.animationCountRate; i++) {
+        for (i = 0; i <= ValidationMessage.animationCount && value > ValidationMessage.animationCountRate; i++) {
           value -= ValidationMessage.animationCountRate;
         }
-        value = (value*ValidationMessage.animationCount).clamp(0, 1);
+        value = (value * ValidationMessage.animationCount).clamp(0, 1);
         if (i.isOdd) {
-          value = 1-value;
+          value = 1 - value;
         }
         final color = ColorTween(
           begin: baseColor.withValues(alpha: 0),
           end: baseColor,
         ).transform(Curves.easeOutQuad.transform(value));
-        Widget content = Text(error.toString(),
+        Widget content = Text(
+          error.toString(),
           style: (widget.errorTextStyle ?? Theme.of(context).textTheme.titleMedium!).copyWith(
             height: 1.1,
-            color: error.isBlocking
-                ? Colors.white
-                : color,
+            color: error.isBlocking ? Colors.white : color,
           ),
         );
         if (error is InternalError) {
@@ -685,14 +716,14 @@ class SingleValidationMessageState extends State<SingleValidationMessage> with S
           );
         }
         return Padding(
-          padding: const EdgeInsets.only(bottom: 4,),
+          padding: const EdgeInsets.only(
+            bottom: 4,
+          ),
           child: Container(
             padding: const EdgeInsets.only(left: 8, right: 8, bottom: 4, top: 2),
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(12)),
-              color: error.isBlocking
-                  ? color
-                  : Colors.transparent,
+              color: error.isBlocking ? color : Colors.transparent,
             ),
             child: content,
           ),
@@ -700,13 +731,9 @@ class SingleValidationMessageState extends State<SingleValidationMessage> with S
       },
     );
   }
-
 }
 
-
-
 class SaveConfirmationValidationMessage extends StatelessWidget {
-
   final List<ValidationError> allErrors;
 
   const SaveConfirmationValidationMessage({
@@ -722,9 +749,9 @@ class SaveConfirmationValidationMessage extends StatelessWidget {
     List<ValidationError> unfinished = [];
     for (final e in allErrors) {
       if (e.isVisibleAsSaveConfirmation) {
-        if (e.severity==ValidationErrorSeverity.unfinished) {
+        if (e.severity == ValidationErrorSeverity.unfinished) {
           unfinished.add(e);
-        } else if (e.severity==ValidationErrorSeverity.nonBlockingError) {
+        } else if (e.severity == ValidationErrorSeverity.nonBlockingError) {
           redWarnings.add(e);
         } else if (e.isBlocking) {
           errors.add(e);
@@ -759,11 +786,9 @@ class SaveConfirmationValidationMessage extends StatelessWidget {
       ],
     );
   }
-
 }
 
 class SaveConfirmationValidationMessageGroup extends StatelessWidget {
-
   final String? name;
   final ValidationErrorSeverity severity;
   final List<ValidationError> errors;
@@ -780,41 +805,47 @@ class SaveConfirmationValidationMessageGroup extends StatelessWidget {
     if (errors.isEmpty) {
       return const SizedBox.shrink();
     }
-    bool isBlocking = severity==ValidationErrorSeverity.error || severity==ValidationErrorSeverity.invalidating;
+    bool isBlocking = severity == ValidationErrorSeverity.error || severity == ValidationErrorSeverity.invalidating;
     final children = <Widget>[];
     final seenStrings = <String>[];
     for (final e in errors) {
       if (!seenStrings.contains(e.error)) {
         seenStrings.add(e.error);
-        children.add(InkWell(
-          onTap: () {
-            Navigator.of(context).pop(false);
-            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-              e.field.dao.focusError(e);
-            });
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(left: 15, top: 1, bottom: 2),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 7),
-                  child: Icon(Icons.circle,
-                    size: 10,
-                    color: ValidationMessage.severityColors[Theme.of(context).brightness]![e.severity],
+        children.add(
+          InkWell(
+            onTap: () {
+              Navigator.of(context).pop(false);
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                e.field.dao.focusError(e);
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 15, top: 1, bottom: 2),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 7),
+                    child: Icon(
+                      Icons.circle,
+                      size: 10,
+                      color: ValidationMessage.severityColors[Theme.of(context).brightness]![e.severity],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 6,),
-                Expanded(
-                  child: Text(e.error,
-                    // style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: ValidationMessage.severityColors[Theme.of(context).brightness]![e.severity]!),
+                  const SizedBox(
+                    width: 6,
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: Text(
+                      e.error,
+                      // style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: ValidationMessage.severityColors[Theme.of(context).brightness]![e.severity]!),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),);
+        );
       }
     }
     return Material(
@@ -830,35 +861,34 @@ class SaveConfirmationValidationMessageGroup extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 18),
-            if (name!=null)
+            if (name != null)
               Row(
                 children: [
-                  Icon(Icons.warning,
+                  Icon(
+                    Icons.warning,
                     size: isBlocking ? 38 : 27,
                     color: ValidationMessage.severityColors[Theme.of(context).brightness]![severity],
                   ),
-                  const SizedBox(width: 4,),
+                  const SizedBox(
+                    width: 4,
+                  ),
                   Expanded(
-                    child: Text(name!,
-                      style: isBlocking
-                          ? Theme.of(context).textTheme.titleLarge
-                          : Theme.of(context).textTheme.titleMedium,
+                    child: Text(
+                      name!,
+                      style:
+                          isBlocking ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
                 ],
               ),
             ...children,
-            if (isBlocking)
-              const SizedBox(height: 12),
+            if (isBlocking) const SizedBox(height: 12),
           ],
         ),
       ),
     );
   }
-
 }
-
-
 
 class ValidationRequiredOverlay extends StatelessWidget {
   final bool isRequired;
@@ -881,29 +911,44 @@ class ValidationRequiredOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final showAsterisk = isRequired && (!dense || isEmpty);
-    final visibleErrors = !showAsterisk ? <ValidationError>[]
-        : errors.where((e) => e.isBlocking);
-    final isAlignedRight = textAlign==TextAlign.right && !isEmpty; // because label is never aligned right in TextField
+    final visibleErrors = !showAsterisk ? <ValidationError>[] : errors.where((e) => e.isBlocking);
+    final isAlignedRight =
+        textAlign == TextAlign.right && !isEmpty; // because label is never aligned right in TextField
     return Stack(
       clipBehavior: Clip.none,
       children: [
         child,
         if (showAsterisk)
           Positioned(
-            top: dense ? 7
-                : isEmpty ? 5 : 10,
-            left: isAlignedRight ? null
-                : dense ? -5
-                : isEmpty ? 4 : 5,
-            right: !isAlignedRight ? null
-                : dense ? -5
-                : isEmpty ? 4 : 5,
+            top: dense
+                ? 7
+                : isEmpty
+                    ? 5
+                    : 10,
+            left: isAlignedRight
+                ? null
+                : dense
+                    ? -5
+                    : isEmpty
+                        ? 4
+                        : 5,
+            right: !isAlignedRight
+                ? null
+                : dense
+                    ? -5
+                    : isEmpty
+                        ? 4
+                        : 5,
             child: TooltipFromZero(
-              message: visibleErrors.isEmpty ? ''
-                  : visibleErrors.map((e) => e.error).reduce((v, e) => '$v, $e'),
+              message: visibleErrors.isEmpty ? '' : visibleErrors.map((e) => e.error).reduce((v, e) => '$v, $e'),
               child: IgnorePointer(
-                child: Icon(MaterialCommunityIcons.asterisk,
-                  size: dense ? 11 : isEmpty ? 14 : 8,
+                child: Icon(
+                  MaterialCommunityIcons.asterisk,
+                  size: dense
+                      ? 11
+                      : isEmpty
+                          ? 14
+                          : 8,
                   color: isEmpty
                       ? Theme.of(context).colorScheme.error
                       : Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75),

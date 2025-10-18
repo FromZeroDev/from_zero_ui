@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 
-
 class FixedSlideTransition extends AnimatedWidget {
-
   final Widget? child;
   final Animation<Offset> position;
   final bool transformHitTests;
   final FilterQuality? filterQuality;
-
 
   const FixedSlideTransition({
     required this.child,
@@ -27,5 +24,4 @@ class FixedSlideTransition extends AnimatedWidget {
       child: child,
     );
   }
-
 }

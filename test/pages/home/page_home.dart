@@ -8,16 +8,13 @@ import 'package:go_router/go_router.dart';
 import '../../router.dart';
 
 class PageHome extends StatefulWidget {
-
   const PageHome({super.key});
 
   @override
   PageHomeState createState() => PageHomeState();
-
 }
 
 class PageHomeState extends State<PageHome> {
-
   ScrollController controller = ScrollController();
   late DAO testDao;
 
@@ -59,7 +56,10 @@ class PageHomeState extends State<PageHome> {
           Text("FromZero playground"),
           Hero(
             tag: 'title-hero',
-            child: Icon(Icons.ac_unit, color: Colors.white,),
+            child: Icon(
+              Icons.ac_unit,
+              color: Colors.white,
+            ),
           ),
         ],
       ),
@@ -77,7 +77,7 @@ class PageHomeState extends State<PageHome> {
     );
   }
 
-  Widget _getPage (BuildContext context){
+  Widget _getPage(BuildContext context) {
     return SingleChildScrollView(
       controller: controller,
       child: ResponsiveHorizontalInsets(
@@ -86,7 +86,9 @@ class PageHomeState extends State<PageHome> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const AppbarFiller(),
-              const SizedBox(height: 12,),
+              const SizedBox(
+                height: 12,
+              ),
               AspectRatio(
                 aspectRatio: 4,
                 child: ContextMenuFromZero(
@@ -96,24 +98,41 @@ class PageHomeState extends State<PageHome> {
                       icon: const Icon(Icons.translate),
                     );
                   }),
-                  child: const FromZeroBanner(logoSizePercentage: 0.8,),
+                  child: const FromZeroBanner(
+                    logoSizePercentage: 0.8,
+                  ),
                 ),
               ),
-              const SizedBox(height: 12,),
-              const SizedBox(height: 12,),
+              const SizedBox(
+                height: 12,
+              ),
+              const SizedBox(
+                height: 12,
+              ),
               Card(
                 clipBehavior: Clip.hardEdge,
-                child: Container(height: 1200, width: 600, color: Colors.red,
+                child: Container(
+                  height: 1200,
+                  width: 600,
+                  color: Colors.red,
                   child: Column(
                     children: [
-                      const SizedBox(height: 16,),
+                      const SizedBox(
+                        height: 16,
+                      ),
                       Text(Platform.script.toString()),
-                      const SizedBox(height: 16,),
+                      const SizedBox(
+                        height: 16,
+                      ),
                       const AspectRatio(
                         aspectRatio: 4,
-                        child: FromZeroBanner(logoSizePercentage: 0.8,),
+                        child: FromZeroBanner(
+                          logoSizePercentage: 0.8,
+                        ),
                       ),
-                      const SizedBox(height: 32,),
+                      const SizedBox(
+                        height: 32,
+                      ),
                       ContextMenuFromZero(
                         actions: [
                           ...List.generate(3, (index) {
@@ -138,8 +157,11 @@ class PageHomeState extends State<PageHome> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 32,),
-                      ...testDao.buildFormWidgets(context,
+                      const SizedBox(
+                        height: 32,
+                      ),
+                      ...testDao.buildFormWidgets(
+                        context,
                         asSlivers: false,
                         expandToFillContainer: false,
                         showActionButtons: false,
@@ -148,12 +170,13 @@ class PageHomeState extends State<PageHome> {
                   ),
                 ),
               ),
-              const SizedBox(height: 12,),
+              const SizedBox(
+                height: 12,
+              ),
             ],
           ),
         ),
       ),
     );
   }
-
 }

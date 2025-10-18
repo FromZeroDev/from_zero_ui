@@ -18,14 +18,13 @@ import 'package:sanitize_filename/sanitize_filename.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
 
-
 final _percentFormatter = NumberFormat.decimalPercentPattern(decimalDigits: 1);
 
 Set<int> _ongoingDownloads = {};
 
 bool saveFileFromZeroDefaultAutoOpenOnFinish = false;
 
-Future<bool> saveFileFromZero ({
+Future<bool> saveFileFromZero({
   required BuildContext context,
   required FutureOr<List<int>> Function() data,
   required String? pathAppend,
@@ -46,14 +45,14 @@ Future<bool> saveFileFromZero ({
   List<String>? multipleDownloadsNames,
   int multipleDownloadsCurrentIndex = 0,
 }) async {
-
   final hashCode = Object.hashAll([pathAppend, name]);
   if (_ongoingDownloads.contains(hashCode)) {
     return false; // already downloading
   }
   _ongoingDownloads.add(hashCode);
   // avoid using the context over async gaps
-  final snackbarHostContext = isHostContext ? context : context.findAncestorStateOfType<SnackBarHostFromZeroState>()!.context;
+  final snackbarHostContext =
+      isHostContext ? context : context.findAncestorStateOfType<SnackBarHostFromZeroState>()!.context;
   final localizations = FromZeroLocalizations.of(snackbarHostContext);
 
   if (!await requestDefaultFilePermission()) {
@@ -68,24 +67,23 @@ Future<bool> saveFileFromZero ({
   if (showSnackBars && showDownloadSnackBar) {
     const type = SnackBarFromZero.info;
     Widget progressIndicator;
-    if (downloadedAmount!=null && fileSize!=null) {
+    if (downloadedAmount != null && fileSize != null) {
       progressIndicator = ValueListenableBuilder<int>(
         valueListenable: downloadedAmount,
         builder: (context, count, child) {
           return ValueListenableBuilder<int?>(
             valueListenable: fileSize,
             builder: (context, size, child) {
-              if (size==null || size==0) {
+              if (size == null || size == 0) {
                 size = 1;
               }
               return LinearProgressIndicator(
                 valueColor: AlwaysStoppedAnimation(SnackBarFromZero.colors[type]),
                 backgroundColor: SnackBarFromZero.softColors[type],
-                value: count/size,
+                value: count / size,
               );
             },
           );
-
         },
       );
     } else {
@@ -94,16 +92,18 @@ Future<bool> saveFileFromZero ({
         backgroundColor: SnackBarFromZero.softColors[type],
       );
     }
-    if (multipleDownloads!=null) {
+    if (multipleDownloads != null) {
       progressIndicator = Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           LinearProgressIndicator(
             valueColor: AlwaysStoppedAnimation(SnackBarFromZero.colors[type]),
             backgroundColor: SnackBarFromZero.softColors[type],
-            value: multipleDownloadsCurrentIndex/multipleDownloads.length,
+            value: multipleDownloadsCurrentIndex / multipleDownloads.length,
           ),
-          const Divider(height: 1,),
+          const Divider(
+            height: 1,
+          ),
           progressIndicator,
         ],
       );
@@ -116,31 +116,36 @@ Future<bool> saveFileFromZero ({
       type: type,
       progressIndicator: progressIndicator,
       duration: null,
-      title: Text(localizations.translate('downloading')
-          + (multipleDownloads==null ? '' : ' (${multipleDownloadsCurrentIndex+1} / ${multipleDownloads.length})'),),
+      title: Text(
+        localizations.translate('downloading') +
+            (multipleDownloads == null ? '' : ' (${multipleDownloadsCurrentIndex + 1} / ${multipleDownloads.length})'),
+      ),
       onCancel: () {
         cancelled = true;
         onCancel?.call();
       },
-      message: downloadedAmount==null ? null : ValueListenableBuilder<int>(
-        valueListenable: downloadedAmount,
-        builder: (context, count, child) {
-          if (fileSize==null) {
-            return Text(count.bytes().toString());
-          } else {
-            return ValueListenableBuilder<int?>(
-              valueListenable: fileSize,
-              builder: (context, size, child) {
-                if (size==null || size==0) {
-                  return const Text('');
+      message: downloadedAmount == null
+          ? null
+          : ValueListenableBuilder<int>(
+              valueListenable: downloadedAmount,
+              builder: (context, count, child) {
+                if (fileSize == null) {
+                  return Text(count.bytes().toString());
                 } else {
-                  return Text('${_percentFormatter.format(count/size)}   ( ${count.bytes()} / ${size.bytes()} )');
+                  return ValueListenableBuilder<int?>(
+                    valueListenable: fileSize,
+                    builder: (context, size, child) {
+                      if (size == null || size == 0) {
+                        return const Text('');
+                      } else {
+                        return Text(
+                            '${_percentFormatter.format(count / size)}   ( ${count.bytes()} / ${size.bytes()} )');
+                      }
+                    },
+                  );
                 }
               },
-            );
-          }
-        },
-      ),
+            ),
     ).show(isHostContext: true);
   }
 
@@ -152,7 +157,6 @@ Future<bool> saveFileFromZero ({
   StackTrace? stackTrace;
   // execute save
   try {
-
     // finish download
     List<int> bytes = await data();
     if (cancelled) {
@@ -161,8 +165,7 @@ Future<bool> saveFileFromZero ({
     }
     downloadSuccess = true;
 
-    if (kIsWeb){
-
+    if (kIsWeb) {
       // web download implementation (downloaded by browser)
       final blob = html.Blob([bytes]);
       final url = html.Url.createObjectUrlFromBlob(blob);
@@ -174,13 +177,11 @@ Future<bool> saveFileFromZero ({
       anchor.click();
       html.document.body!.children.remove(anchor);
       html.Url.revokeObjectUrl(url);
-
-    } else{
-
+    } else {
       // get base path depending on the platform
       String basePath = (await PlatformExtended.getDownloadsDirectory()).absolute.path;
       // add pathAppend to the target path
-      if (pathAppend!=null) {
+      if (pathAppend != null) {
         basePath = p.join(basePath, pathAppend);
       }
       // if file already exists, add numbers at the end to avoid conflict
@@ -204,7 +205,7 @@ Future<bool> saveFileFromZero ({
       await file.writeAsBytes(bytes);
 
       // get pretty path to show to user
-      if (PlatformExtended.customDownloadsDirectory!=null) {
+      if (PlatformExtended.customDownloadsDirectory != null) {
         uiPath = file.absolute.path;
       } else {
         if (Platform.isWindows) {
@@ -212,14 +213,12 @@ Future<bool> saveFileFromZero ({
         } else {
           uiPath = localizations.translate('downloads');
         }
-        if (pathAppend!=null) {
+        if (pathAppend != null) {
           uiPath = p.join(uiPath, pathAppend);
         }
         uiPath = p.join(uiPath, name);
       }
-
     }
-
   } catch (e, st) {
     if (e is DioException) {
       // // this logging should be done in DIO interceptors. That is the only way to ensure it is logged only once for each call.
@@ -235,7 +234,7 @@ Future<bool> saveFileFromZero ({
       //   );
       // }
     } else {
-      log (LgLvl.error, 'Error while saving file:', e: e, st: st);
+      log(LgLvl.error, 'Error while saving file:', e: e, st: st);
     }
     error = e;
     stackTrace = st;
@@ -249,18 +248,19 @@ Future<bool> saveFileFromZero ({
   downloadSnackBarController?.dismiss();
   // show results snackBar
   bool retry = false;
-  if (success && (autoOpenOnFinish??saveFileFromZeroDefaultAutoOpenOnFinish)) {
-    if (multipleDownloads==null) {
+  if (success && (autoOpenOnFinish ?? saveFileFromZeroDefaultAutoOpenOnFinish)) {
+    if (multipleDownloads == null) {
       openFile(file!);
     } else {
-      if (multipleDownloadsCurrentIndex==multipleDownloads.lastIndex) {
+      if (multipleDownloadsCurrentIndex == multipleDownloads.lastIndex) {
         openFolder(file!);
       }
     }
   }
-  if (error!=null || (showSnackBars && showResultSnackBar)) {
-    if (success && uiPath!=null
-        && (multipleDownloads==null || multipleDownloadsCurrentIndex==multipleDownloads.lastIndex)) {
+  if (error != null || (showSnackBars && showResultSnackBar)) {
+    if (success &&
+        uiPath != null &&
+        (multipleDownloads == null || multipleDownloadsCurrentIndex == multipleDownloads.lastIndex)) {
       // we're trusting that the parent SnackbarHost won't be disposed while waiting. SnackbarHost should live at the root of the widget tree for as long as the app lives.
       // ignore: use_build_context_synchronously
       await SnackBarFromZero(
@@ -268,19 +268,22 @@ Future<bool> saveFileFromZero ({
         context: snackbarHostContext,
         type: SnackBarFromZero.success,
         duration: const Duration(seconds: 8),
-        title:  Text(successTitle ?? localizations.translate('download_success')),
+        title: Text(successTitle ?? localizations.translate('download_success')),
         message: Text(successMessage ?? "${localizations.translate('downloaded_to')} $uiPath"),
         actions: [
-          if (multipleDownloads==null)
+          if (multipleDownloads == null)
             SnackBarAction(
               label: localizations.translate('open').toUpperCase(),
               onPressed: () => openFile(file!),
             ),
-          if (Platform.isWindows && multipleDownloads==null)
+          if (Platform.isWindows && multipleDownloads == null)
             SnackBarAction(
               label: 'COPIAR', // TODO 3 internationalize
               onPressed: () async {
-                await Process.run('cmd', ['/c', 'echo.|clip']); // clear windows clipboard, necessary because if a file is copied to clipboard, Pasteboard.writeFiles doesn't work
+                await Process.run('cmd', [
+                  '/c',
+                  'echo.|clip'
+                ]); // clear windows clipboard, necessary because if a file is copied to clipboard, Pasteboard.writeFiles doesn't work
                 await Pasteboard.writeFiles([file!.absolute.path]);
               },
             ),
@@ -301,20 +304,23 @@ Future<bool> saveFileFromZero ({
         type: SnackBarFromZero.error,
         icon: downloadSuccess
             ? null
-            : ApiProviderBuilder.getErrorIcon(snackbarHostContext, error, stackTrace), // ignore: use_build_context_synchronously
+            : ApiProviderBuilder.getErrorIcon(
+                snackbarHostContext, error, stackTrace), // ignore: use_build_context_synchronously
         duration: null,
         title: Text(localizations.translate('download_fail')),
-        message: Text(downloadSuccess
-            ? localizations.translate('error_file')
-            : ('${ApiProviderBuilder.getErrorTitle(snackbarHostContext, error, stackTrace)}${errorSubtitle==null ? '' : '\n$errorSubtitle'}'),), // ignore: use_build_context_synchronously
+        message: Text(
+          downloadSuccess
+              ? localizations.translate('error_file')
+              : ('${ApiProviderBuilder.getErrorTitle(snackbarHostContext, error, stackTrace)}${errorSubtitle == null ? '' : '\n$errorSubtitle'}'),
+        ), // ignore: use_build_context_synchronously
         actions: [
-          if (onRetry!=null)
-          SnackBarAction(
-            label: localizations.translate('retry'),
-            onPressed: () {
-              retry = true;
-            },
-          ),
+          if (onRetry != null)
+            SnackBarAction(
+              label: localizations.translate('retry'),
+              onPressed: () {
+                retry = true;
+              },
+            ),
         ],
       ).show(isHostContext: true).closed;
     }
@@ -347,7 +353,7 @@ Future<bool> saveFileFromZero ({
       multipleDownloadsCurrentIndex: multipleDownloadsCurrentIndex,
     );
   }
-  if (success && multipleDownloads!=null && multipleDownloadsCurrentIndex<multipleDownloads.lastIndex) {
+  if (success && multipleDownloads != null && multipleDownloadsCurrentIndex < multipleDownloads.lastIndex) {
     multipleDownloadsCurrentIndex++;
     // we're trusting that the parent SnackbarHost won't be disposed while waiting.
     // SnackbarHost should live at the root of the widget tree for as long as the app lives.
@@ -360,7 +366,7 @@ Future<bool> saveFileFromZero ({
       downloadedAmount: downloadedAmount,
       fileSize: fileSize,
       onCancel: onCancel,
-      onRetry: onRetry==null ? null : multipleDownloads[multipleDownloadsCurrentIndex],
+      onRetry: onRetry == null ? null : multipleDownloads[multipleDownloadsCurrentIndex],
       showDownloadSnackBar: showDownloadSnackBar,
       showResultSnackBar: showResultSnackBar,
       showSnackBars: showSnackBars,
@@ -376,18 +382,15 @@ Future<bool> saveFileFromZero ({
   }
 
   return success;
-
 }
 
-
 Future<void> openFile(File file) async {
-  if (Platform.isAndroid){
+  if (Platform.isAndroid) {
     await OpenFile.open(file.absolute.path);
-  } else{
+  } else {
     await launch(file.absolute.path);
   }
 }
-
 
 Future<void> openFolder(File file) async {
   if (Platform.isAndroid) {
@@ -399,7 +402,6 @@ Future<void> openFolder(File file) async {
   }
 }
 
-
 Future<bool> requestDefaultFilePermission({
   Object? lgType,
   bool forceRequestOnAndroid29Plus = false,
@@ -409,7 +411,9 @@ Future<bool> requestDefaultFilePermission({
   } else if (Platform.isAndroid) {
     final androidInfo = await DeviceInfoPlugin().androidInfo;
     if (!forceRequestOnAndroid29Plus && androidInfo.version.sdkInt >= 29) {
-      log(LgLvl.finer, 'Requesting default file permission, not needed on Android sdk >= 29, returning true...',
+      log(
+        LgLvl.finer,
+        'Requesting default file permission, not needed on Android sdk >= 29, returning true...',
         type: lgType,
       );
       // apparently, in Android 10+, we implicitly have access to files we own (created by us)
@@ -418,16 +422,19 @@ Future<bool> requestDefaultFilePermission({
       // permissions, if we wanted to access other app's files: https://github.com/Baseflow/flutter-permission-handler/issues/907#issuecomment-1326089512
       return true;
     } else {
-      log(LgLvl.finer, 'Requesting file permission, '
-          '${androidInfo.version.sdkInt < 29
-              ? 'on Android sdk < 29, we need to actually request it and wait for it...'
-              : 'android version is >=29 but forceRequestOnAndroid29Pluswas passed as true'}',
+      log(
+        LgLvl.finer,
+        'Requesting file permission, '
+        '${androidInfo.version.sdkInt < 29 ? 'on Android sdk < 29, we need to actually request it and wait for it...' : 'android version is >=29 but forceRequestOnAndroid29Pluswas passed as true'}',
         type: lgType,
       );
       final result = androidInfo.version.sdkInt < 29
           ? await Permission.storage.request() // deprecated on >=29 and always returns false
-          : await Permission.manageExternalStorage.request(); // this permisison is excessive, but its all we can do, also we would need to add it to the manifest :))
-      log(LgLvl.fine, 'Request for file permission returned $result',
+          : await Permission.manageExternalStorage
+              .request(); // this permisison is excessive, but its all we can do, also we would need to add it to the manifest :))
+      log(
+        LgLvl.fine,
+        'Request for file permission returned $result',
         type: lgType,
       );
       return result.isGranted;

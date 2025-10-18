@@ -2,12 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-
 /// Used for relaying scroll gestures to a Scrollable from outside its bounds
 /// Could have other applications, but not tested
 /// By desgin, only relays to the first Listener found that has the corresponding callback
 class GestureRelayController {
-
   GestureRelayController();
 
   final List<PointerDownEventListener> _onPointerDowns = [];
@@ -20,9 +18,11 @@ class GestureRelayController {
       _onPointerDowns.add(listener);
     }
   }
+
   void removeOnPointerDown(PointerDownEventListener listener) {
     _onPointerDowns.remove(listener);
   }
+
   void relayOnPointerDown(PointerDownEvent event) {
     for (final e in _onPointerDowns) {
       e(event);
@@ -34,19 +34,19 @@ class GestureRelayController {
       _onPointerSignals.add(listener);
     }
   }
+
   void removeOnPointerSignal(PointerSignalEventListener listener) {
     _onPointerSignals.remove(listener);
   }
+
   void relayOnPointerSignal(PointerSignalEvent event) {
     for (final e in _onPointerSignals) {
       e(event);
     }
   }
-  
 }
 
 class GestureRelayer extends StatefulWidget {
-
   final GestureRelayController controller;
   final Widget child;
 
@@ -58,11 +58,9 @@ class GestureRelayer extends StatefulWidget {
 
   @override
   State<GestureRelayer> createState() => _GestureRelayerState();
-
 }
 
 class _GestureRelayerState extends State<GestureRelayer> {
-
   @override
   void initState() {
     super.initState();
@@ -93,7 +91,7 @@ class _GestureRelayerState extends State<GestureRelayer> {
       context.visitAncestorElements((element) {
         if (element.widget is Listener) {
           final callback = (element.widget as Listener).onPointerDown;
-          if (callback!=null) {
+          if (callback != null) {
             callback(event);
             return false;
           }
@@ -102,12 +100,13 @@ class _GestureRelayerState extends State<GestureRelayer> {
       });
     }
   }
+
   void _relayOnPointerSignal(PointerSignalEvent event) {
     if (mounted) {
       context.visitAncestorElements((element) {
         if (element.widget is Listener) {
           final callback = (element.widget as Listener).onPointerSignal;
-          if (callback!=null) {
+          if (callback != null) {
             callback(event);
             return false;
           }
@@ -121,11 +120,9 @@ class _GestureRelayerState extends State<GestureRelayer> {
   Widget build(BuildContext context) {
     return widget.child;
   }
-
 }
 
 class GestureRelayListener extends StatelessWidget {
-
   final GestureRelayController controller;
   final Widget child;
   final HitTestBehavior behaviour;
@@ -146,5 +143,4 @@ class GestureRelayListener extends StatelessWidget {
       child: child,
     );
   }
-
 }

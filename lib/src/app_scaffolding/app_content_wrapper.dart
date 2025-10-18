@@ -16,12 +16,7 @@ import 'package:hive/hive.dart';
 import 'package:mlog/mlog.dart';
 import 'package:window_manager/window_manager.dart';
 
-
-
-
 bool windowsDesktopBitsdojoWorking = true;
-
-
 
 var fromZeroScreenProvider = ChangeNotifierProvider<ScreenFromZero>((ref) {
   return ScreenFromZero();
@@ -40,7 +35,9 @@ var fromZeroThemeParametersProvider = ChangeNotifierProvider<ThemeParametersFrom
 });
 
 /// Override this for custom logging, including logs from from_zero
-void Function(LgLvl level, String? msg, {
+void Function(
+  LgLvl level,
+  String? msg, {
   Object? type,
   Object? e,
   StackTrace? st,
@@ -49,7 +46,9 @@ void Function(LgLvl level, String? msg, {
   FlutterErrorDetails? details,
 }) log = defaultLog;
 
-void defaultLog(LgLvl level, String? msg, {
+void defaultLog(
+  LgLvl level,
+  String? msg, {
   Object? type,
   Object? e,
   StackTrace? st,
@@ -57,19 +56,24 @@ void defaultLog(LgLvl level, String? msg, {
   int extraTraceLineOffset = 0,
   FlutterErrorDetails? details,
 }) {
-  final message = defaultLogGetString(level, msg,
+  final message = defaultLogGetString(
+    level,
+    msg,
     type: type,
     e: e,
     st: st,
     extraTraceLineOffset: extraTraceLineOffset + 1,
     details: details,
   );
-  if (message!=null) {
-    print (message); //ignore: avoid_print
+  if (message != null) {
+    print(message); //ignore: avoid_print
   }
 }
 
-String? defaultLogGetMap(JsonMessageBuilder messageBuilder, LgLvl level, String msg, {
+String? defaultLogGetMap(
+  JsonMessageBuilder messageBuilder,
+  LgLvl level,
+  String msg, {
   Object? type,
   Object? e,
   StackTrace? st,
@@ -95,23 +99,20 @@ String? defaultLogGetMap(JsonMessageBuilder messageBuilder, LgLvl level, String 
   if (e is DioException) {
     msg += ' (${e.type})'
         '\n  ${e.requestOptions.uri}'
-        '${e.response==null
-            ? '' 
-            : '  ${e.response!.statusCode} - ${_parseDioErrorResponse(e.response!.data)}'
-        }';
+        '${e.response == null ? '' : '  ${e.response!.statusCode} - ${_parseDioErrorResponse(e.response!.data)}'}';
 
     logBuilder
-        ..setExtra('data_dio_url', e.requestOptions.uri.toString())
-        ..setExtra('data_dio_error_type', e.type.toString());
+      ..setExtra('data_dio_url', e.requestOptions.uri.toString())
+      ..setExtra('data_dio_error_type', e.type.toString());
 
-    if (e.response!=null) {
-      if (e.response!.statusCode!=null) {
+    if (e.response != null) {
+      if (e.response!.statusCode != null) {
         logBuilder.setExtra("data_dio_response_status_code", e.response!.statusCode!);
       }
       logBuilder.setExtra('data_dio_response_data', _parseDioErrorResponse(e.response!.data));
     }
   }
-  if (details!=null) {
+  if (details != null) {
     logBuilder.setExtra('data_flutter_error_details', getFlutterDetailsString(details));
   }
   logBuilder.message = msg;
@@ -119,7 +120,9 @@ String? defaultLogGetMap(JsonMessageBuilder messageBuilder, LgLvl level, String 
   return logBuilder.buildMessage();
 }
 
-String? defaultLogGetString(LgLvl level, String? msg, {
+String? defaultLogGetString(
+  LgLvl level,
+  String? msg, {
   Object? type,
   Object? e,
   StackTrace? st,
@@ -135,11 +138,11 @@ String? defaultLogGetString(LgLvl level, String? msg, {
     if (msg is String) {
       msg += ' (${e.type})'
           '\n  ${e.requestOptions.uri}'
-          '${e.response==null ? '' : '  ${e.response!.statusCode} - ${_parseDioErrorResponse(e.response!.data)}'}';
+          '${e.response == null ? '' : '  ${e.response!.statusCode} - ${_parseDioErrorResponse(e.response!.data)}'}';
     }
   }
   String message;
-  if (jsonMap!=null) {
+  if (jsonMap != null) {
     message = json.encode(jsonMap);
   } else {
     message = LogBuilder(
@@ -152,11 +155,12 @@ String? defaultLogGetString(LgLvl level, String? msg, {
       extraTraceLineOffset: extraTraceLineOffset + 1,
     ).buildMessage();
   }
-  if (details!=null) {
+  if (details != null) {
     message = addFlutterDetailsToMlog(message, details);
   }
   return message;
 }
+
 String _parseDioErrorResponse(dynamic data) {
   if (data is List<int>) return utf8.decode(data, allowMalformed: true);
   return data.toString();
@@ -168,13 +172,17 @@ String getFlutterDetailsString(FlutterErrorDetails details) {
     maxDescendentsTruncatableNode: 5,
   ).render(details.toDiagnosticsNode(style: DiagnosticsTreeStyle.error)).trimRight();
 }
+
 String addFlutterDetailsToMlog(String msg, FlutterErrorDetails details) {
   String detailsString = '\n${getFlutterDetailsString(details)}';
-  detailsString = detailsString.splitMapJoin('\n', onNonMatch: (e) {
-    return '    $e';
-  },);
-  if (msg.length<=3) return detailsString;
-  return msg.substring(0, msg.length-2) + detailsString + msg.substring(msg.length-2);
+  detailsString = detailsString.splitMapJoin(
+    '\n',
+    onNonMatch: (e) {
+      return '    $e';
+    },
+  );
+  if (msg.length <= 3) return detailsString;
+  return msg.substring(0, msg.length - 2) + detailsString + msg.substring(msg.length - 2);
 }
 
 enum FzLgType {
@@ -201,11 +209,9 @@ enum FzLgType {
   }
 }
 
-
 /// Put this widget in the builder method of your MaterialApp.
 /// Controls different app-wide providers and features needed by other FromZeroWidgets
 class FromZeroAppContentWrapper extends ConsumerStatefulWidget {
-
   final Widget child;
   final GoRouter goRouter;
   final bool allowDraggingWithMouseDownOnDesktop;
@@ -228,23 +234,28 @@ class FromZeroAppContentWrapper extends ConsumerStatefulWidget {
   static void exitApp(int code) {
     log(LgLvl.info, 'Exiting app with code: $code...', type: FzLgType.routing);
     if (!kIsWeb && Platform.isWindows) {
-      log(LgLvl.fine, 'Detected platform windows, releaseMode=$kReleaseMode, processName=$windowsProcessName', type: FzLgType.routing);
-      if (kReleaseMode && windowsProcessName!=null) {
+      log(LgLvl.fine, 'Detected platform windows, releaseMode=$kReleaseMode, processName=$windowsProcessName',
+          type: FzLgType.routing);
+      if (kReleaseMode && windowsProcessName != null) {
         log(LgLvl.fine, 'Running process: taskkill /IM "$windowsProcessName" /F', type: FzLgType.routing);
         // this ensures the process is completely killed and doesn't hang in older Windows versions
         final result = Process.runSync('cmd', ['/c', 'taskkill', '/IM', '$windowsProcessName', '/F']);
-        log(LgLvl.error, 'Seems like killing the process didn\'t work...'
-            '\nFinished taskkill process with code: ${result.exitCode}'
-            '\n   stderr:\n${result.stderr}\n   stdout:\n${result.stdout}',
+        log(
+          LgLvl.error,
+          'Seems like killing the process didn\'t work...'
+          '\nFinished taskkill process with code: ${result.exitCode}'
+          '\n   stderr:\n${result.stderr}\n   stdout:\n${result.stdout}',
           type: FzLgType.routing,
         );
       }
     }
     _exit(code);
   }
+
   static void _exit(int code) {
     log(LgLvl.fine, 'Exiting the normal dart way (debugger(); + exit(0);)...', type: FzLgType.routing);
-    debugger(); exit(code);
+    debugger();
+    exit(code);
   }
 
   static Future<Map<String, int>> getWindowsProcessess() async {
@@ -262,13 +273,11 @@ class FromZeroAppContentWrapper extends ConsumerStatefulWidget {
     }
     return pids;
   }
-
 }
 
-
 ValueNotifier<bool> isMouseOverWindowBar = ValueNotifier(false);
-class FromZeroAppContentWrapperState extends ConsumerState<FromZeroAppContentWrapper> {
 
+class FromZeroAppContentWrapperState extends ConsumerState<FromZeroAppContentWrapper> {
   @override
   void initState() {
     super.initState();
@@ -276,7 +285,7 @@ class FromZeroAppContentWrapperState extends ConsumerState<FromZeroAppContentWra
       // if (WindowEventListener.listeningCount==0) {
       //   WindowEventListener().listen(() => widget.goRouter);
       // }
-      if (WindowEventListenerWindowManagerPackage.listener==null) {
+      if (WindowEventListenerWindowManagerPackage.listener == null) {
         WindowEventListenerWindowManagerPackage.initListener(() => widget.goRouter);
         windowManager.addListener(WindowEventListenerWindowManagerPackage.listener!);
       }
@@ -296,7 +305,7 @@ class FromZeroAppContentWrapperState extends ConsumerState<FromZeroAppContentWra
     );
     final screen = ref.read(fromZeroScreenProvider);
     final scaffoldChangeNotifier = ref.read(fromZeroScaffoldChangeNotifierProvider);
-    bool showWindowButtons = PlatformExtended.appWindow!=null && scaffoldChangeNotifier.showWindowBarOnDesktop;
+    bool showWindowButtons = PlatformExtended.appWindow != null && scaffoldChangeNotifier.showWindowBarOnDesktop;
     ScrollBehavior scrollConfiguration = ScrollConfiguration.of(context).copyWith(
       scrollbars: false,
     );
@@ -313,18 +322,18 @@ class FromZeroAppContentWrapperState extends ConsumerState<FromZeroAppContentWra
         builder: (context, constraints) {
           double screenWidth = scaffoldChangeNotifier.previousWidth ?? 1280;
           double screenHeight = scaffoldChangeNotifier.previousHeight ?? 720;
-          if (constraints.maxWidth>0){
+          if (constraints.maxWidth > 0) {
             screenWidth = constraints.maxWidth;
             screenHeight = constraints.maxHeight;
-            if (scaffoldChangeNotifier.previousWidth==null) {
+            if (scaffoldChangeNotifier.previousWidth == null) {
               screen._isMobileLayout = constraints.maxWidth < ScaffoldFromZero.screenSizeMedium;
-              if (constraints.maxWidth>=ScaffoldFromZero.screenSizeXLarge){
+              if (constraints.maxWidth >= ScaffoldFromZero.screenSizeXLarge) {
                 screen._breakpoint = ScaffoldFromZero.screenSizeXLarge;
-              } else if (constraints.maxWidth>=ScaffoldFromZero.screenSizeLarge){
+              } else if (constraints.maxWidth >= ScaffoldFromZero.screenSizeLarge) {
                 screen._breakpoint = ScaffoldFromZero.screenSizeLarge;
-              } else if (constraints.maxWidth>=ScaffoldFromZero.screenSizeMedium){
+              } else if (constraints.maxWidth >= ScaffoldFromZero.screenSizeMedium) {
                 screen._breakpoint = ScaffoldFromZero.screenSizeMedium;
-              } else{
+              } else {
                 screen._breakpoint = ScaffoldFromZero.screenSizeSmall;
               }
               scaffoldChangeNotifier.previousWidth = constraints.maxWidth;
@@ -332,13 +341,13 @@ class FromZeroAppContentWrapperState extends ConsumerState<FromZeroAppContentWra
             } else {
               WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                 screen._isMobileLayout = constraints.maxWidth < ScaffoldFromZero.screenSizeMedium;
-                if (constraints.maxWidth>=ScaffoldFromZero.screenSizeXLarge){
+                if (constraints.maxWidth >= ScaffoldFromZero.screenSizeXLarge) {
                   screen.breakpoint = ScaffoldFromZero.screenSizeXLarge;
-                } else if (constraints.maxWidth>=ScaffoldFromZero.screenSizeLarge){
+                } else if (constraints.maxWidth >= ScaffoldFromZero.screenSizeLarge) {
                   screen.breakpoint = ScaffoldFromZero.screenSizeLarge;
-                } else if (constraints.maxWidth>=ScaffoldFromZero.screenSizeMedium){
+                } else if (constraints.maxWidth >= ScaffoldFromZero.screenSizeMedium) {
                   screen.breakpoint = ScaffoldFromZero.screenSizeMedium;
-                } else{
+                } else {
                   screen.breakpoint = ScaffoldFromZero.screenSizeSmall;
                 }
                 scaffoldChangeNotifier.validateDrawerWidths(screen.isMobileLayout, constraints.maxWidth);
@@ -369,7 +378,9 @@ class FromZeroAppContentWrapperState extends ConsumerState<FromZeroAppContentWra
                         ),
                         if (showWindowButtons)
                           Positioned(
-                            top: 0, left: 0, right: 0,
+                            top: 0,
+                            left: 0,
+                            right: 0,
                             child: ValueListenableBuilder<bool>(
                               valueListenable: isMouseOverWindowBar,
                               builder: (context, value, child) {
@@ -399,14 +410,9 @@ class FromZeroAppContentWrapperState extends ConsumerState<FromZeroAppContentWra
       ),
     );
   }
-
 }
 
-
-
-
 class AppearOnMouseOver extends StatefulWidget {
-
   final bool appear;
   final Widget child;
 
@@ -418,16 +424,15 @@ class AppearOnMouseOver extends StatefulWidget {
 
   @override
   AppearOnMouseOverState createState() => AppearOnMouseOverState();
-
 }
-class AppearOnMouseOverState extends State<AppearOnMouseOver> {
 
+class AppearOnMouseOverState extends State<AppearOnMouseOver> {
   bool visible = false;
   bool pressed = false;
 
   @override
   Widget build(BuildContext context) {
-    bool visible = (this.visible||pressed)&&widget.appear;
+    bool visible = (this.visible || pressed) && widget.appear;
     return MouseRegion(
       opaque: false,
       onEnter: (event) {
@@ -466,12 +471,9 @@ class AppearOnMouseOverState extends State<AppearOnMouseOver> {
       ),
     );
   }
-
 }
 
-
 class WindowBar extends StatelessWidget {
-
   static String? logoImageAssetsPath;
 
   final double? height;
@@ -505,41 +507,54 @@ class WindowBar extends StatelessWidget {
   Widget build(BuildContext context) {
     MediaQuery.sizeOf(context); // listen to resize, to difference maximized
     final theme = Theme.of(context);
-    final Color iconColor = iconTheme?.color
-        ?? theme.appBarTheme.iconTheme?.color 
-        ?? theme.primaryIconTheme.color 
-        ?? theme.iconTheme.color
-        ?? (theme.brightness==Brightness.light ? Colors.black : Colors.white);
+    final Color iconColor = iconTheme?.color ??
+        theme.appBarTheme.iconTheme?.color ??
+        theme.primaryIconTheme.color ??
+        theme.iconTheme.color ??
+        (theme.brightness == Brightness.light ? Colors.black : Colors.white);
     return Container(
-      height: height ?? (PlatformExtended.appWindow==null
-          ? 32
-          : appWindow.isMaximized ? appWindow.titleBarHeight * 0.66 : appWindow.titleBarHeight),
+      height: height ??
+          (PlatformExtended.appWindow == null
+              ? 32
+              : appWindow.isMaximized
+                  ? appWindow.titleBarHeight * 0.66
+                  : appWindow.titleBarHeight),
       color: backgroundColor,
       child: MoveWindowFromZero(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (title!=null)
-              title!,
-            if (title==null && (logoImageAssetsPath!=null || FromZeroAppContentWrapper.appNameForCloseConfirmation!=null))
-              const SizedBox(width: 9,),
-            if (title==null && logoImageAssetsPath!=null)
+            if (title != null) title!,
+            if (title == null &&
+                (logoImageAssetsPath != null || FromZeroAppContentWrapper.appNameForCloseConfirmation != null))
+              const SizedBox(
+                width: 9,
+              ),
+            if (title == null && logoImageAssetsPath != null)
               IgnorePointer(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 3),
                   child: SizedBox(
-                    width: 14, height: 14,
-                    child: Image.asset(logoImageAssetsPath!,),
+                    width: 14,
+                    height: 14,
+                    child: Image.asset(
+                      logoImageAssetsPath!,
+                    ),
                   ),
                 ),
               ),
-            if (title==null && logoImageAssetsPath!=null && FromZeroAppContentWrapper.appNameForCloseConfirmation!=null)
-              const SizedBox(width: 7,),
-            if (title==null && FromZeroAppContentWrapper.appNameForCloseConfirmation!=null)
+            if (title == null &&
+                logoImageAssetsPath != null &&
+                FromZeroAppContentWrapper.appNameForCloseConfirmation != null)
+              const SizedBox(
+                width: 7,
+              ),
+            if (title == null && FromZeroAppContentWrapper.appNameForCloseConfirmation != null)
               IgnorePointer(
                 child: Material(
                   type: MaterialType.transparency,
-                  child: Text(FromZeroAppContentWrapper.appNameForCloseConfirmation!,
+                  child: Text(
+                    FromZeroAppContentWrapper.appNameForCloseConfirmation!,
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.normal,
@@ -548,7 +563,7 @@ class WindowBar extends StatelessWidget {
                 ),
               ),
             Expanded(child: Container()),
-            if (PlatformExtended.appWindow!=null && showMinimize)
+            if (PlatformExtended.appWindow != null && showMinimize)
               MinimizeWindowButton(
                 animate: true,
                 onPressed: () {
@@ -564,7 +579,7 @@ class WindowBar extends StatelessWidget {
                   iconMouseDown: iconColor,
                 ),
               ),
-            if (PlatformExtended.appWindow!=null && showMaximizeOrRestore)
+            if (PlatformExtended.appWindow != null && showMaximizeOrRestore)
               WindowButton(
                 animate: true,
                 iconBuilder: (buttonContext) => appWindow.isMaximized
@@ -584,7 +599,7 @@ class WindowBar extends StatelessWidget {
                   iconMouseDown: iconColor,
                 ),
               ),
-            if (PlatformExtended.appWindow!=null && showClose)
+            if (PlatformExtended.appWindow != null && showClose)
               CloseWindowButton(
                 animate: true,
                 onPressed: () async {
@@ -612,34 +627,36 @@ class WindowBar extends StatelessWidget {
     try {
       final navigator = goRouter.routerDelegate.navigatorKey.currentState!;
       while (true) {
-
         final goRoute = goRouter.routerDelegate.currentConfiguration.last.route;
-        log (LgLvl.fine, 'Trying to pop ${goRouter.routerDelegate.currentConfiguration.last.matchedLocation}', type: FzLgType.routing);
+        log(LgLvl.fine, 'Trying to pop ${goRouter.routerDelegate.currentConfiguration.last.matchedLocation}',
+            type: FzLgType.routing);
         if (await navigator.maybePop()) {
           final previousGoRouteFromZero = goRoute is GoRouteFromZero ? goRoute : null;
           final newGoRoute = goRouter.routerDelegate.currentConfiguration.last.route;
           final newGoRouteFromZero = newGoRoute is GoRouteFromZero ? newGoRoute : null;
-          if (newGoRoute==goRoute) {
+          if (newGoRoute == goRoute) {
             // if route refused to pop, or popped route was a modal, stop iteration
-            log(LgLvl.finer, 'Route refused to pop, or popped route was a modal, stopping iteration...', type: FzLgType.routing);
+            log(LgLvl.finer, 'Route refused to pop, or popped route was a modal, stopping iteration...',
+                type: FzLgType.routing);
             return;
           }
-          if (previousGoRouteFromZero?.pageScaffoldId!=newGoRouteFromZero?.pageScaffoldId) {
+          if (previousGoRouteFromZero?.pageScaffoldId != newGoRouteFromZero?.pageScaffoldId) {
             // if new route is a different scaffold ID, stop iteration
             log(LgLvl.finer, 'New route is a different scaffold ID, stopping iteration...', type: FzLgType.routing);
             return;
           }
         } else {
           // if successfully popped last route, exit app (maybePop only false when popDisposition==bubble)
-          log (LgLvl.finer, 'Successfully popped last route, exiting app...', type: FzLgType.routing);
+          log(LgLvl.finer, 'Successfully popped last route, exiting app...', type: FzLgType.routing);
           FromZeroAppContentWrapper.exitApp(0);
           return;
         }
-        log (LgLvl.finer, 'Popped successfully, continuing popping iteration...', type: FzLgType.routing);
-
+        log(LgLvl.finer, 'Popped successfully, continuing popping iteration...', type: FzLgType.routing);
       }
     } catch (e, st) {
-      log (LgLvl.error, 'Error while processing smartMultiPop, defaulting to exiting app...',
+      log(
+        LgLvl.error,
+        'Error while processing smartMultiPop, defaulting to exiting app...',
         e: e,
         st: st,
         type: FzLgType.routing,
@@ -650,7 +667,6 @@ class WindowBar extends StatelessWidget {
 }
 
 class MoveWindowFromZero extends StatefulWidget {
-
   final Widget? child;
   final VoidCallback? onDoubleTap;
 
@@ -662,15 +678,14 @@ class MoveWindowFromZero extends StatefulWidget {
 
   @override
   State<MoveWindowFromZero> createState() => _MoveWindowFromZeroState();
-
 }
-class _MoveWindowFromZeroState extends State<MoveWindowFromZero> {
 
+class _MoveWindowFromZeroState extends State<MoveWindowFromZero> {
   TapDownDetails? lastTapDownDetails;
   Timer? timer;
   void onTapDown(TapDownDetails details) {
     timer?.cancel();
-    if (lastTapDownDetails?.globalPosition==details.globalPosition) {
+    if (lastTapDownDetails?.globalPosition == details.globalPosition) {
       (widget.onDoubleTap ?? appWindow.maximizeOrRestore).call();
       lastTapDownDetails = null;
     } else {
@@ -685,10 +700,9 @@ class _MoveWindowFromZeroState extends State<MoveWindowFromZero> {
   Widget build(BuildContext context) {
     final Map<Type, GestureRecognizerFactory> gestures = <Type, GestureRecognizerFactory>{};
     gestures[TransparentTapGestureRecognizer] = GestureRecognizerFactoryWithHandlers<TransparentTapGestureRecognizer>(
-          () => TransparentTapGestureRecognizer(debugOwner: this),
-          (TapGestureRecognizer instance) {
-        instance
-          .onTapDown = onTapDown;
+      () => TransparentTapGestureRecognizer(debugOwner: this),
+      (TapGestureRecognizer instance) {
+        instance.onTapDown = onTapDown;
       },
     );
     return RawGestureDetector(
@@ -703,15 +717,9 @@ class _MoveWindowFromZeroState extends State<MoveWindowFromZero> {
       ),
     );
   }
-
 }
 
-
-
-
-
-class ScreenFromZero extends ChangeNotifier{
-
+class ScreenFromZero extends ChangeNotifier {
   late bool _isMobileLayout;
   bool get isMobileLayout => _isMobileLayout;
   set isMobileLayout(bool value) {
@@ -732,12 +740,9 @@ class ScreenFromZero extends ChangeNotifier{
     _scale = value;
     notifyListeners();
   }
-
 }
 
-
-class ScaffoldFromZeroChangeNotifier extends ChangeNotifier{
-
+class ScaffoldFromZeroChangeNotifier extends ChangeNotifier {
   final bool drawerOpenByDefaultOnDesktop;
   final bool showWindowBarOnDesktop;
 
@@ -753,8 +758,6 @@ class ScaffoldFromZeroChangeNotifier extends ChangeNotifier{
     notifyListeners();
   }
 
-
-
   // DRAWER RELATED STUFF
 
   final Map<String, ValueNotifier<double>> drawerContentScrollOffsets = {};
@@ -768,17 +771,18 @@ class ScaffoldFromZeroChangeNotifier extends ChangeNotifier{
   final Map<String, double> expandedDrawerWidths = {};
   double getCurrentDrawerWidth(String pageScaffoldId) {
     if (!_currentDrawerWidths.containsKey(pageScaffoldId)) {
-      _currentDrawerWidths[pageScaffoldId] =
-          drawerOpenByDefaultOnDesktop  ? expandedDrawerWidths[pageScaffoldId] ?? 304
-                                        : collapsedDrawerWidths[pageScaffoldId] ?? 56;
+      _currentDrawerWidths[pageScaffoldId] = drawerOpenByDefaultOnDesktop
+          ? expandedDrawerWidths[pageScaffoldId] ?? 304
+          : collapsedDrawerWidths[pageScaffoldId] ?? 56;
       blockNotify = true;
-      if (previousWidth!=null) {
-        validateDrawerWidths(previousWidth!<ScaffoldFromZero.screenSizeMedium, previousWidth!);
+      if (previousWidth != null) {
+        validateDrawerWidths(previousWidth! < ScaffoldFromZero.screenSizeMedium, previousWidth!);
       }
       blockNotify = false;
     }
     return _currentDrawerWidths[pageScaffoldId] ?? 0;
   }
+
   bool blockNotify = false;
   void setCurrentDrawerWidth(String pageScaffoldId, double value) {
     if (_currentDrawerWidths[pageScaffoldId] != value) {
@@ -786,45 +790,55 @@ class ScaffoldFromZeroChangeNotifier extends ChangeNotifier{
       if (!blockNotify) notifyListeners();
     }
   }
-  void collapseDrawer([String? pageScaffoldId]){
+
+  void collapseDrawer([String? pageScaffoldId]) {
     pageScaffoldId ??= currentRouteState!.pageScaffoldId;
     setCurrentDrawerWidth(pageScaffoldId, collapsedDrawerWidths[pageScaffoldId] ?? 56);
   }
-  void expandDrawer([String? pageScaffoldId]){
+
+  void expandDrawer([String? pageScaffoldId]) {
     pageScaffoldId ??= currentRouteState!.pageScaffoldId;
     setCurrentDrawerWidth(pageScaffoldId, expandedDrawerWidths[pageScaffoldId] ?? 304);
   }
+
   bool get isCurrentDrawerExpanded => isDrawerExpanded();
   bool isDrawerExpanded([String? pageScaffoldId]) {
     pageScaffoldId ??= currentRouteState!.pageScaffoldId;
-    return getCurrentDrawerWidth(pageScaffoldId)==expandedDrawerWidths[pageScaffoldId];
+    return getCurrentDrawerWidth(pageScaffoldId) == expandedDrawerWidths[pageScaffoldId];
   }
 
   // Mechanism to automatically expand/collapse drawer in response to screen width changes in desktop
   double? previousWidth;
   double? previousHeight;
-  void validateDrawerWidths(bool isMobileLayout, double width){
+  void validateDrawerWidths(bool isMobileLayout, double width) {
     for (final e in _currentDrawerWidths.keys) {
       validateDrawerWidth(e, isMobileLayout, width);
     }
   }
-  void validateDrawerWidth(String pageScaffoldId, bool isMobileLayout, double width){
+
+  void validateDrawerWidth(String pageScaffoldId, bool isMobileLayout, double width) {
     final collapsed = collapsedDrawerWidths[pageScaffoldId] ?? 56;
     final expanded = expandedDrawerWidths[pageScaffoldId] ?? 304;
     if (width < ScaffoldFromZero.screenSizeMedium) {
       setCurrentDrawerWidth(pageScaffoldId, 0);
-    } else if (PlatformExtended.isDesktop && previousWidth!=null && previousWidth!<ScaffoldFromZero.screenSizeLarge && width>=ScaffoldFromZero.screenSizeLarge){
+    } else if (PlatformExtended.isDesktop &&
+        previousWidth != null &&
+        previousWidth! < ScaffoldFromZero.screenSizeLarge &&
+        width >= ScaffoldFromZero.screenSizeLarge) {
       setCurrentDrawerWidth(pageScaffoldId, expanded);
-    } else if (PlatformExtended.isDesktop && previousWidth!=null && previousWidth!>=ScaffoldFromZero.screenSizeLarge && width<ScaffoldFromZero.screenSizeLarge){
+    } else if (PlatformExtended.isDesktop &&
+        previousWidth != null &&
+        previousWidth! >= ScaffoldFromZero.screenSizeLarge &&
+        width < ScaffoldFromZero.screenSizeLarge) {
       setCurrentDrawerWidth(pageScaffoldId, collapsed);
     } else {
       final currentWidth = getCurrentDrawerWidth(pageScaffoldId);
-      if (currentWidth < collapsed){
+      if (currentWidth < collapsed) {
         setCurrentDrawerWidth(pageScaffoldId, collapsed);
-      } else if (currentWidth > expanded){
+      } else if (currentWidth > expanded) {
         setCurrentDrawerWidth(pageScaffoldId, expanded);
       } else if (currentWidth > collapsed && currentWidth < expanded) {
-        if (currentWidth > ((expanded-collapsed)/2)) {
+        if (currentWidth > ((expanded - collapsed) / 2)) {
           setCurrentDrawerWidth(pageScaffoldId, expanded);
         } else {
           setCurrentDrawerWidth(pageScaffoldId, collapsed);
@@ -832,7 +846,6 @@ class ScaffoldFromZeroChangeNotifier extends ChangeNotifier{
       }
     }
   }
-
 
   // SCAFFOLD TRANSITION RELATED STUFF
 
@@ -855,8 +868,11 @@ class ScaffoldFromZeroChangeNotifier extends ChangeNotifier{
       });
     }
   }
-  void updateAnimationTypes(){
-    if (currentRouteState==null || previousRouteState==null || currentRouteState!.pageScaffoldId!=previousRouteState!.pageScaffoldId) {
+
+  void updateAnimationTypes() {
+    if (currentRouteState == null ||
+        previousRouteState == null ||
+        currentRouteState!.pageScaffoldId != previousRouteState!.pageScaffoldId) {
       _animationType = ScaffoldTypeAnimation.other;
     } else if (currentRouteState!.pageScaffoldDepth > previousRouteState!.pageScaffoldDepth) {
       _animationType = ScaffoldTypeAnimation.inner;
@@ -865,25 +881,20 @@ class ScaffoldFromZeroChangeNotifier extends ChangeNotifier{
     } else {
       _animationType = ScaffoldTypeAnimation.same;
     }
-    fadeAnim = animationType==ScaffoldTypeAnimation.same;
-    sharedAnim = animationType==ScaffoldTypeAnimation.inner || animationType==ScaffoldTypeAnimation.outer;
-    titleAnimation = animationType!=ScaffoldTypeAnimation.other;
-        // && currentRoute!=null && previousRoute!=null
-        // && !(  (currentScaffold.title?.key!=null && previousScaffold.title?.key!=null
-        //         && currentScaffold.title?.key==previousScaffold.title?.key)
-        //     || (currentScaffold.title is Text && previousScaffold.title is Text
-        //         && (currentScaffold.title as Text).data == (previousScaffold.title as Text).data));
-              // because of the change to using routes, we lost the ability to compare the titles of the different pages
-              // could still be done if the pages put it here, but is messy and not really necessary
+    fadeAnim = animationType == ScaffoldTypeAnimation.same;
+    sharedAnim = animationType == ScaffoldTypeAnimation.inner || animationType == ScaffoldTypeAnimation.outer;
+    titleAnimation = animationType != ScaffoldTypeAnimation.other;
+    // && currentRoute!=null && previousRoute!=null
+    // && !(  (currentScaffold.title?.key!=null && previousScaffold.title?.key!=null
+    //         && currentScaffold.title?.key==previousScaffold.title?.key)
+    //     || (currentScaffold.title is Text && previousScaffold.title is Text
+    //         && (currentScaffold.title as Text).data == (previousScaffold.title as Text).data));
+    // because of the change to using routes, we lost the ability to compare the titles of the different pages
+    // could still be done if the pages put it here, but is messy and not really necessary
   }
-
 }
 
-
-
-
 class WindowEventListenerWindowManagerPackage with WindowListener {
-
   GoRouter Function() routerGetter;
 
   WindowEventListenerWindowManagerPackage._(this.routerGetter);
@@ -899,14 +910,9 @@ class WindowEventListenerWindowManagerPackage with WindowListener {
     final goRouter = routerGetter();
     WindowBar.smartMultiPop(goRouter);
   }
-
 }
 
-
-
-
 class CloseConfirmDialog extends StatelessWidget {
-
   final bool? forceExitApp;
 
   const CloseConfirmDialog({
@@ -917,7 +923,8 @@ class CloseConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DialogFromZero(
-      title: Text("¿Seguro que quiere cerrar ${FromZeroAppContentWrapper.appNameForCloseConfirmation ?? 'la aplicación'}?"), // TODO 3 internationalize
+      title: Text(
+          "¿Seguro que quiere cerrar ${FromZeroAppContentWrapper.appNameForCloseConfirmation ?? 'la aplicación'}?"), // TODO 3 internationalize
       dialogActions: <Widget>[
         const DialogButton.cancel(),
         DialogButton(
@@ -930,9 +937,10 @@ class CloseConfirmDialog extends StatelessWidget {
           },
           child: const Text("CERRAR"),
         ),
-        const SizedBox(width: 6,),
+        const SizedBox(
+          width: 6,
+        ),
       ],
     );
   }
-
 }

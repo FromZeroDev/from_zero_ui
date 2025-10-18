@@ -9,9 +9,7 @@ import 'package:from_zero_ui/src/ui_components/file_picker_from_zero.dart';
 import 'package:from_zero_ui/util/copied_flutter_widgets/my_ensure_visible_when_focused.dart';
 import 'package:path/path.dart' as path;
 
-
 class FileField extends StringField {
-
   final FileType fileType;
   final List<String>? allowedExtensions;
   final bool enableDragAndDrop;
@@ -20,15 +18,14 @@ class FileField extends StringField {
   final bool allowTyping;
   final String? initialDirectory;
 
-
   File? get file => value.isNullOrEmpty ? null : File(value!);
   String? get filename {
-    return value.isNullOrEmpty ? null
+    return value.isNullOrEmpty
+        ? null
         : pickDirectory
             ? '$value${path.separator}'
             : value?.split('/').last.split(r'\').last;
   }
-
 
   FileField({
     required super.uiNameGetter,
@@ -65,10 +62,9 @@ class FileField extends StringField {
     this.pickDirectory = false,
     this.allowTyping = false,
     this.initialDirectory,
-  }) :  super(
+  }) : super(
           dbValue: dbValue ?? value,
         );
-
 
   @override
   FileField copyWith({
@@ -115,16 +111,16 @@ class FileField extends StringField {
     List<TextInputFormatter>? inputFormatters,
   }) {
     return FileField(
-      uiNameGetter: uiNameGetter??this.uiNameGetter,
-      value: value??this.value,
-      dbValue: dbValue??this.dbValue,
-      clearableGetter: clearableGetter??this.clearableGetter,
-      maxWidth: maxWidth??this.maxWidth,
-      minWidth: minWidth??this.minWidth,
-      flex: flex??this.flex,
-      hintGetter: hintGetter??this.hintGetter,
-      tooltipGetter: tooltipGetter??this.tooltipGetter,
-      tableColumnWidth: tableColumnWidth??this.tableColumnWidth,
+      uiNameGetter: uiNameGetter ?? this.uiNameGetter,
+      value: value ?? this.value,
+      dbValue: dbValue ?? this.dbValue,
+      clearableGetter: clearableGetter ?? this.clearableGetter,
+      maxWidth: maxWidth ?? this.maxWidth,
+      minWidth: minWidth ?? this.minWidth,
+      flex: flex ?? this.flex,
+      hintGetter: hintGetter ?? this.hintGetter,
+      tooltipGetter: tooltipGetter ?? this.tooltipGetter,
+      tableColumnWidth: tableColumnWidth ?? this.tableColumnWidth,
       hiddenInTableGetter: hiddenInTableGetter ?? hiddenGetter ?? this.hiddenInTableGetter,
       hiddenInViewGetter: hiddenInViewGetter ?? hiddenGetter ?? this.hiddenInViewGetter,
       hiddenInFormGetter: hiddenInFormGetter ?? hiddenGetter ?? this.hiddenInFormGetter,
@@ -133,7 +129,8 @@ class FileField extends StringField {
       colModelBuilder: colModelBuilder ?? this.colModelBuilder,
       undoValues: undoValues ?? List.from(this.undoValues),
       redoValues: redoValues ?? List.from(this.redoValues),
-      invalidateNonEmptyValuesIfHiddenInForm: invalidateNonEmptyValuesIfHiddenInForm ?? this.invalidateNonEmptyValuesIfHiddenInForm,
+      invalidateNonEmptyValuesIfHiddenInForm:
+          invalidateNonEmptyValuesIfHiddenInForm ?? this.invalidateNonEmptyValuesIfHiddenInForm,
       defaultValue: defaultValue ?? this.defaultValue,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       actionsGetter: actionsGetter ?? this.actionsGetter,
@@ -154,8 +151,9 @@ class FileField extends StringField {
   }
 
   @override
-  List<Widget> buildFieldEditorWidgets(BuildContext context, {
-    bool addCard=false,
+  List<Widget> buildFieldEditorWidgets(
+    BuildContext context, {
+    bool addCard = false,
     bool asSliver = true,
     bool expandToFillContainer = true,
     bool dense = false,
@@ -166,7 +164,9 @@ class FileField extends StringField {
   }) {
     if (allowTyping) {
       bool addedFilePicker = !enableDragAndDrop;
-      return super.buildFieldEditorWidgets(context,
+      return super
+          .buildFieldEditorWidgets(
+        context,
         addCard: addCard,
         asSliver: asSliver,
         expandToFillContainer: expandToFillContainer,
@@ -174,7 +174,8 @@ class FileField extends StringField {
         focusNode: focusNode,
         ignoreHidden: ignoreHidden,
         mainScrollController: mainScrollController,
-      ).map((e) {
+      )
+          .map((e) {
         if (!addedFilePicker) {
           addedFilePicker = true;
           return FilePickerFromZero(
@@ -203,18 +204,21 @@ class FileField extends StringField {
     if (hiddenInForm && !ignoreHidden) {
       result = const SizedBox.shrink();
       if (asSliver) {
-        result = SliverToBoxAdapter(child: result,);
+        result = SliverToBoxAdapter(
+          child: result,
+        );
       }
       return [result];
     }
     if (expandToFillContainer) {
       result = LayoutBuilder(
         builder: (context, constraints) {
-          return _buildFieldEditorWidget(context,
+          return _buildFieldEditorWidget(
+            context,
             addCard: addCard,
             asSliver: asSliver,
             expandToFillContainer: expandToFillContainer,
-            largeHorizontally: constraints.maxWidth>=ScaffoldFromZero.screenSizeMedium,
+            largeHorizontally: constraints.maxWidth >= ScaffoldFromZero.screenSizeMedium,
             focusNode: focusNode!,
             dense: dense,
             constraints: constraints,
@@ -223,7 +227,8 @@ class FileField extends StringField {
         },
       );
     } else {
-      result = _buildFieldEditorWidget(context,
+      result = _buildFieldEditorWidget(
+        context,
         addCard: addCard,
         asSliver: asSliver,
         expandToFillContainer: expandToFillContainer,
@@ -239,9 +244,11 @@ class FileField extends StringField {
     }
     return [result];
   }
-  Widget _buildFieldEditorWidget(BuildContext context, {
+
+  Widget _buildFieldEditorWidget(
+    BuildContext context, {
     required FocusNode focusNode,
-    bool addCard=false,
+    bool addCard = false,
     bool asSliver = true,
     bool expandToFillContainer = true,
     bool largeHorizontally = false,
@@ -250,19 +257,20 @@ class FileField extends StringField {
     bool useGlobalKeys = true,
   }) {
     String? initialDirectory;
-    if (this.initialDirectory!=null) {
+    if (this.initialDirectory != null) {
       initialDirectory = this.initialDirectory;
     } else if (value.isNotNullOrEmpty) {
-      try { initialDirectory = File(value!).parent.path; } catch (_) {}
+      try {
+        initialDirectory = File(value!).parent.path;
+      } catch (_) {}
     }
     Widget result = NotificationListener(
       onNotification: (notification) => true,
       child: AnimatedBuilder(
         animation: this,
         builder: (context, child) {
-          final visibleValidationErrors = passedFirstEdit
-              ? validationErrors
-              : validationErrors.where((e) => e.isBeforeEditing);
+          final visibleValidationErrors =
+              passedFirstEdit ? validationErrors : validationErrors.where((e) => e.isBeforeEditing);
           Widget result = Stack(
             children: [
               Material(
@@ -285,8 +293,17 @@ class FileField extends StringField {
                   child: Builder(
                     builder: (context) {
                       return Padding(
-                        padding: EdgeInsets.only(right: dense ? 0 : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length*40),
-                        child: ComboField.buttonContentBuilder(context, uiName, hint, filename, enabled, false,
+                        padding: EdgeInsets.only(
+                            right: dense
+                                ? 0
+                                : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40),
+                        child: ComboField.buttonContentBuilder(
+                          context,
+                          uiName,
+                          hint,
+                          filename,
+                          enabled,
+                          false,
                           dense: dense,
                           showDropdownIcon: false,
                         ),
@@ -304,10 +321,15 @@ class FileField extends StringField {
             ],
           );
           result = TooltipFromZero(
-            message: (dense ? visibleValidationErrors : visibleValidationErrors.where((e) => e.severity==ValidationErrorSeverity.disabling)).fold('', (a, b) {
-              return a.toString().trim().isEmpty ? b.toString()
-                  : b.toString().trim().isEmpty ? a.toString()
-                  : '$a\n$b';
+            message: (dense
+                    ? visibleValidationErrors
+                    : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
+                .fold('', (a, b) {
+              return a.toString().trim().isEmpty
+                  ? b.toString()
+                  : b.toString().trim().isEmpty
+                      ? a.toString()
+                      : '$a\n$b';
             }),
             waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
             child: result,
@@ -322,9 +344,13 @@ class FileField extends StringField {
               ...defaultActions,
             ];
             if (!enabled) {
-              allActions = allActions.map((e) => e.copyWith(
-                disablingError: '',
-              ),).toList();
+              allActions = allActions
+                  .map(
+                    (e) => e.copyWith(
+                      disablingError: '',
+                    ),
+                  )
+                  .toList();
             }
             result = AppbarFromZero(
               contextMenuEnabled: enabled,
@@ -344,7 +370,7 @@ class FileField extends StringField {
           }
           result = ValidationRequiredOverlay(
             isRequired: isRequired,
-            isEmpty: enabled && value==null,
+            isEmpty: enabled && value == null,
             errors: validationErrors,
             dense: dense,
             child: result,
@@ -375,7 +401,10 @@ class FileField extends StringField {
                 child: result,
               ),
               if (!dense)
-                ValidationMessage(errors: validationErrors, passedFirstEdit: passedFirstEdit,),
+                ValidationMessage(
+                  errors: validationErrors,
+                  passedFirstEdit: passedFirstEdit,
+                ),
             ],
           ),
         ),
@@ -399,7 +428,7 @@ class FileField extends StringField {
               pickDirectory: pickDirectory,
               initialDirectory: initialDirectory,
             );
-            if (result!=null && result.isNotEmpty) {
+            if (result != null && result.isNotEmpty) {
               userInteracted = true;
               commitValue(result.first.absolute.path);
             }
@@ -408,6 +437,4 @@ class FileField extends StringField {
       ...super.buildDefaultActions(context, focusNode: focusNode),
     ];
   }
-
 }
-

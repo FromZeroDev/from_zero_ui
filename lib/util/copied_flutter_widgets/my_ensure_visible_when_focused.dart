@@ -57,15 +57,13 @@ class EnsureVisibleWhenFocused extends StatefulWidget {
   final Duration duration;
 
   @override
-  EnsureVisibleWhenFocusedState createState() =>
-      EnsureVisibleWhenFocusedState();
+  EnsureVisibleWhenFocusedState createState() => EnsureVisibleWhenFocusedState();
 }
 
 ///
 /// We implement the WidgetsBindingObserver to be notified of any change to the window metrics
 ///
-class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused>
-    with WidgetsBindingObserver {
+class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -111,7 +109,6 @@ class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused>
   // }
 
   Future<void> _ensureVisible() async {
-
     // Wait for the keyboard to come into view
     // await Future.any([
     //   Future<dynamic>.delayed(const Duration(milliseconds: 300)),
@@ -132,7 +129,6 @@ class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused>
         duration: widget.duration,
       );
     }
-
   }
 
   static Future<void> ensureVisibleForContext({
@@ -142,7 +138,6 @@ class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused>
     Curve curve = Curves.easeOut,
     Duration duration = const Duration(milliseconds: 100),
   }) async {
-
     // Find the object which has the focus
     final object = context.findRenderObject()!;
     final viewport = RenderAbstractViewport.maybeOf(object);
@@ -176,7 +171,6 @@ class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused>
         // alignmentEnd: 1.0, // force hard edge alignment for nested scrollables
       );
     }
-
   }
 
   static Future<void> _executeEnsureVisible({
@@ -188,7 +182,6 @@ class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused>
     Curve curve = Curves.easeOut,
     Duration duration = const Duration(milliseconds: 100),
   }) async {
-
     // Get its offset
     final position = scrollableState.position;
 
@@ -219,7 +212,6 @@ class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused>
     //   duration: widget.duration,
     //   curve: widget.curve,
     // );
-
   }
 
   @override

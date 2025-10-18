@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-
 class NotificationRelayController {
-
   bool Function(Notification notification) shouldRelay;
 
   NotificationRelayController(this.shouldRelay);
@@ -15,6 +13,7 @@ class NotificationRelayController {
       _listeners.add(listener);
     }
   }
+
   void removeListener(void Function(Notification notification) listener) {
     _listeners.remove(listener);
   }
@@ -28,12 +27,9 @@ class NotificationRelayController {
     }
     return shouldNotify;
   }
-
 }
 
-
 class NotificationRelayListener extends StatelessWidget {
-
   final Widget child;
   final NotificationRelayController controller;
   final bool consumeRelayedNotifications;
@@ -58,9 +54,7 @@ class NotificationRelayListener extends StatelessWidget {
       },
     );
   }
-
 }
-
 
 class NotificationRelayer extends StatefulWidget {
   final Widget child;
@@ -74,6 +68,7 @@ class NotificationRelayer extends StatefulWidget {
   @override
   NotificationRelayerState createState() => NotificationRelayerState();
 }
+
 class NotificationRelayerState extends State<NotificationRelayer> {
   @override
   void initState() {
@@ -105,4 +100,3 @@ class NotificationRelayerState extends State<NotificationRelayer> {
     return widget.child;
   }
 }
-

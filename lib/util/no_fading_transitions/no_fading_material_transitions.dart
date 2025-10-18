@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class FadeUpwardsSlideTransition extends StatelessWidget {
@@ -10,9 +9,9 @@ class FadeUpwardsSlideTransition extends StatelessWidget {
     this.movementTween,
     this.upwards = true,
     super.key,
-  }) : _positionAnimation = routeAnimation
-          .drive((movementTween ?? (upwards ? _bottomUpTween : _topDownTween))
-              .chain(_fastOutSlowInTween),);
+  }) : _positionAnimation = routeAnimation.drive(
+          (movementTween ?? (upwards ? _bottomUpTween : _topDownTween)).chain(_fastOutSlowInTween),
+        );
 
   // Fractional offset from 1/4 screen below the top to fully on screen.
   static final Tween<Offset> _bottomUpTween = Tween<Offset>(

@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-
 typedef DataBuilder<T> = Widget Function(BuildContext context, T data);
 typedef DataMultiBuilder<T> = Widget Function(BuildContext context, List<T> data);
 typedef LoadingBuilder = Widget Function(BuildContext context);
 typedef ErrorBuilder = Widget Function(BuildContext context, Object error, StackTrace? stackTrace);
-typedef FutureTransitionBuilder = Widget Function (BuildContext context, Widget child, Animation<double> animation);
-
+typedef FutureTransitionBuilder = Widget Function(BuildContext context, Widget child, Animation<double> animation);
 
 enum AnimatedSwitcherType {
   none,
@@ -19,7 +17,6 @@ enum AnimatedSwitcherType {
 }
 
 class AsyncValueBuilder<T> extends StatelessWidget {
-
   final AsyncValue<T> asyncValue;
   final DataBuilder<T> dataBuilder;
   final LoadingBuilder loadingBuilder;
@@ -85,11 +82,11 @@ class AsyncValueBuilder<T> extends StatelessWidget {
     );
   }
 
-  static Widget defaultLoadingBuilder(BuildContext context){
+  static Widget defaultLoadingBuilder(BuildContext context) {
     return const LoadingSign();
   }
 
-  static Widget defaultErrorBuilder(BuildContext context, Object error, StackTrace? stackTrace){
+  static Widget defaultErrorBuilder(BuildContext context, Object error, StackTrace? stackTrace) {
     // log(error, stackTrace: stackTrace);
     return ErrorSign(
       icon: const Icon(Icons.error_outline), //size: 64, color: Theme.of(context).colorScheme.error,
@@ -98,14 +95,12 @@ class AsyncValueBuilder<T> extends StatelessWidget {
     );
   }
 
-  static Widget defaultTransitionBuilder(BuildContext context, Widget child, Animation<double> animation){
+  static Widget defaultTransitionBuilder(BuildContext context, Widget child, Animation<double> animation) {
     return AnimatedSwitcherImage.defaultTransitionBuilder(child, animation);
   }
-
 }
 
 class SliverAsyncValueBuilder<T> extends AsyncValueBuilder<T> {
-
   const SliverAsyncValueBuilder({
     required super.asyncValue,
     required super.dataBuilder,
@@ -114,13 +109,15 @@ class SliverAsyncValueBuilder<T> extends AsyncValueBuilder<T> {
     super.errorBuilder = SliverAsyncValueBuilder.defaultErrorBuilder,
     super.transitionBuilder = SliverAsyncValueBuilder.defaultTransitionBuilder,
     super.layoutBuilder = AnimatedSwitcherImage.sliverLayoutBuilder,
-    super.animatedSwitcherType = AnimatedSwitcherType.normal, /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
+    super.animatedSwitcherType = AnimatedSwitcherType.normal,
+
+    /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-    applyAnimatedContainerFromChildSize: false,
-  );
+          applyAnimatedContainerFromChildSize: false,
+        );
 
-  static Widget defaultLoadingBuilder(BuildContext context){
+  static Widget defaultLoadingBuilder(BuildContext context) {
     return SliverToBoxAdapter(
       child: SizedBox(
         height: 256,
@@ -129,7 +126,7 @@ class SliverAsyncValueBuilder<T> extends AsyncValueBuilder<T> {
     );
   }
 
-  static Widget defaultErrorBuilder(BuildContext context, Object error, StackTrace? stackTrace){
+  static Widget defaultErrorBuilder(BuildContext context, Object error, StackTrace? stackTrace) {
     return ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 256),
       child: SliverToBoxAdapter(
@@ -138,16 +135,12 @@ class SliverAsyncValueBuilder<T> extends AsyncValueBuilder<T> {
     );
   }
 
-  static Widget defaultTransitionBuilder(BuildContext context, Widget child, Animation<double> animation){
+  static Widget defaultTransitionBuilder(BuildContext context, Widget child, Animation<double> animation) {
     return AnimatedSwitcherImage.sliverTransitionBuilder(child, animation);
   }
-
 }
 
-
-
 class AsyncValueMultiBuilder<T> extends StatelessWidget {
-
   final List<AsyncValue<T>> asyncValues;
   final DataMultiBuilder<T> dataBuilder;
   final LoadingBuilder loadingBuilder;
@@ -192,16 +185,17 @@ class AsyncValueMultiBuilder<T> extends StatelessWidget {
           data.add(d);
         },
         error: (e, st) {
-          error = e; stackTrace = st;
+          error = e;
+          stackTrace = st;
         },
       );
     }
     Widget result;
     String stateString;
-    if (error!=null) {
+    if (error != null) {
       stateString = 'Error-${error.hashCode}';
       result = errorBuilder(context, error!, stackTrace);
-    } else if (data.length==asyncValues.length) {
+    } else if (data.length == asyncValues.length) {
       stateString = asyncValues.isEmpty ? 'empty' : 'Data-${Object.hashAll(asyncValues)}';
       result = dataBuilder(context, data);
     } else {
@@ -222,7 +216,6 @@ class AsyncValueMultiBuilder<T> extends StatelessWidget {
       child: result,
     );
   }
-
 }
 
 class SliverAsyncValueMultiBuilder<T> extends AsyncValueMultiBuilder<T> {
@@ -234,17 +227,16 @@ class SliverAsyncValueMultiBuilder<T> extends AsyncValueMultiBuilder<T> {
     super.errorBuilder = SliverAsyncValueBuilder.defaultErrorBuilder,
     super.transitionBuilder = SliverAsyncValueBuilder.defaultTransitionBuilder,
     super.layoutBuilder = AnimatedSwitcherImage.sliverLayoutBuilder,
-    super.animatedSwitcherType = AnimatedSwitcherType.normal, /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
+    super.animatedSwitcherType = AnimatedSwitcherType.normal,
+
+    /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-    applyAnimatedContainerFromChildSize: false,
-  );
+          applyAnimatedContainerFromChildSize: false,
+        );
 }
 
-
-
 class FutureProviderBuilder<T> extends ConsumerWidget {
-
   final ProviderBase<AsyncValue<T>> provider;
   final DataBuilder<T> dataBuilder;
   final LoadingBuilder loadingBuilder;
@@ -297,7 +289,6 @@ class FutureProviderBuilder<T> extends ConsumerWidget {
       clipBehaviour: clipBehaviour,
     );
   }
-
 }
 
 class SliverFutureProviderBuilder<T> extends FutureProviderBuilder<T> {
@@ -309,17 +300,16 @@ class SliverFutureProviderBuilder<T> extends FutureProviderBuilder<T> {
     super.errorBuilder = SliverAsyncValueBuilder.defaultErrorBuilder,
     super.transitionBuilder = SliverAsyncValueBuilder.defaultTransitionBuilder,
     super.layoutBuilder = AnimatedSwitcherImage.sliverLayoutBuilder,
-    super.animatedSwitcherType = AnimatedSwitcherType.normal, /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
+    super.animatedSwitcherType = AnimatedSwitcherType.normal,
+
+    /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-    applyAnimatedContainerFromChildSize: false,
-  );
+          applyAnimatedContainerFromChildSize: false,
+        );
 }
 
-
-
 class AsyncBuilderAnimationWrapper extends StatelessWidget {
-
   final FutureTransitionBuilder transitionBuilder;
   final Duration transitionDuration;
   final Curve transitionInCurve;
@@ -351,21 +341,22 @@ class AsyncBuilderAnimationWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final notifyResize = applyAnimatedContainerFromChildSize ? ChangeNotifier() : null;
     Widget result = child;
-    if (loadingState!=null) {
+    if (loadingState != null) {
       result = KeyedSubtree(
         key: child.key ?? ValueKey(loadingState),
         child: result,
       );
     }
-    if (animatedSwitcherType!=AnimatedSwitcherType.none && transitionDuration!=Duration.zero) {
-      if (animatedSwitcherType==AnimatedSwitcherType.normal) {
+    if (animatedSwitcherType != AnimatedSwitcherType.none && transitionDuration != Duration.zero) {
+      if (animatedSwitcherType == AnimatedSwitcherType.normal) {
         result = AnimatedSwitcher(
           duration: transitionDuration,
           switchInCurve: transitionInCurve,
           switchOutCurve: transitionOutCurve,
           transitionBuilder: (child, animation) => transitionBuilder(context, child, animation),
           layoutBuilder: (currentChild, previousChildren) {
-            return layoutBuilder(currentChild, previousChildren, alignment ?? Alignment.center, clipBehaviour ?? Clip.hardEdge);
+            return layoutBuilder(
+                currentChild, previousChildren, alignment ?? Alignment.center, clipBehaviour ?? Clip.hardEdge);
           },
           child: result,
         );
@@ -378,8 +369,8 @@ class AsyncBuilderAnimationWrapper extends StatelessWidget {
           layoutBuilder: layoutBuilder,
           alignment: alignment ?? Alignment.center,
           clipBehaviour: clipBehaviour ?? Clip.hardEdge,
-          takeImages: animatedSwitcherType!=AnimatedSwitcherType.imageNoOutgoing,
-          rebuildOutgoingChildrenIfNoImageReady: animatedSwitcherType==AnimatedSwitcherType.imageWithRebuild,
+          takeImages: animatedSwitcherType != AnimatedSwitcherType.imageNoOutgoing,
+          rebuildOutgoingChildrenIfNoImageReady: animatedSwitcherType == AnimatedSwitcherType.imageWithRebuild,
           child: result,
         );
       }
@@ -394,5 +385,4 @@ class AsyncBuilderAnimationWrapper extends StatelessWidget {
     }
     return result;
   }
-
 }

@@ -4,13 +4,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-typedef ButtonChildBuilder<T> = Widget Function(BuildContext context, String? title, String? hint, T? value, bool enabled, bool clearable, {bool showDropdownIcon});
+typedef ButtonChildBuilder<T> = Widget Function(
+    BuildContext context, String? title, String? hint, T? value, bool enabled, bool clearable,
+    {bool showDropdownIcon});
+
 /// returns true if navigator should pop after (default true)
 typedef OnPopupItemSelected<T> = bool? Function(T? value);
-typedef ExtraWidgetBuilder<T> = Widget Function(BuildContext context, OnPopupItemSelected<T>? onSelected,);
+typedef ExtraWidgetBuilder<T> = Widget Function(
+  BuildContext context,
+  OnPopupItemSelected<T>? onSelected,
+);
 
 class ComboFromZero<T> extends StatefulWidget {
-
   final T? value;
   final List<T>? possibleValues;
   final AsyncValue<List<T>>? possibleValuesAsync;
@@ -32,13 +37,16 @@ class ComboFromZero<T> extends StatefulWidget {
   final ExtraWidgetBuilder<T>? extraWidget;
   final FocusNode? focusNode;
   final Widget Function(T value)? popupWidgetBuilder;
-  final ButtonStyle? buttonStyle; /// if null, an InkWell will be used instead
+  final ButtonStyle? buttonStyle;
+
+  /// if null, an InkWell will be used instead
   final double popupRowHeight;
   final bool useFixedPopupRowHeight;
   final bool showNullInSelection;
   final bool showHintAsNullInSelection;
 
-  const ComboFromZero({super.key, 
+  const ComboFromZero({
+    super.key,
     this.value,
     this.possibleValues,
     this.possibleValuesAsync,
@@ -67,56 +75,69 @@ class ComboFromZero<T> extends StatefulWidget {
     this.blockComboWhilePossibleValuesLoad = false,
     this.showNullInSelection = false,
     this.showHintAsNullInSelection = true,
-  }) :  assert(possibleValues!=null
-              || possibleValuesFuture!=null
-              || possibleValuesProvider!=null,);
+  }) : assert(
+          possibleValues != null || possibleValuesFuture != null || possibleValuesProvider != null,
+        );
 
   @override
   ComboFromZeroState<T> createState() => ComboFromZeroState<T>();
 
-  static Widget defaultButtonChildBuilder(BuildContext context, String? title, String? hint, dynamic value, bool enabled, bool clearable, {bool showDropdownIcon=true}) {
+  static Widget defaultButtonChildBuilder(
+      BuildContext context, String? title, String? hint, dynamic value, bool enabled, bool clearable,
+      {bool showDropdownIcon = true}) {
     final theme = Theme.of(context);
     return IntrinsicWidth(
       child: ConstrainedBox(
         constraints: const BoxConstraints(
-          minHeight: 38, minWidth: 192,
+          minHeight: 38,
+          minWidth: 192,
         ),
         child: Padding(
-          padding: EdgeInsets.only(right: enabled&&clearable ? 32 : 0),
+          padding: EdgeInsets.only(right: enabled && clearable ? 32 : 0),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(width: 8,),
+              const SizedBox(
+                width: 8,
+              ),
               Expanded(
-                child: value==null&&hint==null&&title!=null
-                    ? Text(title, style: theme.textTheme.titleMedium!.copyWith(
-                        color: enabled ? theme.textTheme.bodyLarge!.color : theme.disabledColor,
-                      ),)
+                child: value == null && hint == null && title != null
+                    ? Text(
+                        title,
+                        style: theme.textTheme.titleMedium!.copyWith(
+                          color: enabled ? theme.textTheme.bodyLarge!.color : theme.disabledColor,
+                        ),
+                      )
                     : MaterialKeyValuePair(
                         title: title,
-                        value: value==null ? (hint ?? '') : value.toString(),
+                        value: value == null ? (hint ?? '') : value.toString(),
                         valueStyle: theme.textTheme.titleMedium!.copyWith(
                           height: 1,
-                          color: enabled&&value!=null ? theme.textTheme.bodyLarge!.color : theme.disabledColor,
+                          color: enabled && value != null ? theme.textTheme.bodyLarge!.color : theme.disabledColor,
                         ),
                       ),
               ),
-              const SizedBox(width: 4,),
+              const SizedBox(
+                width: 4,
+              ),
               if (showDropdownIcon && enabled && !clearable)
-                Icon(Icons.arrow_drop_down, color: theme.textTheme.bodyLarge!.color,),
-              const SizedBox(width: 4,),
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: theme.textTheme.bodyLarge!.color,
+                ),
+              const SizedBox(
+                width: 4,
+              ),
             ],
           ),
         ),
       ),
     );
   }
-
 }
 
 class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
-
   final buttonKey = GlobalKey();
   late FocusNode buttonFocusNode = widget.focusNode ?? FocusNode();
   bool _isPushedPopup = false;
@@ -127,9 +148,9 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
     buttonFocusNode = widget.focusNode ?? buttonFocusNode;
     if (!widget.enabled && _isPushedPopup) {
       final thisRoute = ModalRoute.of(context);
-      if (thisRoute!=null) {
+      if (thisRoute != null) {
         Navigator.of(context).popUntil((route) {
-          return route==thisRoute;
+          return route == thisRoute;
         });
       } else {
         Navigator.of(context).pop();
@@ -142,21 +163,22 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
   Widget build(BuildContext context) {
     Widget result;
     if (widget.blockComboWhilePossibleValuesLoad) {
-      if (widget.possibleValuesProvider!=null) {
+      if (widget.possibleValuesProvider != null) {
         result = ApiProviderBuilder<List<T>>(
           provider: widget.possibleValuesProvider!,
           dataBuilder: _buildCombo,
           loadingBuilder: _buildComboLoading,
           errorBuilder: _buildComboError,
         );
-      } else if (widget.possibleValuesFuture!=null) {
+      } else if (widget.possibleValuesFuture != null) {
         result = FutureBuilderFromZero<List<T>>(
           future: widget.possibleValuesFuture!,
           successBuilder: _buildCombo,
           loadingBuilder: _buildComboLoading,
-          errorBuilder: (context, error, stackTrace) => _buildComboError(context, error, stackTrace is StackTrace ? stackTrace : null),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildComboError(context, error, stackTrace is StackTrace ? stackTrace : null),
         );
-      } else if (widget.possibleValuesAsync!=null) {
+      } else if (widget.possibleValuesAsync != null) {
         result = AsyncValueBuilder<List<T>>(
           asyncValue: widget.possibleValuesAsync!,
           dataBuilder: _buildCombo,
@@ -182,12 +204,24 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
 
   Widget _buildComboLoading(BuildContext context, [ValueListenable<double?>? progress]) {
     Widget result;
-    if (widget.buttonChildBuilder==null) {
-      result = ComboFromZero.defaultButtonChildBuilder(context, widget.title, widget.hint, widget.value, widget.enabled, widget.clearable,
+    if (widget.buttonChildBuilder == null) {
+      result = ComboFromZero.defaultButtonChildBuilder(
+        context,
+        widget.title,
+        widget.hint,
+        widget.value,
+        widget.enabled,
+        widget.clearable,
         showDropdownIcon: widget.showDropdownIcon,
       );
     } else {
-      result = widget.buttonChildBuilder!(context, widget.title, widget.hint, widget.value, widget.enabled, widget.clearable,
+      result = widget.buttonChildBuilder!(
+        context,
+        widget.title,
+        widget.hint,
+        widget.value,
+        widget.enabled,
+        widget.clearable,
         showDropdownIcon: widget.showDropdownIcon,
       );
     }
@@ -209,63 +243,81 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
     );
   }
 
-  Widget _buildCombo(BuildContext context, List<T>? possibleValues,) {
+  Widget _buildCombo(
+    BuildContext context,
+    List<T>? possibleValues,
+  ) {
     Widget result;
-    if (widget.buttonChildBuilder==null) {
-      result = ComboFromZero.defaultButtonChildBuilder(context, widget.title, widget.hint, widget.value, widget.enabled, widget.clearable,
+    if (widget.buttonChildBuilder == null) {
+      result = ComboFromZero.defaultButtonChildBuilder(
+        context,
+        widget.title,
+        widget.hint,
+        widget.value,
+        widget.enabled,
+        widget.clearable,
         showDropdownIcon: widget.showDropdownIcon,
       );
     } else {
-      result = widget.buttonChildBuilder!(context, widget.title, widget.hint, widget.value, widget.enabled, widget.clearable,
+      result = widget.buttonChildBuilder!(
+        context,
+        widget.title,
+        widget.hint,
+        widget.value,
+        widget.enabled,
+        widget.clearable,
         showDropdownIcon: widget.showDropdownIcon,
       );
     }
-    final onPressed = widget.enabled ? () async {
-      buttonFocusNode.requestFocus();
-      _isPushedPopup = true;
-      T? selected = await showPopupFromZero<T>(
-        context: context,
-        anchorKey: buttonKey,
-        width: widget.popupWidth,
-        builder: (context) {
-          Widget result;
-          if (possibleValues!=null) {
-            result = _buildPopup(context, possibleValues);
-          } else {
-            if (widget.possibleValuesProvider!=null) {
-              result = ApiProviderBuilder<List<T>>(
-                provider: widget.possibleValuesProvider!,
-                dataBuilder: _buildPopup,
-                loadingBuilder: _buildPopupLoading,
-                errorBuilder: _buildPopupError,
-              );
-            } else if (widget.possibleValuesFuture!=null) {
-              result = FutureBuilderFromZero<List<T>>(
-                future: widget.possibleValuesFuture!,
-                successBuilder: _buildPopup,
-                loadingBuilder: _buildPopupLoading,
-                errorBuilder: (context, error, stackTrace) => _buildPopupError(context, error, stackTrace is StackTrace ? stackTrace : null),
-              );
-            } else if (widget.possibleValuesAsync!=null) {
-              result = AsyncValueBuilder<List<T>>(
-                asyncValue: widget.possibleValuesAsync!,
-                dataBuilder: _buildPopup,
-                loadingBuilder: _buildPopupLoading,
-                errorBuilder: _buildPopupError,
-              );
-            } else {
-              result = _buildPopup(context, widget.possibleValues!);
+    final onPressed = widget.enabled
+        ? () async {
+            buttonFocusNode.requestFocus();
+            _isPushedPopup = true;
+            T? selected = await showPopupFromZero<T>(
+              context: context,
+              anchorKey: buttonKey,
+              width: widget.popupWidth,
+              builder: (context) {
+                Widget result;
+                if (possibleValues != null) {
+                  result = _buildPopup(context, possibleValues);
+                } else {
+                  if (widget.possibleValuesProvider != null) {
+                    result = ApiProviderBuilder<List<T>>(
+                      provider: widget.possibleValuesProvider!,
+                      dataBuilder: _buildPopup,
+                      loadingBuilder: _buildPopupLoading,
+                      errorBuilder: _buildPopupError,
+                    );
+                  } else if (widget.possibleValuesFuture != null) {
+                    result = FutureBuilderFromZero<List<T>>(
+                      future: widget.possibleValuesFuture!,
+                      successBuilder: _buildPopup,
+                      loadingBuilder: _buildPopupLoading,
+                      errorBuilder: (context, error, stackTrace) =>
+                          _buildPopupError(context, error, stackTrace is StackTrace ? stackTrace : null),
+                    );
+                  } else if (widget.possibleValuesAsync != null) {
+                    result = AsyncValueBuilder<List<T>>(
+                      asyncValue: widget.possibleValuesAsync!,
+                      dataBuilder: _buildPopup,
+                      loadingBuilder: _buildPopupLoading,
+                      errorBuilder: _buildPopupError,
+                    );
+                  } else {
+                    result = _buildPopup(context, widget.possibleValues!);
+                  }
+                }
+                return result;
+              },
+            );
+            _isPushedPopup = false;
+            if (selected == null) {
+              widget.onCanceled?.call();
             }
           }
-          return result;
-        },
-      );
-      _isPushedPopup = false;
-      if (selected==null) {
-        widget.onCanceled?.call();
-      }
-    } : null;
-    if (widget.buttonStyle!=null) {
+        : null;
+    if (widget.buttonStyle != null) {
       result = TextButton(
         key: buttonKey,
         style: widget.buttonStyle,
@@ -298,7 +350,9 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
         result,
         if (widget.enabled && widget.clearable)
           Positioned(
-            right: 8, top: 0, bottom: 0,
+            right: 8,
+            top: 0,
+            bottom: 0,
             child: ExcludeFocus(
               child: Center(
                 child: AnimatedSwitcher(
@@ -313,18 +367,20 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
                       ),
                     );
                   },
-                  child: widget.value!=null ? TooltipFromZero(
-                    message: FromZeroLocalizations.of(context).translate('clear'),
-                    child: IconButton(
-                      icon: const Icon(Icons.close),
-                      splashRadius: 20,
-                      onPressed: () {
-                        if (widget.enabled) {
-                          widget.onSelected?.call(null);
-                        }
-                      },
-                    ),
-                  ) : const SizedBox.shrink(),
+                  child: widget.value != null
+                      ? TooltipFromZero(
+                          message: FromZeroLocalizations.of(context).translate('clear'),
+                          child: IconButton(
+                            icon: const Icon(Icons.close),
+                            splashRadius: 20,
+                            onPressed: () {
+                              if (widget.enabled) {
+                                widget.onSelected?.call(null);
+                              }
+                            },
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ),
             ),
@@ -334,7 +390,10 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
     return result;
   }
 
-  Widget _buildPopup(BuildContext context, List<T> possibleValues,) {
+  Widget _buildPopup(
+    BuildContext context,
+    List<T> possibleValues,
+  ) {
     return ComboFromZeroPopup<T>(
       possibleValues: possibleValues,
       onSelected: (value) {
@@ -370,13 +429,9 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
       child: ApiProviderBuilder.defaultLoadingBuilder(context, progress),
     );
   }
-
 }
 
-
-
 class ComboFromZeroPopup<T> extends StatefulWidget {
-
   final T? value;
   final List<T> possibleValues;
   final VoidCallback? onCanceled;
@@ -414,11 +469,9 @@ class ComboFromZeroPopup<T> extends StatefulWidget {
 
   @override
   ComboFromZeroPopupState<T> createState() => ComboFromZeroPopupState<T>();
-
 }
 
 class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
-
   final ScrollController popupScrollController = ScrollController();
   String? searchQuery;
   TableController<T?> tableController = TableController();
@@ -443,8 +496,8 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
   @override
   Widget build(BuildContext context) {
     final defaultTextStyle = Theme.of(context).textTheme.titleMedium!.copyWith(
-      fontWeight: FontWeight.w500,
-    );
+          fontWeight: FontWeight.w500,
+        );
     final rows = widget.possibleValues.map((e) {
       return SimpleRowModel<T?>(
         id: e,
@@ -457,16 +510,20 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
       );
     }).toList();
     if (widget.showNullInSelection) {
-      rows.add(SimpleRowModel<T?>(
-        id: null,
-        values: {0: (widget.showHintAsNullInSelection ? widget.hint : null) ?? '< Vacío >'}, // TODO 3 internationalize
-        height: widget.useFixedRowHeight ? widget.rowHeight : null,
-        alwaysOnTop: true,
-        textStyle: defaultTextStyle,
-        onRowTap: (value) {
-          _select(null);
-        },
-      ),);
+      rows.add(
+        SimpleRowModel<T?>(
+          id: null,
+          values: {
+            0: (widget.showHintAsNullInSelection ? widget.hint : null) ?? '< Vacío >'
+          }, // TODO 3 internationalize
+          height: widget.useFixedRowHeight ? widget.rowHeight : null,
+          alwaysOnTop: true,
+          textStyle: defaultTextStyle,
+          onRowTap: (value) {
+            _select(null);
+          },
+        ),
+      );
     }
     return ScrollbarFromZero(
       controller: popupScrollController,
@@ -475,28 +532,33 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
         shrinkWrap: true,
         slivers: [
           if (!showSearchBox)
-            const SliverToBoxAdapter(child: SizedBox(height: 12,),),
+            const SliverToBoxAdapter(
+              child: SizedBox(
+                height: 12,
+              ),
+            ),
           TableFromZero<T?>(
             tableController: tableController,
             tableHorizontalPadding: 8,
             initialSortedColumn: widget.sort ? 0 : -1,
             enableFixedHeightForListRows: widget.useFixedRowHeight,
-            cellBuilder: widget.popupWidgetBuilder==null
+            cellBuilder: widget.popupWidgetBuilder == null
                 ? null
                 : (context, row, colKey, col) => widget.popupWidgetBuilder!(row.id as T),
             rows: rows,
             onFilter: (filtered) {
               List<RowModel<T?>> starts = [];
               List<RowModel<T?>> contains = [];
-              if (searchQuery==null || searchQuery!.isEmpty) {
+              if (searchQuery == null || searchQuery!.isEmpty) {
                 contains = filtered;
               } else {
                 final q = searchQuery!.trim().toUpperCase();
                 for (final e in filtered) {
                   final value = (e.id is DAO)
                       ? (e.id! as DAO).searchName.toUpperCase()
-                      : e.id==null ? e.values[0]
-                      : e.id.toString().toUpperCase();
+                      : e.id == null
+                          ? e.values[0]
+                          : e.id.toString().toUpperCase();
                   if (value.contains(q)) {
                     if (value.startsWith(q)) {
                       starts.add(e);
@@ -524,35 +586,48 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
               color: Theme.of(context).cardColor,
               child: Column(
                 children: [
-                  if (widget.title!=null)
+                  if (widget.title != null)
                     Container(
                       padding: EdgeInsets.only(
                         top: showSearchBox ? 8.0 : 0,
-                        bottom: widget.extraWidget!=null ? 4 : !showSearchBox ? 12 : 0,
-                        left: 8, right: 8,
+                        bottom: widget.extraWidget != null
+                            ? 4
+                            : !showSearchBox
+                                ? 12
+                                : 0,
+                        left: 8,
+                        right: 8,
                       ),
                       alignment: Alignment.center,
                       child: Transform.translate(
-                        offset: Offset(0, widget.extraWidget==null&&showSearchBox ? 4 : 0),
-                        child: Text(widget.title!,
+                        offset: Offset(0, widget.extraWidget == null && showSearchBox ? 4 : 0),
+                        child: Text(
+                          widget.title!,
                           style: Theme.of(context).textTheme.titleMedium,
                           textAlign: TextAlign.center,
                         ),
                       ),
                     ),
-                  if (widget.extraWidget!=null)
-                    widget.extraWidget!(context, widget.onSelected,),
+                  if (widget.extraWidget != null)
+                    widget.extraWidget!(
+                      context,
+                      widget.onSelected,
+                    ),
                   if (showSearchBox)
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0, left: 12, right: 12,),
+                      padding: const EdgeInsets.only(
+                        bottom: 8.0,
+                        left: 12,
+                        right: 12,
+                      ),
                       child: KeyboardListener(
                         includeSemantics: false,
                         focusNode: FocusNode(),
                         onKeyEvent: (value) {
                           if (value is KeyDownEvent) {
-                            if (value.logicalKey==LogicalKeyboardKey.arrowDown) {
+                            if (value.logicalKey == LogicalKeyboardKey.arrowDown) {
                               FocusScope.of(context).focusInDirection(TraversalDirection.down);
-                            } else if (value.logicalKey==LogicalKeyboardKey.arrowUp) {
+                            } else if (value.logicalKey == LogicalKeyboardKey.arrowUp) {
                               FocusScope.of(context).focusInDirection(TraversalDirection.up);
                             }
                           }
@@ -561,10 +636,18 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
                           initialValue: searchQuery,
                           focusNode: initialFocus,
                           decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.only(left: 8, right: 80, bottom: 4, top: 8,),
+                            contentPadding: const EdgeInsets.only(
+                              left: 8,
+                              right: 80,
+                              bottom: 4,
+                              top: 8,
+                            ),
                             labelText: FromZeroLocalizations.of(context).translate('search...'),
                             labelStyle: const TextStyle(height: 1.5),
-                            suffixIcon: Icon(Icons.search, color: Theme.of(context).disabledColor,),
+                            suffixIcon: Icon(
+                              Icons.search,
+                              color: Theme.of(context).disabledColor,
+                            ),
                           ),
                           onChanged: (value) {
                             searchQuery = value;
@@ -572,7 +655,7 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
                           },
                           onFieldSubmitted: (value) {
                             final filtered = tableController.filtered;
-                            if (filtered.length==1) {
+                            if (filtered.length == 1) {
                               _select(filtered.first.id);
                             }
                           },
@@ -583,7 +666,11 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 12,),),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 12,
+            ),
+          ),
         ],
       ),
     );
@@ -591,11 +678,8 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
 
   void _select(T? e) {
     bool? pop = widget.onSelected?.call(e);
-    if (pop??true) {
+    if (pop ?? true) {
       Navigator.of(context).pop(e);
     }
   }
-
 }
-
-

@@ -1,8 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-
 class SingleFocusTraversal extends ReadingOrderTraversalPolicy {
-
   final FocusNode focusNode;
 
   SingleFocusTraversal(this.focusNode);
@@ -19,7 +17,7 @@ class SingleFocusTraversal extends ReadingOrderTraversalPolicy {
 
   @override
   FocusNode? findFirstFocusInDirection(FocusNode currentNode, TraversalDirection direction) {
-    if (currentNode==focusNode) {
+    if (currentNode == focusNode) {
       return null;
     }
     return focusNode;
@@ -27,7 +25,7 @@ class SingleFocusTraversal extends ReadingOrderTraversalPolicy {
 
   @override
   bool next(FocusNode currentNode) {
-    if (currentNode==focusNode) {
+    if (currentNode == focusNode) {
       return super.next(currentNode);
     }
     focusNode.requestFocus();
@@ -36,7 +34,7 @@ class SingleFocusTraversal extends ReadingOrderTraversalPolicy {
 
   @override
   bool previous(FocusNode currentNode) {
-    if (currentNode==focusNode) {
+    if (currentNode == focusNode) {
       return super.previous(currentNode);
     }
     focusNode.requestFocus();
@@ -45,7 +43,7 @@ class SingleFocusTraversal extends ReadingOrderTraversalPolicy {
 
   @override
   bool inDirection(FocusNode currentNode, TraversalDirection direction) {
-    if (currentNode==focusNode) {
+    if (currentNode == focusNode) {
       return super.inDirection(currentNode, direction);
     }
     focusNode.requestFocus();
@@ -56,5 +54,4 @@ class SingleFocusTraversal extends ReadingOrderTraversalPolicy {
   Iterable<FocusNode> sortDescendants(Iterable<FocusNode> descendants, FocusNode currentNode) {
     return [focusNode];
   }
-
 }

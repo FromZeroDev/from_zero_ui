@@ -5,9 +5,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-
-
-
 abstract class _ParentInkResponseTranslucentState {
   void markChildInkResponseTranslucentPressed(_ParentInkResponseTranslucentState childState, bool value);
 }
@@ -594,13 +591,16 @@ class _InkResponseTranslucentStateWidget extends StatefulWidget {
     ];
     properties.add(IterableProperty<String>('gestures', gestures, ifEmpty: '<none>'));
     properties.add(DiagnosticsProperty<MouseCursor>('mouseCursor', mouseCursor));
-    properties.add(DiagnosticsProperty<bool>('containedInkWellTranslucent', containedInkWellTranslucent, level: DiagnosticLevel.fine));
-    properties.add(DiagnosticsProperty<BoxShape>(
-      'highlightShape',
-      highlightShape,
-      description: '${containedInkWellTranslucent ? "clipped to " : ""}$highlightShape',
-      showName: false,
-    ),);
+    properties.add(DiagnosticsProperty<bool>('containedInkWellTranslucent', containedInkWellTranslucent,
+        level: DiagnosticLevel.fine));
+    properties.add(
+      DiagnosticsProperty<BoxShape>(
+        'highlightShape',
+        highlightShape,
+        description: '${containedInkWellTranslucent ? "clipped to " : ""}$highlightShape',
+        showName: false,
+      ),
+    );
   }
 }
 
@@ -614,8 +614,7 @@ enum _HighlightType {
 
 class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWidget>
     with AutomaticKeepAliveClientMixin<_InkResponseTranslucentStateWidget>
-    implements _ParentInkResponseTranslucentState
-{
+    implements _ParentInkResponseTranslucentState {
   Set<InteractiveInkFeature>? _splashes;
   InteractiveInkFeature? _currentSplash;
   bool _hovering = false;
@@ -628,7 +627,8 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
 
   bool get highlightsExist => _highlights.values.where((InkHighlight? highlight) => highlight != null).isNotEmpty;
 
-  final ObserverList<_ParentInkResponseTranslucentState> _activeChildren = ObserverList<_ParentInkResponseTranslucentState>();
+  final ObserverList<_ParentInkResponseTranslucentState> _activeChildren =
+      ObserverList<_ParentInkResponseTranslucentState>();
 
   @override
   void markChildInkResponseTranslucentPressed(_ParentInkResponseTranslucentState childState, bool value) {
@@ -643,6 +643,7 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
       widget.parentState?.markChildInkResponseTranslucentPressed(this, nowAnyPressed);
     }
   }
+
   bool get _anyChildInkResponseTranslucentPressed => _activeChildren.isNotEmpty;
 
   void simulateTap([Intent? intent]) {
@@ -657,7 +658,7 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
 
   void handleStatesControllerChange() {
     // Force a rebuild to resolve widget.overlayColor, widget.mouseCursor
-    setState(() { });
+    setState(() {});
   }
 
   WidgetStatesController get statesController => widget.statesController ?? internalStatesController!;
@@ -745,7 +746,7 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
     }
   }
 
-  void updateHighlight(_HighlightType type, { required bool value, bool callOnHover = true }) {
+  void updateHighlight(_HighlightType type, {required bool value, bool callOnHover = true}) {
     final InkHighlight? highlight = _highlights[type];
     void handleInkRemoval() {
       assert(_highlights[type] != null);
@@ -761,7 +762,7 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
           statesController.update(WidgetState.hovered, value);
         }
       case _HighlightType.focus:
-      // see handleFocusUpdate()
+        // see handleFocusUpdate()
         break;
     }
 
@@ -842,8 +843,10 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
     final MaterialInkController inkController = Material.of(context);
     final RenderBox referenceBox = context.findRenderObject()! as RenderBox;
     final Offset position = referenceBox.globalToLocal(globalPosition);
-    final Color color =  widget.overlayColor?.resolve(statesController.value) ?? widget.splashColor ?? Theme.of(context).splashColor;
-    final RectCallback? rectCallback = widget.containedInkWellTranslucent ? widget.getRectCallback!(referenceBox) : null;
+    final Color color =
+        widget.overlayColor?.resolve(statesController.value) ?? widget.splashColor ?? Theme.of(context).splashColor;
+    final RectCallback? rectCallback =
+        widget.containedInkWellTranslucent ? widget.getRectCallback!(referenceBox) : null;
     final BorderRadius? borderRadius = widget.borderRadius;
     final ShapeBorder? customBorder = widget.customBorder;
 
@@ -1037,17 +1040,15 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
   }
 
   bool _primaryButtonEnabled(_InkResponseTranslucentStateWidget widget) {
-    return widget.onTap != null
-        || widget.onDoubleTap != null
-        || widget.onLongPress != null
-        || widget.onTapUp != null
-        || widget.onTapDown != null;
+    return widget.onTap != null ||
+        widget.onDoubleTap != null ||
+        widget.onLongPress != null ||
+        widget.onTapUp != null ||
+        widget.onTapDown != null;
   }
 
   bool _secondaryButtonEnabled(_InkResponseTranslucentStateWidget widget) {
-    return widget.onSecondaryTap != null
-        || widget.onSecondaryTapUp != null
-        || widget.onSecondaryTapDown != null;
+    return widget.onSecondaryTap != null || widget.onSecondaryTapUp != null || widget.onSecondaryTapDown != null;
   }
 
   bool get enabled => isWidgetEnabled(widget);
@@ -1094,9 +1095,9 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
 
       final ThemeData theme = Theme.of(context);
       switch (type) {
-      // The pressed state triggers a ripple (ink splash), per the current
-      // Material Design spec. A separate highlight is no longer used.
-      // See https://material.io/design/interaction/states.html#pressed
+        // The pressed state triggers a ripple (ink splash), per the current
+        // Material Design spec. A separate highlight is no longer used.
+        // See https://material.io/design/interaction/states.html#pressed
         case _HighlightType.pressed:
           return widget.overlayColor?.resolve(pressed) ?? widget.highlightColor ?? theme.highlightColor;
         case _HighlightType.focus:
@@ -1105,11 +1106,13 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
           return widget.overlayColor?.resolve(hovered) ?? widget.hoverColor ?? theme.hoverColor;
       }
     }
+
     for (final _HighlightType type in _highlights.keys) {
       _highlights[type]?.color = getHighlightColorForType(type);
     }
 
-    _currentSplash?.color = widget.overlayColor?.resolve(statesController.value) ?? widget.splashColor ?? Theme.of(context).splashColor;
+    _currentSplash?.color =
+        widget.overlayColor?.resolve(statesController.value) ?? widget.splashColor ?? Theme.of(context).splashColor;
 
     final MouseCursor effectiveMouseCursor = WidgetStateProperty.resolveAs<MouseCursor>(
       widget.mouseCursor ?? WidgetStateMouseCursor.clickable,
@@ -1120,13 +1123,16 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
       state: this,
       child: Actions(
         actions: _actionMap,
-        child: Focus( // keep focus widget bellow the child
+        child: Focus(
+          // keep focus widget bellow the child
           focusNode: widget.focusNode,
           canRequestFocus: _canRequestFocus,
           onFocusChange: handleFocusUpdate,
           autofocus: widget.autofocus,
           child: MouseRegion(
-            cursor: _primaryEnabled || _secondaryEnabled ? effectiveMouseCursor : MouseCursor.defer, // CHANGE FROM FLUTTER ORIGINAL: don't interfere with underlying cursor if disabled
+            cursor: _primaryEnabled || _secondaryEnabled
+                ? effectiveMouseCursor
+                : MouseCursor.defer, // CHANGE FROM FLUTTER ORIGINAL: don't interfere with underlying cursor if disabled
             onEnter: handleMouseEnter,
             onExit: handleMouseExit,
             child: DefaultSelectionStyle.merge(
@@ -1134,7 +1140,8 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
               child: Semantics(
                 onTap: widget.excludeFromSemantics || widget.onTap == null ? null : simulateTap,
                 onLongPress: widget.excludeFromSemantics || widget.onLongPress == null ? null : simulateLongPress,
-                child: Stack( // CHANGE FROM FLUTTER ORIGINAL: separate the GestureDetector, if it is bellow the child, it absorbes pointer
+                child: Stack(
+                  // CHANGE FROM FLUTTER ORIGINAL: separate the GestureDetector, if it is bellow the child, it absorbes pointer
                   children: [
                     widget.child ?? const SizedBox.expand(),
                     Positioned.fill(
@@ -1147,7 +1154,7 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
                         onDoubleTap: widget.onDoubleTap != null ? handleDoubleTap : null,
                         onLongPress: widget.onLongPress != null ? handleLongPress : null,
                         onSecondaryTapDown: _secondaryEnabled ? handleSecondaryTapDown : null,
-                        onSecondaryTapUp: _secondaryEnabled ? handleSecondaryTapUp: null,
+                        onSecondaryTapUp: _secondaryEnabled ? handleSecondaryTapUp : null,
                         onSecondaryTap: _secondaryEnabled ? handleSecondaryTap : null,
                         onSecondaryTapCancel: _secondaryEnabled ? handleSecondaryTapCancel : null,
                         excludeFromSemantics: true,
@@ -1283,8 +1290,8 @@ class InkWellTranslucent extends InkResponseTranslucent {
     super.autofocus,
     super.statesController,
   }) : super(
-    containedInkWellTranslucent: true,
-    highlightShape: BoxShape.rectangle,
-    enableFeedback: enableFeedback ?? true,
-  );
+          containedInkWellTranslucent: true,
+          highlightShape: BoxShape.rectangle,
+          enableFeedback: enableFeedback ?? true,
+        );
 }

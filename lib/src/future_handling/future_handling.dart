@@ -4,10 +4,7 @@ import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-
-
 class LoadingSign extends ImplicitlyAnimatedWidget {
-
   final double? value;
   final Color? color;
   final EdgeInsets padding;
@@ -17,8 +14,10 @@ class LoadingSign extends ImplicitlyAnimatedWidget {
     super.key,
     this.value,
     this.color,
+
     /// for animating value
     super.duration = const Duration(milliseconds: 250),
+
     /// for animating value
     super.curve = Curves.easeOutCubic,
     this.padding = const EdgeInsets.all(12),
@@ -27,11 +26,9 @@ class LoadingSign extends ImplicitlyAnimatedWidget {
 
   @override
   ImplicitlyAnimatedWidgetState<LoadingSign> createState() => _LoadingSignState();
-
 }
 
 class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
-
   Tween<double>? _valueTween;
   bool passedInitialDelay = false;
 
@@ -40,7 +37,7 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
     super.initState();
     Future<dynamic>.delayed(const Duration(milliseconds: 250)).then((value) {
       if (mounted) {
-        setState((){
+        setState(() {
           passedInitialDelay = true;
         });
       }
@@ -57,7 +54,7 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
       widget.value ?? 0.0,
       // A function that takes a color value and returns a tween
       // beginning at that value.
-          (dynamic value) => Tween<double>(begin: value as double?),
+      (dynamic value) => Tween<double>(begin: value as double?),
     ) as Tween<double>?;
     // We could have more tweens than one by using the visitor
     // multiple times.
@@ -76,20 +73,20 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
     Color colorMedium = color.withValues(alpha: 0.8);
     Color colorMild = color.withValues(alpha: 0.2);
     Color colorTransparent = color.withValues(alpha: 0);
-    double fontSize = widget.size*0.3;
-    double strokeWidth = widget.size*0.1;
+    double fontSize = widget.size * 0.3;
+    double strokeWidth = widget.size * 0.1;
     if (widget.size < 36) {
       fontSize = 0;
-      strokeWidth = (strokeWidth*2).clamp(0, 3.6);
+      strokeWidth = (strokeWidth * 2).clamp(0, 3.6);
     }
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {
         double? value = _valueTween?.evaluate(animation);
-        if (value!=null && (value<=0 || value>1)) value = null;
+        if (value != null && (value <= 0 || value > 1)) value = null;
         return Container(
           padding: widget.padding,
-          alignment: context.findAncestorWidgetOfExactType<Scaffold>()==null
+          alignment: context.findAncestorWidgetOfExactType<Scaffold>() == null
               ? Alignment.center
               : goldenRatioVerticalAlignment,
           child: LimitedBox(
@@ -102,18 +99,23 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
                   curve: Curves.easeOut,
                   repeat: true,
                   builder: (loopingAnimation, child) {
-                    Color backgroundColor = ColorTween(begin: colorTransparent, end: colorMild).evaluate(loopingAnimation)!;
+                    Color backgroundColor =
+                        ColorTween(begin: colorTransparent, end: colorMild).evaluate(loopingAnimation)!;
                     return Stack(
                       // fit: StackFit.expand,
                       children: [
                         Positioned.fill(
                           child: Padding(
-                            padding: EdgeInsets.all(strokeWidth/2),
+                            padding: EdgeInsets.all(strokeWidth / 2),
                             child: DecoratedBox(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 gradient: RadialGradient(
-                                  colors: [colorTransparent, colorTransparent, backgroundColor,],
+                                  colors: [
+                                    colorTransparent,
+                                    colorTransparent,
+                                    backgroundColor,
+                                  ],
                                   stops: [0, 0.25 + (0.75 * loopingAnimation.value), 1],
                                 ),
                               ),
@@ -121,7 +123,8 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
                           ),
                         ),
                         SizedBox(
-                          width: widget.size, height: widget.size,
+                          width: widget.size,
+                          height: widget.size,
                           child: AspectRatio(
                             aspectRatio: 1,
                             child: CircularProgressIndicator(
@@ -136,27 +139,34 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
                     );
                   },
                 ),
-                if (value!=null && fontSize>0)
+                if (value != null && fontSize > 0)
                   Positioned.fill(
                     child: Center(
                       child: OpacityGradient(
                         direction: OpacityGradient.vertical,
                         size: 5,
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 1, bottom: 1,),
+                          padding: const EdgeInsets.only(
+                            left: 1,
+                            bottom: 1,
+                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text((value*100).round().toString(),
+                              Text(
+                                (value * 100).round().toString(),
                                 style: TextStyle(
                                   fontSize: fontSize,
                                   color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75),
                                 ),
                               ),
-                              Text('%', style: TextStyle(
-                                fontSize: fontSize,
-                                color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75),
-                              ),),
+                              Text(
+                                '%',
+                                style: TextStyle(
+                                  fontSize: fontSize,
+                                  color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -170,16 +180,11 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
       },
     );
   }
-
 }
-
-
-
 
 const goldenRatioVerticalAlignment = Alignment(0, -0.2360939431396786);
 
 class ErrorSign extends StatelessWidget {
-
   final String title;
   final Widget? titleWidget;
   final String? subtitle;
@@ -203,33 +208,38 @@ class ErrorSign extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleWidget = this.titleWidget ?? Text(
-      title,
-      style: Theme.of(context).textTheme.titleLarge,
-      textAlign: TextAlign.center,
-    );
-    final subtitleWidget = this.subtitleWidget
-        ?? (subtitle.isNullOrBlank
+    final titleWidget = this.titleWidget ??
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleLarge,
+          textAlign: TextAlign.center,
+        );
+    final subtitleWidget = this.subtitleWidget ??
+        (subtitle.isNullOrBlank
             ? null
             : Text(
                 subtitle!,
                 style: Theme.of(context).textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               ));
-    final retryWidget = retryButton==null && onRetry==null ? null
-        : (retryButton ?? DialogButton.accept(
-            leading: const Icon(Icons.refresh),
-            onPressed: onRetry,
-            child: Text(FromZeroLocalizations.of(context).translate("retry")),
-          ));
+    final retryWidget = retryButton == null && onRetry == null
+        ? null
+        : (retryButton ??
+            DialogButton.accept(
+              leading: const Icon(Icons.refresh),
+              onPressed: onRetry,
+              child: Text(FromZeroLocalizations.of(context).translate("retry")),
+            ));
     final compact = this.compact ?? MediaQuery.sizeOf(context).height < 512;
-    final iconWidget = icon==null ? null
+    final iconWidget = icon == null
+        ? null
         : IconTheme(
             data: Theme.of(context).iconTheme.copyWith(
-              size: 128,
-              color: !compact
-                  ? Theme.of(context).disabledColor
-                  : Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.1),),
+                  size: 128,
+                  color: !compact
+                      ? Theme.of(context).disabledColor
+                      : Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.1),
+                ),
             child: icon!,
           );
     Widget result;
@@ -237,19 +247,22 @@ class ErrorSign extends StatelessWidget {
       result = Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (iconWidget!=null)
-            iconWidget,
-          if (iconWidget!=null)
-            const SizedBox(height: 16,),
+          if (iconWidget != null) iconWidget,
+          if (iconWidget != null)
+            const SizedBox(
+              height: 16,
+            ),
           titleWidget,
-          if (subtitleWidget!=null)
-            const SizedBox(height: 8,),
-          if (subtitleWidget!=null)
-            subtitleWidget,
-          if (retryWidget!=null)
-            const SizedBox(height: 16,),
-          if (retryWidget!=null)
-            retryWidget,
+          if (subtitleWidget != null)
+            const SizedBox(
+              height: 8,
+            ),
+          if (subtitleWidget != null) subtitleWidget,
+          if (retryWidget != null)
+            const SizedBox(
+              height: 16,
+            ),
+          if (retryWidget != null) retryWidget,
         ],
       );
     } else {
@@ -259,7 +272,7 @@ class ErrorSign extends StatelessWidget {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              if (iconWidget!=null)
+              if (iconWidget != null)
                 Positioned.fill(
                   child: OverflowBox(
                     maxHeight: double.infinity,
@@ -270,18 +283,20 @@ class ErrorSign extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   titleWidget,
-                  if (subtitleWidget!=null)
-                    const SizedBox(height: 8,),
-                  if (subtitleWidget!=null)
-                    subtitleWidget,
+                  if (subtitleWidget != null)
+                    const SizedBox(
+                      height: 8,
+                    ),
+                  if (subtitleWidget != null) subtitleWidget,
                 ],
               ),
             ],
           ),
-          if (retryWidget!=null)
-            const SizedBox(height: 16,),
-          if (retryWidget!=null)
-            retryWidget,
+          if (retryWidget != null)
+            const SizedBox(
+              height: 16,
+            ),
+          if (retryWidget != null) retryWidget,
         ],
       );
     }
@@ -294,9 +309,8 @@ class ErrorSign extends StatelessWidget {
     result = Padding(
       padding: const EdgeInsets.all(12.0),
       child: Align(
-        alignment: context.findAncestorWidgetOfExactType<Scaffold>()==null
-            ? Alignment.center
-            : goldenRatioVerticalAlignment,
+        alignment:
+            context.findAncestorWidgetOfExactType<Scaffold>() == null ? Alignment.center : goldenRatioVerticalAlignment,
         child: ScrollbarFromZero(
           controller: scrollController,
           child: SingleChildScrollView(
@@ -311,17 +325,13 @@ class ErrorSign extends StatelessWidget {
     );
     return result;
   }
-
 }
-
-
 
 typedef SuccessBuilder<T> = Widget Function(BuildContext context, T data);
 typedef FutureErrorBuilder = Widget Function(BuildContext context, Object? error, Object? stackTrace);
 typedef FutureLoadingBuilder = Widget Function(BuildContext context);
 
 class FutureBuilderFromZero<T> extends StatefulWidget {
-
   final T? initialData;
   final Future future;
   final SuccessBuilder<T> successBuilder;
@@ -330,7 +340,8 @@ class FutureBuilderFromZero<T> extends StatefulWidget {
   final FutureErrorBuilder errorBuilder;
   final FutureLoadingBuilder loadingBuilder;
   final AnimatedSwitcherTransitionBuilder transitionBuilder;
-  final bool enableSkipFrame; // when transitioning from having data to not having it, delay the transition by 1 frame, to not show loading unnecessarily
+  final bool
+      enableSkipFrame; // when transitioning from having data to not having it, delay the transition by 1 frame, to not show loading unnecessarily
   final Duration transitionDuration;
   final Curve transitionInCurve;
   final Curve transitionOutCurve;
@@ -364,26 +375,24 @@ class FutureBuilderFromZero<T> extends StatefulWidget {
   @override
   FutureBuilderFromZeroState<T> createState() => FutureBuilderFromZeroState<T>();
 
-  static Widget defaultLoadingBuilder(BuildContext context){
+  static Widget defaultLoadingBuilder(BuildContext context) {
     return ApiProviderBuilder.defaultLoadingBuilder(context, null);
   }
 
-  static Widget defaultErrorBuilder(BuildContext context, dynamic error, dynamic stackTrace){
+  static Widget defaultErrorBuilder(BuildContext context, dynamic error, dynamic stackTrace) {
     // log(error, stackTrace: stackTrace);
     return ApiProviderBuilder.defaultErrorBuilder(context, error, stackTrace, null);
   }
 
-  static Widget defaultTransitionBuilder(Widget child, Animation<double> animation){
+  static Widget defaultTransitionBuilder(Widget child, Animation<double> animation) {
     return ZoomedFadeInFadeOutTransition(
       animation: animation,
       child: child,
     );
   }
-
 }
 
 class FutureBuilderFromZeroState<T> extends State<FutureBuilderFromZero<T>> {
-
   bool skipFrame = false;
   late int initialTimestamp;
 
@@ -400,9 +409,7 @@ class FutureBuilderFromZeroState<T> extends State<FutureBuilderFromZero<T>> {
 
   dynamic _previousBuildData;
   dynamic _currentBuildData;
-  void updatePreviousData() {
-
-  }
+  void updatePreviousData() {}
 
   @override
   Widget build(BuildContext context) {
@@ -411,43 +418,53 @@ class FutureBuilderFromZeroState<T> extends State<FutureBuilderFromZero<T>> {
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         Widget result;
         int state = 0;
-        if (snapshot.connectionState==ConnectionState.done
-            || (snapshot.hasData && (_currentBuildData==null || _currentBuildData==widget.future || widget.keepPreviousDataWhileLoading))
-            || (_previousBuildData==null && widget.initialData!=null)){
+        if (snapshot.connectionState == ConnectionState.done ||
+            (snapshot.hasData &&
+                (_currentBuildData == null ||
+                    _currentBuildData == widget.future ||
+                    widget.keepPreviousDataWhileLoading)) ||
+            (_previousBuildData == null && widget.initialData != null)) {
           if (widget.enableSkipFrame) skipFrame = true;
-          if (snapshot.hasData){
+          if (snapshot.hasData) {
             state = 1;
             result = widget.successBuilder(context, snapshot.data);
-          } else if (_previousBuildData==null && widget.initialData!=null) {
+          } else if (_previousBuildData == null && widget.initialData != null) {
             state = 1;
             result = widget.successBuilder(context, widget.initialData as T);
           } else {
             state = -1;
-            result = widget.errorBuilder(context, snapshot.hasError ? snapshot.error : "Forever Loading", snapshot.hasError ? snapshot.stackTrace : '',);
+            result = widget.errorBuilder(
+              context,
+              snapshot.hasError ? snapshot.error : "Forever Loading",
+              snapshot.hasError ? snapshot.stackTrace : '',
+            );
           }
-        } else{
-          if (skipFrame && (snapshot.hasData || snapshot.hasError)){
+        } else {
+          if (skipFrame && (snapshot.hasData || snapshot.hasError)) {
             WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-              try{setState(() {
-                skipFrame = false;
-              });}catch(_){}
+              try {
+                setState(() {
+                  skipFrame = false;
+                });
+              } catch (_) {}
             });
-            if (snapshot.hasData){
+            if (snapshot.hasData) {
               state = 1;
               result = widget.successBuilder(context, snapshot.data);
             } else {
               state = -1;
               result = widget.errorBuilder(context, snapshot.error, snapshot.stackTrace);
             }
-          } else{
+          } else {
             state = 0;
             result = widget.loadingBuilder(context);
           }
         }
-        if (state==1) {
+        if (state == 1) {
           updatePreviousData();
         }
-        int milliseconds = (DateTime.now().millisecondsSinceEpoch-initialTimestamp).clamp(0, widget.transitionDuration.inMilliseconds);
+        int milliseconds = (DateTime.now().millisecondsSinceEpoch - initialTimestamp)
+            .clamp(0, widget.transitionDuration.inMilliseconds);
         result = AsyncBuilderAnimationWrapper(
           transitionBuilder: (context, child, animation) => widget.transitionBuilder(child, animation),
           transitionDuration: Duration(milliseconds: milliseconds),
@@ -465,15 +482,10 @@ class FutureBuilderFromZeroState<T> extends State<FutureBuilderFromZero<T>> {
       },
     );
   }
-
 }
-
-
-
 
 // TODO 3 move this to animations
 class AnimatedContainerFromChildSize extends StatefulWidget {
-
   final Duration duration;
   final Curve curve;
   final Widget child;
@@ -499,11 +511,9 @@ class AnimatedContainerFromChildSize extends StatefulWidget {
 
   @override
   AnimatedContainerFromChildSizeState createState() => AnimatedContainerFromChildSizeState();
-
 }
 
 class AnimatedContainerFromChildSizeState extends State<AnimatedContainerFromChildSize> {
-
   GlobalKey globalKey = GlobalKey();
   Size? previousSize;
   Size? _size;
@@ -519,15 +529,17 @@ class AnimatedContainerFromChildSizeState extends State<AnimatedContainerFromChi
   @override
   void initState() {
     initialTimestamp = DateTime.now().millisecondsSinceEpoch;
-    export = context.findAncestorWidgetOfExactType<Export>()!=null;
+    export = context.findAncestorWidgetOfExactType<Export>() != null;
     _addCallback(null);
     super.initState();
   }
+
   @override
   void didUpdateWidget(AnimatedContainerFromChildSize oldWidget) {
     _addCallback(oldWidget);
     super.didUpdateWidget(oldWidget);
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -535,26 +547,27 @@ class AnimatedContainerFromChildSizeState extends State<AnimatedContainerFromChi
   }
 
   void _addCallback(AnimatedContainerFromChildSize? oldWidget) {
-    if (widget.notifyResize != oldWidget?.notifyResize){
+    if (widget.notifyResize != oldWidget?.notifyResize) {
       oldWidget?.notifyResize?.removeListener(_setState);
       widget.notifyResize?.addListener(_setState);
     }
-    if (widget.child != oldWidget?.child){
+    if (widget.child != oldWidget?.child) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         try {
           RenderBox renderBox = globalKey.currentContext!.findRenderObject()! as RenderBox;
           previousSize = size;
           size = renderBox.size;
-          if (size!=previousSize) {
+          if (size != previousSize) {
             setState(() {});
           }
-        } catch (_, __) { }
+        } catch (_, __) {}
       });
     }
   }
+
   void _setState() {
     if (mounted) {
-      setState((){});
+      setState(() {});
     }
   }
 
@@ -566,21 +579,24 @@ class AnimatedContainerFromChildSizeState extends State<AnimatedContainerFromChi
         _addCallback(null);
         Widget child = NotificationListener(
           onNotification: (notification) {
-            if (notification is ScrollMetricsNotification
-                || notification is SizeChangedLayoutNotification) {
+            if (notification is ScrollMetricsNotification || notification is SizeChangedLayoutNotification) {
               _addCallback(null);
             }
             return false;
           },
           child: SizeChangedLayoutNotifier(
-            child: Container(key: globalKey, child: widget.child,),
+            child: Container(
+              key: globalKey,
+              child: widget.child,
+            ),
           ),
         );
-        if (size == null){
-          return buildResult(context,
+        if (size == null) {
+          return buildResult(
+            context,
             child: child,
           );
-        } else{
+        } else {
           double height = max(size!.height, constraints.minHeight);
           double width = max(size!.width, constraints.minWidth);
           double durationMult = 1;
@@ -589,7 +605,9 @@ class AnimatedContainerFromChildSizeState extends State<AnimatedContainerFromChi
           //   double previousWidth = max(previousSize!.width, constraints.minWidth);
           //   durationMult = ((max((previousHeight-height).abs(), (previousWidth-width).abs()))/64).clamp(0.0, 1.0); TODO 3 make this work right when called multiple times in succesion by LayoutBuilder
           // }
-          int milliseconds = (DateTime.now().millisecondsSinceEpoch-initialTimestamp).clamp(0, widget.duration.inMilliseconds*durationMult).toInt();
+          int milliseconds = (DateTime.now().millisecondsSinceEpoch - initialTimestamp)
+              .clamp(0, widget.duration.inMilliseconds * durationMult)
+              .toInt();
 
           Widget result = OverflowBox(
             maxWidth: constraints.maxWidth,
@@ -605,7 +623,8 @@ class AnimatedContainerFromChildSizeState extends State<AnimatedContainerFromChi
               child: result,
             );
           }
-          return buildResult(context,
+          return buildResult(
+            context,
             duration: Duration(milliseconds: milliseconds),
             width: width,
             height: height,
@@ -616,7 +635,8 @@ class AnimatedContainerFromChildSizeState extends State<AnimatedContainerFromChi
     );
   }
 
-  Widget buildResult(BuildContext context, {
+  Widget buildResult(
+    BuildContext context, {
     required Widget child,
     Duration? duration,
     double? width,
@@ -630,5 +650,4 @@ class AnimatedContainerFromChildSizeState extends State<AnimatedContainerFromChi
       child: child,
     );
   }
-
 }

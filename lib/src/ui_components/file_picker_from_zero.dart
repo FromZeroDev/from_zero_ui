@@ -3,9 +3,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-
 class FilePickerFromZero extends StatefulWidget {
-
   final Widget child;
   final ValueChanged<List<File>> onSelected;
   final String? dialogTitle;
@@ -39,11 +37,9 @@ class FilePickerFromZero extends StatefulWidget {
 
   @override
   State<FilePickerFromZero> createState() => _FilePickerFromZeroState();
-
 }
 
 class _FilePickerFromZeroState extends State<FilePickerFromZero> {
-
   bool _dragging = false;
   OverlayEntry? overlayEntry;
 
@@ -78,18 +74,20 @@ class _FilePickerFromZeroState extends State<FilePickerFromZero> {
     } else {
       result = InkWell(
         focusNode: widget.focusNode,
-        onTap: !widget.enabled ? null : () async {
-          final result = await pickFileFromZero(
-            dialogTitle: widget.dialogTitle,
-            pickDirectory: widget.pickDirectory,
-            fileType: widget.fileType,
-            allowedExtensions: widget.allowedExtensions,
-            initialDirectory: widget.initialDirectory,
-          );
-          if (result!=null) {
-            widget.onSelected(result);
-          }
-        },
+        onTap: !widget.enabled
+            ? null
+            : () async {
+                final result = await pickFileFromZero(
+                  dialogTitle: widget.dialogTitle,
+                  pickDirectory: widget.pickDirectory,
+                  fileType: widget.fileType,
+                  allowedExtensions: widget.allowedExtensions,
+                  initialDirectory: widget.initialDirectory,
+                );
+                if (result != null) {
+                  widget.onSelected(result);
+                }
+              },
         child: widget.child,
       );
     }
@@ -149,17 +147,18 @@ class _FilePickerFromZeroState extends State<FilePickerFromZero> {
   }
 
   bool _isListAccepted(List<String> paths) {
-    if (!widget.allowMultiple && paths.length>1) {
+    if (!widget.allowMultiple && paths.length > 1) {
       return false;
     } else {
       return paths.where(_isAccepted).isNotEmpty;
     }
   }
+
   bool _isAccepted(String path) {
     bool accepted = true;
-    if (accepted && widget.allowedExtensions!=null) {
-      final dotIndex = path.lastIndexOf('.')+1;
-      if (dotIndex>0 && dotIndex<path.length-1) {
+    if (accepted && widget.allowedExtensions != null) {
+      final dotIndex = path.lastIndexOf('.') + 1;
+      if (dotIndex > 0 && dotIndex < path.length - 1) {
         final extension = path.substring(dotIndex);
         accepted = widget.allowedExtensions!.contains(extension);
       } else {
@@ -168,10 +167,7 @@ class _FilePickerFromZeroState extends State<FilePickerFromZero> {
     }
     return accepted;
   }
-
 }
-
-
 
 Future<List<File>?> pickFileFromZero({
   String? dialogTitle,

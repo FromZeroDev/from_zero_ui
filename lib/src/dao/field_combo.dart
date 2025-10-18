@@ -3,16 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/util/copied_flutter_widgets/my_ensure_visible_when_focused.dart';
 
-
 class ComboField<T extends DAO> extends Field<T> {
-
   ContextFulFieldValueGetter<List<T>?, ComboField<T>>? possibleValuesGetter;
   ContextFulFieldValueGetter<Future<List<T>>?, ComboField<T>>? possibleValuesFutureGetter;
-  ContextFulFieldValueGetter<
-          AutoDisposeStateNotifierProvider<ApiState<List<T>>,
-          AsyncValue<List<T>>
-      >?,
-      ComboField<T>>? possibleValuesProviderGetter;
+  ContextFulFieldValueGetter<AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>?, ComboField<T>>?
+      possibleValuesProviderGetter;
   bool? showSearchBox;
   ExtraWidgetBuilder<T>? extraWidget;
   FieldValueGetter<DAO?, ComboField<T>>? newObjectTemplateGetter;
@@ -23,7 +18,6 @@ class ComboField<T extends DAO> extends Field<T> {
   bool invalidateValuesNotInPossibleValues;
   bool showNullInSelection;
   bool showHintAsNullInSelection;
-
 
   ComboField({
     required super.uiNameGetter,
@@ -109,22 +103,22 @@ class ComboField<T extends DAO> extends Field<T> {
     bool? showHintAsNullInSelection,
   }) {
     return ComboField<T>(
-      uiNameGetter: uiNameGetter??this.uiNameGetter,
-      value: value??this.value,
-      dbValue: dbValue??this.dbValue,
-      clearableGetter: clearableGetter??this.clearableGetter,
-      maxWidth: maxWidth??this.maxWidth,
-      minWidth: minWidth??this.minWidth,
-      flex: flex??this.flex,
-      possibleValuesGetter: possibleValuesGetter??this.possibleValuesGetter,
-      possibleValuesFutureGetter: possibleValuesFutureGetter??this.possibleValuesFutureGetter,
-      possibleValuesProviderGetter: possibleValuesProviderGetter??this.possibleValuesProviderGetter,
-      hintGetter: hintGetter??this.hintGetter,
-      tooltipGetter: tooltipGetter??this.tooltipGetter,
-      sort: sort??this.sort,
-      showSearchBox: showSearchBox??this.showSearchBox,
-      extraWidget: extraWidget??this.extraWidget,
-      tableColumnWidth: tableColumnWidth??this.tableColumnWidth,
+      uiNameGetter: uiNameGetter ?? this.uiNameGetter,
+      value: value ?? this.value,
+      dbValue: dbValue ?? this.dbValue,
+      clearableGetter: clearableGetter ?? this.clearableGetter,
+      maxWidth: maxWidth ?? this.maxWidth,
+      minWidth: minWidth ?? this.minWidth,
+      flex: flex ?? this.flex,
+      possibleValuesGetter: possibleValuesGetter ?? this.possibleValuesGetter,
+      possibleValuesFutureGetter: possibleValuesFutureGetter ?? this.possibleValuesFutureGetter,
+      possibleValuesProviderGetter: possibleValuesProviderGetter ?? this.possibleValuesProviderGetter,
+      hintGetter: hintGetter ?? this.hintGetter,
+      tooltipGetter: tooltipGetter ?? this.tooltipGetter,
+      sort: sort ?? this.sort,
+      showSearchBox: showSearchBox ?? this.showSearchBox,
+      extraWidget: extraWidget ?? this.extraWidget,
+      tableColumnWidth: tableColumnWidth ?? this.tableColumnWidth,
       hiddenInTableGetter: hiddenInTableGetter ?? hiddenGetter ?? this.hiddenInTableGetter,
       hiddenInViewGetter: hiddenInViewGetter ?? hiddenGetter ?? this.hiddenInViewGetter,
       hiddenInFormGetter: hiddenInFormGetter ?? hiddenGetter ?? this.hiddenInFormGetter,
@@ -136,8 +130,10 @@ class ComboField<T extends DAO> extends Field<T> {
       colModelBuilder: colModelBuilder ?? this.colModelBuilder,
       undoValues: undoValues ?? List.from(this.undoValues),
       redoValues: redoValues ?? List.from(this.redoValues),
-      invalidateValuesNotInPossibleValues: invalidateValuesNotInPossibleValues ?? this.invalidateValuesNotInPossibleValues,
-      invalidateNonEmptyValuesIfHiddenInForm: invalidateNonEmptyValuesIfHiddenInForm ?? this.invalidateNonEmptyValuesIfHiddenInForm,
+      invalidateValuesNotInPossibleValues:
+          invalidateValuesNotInPossibleValues ?? this.invalidateValuesNotInPossibleValues,
+      invalidateNonEmptyValuesIfHiddenInForm:
+          invalidateNonEmptyValuesIfHiddenInForm ?? this.invalidateNonEmptyValuesIfHiddenInForm,
       defaultValue: defaultValue ?? this.defaultValue,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       actionsGetter: actionsGetter ?? this.actionsGetter,
@@ -149,41 +145,51 @@ class ComboField<T extends DAO> extends Field<T> {
   }
 
   @override
-  Future<bool> validate(BuildContext context, DAO dao, int currentValidationId, {
-    bool validateIfNotEdited=false,
-    bool validateIfHidden=false,
+  Future<bool> validate(
+    BuildContext context,
+    DAO dao,
+    int currentValidationId, {
+    bool validateIfNotEdited = false,
+    bool validateIfHidden = false,
   }) async {
-    if (currentValidationId!=dao.validationCallCount || !context.mounted) return false;
-    await super.validate(context, dao, currentValidationId, // ignore: use_build_context_synchronously
+    if (currentValidationId != dao.validationCallCount || !context.mounted) return false;
+    await super.validate(
+      context, dao, currentValidationId, // ignore: use_build_context_synchronously
       validateIfNotEdited: validateIfNotEdited,
       validateIfHidden: validateIfHidden,
     );
-    if (currentValidationId!=dao.validationCallCount || !context.mounted) return false;
+    if (currentValidationId != dao.validationCallCount || !context.mounted) return false;
     final List<T> possibleValues;
     final provider = possibleValuesProviderGetter?.call(context, this, dao); // ignore: use_build_context_synchronously
-    if (provider!=null) {
+    if (provider != null) {
       possibleValues = await (context as WidgetRef).watch(provider.notifier).future;
     } else {
       final future = possibleValuesFutureGetter?.call(context, this, dao); // ignore: use_build_context_synchronously
-      if (future!=null) {
+      if (future != null) {
         possibleValues = await future;
       } else {
         possibleValues = possibleValuesGetter!.call(context, this, dao)!; // ignore: use_build_context_synchronously
       }
     }
-    if (currentValidationId!=dao.validationCallCount || !context.mounted) return false;
-    if (invalidateValuesNotInPossibleValues && value!=null && !possibleValues.contains(value)) {
+    if (currentValidationId != dao.validationCallCount || !context.mounted) return false;
+    if (invalidateValuesNotInPossibleValues && value != null && !possibleValues.contains(value)) {
       // ignore: use_build_context_synchronously
       final error = '$uiName: ${FromZeroLocalizations.of(context).translate("validation_combo_not_possible")}';
-      if (value==dbValue) {
-        validationErrors.add(ValidationError(field: this,
-          error: error,
-        ),);
+      if (value == dbValue) {
+        validationErrors.add(
+          ValidationError(
+            field: this,
+            error: error,
+          ),
+        );
       } else {
-        validationErrors.add(InvalidatingError<T>(field: this,
-          error: error,
-          defaultValue: null,
-        ),);
+        validationErrors.add(
+          InvalidatingError<T>(
+            field: this,
+            error: error,
+            defaultValue: null,
+          ),
+        );
       }
     }
     validationErrors.sort((a, b) => a.severity.weight.compareTo(b.severity.weight));
@@ -191,8 +197,9 @@ class ComboField<T extends DAO> extends Field<T> {
   }
 
   @override
-  List<Widget> buildFieldEditorWidgets(BuildContext context, {
-    bool addCard=false,
+  List<Widget> buildFieldEditorWidgets(
+    BuildContext context, {
+    bool addCard = false,
     bool asSliver = true,
     expandToFillContainer = true,
     bool dense = false,
@@ -206,18 +213,21 @@ class ComboField<T extends DAO> extends Field<T> {
     if (hiddenInForm && !ignoreHidden) {
       result = const SizedBox.shrink();
       if (asSliver) {
-        result = SliverToBoxAdapter(child: result,);
+        result = SliverToBoxAdapter(
+          child: result,
+        );
       }
       return [result];
     }
     if (expandToFillContainer) {
       result = LayoutBuilder(
         builder: (context, constraints) {
-          return _buildFieldEditorWidget(context,
+          return _buildFieldEditorWidget(
+            context,
             addCard: addCard,
             asSliver: asSliver,
             expandToFillContainer: expandToFillContainer,
-            largeHorizontally: constraints.maxWidth>=ScaffoldFromZero.screenSizeMedium,
+            largeHorizontally: constraints.maxWidth >= ScaffoldFromZero.screenSizeMedium,
             dense: dense,
             focusNode: focusNode!,
             constraints: constraints,
@@ -226,7 +236,8 @@ class ComboField<T extends DAO> extends Field<T> {
         },
       );
     } else {
-      result = _buildFieldEditorWidget(context,
+      result = _buildFieldEditorWidget(
+        context,
         addCard: addCard,
         asSliver: asSliver,
         expandToFillContainer: expandToFillContainer,
@@ -242,8 +253,11 @@ class ComboField<T extends DAO> extends Field<T> {
     }
     return [result];
   }
-  Widget _buildFieldEditorWidget(BuildContext context, {
-    required FocusNode focusNode, bool addCard=false,
+
+  Widget _buildFieldEditorWidget(
+    BuildContext context, {
+    required FocusNode focusNode,
+    bool addCard = false,
     bool asSliver = true,
     bool expandToFillContainer = true,
     bool largeHorizontally = false,
@@ -257,35 +271,42 @@ class ComboField<T extends DAO> extends Field<T> {
       extraWidget = (context, onSelected) {
         final navigator = Navigator.of(context);
         final emptyDAO = newObjectTemplate!.copyWith();
-        return Column (
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (this.extraWidget!=null)
-              this.extraWidget!(context, onSelected),
+            if (this.extraWidget != null) this.extraWidget!(context, onSelected),
             Align(
               alignment: Alignment.centerRight,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2,),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 2,
+                ),
                 child: TextButton(
                   onPressed: () async {
-                     final res = await emptyDAO.maybeEdit(dao.contextForValidation ?? context);
-                     if (res!=null) {
-                       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                         onSelected?.call(emptyDAO as T);
-                         navigator.pop(emptyDAO as T);
-                       });
-                     }
+                    final res = await emptyDAO.maybeEdit(dao.contextForValidation ?? context);
+                    if (res != null) {
+                      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                        onSelected?.call(emptyDAO as T);
+                        navigator.pop(emptyDAO as T);
+                      });
+                    }
                   },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6,),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 6,
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const SizedBox(width: 6),
                         const Icon(Icons.add),
-                        const SizedBox(width: 6,),
-                        Text('${FromZeroLocalizations.of(context).translate("add")} ${emptyDAO.classUiName}',
+                        const SizedBox(
+                          width: 6,
+                        ),
+                        Text(
+                          '${FromZeroLocalizations.of(context).translate("add")} ${emptyDAO.classUiName}',
                           style: const TextStyle(fontSize: 16),
                         ),
                         const SizedBox(width: 6),
@@ -304,9 +325,8 @@ class ComboField<T extends DAO> extends Field<T> {
       animation: this,
       builder: (context, child) {
         final enabled = this.enabled;
-        final visibleValidationErrors = passedFirstEdit
-            ? validationErrors
-            : validationErrors.where((e) => e.isBeforeEditing);
+        final visibleValidationErrors =
+            passedFirstEdit ? validationErrors : validationErrors.where((e) => e.isBeforeEditing);
         Widget result = ComboFromZero<T>(
           focusNode: focusNode,
           enabled: enabled,
@@ -323,11 +343,18 @@ class ComboField<T extends DAO> extends Field<T> {
           showSearchBox: showSearchBox,
           onSelected: (v) => _onSelected(v, focusNode),
           // popupWidth: maxWidth,
-          buttonStyle: addCard||dense ? null : TextButton.styleFrom(padding: EdgeInsets.zero),
-          buttonChildBuilder: (context, title, hint, value, enabled, clearable, {showDropdownIcon=false}) {
+          buttonStyle: addCard || dense ? null : TextButton.styleFrom(padding: EdgeInsets.zero),
+          buttonChildBuilder: (context, title, hint, value, enabled, clearable, {showDropdownIcon = false}) {
             return Padding(
-              padding: EdgeInsets.only(right: dense ? 0 : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length*40),
-              child: buttonContentBuilder(context, title, hint, (dense ? value?.uiNameDense : value), enabled, false,
+              padding: EdgeInsets.only(
+                  right: dense ? 0 : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40),
+              child: buttonContentBuilder(
+                context,
+                title,
+                hint,
+                (dense ? value?.uiNameDense : value),
+                enabled,
+                false,
                 showDropdownIcon: showDropdownIcon,
                 dense: dense,
               ),
@@ -337,12 +364,13 @@ class ComboField<T extends DAO> extends Field<T> {
           showViewActionOnDAOs: showViewActionOnDAOs,
           showDropdownIcon: showDropdownIcon,
         );
-        if (provider!=null) {
+        if (provider != null) {
           result = Stack(
             children: [
               result,
               Positioned(
-                left: 3, top: 3,
+                left: 3,
+                top: 3,
                 child: ApiProviderBuilder(
                   provider: provider,
                   animatedSwitcherType: AnimatedSwitcherType.normal,
@@ -351,7 +379,8 @@ class ComboField<T extends DAO> extends Field<T> {
                   },
                   loadingBuilder: (context, progress) {
                     return SizedBox(
-                      height: 10, width: 10,
+                      height: 10,
+                      width: 10,
                       child: LoadingSign(
                         value: null,
                         padding: EdgeInsets.zero,
@@ -362,7 +391,8 @@ class ComboField<T extends DAO> extends Field<T> {
                   },
                   errorBuilder: (context, error, stackTrace, onRetry) {
                     return const SizedBox(
-                      height: 10, width: 10,
+                      height: 10,
+                      width: 10,
                       child: Icon(
                         Icons.error_outlined,
                         color: Colors.red,
@@ -378,16 +408,23 @@ class ComboField<T extends DAO> extends Field<T> {
         result = AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           color: dense && visibleValidationErrors.isNotEmpty
-              ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!.withValues(alpha: 0.2)
+              ? ValidationMessage
+                  .severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!
+                  .withValues(alpha: 0.2)
               : backgroundColor?.call(context, this, dao),
           curve: Curves.easeOut,
           child: result,
         );
         result = TooltipFromZero(
-          message: (dense ? visibleValidationErrors : visibleValidationErrors.where((e) => e.severity==ValidationErrorSeverity.disabling)).fold('', (a, b) {
-            return a.toString().trim().isEmpty ? b.toString()
-                : b.toString().trim().isEmpty ? a.toString()
-                : '$a\n$b';
+          message: (dense
+                  ? visibleValidationErrors
+                  : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
+              .fold('', (a, b) {
+            return a.toString().trim().isEmpty
+                ? b.toString()
+                : b.toString().trim().isEmpty
+                    ? a.toString()
+                    : '$a\n$b';
           }),
           waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
           child: result,
@@ -402,9 +439,13 @@ class ComboField<T extends DAO> extends Field<T> {
             ...defaultActions,
           ];
           if (!enabled) {
-            allActions = allActions.map((e) => e.copyWith(
-              disablingError: '',
-            ),).toList();
+            allActions = allActions
+                .map(
+                  (e) => e.copyWith(
+                    disablingError: '',
+                  ),
+                )
+                .toList();
           }
           result = AppbarFromZero(
             contextMenuEnabled: enabled,
@@ -424,7 +465,7 @@ class ComboField<T extends DAO> extends Field<T> {
         }
         result = ValidationRequiredOverlay(
           isRequired: isRequired,
-          isEmpty: enabled && value==null,
+          isEmpty: enabled && value == null,
           errors: validationErrors,
           dense: dense,
           child: result,
@@ -455,7 +496,10 @@ class ComboField<T extends DAO> extends Field<T> {
                 child: result,
               ),
               if (!dense)
-                ValidationMessage(errors: validationErrors, passedFirstEdit: passedFirstEdit,),
+                ValidationMessage(
+                  errors: validationErrors,
+                  passedFirstEdit: passedFirstEdit,
+                ),
             ],
           ),
         ),
@@ -470,84 +514,118 @@ class ComboField<T extends DAO> extends Field<T> {
     focusNode.requestFocus();
   }
 
-  static Widget buttonContentBuilder(BuildContext context, String? title, String? hint, dynamic value, bool enabled, bool clearable, {
+  static Widget buttonContentBuilder(
+    BuildContext context,
+    String? title,
+    String? hint,
+    dynamic value,
+    bool enabled,
+    bool clearable, {
     bool showDropdownIcon = false,
     bool dense = false,
   }) {
-    final showHintOrTitleInsteadOfValue = value==null||value.toString().isEmpty;
-    final showHintInsteadOfValue = showHintOrTitleInsteadOfValue && hint!=null;
+    final showHintOrTitleInsteadOfValue = value == null || value.toString().isEmpty;
+    final showHintInsteadOfValue = showHintOrTitleInsteadOfValue && hint != null;
     return Padding(
-      padding: EdgeInsets.only(right: enabled&&clearable ? 40 : 0, bottom: dense ? 4 : 0),
+      padding: EdgeInsets.only(right: enabled && clearable ? 40 : 0, bottom: dense ? 4 : 0),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(width: dense ? 0 : 15,),
+          SizedBox(
+            width: dense ? 0 : 15,
+          ),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 dense
-                    ? Text(showHintOrTitleInsteadOfValue ? (hint ?? title ?? '') : value.toString(),
+                    ? Text(
+                        showHintOrTitleInsteadOfValue ? (hint ?? title ?? '') : value.toString(),
                         maxLines: 2,
                         style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          height: 1,
-                          fontWeight: showHintOrTitleInsteadOfValue ? FontWeight.normal : null,
-                          // color: Theme.of(context).textTheme.dis,
-                        ),
+                              height: 1,
+                              fontWeight: showHintOrTitleInsteadOfValue ? FontWeight.normal : null,
+                              // color: Theme.of(context).textTheme.dis,
+                            ),
                       )
-                : value==null&&hint==null&&title!=null
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(title,
-                          maxLines: 2,
-                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            fontWeight: FontWeight.w400,
-                            height: 1.1,
-                            color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
+                    : value == null && hint == null && title != null
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              title,
+                              maxLines: 2,
+                              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.1,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .color!
+                                        .withValues(alpha: enabled ? 1 : 0.75),
+                                  ),
+                            ),
+                          )
+                        : MaterialKeyValuePair(
+                            padding: 4,
+                            title: title,
+                            titleMaxLines: 1,
+                            titleStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                  height: 1,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .color!
+                                      .withValues(alpha: enabled ? 1 : 0.75),
+                                ),
+                            value: showHintOrTitleInsteadOfValue ? (hint ?? '') : value.toString(),
+                            valueMaxLines: 2,
+                            valueStyle: Theme.of(context).textTheme.titleMedium!.copyWith(
+                                  height: 1,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .color!
+                                      .withValues(alpha: enabled && !showHintInsteadOfValue ? 1 : 0.75),
+                                ),
                           ),
-                        ),
-                      )
-                    : MaterialKeyValuePair(
-                        padding: 4,
-                        title: title,
-                        titleMaxLines: 1,
-                        titleStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          height: 1,
-                          color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
-                        ),
-                        value: showHintOrTitleInsteadOfValue ? (hint ?? '') : value.toString(),
-                        valueMaxLines: 2,
-                        valueStyle: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          height: 1,
-                          color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled&&!showHintInsteadOfValue ? 1 : 0.75),
-                        ),
-                      ),
-                const SizedBox(height: 4,),
+                const SizedBox(
+                  height: 4,
+                ),
               ],
             ),
           ),
-          SizedBox(width: dense ? 0 : 6,),
+          SizedBox(
+            width: dense ? 0 : 6,
+          ),
           if (!dense && showDropdownIcon && enabled && !clearable)
-            Icon(Icons.arrow_drop_down, color: Theme.of(context).textTheme.bodyLarge!.color,),
-          SizedBox(width: dense ? 0 : 6,),
+            Icon(
+              Icons.arrow_drop_down,
+              color: Theme.of(context).textTheme.bodyLarge!.color,
+            ),
+          SizedBox(
+            width: dense ? 0 : 6,
+          ),
         ],
       ),
     );
   }
 
-
   @override
   List<ActionFromZero> buildDefaultActions(BuildContext context, {FocusNode? focusNode}) {
     return [
-      ...super.buildDefaultActions(context, focusNode: focusNode,),
-      if (possibleValuesProviderGetter!=null)
-        ActionFromZero.divider(breakpoints: {0: ActionState.popup}),
-      if (possibleValuesProviderGetter!=null)
+      ...super.buildDefaultActions(
+        context,
+        focusNode: focusNode,
+      ),
+      if (possibleValuesProviderGetter != null) ActionFromZero.divider(breakpoints: {0: ActionState.popup}),
+      if (possibleValuesProviderGetter != null)
         ActionFromZero(
           title: 'Refrescar Datos', // TODO 3 internationalize
-          icon: const Icon(Icons.refresh,),
+          icon: const Icon(
+            Icons.refresh,
+          ),
           breakpoints: {0: ActionState.popup},
           onTap: (context) {
             userInteracted = true;
@@ -560,5 +638,4 @@ class ComboField<T extends DAO> extends Field<T> {
         ),
     ];
   }
-
 }

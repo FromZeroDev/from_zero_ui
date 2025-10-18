@@ -15,8 +15,6 @@ import 'pages/scaffold/page_scaffold_other.dart';
 import 'pages/scaffold/page_scaffold_same.dart';
 import 'pages/settings/page_settings.dart';
 
-
-
 final mainRoutes = [
   GoRouteGroupFromZero(
     showAsDropdown: false,
@@ -148,21 +146,14 @@ final initRoute = GoRouteFromZero(
   pageScaffoldId: 'login',
 );
 
-
-
-
-
 class PageSplash extends StatefulWidget {
-
   const PageSplash({super.key});
 
   @override
   PageSplashState createState() => PageSplashState();
-
 }
 
 class PageSplashState extends State<PageSplash> {
-
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -173,8 +164,8 @@ class PageSplashState extends State<PageSplash> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: Theme.of(context).canvasColor,);
+    return Container(
+      color: Theme.of(context).canvasColor,
+    );
   }
-
 }
-

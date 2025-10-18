@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-
 class _ChildEntry {
   _ChildEntry({
     required this.controller,
@@ -40,10 +39,10 @@ class _ChildEntry {
   String toString() => 'Entry#${shortHash(this)}($widgetChild)';
 }
 
-typedef AnimatedSwitcherImageLayoutBuilder = Widget Function(Widget? currentChild, List<Widget> previousChildren, Alignment alignment, Clip clipBehaviour);
+typedef AnimatedSwitcherImageLayoutBuilder = Widget Function(
+    Widget? currentChild, List<Widget> previousChildren, Alignment alignment, Clip clipBehaviour);
 
 class AnimatedSwitcherImage extends StatefulWidget {
-
   const AnimatedSwitcherImage({
     required this.duration,
     this.child,
@@ -91,7 +90,8 @@ class AnimatedSwitcherImage extends StatefulWidget {
     );
   }
 
-  static Widget defaultLayoutBuilder(Widget? currentChild, List<Widget> previousChildren, Alignment alignment, Clip clipBehaviour) {
+  static Widget defaultLayoutBuilder(
+      Widget? currentChild, List<Widget> previousChildren, Alignment alignment, Clip clipBehaviour) {
     return Stack(
       alignment: alignment,
       clipBehavior: clipBehaviour,
@@ -110,7 +110,8 @@ class AnimatedSwitcherImage extends StatefulWidget {
     );
   }
 
-  static Widget sliverLayoutBuilder(Widget? currentChild, List<Widget> previousChildren, Alignment alignment, Clip clipBehaviour) {
+  static Widget sliverLayoutBuilder(
+      Widget? currentChild, List<Widget> previousChildren, Alignment alignment, Clip clipBehaviour) {
     return SliverStack(
       positionedAlignment: alignment,
       children: <Widget>[
@@ -157,8 +158,7 @@ class _AnimatedSwitcherImageState extends State<AnimatedSwitcherImage> with Tick
 
     final bool hasNewChild = widget.child != null;
     final bool hasOldChild = _currentEntry != null;
-    if (hasNewChild != hasOldChild ||
-        hasNewChild && !Widget.canUpdate(widget.child!, _currentEntry!.widgetChild)) {
+    if (hasNewChild != hasOldChild || hasNewChild && !Widget.canUpdate(widget.child!, _currentEntry!.widgetChild)) {
       // Child has changed, fade current entry out and add new entry.
       _childNumber += 1;
       _addEntryForNewChild(animate: true);
@@ -175,7 +175,8 @@ class _AnimatedSwitcherImageState extends State<AnimatedSwitcherImage> with Tick
     }
   }
 
-  void _addEntryForNewChild({ required bool animate }) { // does making this async break something
+  void _addEntryForNewChild({required bool animate}) {
+    // does making this async break something
     assert(animate || _currentEntry == null);
     if (_currentEntry != null) {
       assert(animate);
@@ -245,13 +246,12 @@ class _AnimatedSwitcherImageState extends State<AnimatedSwitcherImage> with Tick
     _outgoingWidgets = null;
   }
 
-
   void _markEntryAsNeedingImageUpdateAfterFrame() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (mounted && widget.takeImages) {
         final entry = _currentEntry;
         // print ('AFTER FRAME ${entry.hashCode}');
-        if (entry!=null) {
+        if (entry != null) {
           if (!entry.isExecutingImageUpdate) {
             // print ('AFTER FRAME ${entry.hashCode}: execute update immediately');
             _updateImageForEntry(entry);
@@ -264,6 +264,7 @@ class _AnimatedSwitcherImageState extends State<AnimatedSwitcherImage> with Tick
       }
     });
   }
+
   Future<void> _updateImageForEntry(_ChildEntry entry) async {
     entry.isExecutingImageUpdate = true;
     entry.needsImageUpdate = false;
@@ -271,10 +272,11 @@ class _AnimatedSwitcherImageState extends State<AnimatedSwitcherImage> with Tick
     entry.imageFuture = future;
     final image = await future;
     if (!mounted) return;
-    if (image!=null) {
+    if (image != null) {
       // print ('Setting image ${entry.hashCode}');
       await precacheImage(image, context);
-      await Future<dynamic>.delayed(const Duration(milliseconds: 1000)); // on success, let app breathe for a while before refreshing
+      await Future<dynamic>.delayed(
+          const Duration(milliseconds: 1000)); // on success, let app breathe for a while before refreshing
       if (!mounted) return;
       entry.image = image;
     }
@@ -284,24 +286,25 @@ class _AnimatedSwitcherImageState extends State<AnimatedSwitcherImage> with Tick
       _updateImageForEntry(entry);
     }
   }
+
   Future<MemoryImage?> _getImageFromEntry(_ChildEntry entry) async {
     final boundary = entry.boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     final layer = boundary?.layer;
     // print ('start getting image ${entry.hashCode} $boundary $layer');
     try {
-      if (boundary!=null && layer!=null) {
+      if (boundary != null && layer != null) {
         final OffsetLayer offsetLayer = layer as OffsetLayer;
         final image = await offsetLayer.toImage(Offset.zero & boundary.size, pixelRatio: 1);
         if (!mounted) return null;
         final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
         if (!mounted) return null;
         // print ('got byte data ${entry.hashCode} $byteData');
-        if (byteData!=null) {
+        if (byteData != null) {
           // print ('got image successfully ${entry.hashCode}');
           return MemoryImage(byteData.buffer.asUint8List());
         }
       }
-    } catch(_) {}
+    } catch (_) {}
     // print ('image returned null ${entry.hashCode}');
     return null;
   }
@@ -319,7 +322,7 @@ class _AnimatedSwitcherImageState extends State<AnimatedSwitcherImage> with Tick
         child = entry.widgetChild;
       }
     } else {
-      if (entry.imageFuture!=null) {
+      if (entry.imageFuture != null) {
         // print ('build outgouning child: ${entry.hashCode} IMAGE FUTURE ');
         child = FutureBuilder(
           future: entry.imageFuture,
@@ -327,21 +330,17 @@ class _AnimatedSwitcherImageState extends State<AnimatedSwitcherImage> with Tick
           builder: (context, snapshot) {
             final data = snapshot.data ?? entry.image;
             // print ('build outgouning child ${entry.hashCode}: ${snapshot.data} ${entry.image}');
-            if (data!=null) {
+            if (data != null) {
               // print ('build outgouning child: ${entry.hashCode} IMAGE SHOWN !!!!!!!!!!!!!!!!!!!!!!!!!!! ');
               return Image(image: data);
             }
             // print ('build outgouning child: ${entry.hashCode} NO IMAGE ');
-            return widget.rebuildOutgoingChildrenIfNoImageReady
-                ? entry.widgetChild
-                : const SizedBox.shrink();
+            return widget.rebuildOutgoingChildrenIfNoImageReady ? entry.widgetChild : const SizedBox.shrink();
           },
         );
       } else {
         // print ('build outgouning child: ${entry.hashCode} NO IMAGE FUTURE ');
-        child = widget.rebuildOutgoingChildrenIfNoImageReady
-            ? entry.widgetChild
-            : const SizedBox.shrink();
+        child = widget.rebuildOutgoingChildrenIfNoImageReady ? entry.widgetChild : const SizedBox.shrink();
       }
     }
     entry.transition = KeyedSubtree(

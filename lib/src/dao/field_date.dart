@@ -3,9 +3,7 @@ import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/util/copied_flutter_widgets/my_ensure_visible_when_focused.dart';
 import 'package:intl/intl.dart';
 
-
 class DateField extends Field<DateTime> {
-
   DateFormat formatter;
   DateFormat formatterDense;
   DateTime firstDate;
@@ -51,10 +49,12 @@ class DateField extends Field<DateTime> {
     super.viewWidgetBuilder,
     super.onValueChanged,
     this.type = DateTimePickerType.date,
-  }) :  firstDate = firstDate ?? defaultFirstDate,
+  })  : firstDate = firstDate ?? defaultFirstDate,
         lastDate = lastDate ?? defaultLastDate,
-        formatter = formatter ?? (type==DateTimePickerType.time ? defaultTimeFormatter : defaultFormatter),
-        formatterDense = formatterDense ?? formatter ?? (type==DateTimePickerType.time ? defaultTimeFormatter : defaultDenseFormatter);
+        formatter = formatter ?? (type == DateTimePickerType.time ? defaultTimeFormatter : defaultFormatter),
+        formatterDense = formatterDense ??
+            formatter ??
+            (type == DateTimePickerType.time ? defaultTimeFormatter : defaultDenseFormatter);
 
   @override
   DateField copyWith({
@@ -90,20 +90,20 @@ class DateField extends Field<DateTime> {
     DateTimePickerType? type,
   }) {
     return DateField(
-      uiNameGetter: uiNameGetter??this.uiNameGetter,
-      value: value??this.value,
-      dbValue: dbValue??this.dbValue,
-      clearableGetter: clearableGetter??this.clearableGetter,
-      maxWidth: maxWidth??this.maxWidth,
-      minWidth: minWidth??this.minWidth,
-      flex: flex??this.flex,
-      formatter: formatter??this.formatter,
-      formatterDense: formatterDense??this.formatterDense,
-      firstDate: firstDate??this.firstDate,
-      lastDate: lastDate??this.lastDate,
-      hintGetter: hintGetter??this.hintGetter,
-      tooltipGetter: tooltipGetter??this.tooltipGetter,
-      tableColumnWidth: tableColumnWidth??this.tableColumnWidth,
+      uiNameGetter: uiNameGetter ?? this.uiNameGetter,
+      value: value ?? this.value,
+      dbValue: dbValue ?? this.dbValue,
+      clearableGetter: clearableGetter ?? this.clearableGetter,
+      maxWidth: maxWidth ?? this.maxWidth,
+      minWidth: minWidth ?? this.minWidth,
+      flex: flex ?? this.flex,
+      formatter: formatter ?? this.formatter,
+      formatterDense: formatterDense ?? this.formatterDense,
+      firstDate: firstDate ?? this.firstDate,
+      lastDate: lastDate ?? this.lastDate,
+      hintGetter: hintGetter ?? this.hintGetter,
+      tooltipGetter: tooltipGetter ?? this.tooltipGetter,
+      tableColumnWidth: tableColumnWidth ?? this.tableColumnWidth,
       hiddenInTableGetter: hiddenInTableGetter ?? hiddenGetter ?? this.hiddenInTableGetter,
       hiddenInViewGetter: hiddenInViewGetter ?? hiddenGetter ?? this.hiddenInViewGetter,
       hiddenInFormGetter: hiddenInFormGetter ?? hiddenGetter ?? this.hiddenInFormGetter,
@@ -112,7 +112,8 @@ class DateField extends Field<DateTime> {
       colModelBuilder: colModelBuilder ?? this.colModelBuilder,
       undoValues: undoValues ?? List.from(this.undoValues),
       redoValues: redoValues ?? List.from(this.redoValues),
-      invalidateNonEmptyValuesIfHiddenInForm: invalidateNonEmptyValuesIfHiddenInForm ?? this.invalidateNonEmptyValuesIfHiddenInForm,
+      invalidateNonEmptyValuesIfHiddenInForm:
+          invalidateNonEmptyValuesIfHiddenInForm ?? this.invalidateNonEmptyValuesIfHiddenInForm,
       defaultValue: defaultValue ?? this.defaultValue,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       actionsGetter: actionsGetter ?? this.actionsGetter,
@@ -123,14 +124,16 @@ class DateField extends Field<DateTime> {
   }
 
   @override
-  String toString() => value==null ? ''
-      : type==DateTimePickerType.time && dao.contextForValidation!=null
+  String toString() => value == null
+      ? ''
+      : type == DateTimePickerType.time && dao.contextForValidation != null
           ? TimeOfDay.fromDateTime(value!).format(dao.contextForValidation!)
           : formatter.format(value!);
 
   @override
-  List<Widget> buildFieldEditorWidgets(BuildContext context, {
-    bool addCard=false,
+  List<Widget> buildFieldEditorWidgets(
+    BuildContext context, {
+    bool addCard = false,
     bool asSliver = true,
     expandToFillContainer = true,
     bool dense = false,
@@ -144,18 +147,21 @@ class DateField extends Field<DateTime> {
     if (hiddenInForm && !ignoreHidden) {
       result = const SizedBox.shrink();
       if (asSliver) {
-        result = SliverToBoxAdapter(child: result,);
+        result = SliverToBoxAdapter(
+          child: result,
+        );
       }
       return [result];
     }
     if (expandToFillContainer) {
       result = LayoutBuilder(
         builder: (context, constraints) {
-          return _buildFieldEditorWidget(context,
+          return _buildFieldEditorWidget(
+            context,
             addCard: addCard,
             asSliver: asSliver,
             expandToFillContainer: expandToFillContainer,
-            largeHorizontally: constraints.maxWidth>=ScaffoldFromZero.screenSizeMedium,
+            largeHorizontally: constraints.maxWidth >= ScaffoldFromZero.screenSizeMedium,
             dense: dense,
             focusNode: focusNode!,
             constraints: constraints,
@@ -164,7 +170,8 @@ class DateField extends Field<DateTime> {
         },
       );
     } else {
-      result = _buildFieldEditorWidget(context,
+      result = _buildFieldEditorWidget(
+        context,
         addCard: addCard,
         asSliver: asSliver,
         expandToFillContainer: expandToFillContainer,
@@ -180,9 +187,11 @@ class DateField extends Field<DateTime> {
     }
     return [result];
   }
-  Widget _buildFieldEditorWidget(BuildContext context, {
+
+  Widget _buildFieldEditorWidget(
+    BuildContext context, {
     required FocusNode focusNode,
-    bool addCard=false,
+    bool addCard = false,
     bool asSliver = true,
     bool expandToFillContainer = true,
     bool largeHorizontally = false,
@@ -194,9 +203,8 @@ class DateField extends Field<DateTime> {
       animation: this,
       builder: (context, child) {
         final enabled = this.enabled;
-        final visibleValidationErrors = passedFirstEdit
-            ? validationErrors
-            : validationErrors.where((e) => e.isBeforeEditing);
+        final visibleValidationErrors =
+            passedFirstEdit ? validationErrors : validationErrors.where((e) => e.isBeforeEditing);
         Widget result = DatePickerFromZero(
           focusNode: focusNode,
           enabled: enabled,
@@ -215,12 +223,21 @@ class DateField extends Field<DateTime> {
             return true;
           },
           popupWidth: maxWidth,
-          buttonStyle: addCard||dense ? null : TextButton.styleFrom(padding: EdgeInsets.zero),
+          buttonStyle: addCard || dense ? null : TextButton.styleFrom(padding: EdgeInsets.zero),
           formatter: dense ? formatterDense : formatter,
           buttonChildBuilder: (context, title, hint, value, formatter, enabled, clearable) {
             return Padding(
-              padding: EdgeInsets.only(right: dense ? 0 : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length*40),
-              child: _buttonContentBuilder(context, title, hint, value, type, formatter, enabled, false,
+              padding: EdgeInsets.only(
+                  right: dense ? 0 : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40),
+              child: _buttonContentBuilder(
+                context,
+                title,
+                hint,
+                value,
+                type,
+                formatter,
+                enabled,
+                false,
                 dense: dense,
               ),
             );
@@ -229,16 +246,23 @@ class DateField extends Field<DateTime> {
         result = AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           color: dense && visibleValidationErrors.isNotEmpty
-              ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!.withValues(alpha: 0.2)
+              ? ValidationMessage
+                  .severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!
+                  .withValues(alpha: 0.2)
               : backgroundColor?.call(context, this, dao),
           curve: Curves.easeOut,
           child: result,
         );
         result = TooltipFromZero(
-          message: (dense ? visibleValidationErrors : visibleValidationErrors.where((e) => e.severity==ValidationErrorSeverity.disabling)).fold('', (a, b) {
-            return a.toString().trim().isEmpty ? b.toString()
-                : b.toString().trim().isEmpty ? a.toString()
-                : '$a\n$b';
+          message: (dense
+                  ? visibleValidationErrors
+                  : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
+              .fold('', (a, b) {
+            return a.toString().trim().isEmpty
+                ? b.toString()
+                : b.toString().trim().isEmpty
+                    ? a.toString()
+                    : '$a\n$b';
           }),
           waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
           child: result,
@@ -253,9 +277,13 @@ class DateField extends Field<DateTime> {
             ...defaultActions,
           ];
           if (!enabled) {
-            allActions = allActions.map((e) => e.copyWith(
-              disablingError: '',
-            ),).toList();
+            allActions = allActions
+                .map(
+                  (e) => e.copyWith(
+                    disablingError: '',
+                  ),
+                )
+                .toList();
           }
           result = AppbarFromZero(
             contextMenuEnabled: enabled,
@@ -275,7 +303,7 @@ class DateField extends Field<DateTime> {
         }
         result = ValidationRequiredOverlay(
           isRequired: isRequired,
-          isEmpty: enabled && value==null,
+          isEmpty: enabled && value == null,
           errors: validationErrors,
           dense: dense,
           child: result,
@@ -306,7 +334,10 @@ class DateField extends Field<DateTime> {
                 child: result,
               ),
               if (!dense)
-                ValidationMessage(errors: validationErrors, passedFirstEdit: passedFirstEdit,),
+                ValidationMessage(
+                  errors: validationErrors,
+                  passedFirstEdit: passedFirstEdit,
+                ),
             ],
           ),
         ),
@@ -315,26 +346,40 @@ class DateField extends Field<DateTime> {
     return result;
   }
 
-  Widget _buttonContentBuilder(BuildContext context, String? title, String? hint, DateTime? value, DateTimePickerType type, DateFormat formatter, bool enabled, bool clearable, {
+  Widget _buttonContentBuilder(
+    BuildContext context,
+    String? title,
+    String? hint,
+    DateTime? value,
+    DateTimePickerType type,
+    DateFormat formatter,
+    bool enabled,
+    bool clearable, {
     bool dense = false,
   }) {
-    final formattedValue = value==null ? null : type==DateTimePickerType.time
-        ? TimeOfDay.fromDateTime(value).format(context)
-        : formatter.format(value);
-    return ComboField.buttonContentBuilder(context, title, hint, formattedValue, enabled, clearable,
+    final formattedValue = value == null
+        ? null
+        : type == DateTimePickerType.time
+            ? TimeOfDay.fromDateTime(value).format(context)
+            : formatter.format(value);
+    return ComboField.buttonContentBuilder(
+      context,
+      title,
+      hint,
+      formattedValue,
+      enabled,
+      clearable,
       dense: dense,
     );
   }
 
   static SimpleColModel dateFieldDefaultGetColumn(Field field, DAO dao) {
-    if (field is! DateField || field.type==DateTimePickerType.date) {
+    if (field is! DateField || field.type == DateTimePickerType.date) {
       return DateColModel(
         name: field.uiName,
         filterEnabled: true,
         flex: field.tableColumnWidth?.round() ?? 192,
-        formatter: field is DateField
-            ? field.formatterDense
-            : defaultDenseFormatter,
+        formatter: field is DateField ? field.formatterDense : defaultDenseFormatter,
       );
     } else {
       return SimpleColModel(
@@ -345,4 +390,3 @@ class DateField extends Field<DateTime> {
     }
   }
 }
-

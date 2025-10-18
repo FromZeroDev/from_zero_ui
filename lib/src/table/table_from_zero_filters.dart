@@ -1,10 +1,8 @@
-
 import 'package:date/date.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:intl/intl.dart';
-
 
 abstract class ConditionFilter<T> {
   ConditionFilter({required this.extra});
@@ -14,9 +12,12 @@ abstract class ConditionFilter<T> {
   String getExtraUiTooltipFromZero(BuildContext context);
   bool isAllowed(RowModel row, dynamic key, ColModel? col);
   late FocusNode focusNode = FocusNode();
-  Widget buildFormWidget({required BuildContext context, VoidCallback? onValueChanged, VoidCallback? onDelete,});
+  Widget buildFormWidget({
+    required BuildContext context,
+    VoidCallback? onValueChanged,
+    VoidCallback? onDelete,
+  });
 }
-
 
 // class FilterIsEmpty extends ConditionFilter {
 //   FilterIsEmpty({
@@ -34,7 +35,6 @@ abstract class ConditionFilter<T> {
 //   }
 // }
 
-
 abstract class FilterText extends ConditionFilter {
   String query;
   FilterText({
@@ -43,10 +43,16 @@ abstract class FilterText extends ConditionFilter {
   });
 
   @override
-  Widget buildFormWidget({required BuildContext context, VoidCallback? onValueChanged, VoidCallback? onDelete,}) {
+  Widget buildFormWidget({
+    required BuildContext context,
+    VoidCallback? onValueChanged,
+    VoidCallback? onDelete,
+  }) {
     return Container(
       height: 42,
-      padding: const EdgeInsets.only(top: 4,),
+      padding: const EdgeInsets.only(
+        top: 4,
+      ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -61,18 +67,28 @@ abstract class FilterText extends ConditionFilter {
             decoration: InputDecoration(
               labelText: getUiName(context),
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              labelStyle: const TextStyle(height: 0.75,),
+              labelStyle: const TextStyle(
+                height: 0.75,
+              ),
               contentPadding: const EdgeInsets.only(top: 30, left: 12, right: 80),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Theme.of(context).colorScheme.secondary, width: 1,),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.secondary,
+                  width: 1,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Theme.of(context).disabledColor, width: 1,),
+                borderSide: BorderSide(
+                  color: Theme.of(context).disabledColor,
+                  width: 1,
+                ),
               ),
             ),
           ),
           Positioned(
-            right: 38, top: 0, bottom: 0,
+            right: 38,
+            top: 0,
+            bottom: 0,
             child: Center(
               child: TooltipFromZero(
                 message: getExtraUiTooltipFromZero(context),
@@ -80,9 +96,12 @@ abstract class FilterText extends ConditionFilter {
                   clipBehavior: Clip.none,
                   children: [
                     Positioned(
-                      top: 0, left: -32, right: -32,
+                      top: 0,
+                      left: -32,
+                      right: -32,
                       child: Center(
-                        child: Text(getExtraUiName(context),
+                        child: Text(
+                          getExtraUiName(context),
                           style: Theme.of(context).textTheme.bodySmall!.copyWith(height: 1.2),
                         ),
                       ),
@@ -94,8 +113,8 @@ abstract class FilterText extends ConditionFilter {
                           return Checkbox(
                             value: extra,
                             onChanged: (value) {
-                              extra = value??false;
-                              checkboxSetState((){});
+                              extra = value ?? false;
+                              checkboxSetState(() {});
                               onValueChanged?.call();
                             },
                           );
@@ -108,10 +127,13 @@ abstract class FilterText extends ConditionFilter {
             ),
           ),
           Positioned(
-            right: 2, top: 0, bottom: 0,
+            right: 2,
+            top: 0,
+            bottom: 0,
             child: Center(
               child: TooltipFromZero(
-                message: '${FromZeroLocalizations.of(context).translate('delete')} ${FromZeroLocalizations.of(context).translate('filter')}',
+                message:
+                    '${FromZeroLocalizations.of(context).translate('delete')} ${FromZeroLocalizations.of(context).translate('filter')}',
                 child: IconButton(
                   icon: const Icon(Icons.close),
                   splashRadius: 20,
@@ -144,114 +166,137 @@ abstract class FilterText extends ConditionFilter {
 //   }
 // }
 
-
 class FilterTextContains extends FilterText {
   FilterTextContains({
     bool inverse = false,
     super.query = '',
-  }) : super(extra: inverse,);
+  }) : super(
+          extra: inverse,
+        );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_text_contains');
   @override
   String getExtraUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('reverse');
   @override
-  String getExtraUiTooltipFromZero(BuildContext context) => FromZeroLocalizations.of(context).translate('reverse_tooltip');
+  String getExtraUiTooltipFromZero(BuildContext context) =>
+      FromZeroLocalizations.of(context).translate('reverse_tooltip');
   @override
   bool isAllowed(row, key, col) {
-    final value = col!=null ? col.getValueString(row, key) : (row.values[key]?.toString() ?? '');
+    final value = col != null ? col.getValueString(row, key) : (row.values[key]?.toString() ?? '');
     bool result = value.toUpperCase().contains(query.toUpperCase());
     if (extra) result = !result;
     return result;
   }
 }
 
-
 class FilterTextStartsWith extends FilterText {
   FilterTextStartsWith({
     bool inverse = false,
     super.query = '',
-  }) : super(extra: inverse,);
+  }) : super(
+          extra: inverse,
+        );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_text_begins');
   @override
   String getExtraUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('reverse');
   @override
-  String getExtraUiTooltipFromZero(BuildContext context) => FromZeroLocalizations.of(context).translate('reverse_tooltip');
+  String getExtraUiTooltipFromZero(BuildContext context) =>
+      FromZeroLocalizations.of(context).translate('reverse_tooltip');
   @override
   bool isAllowed(row, key, col) {
-    final value = col!=null ? col.getValueString(row, key) : (row.values[key]?.toString() ?? '');
+    final value = col != null ? col.getValueString(row, key) : (row.values[key]?.toString() ?? '');
     bool result = value.toUpperCase().startsWith(query.toUpperCase());
     if (extra) result = !result;
     return result;
   }
 }
 
-
 class FilterTextEndsWith extends FilterText {
   FilterTextEndsWith({
     bool inverse = false,
     super.query = '',
-  }) : super(extra: inverse,);
+  }) : super(
+          extra: inverse,
+        );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_text_ends');
   @override
   String getExtraUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('reverse');
   @override
-  String getExtraUiTooltipFromZero(BuildContext context) => FromZeroLocalizations.of(context).translate('reverse_tooltip');
+  String getExtraUiTooltipFromZero(BuildContext context) =>
+      FromZeroLocalizations.of(context).translate('reverse_tooltip');
   @override
   bool isAllowed(row, key, col) {
-    final value = col!=null ? col.getValueString(row, key) : (row.values[key]?.toString() ?? '');
+    final value = col != null ? col.getValueString(row, key) : (row.values[key]?.toString() ?? '');
     bool result = value.toUpperCase().endsWith(query.toUpperCase());
     if (extra) result = !result;
     return result;
   }
 }
 
-
 abstract class FilterNumber extends ConditionFilter {
   num? query;
   FilterNumber({
     required super.extra,
-    required  this.query,
+    required this.query,
   });
 
   @override
-  Widget buildFormWidget({required BuildContext context, VoidCallback? onValueChanged, VoidCallback? onDelete,}) {
+  Widget buildFormWidget({
+    required BuildContext context,
+    VoidCallback? onValueChanged,
+    VoidCallback? onDelete,
+  }) {
     return Container(
       height: 42,
-      padding: const EdgeInsets.only(top: 4,),
+      padding: const EdgeInsets.only(
+        top: 4,
+      ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           TextFormField(
             autofocus: PlatformExtended.isDesktop,
             focusNode: focusNode,
-            initialValue: query==null ? '' : query.toString(),
+            initialValue: query == null ? '' : query.toString(),
             onChanged: (v) {
               try {
                 query = num.parse(v);
-              } catch (_){
+              } catch (_) {
                 query = null;
               }
               onValueChanged?.call();
             },
             keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp( r'[0-9.]')),],
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+            ],
             decoration: InputDecoration(
               labelText: getUiName(context),
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              labelStyle: const TextStyle(height: 0.75,),
+              labelStyle: const TextStyle(
+                height: 0.75,
+              ),
               contentPadding: const EdgeInsets.only(top: 30, left: 12, right: 80),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Theme.of(context).colorScheme.secondary, width: 1,),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.secondary,
+                  width: 1,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Theme.of(context).disabledColor, width: 1,),
+                borderSide: BorderSide(
+                  color: Theme.of(context).disabledColor,
+                  width: 1,
+                ),
               ),
             ),
           ),
           Positioned(
-            right: 38, top: 0, bottom: 0,
+            right: 38,
+            top: 0,
+            bottom: 0,
             child: Center(
               child: TooltipFromZero(
                 message: getExtraUiTooltipFromZero(context),
@@ -259,9 +304,12 @@ abstract class FilterNumber extends ConditionFilter {
                   clipBehavior: Clip.none,
                   children: [
                     Positioned(
-                      top: 0, left: -32, right: -32,
+                      top: 0,
+                      left: -32,
+                      right: -32,
                       child: Center(
-                        child: Text(getExtraUiName(context),
+                        child: Text(
+                          getExtraUiName(context),
                           style: Theme.of(context).textTheme.bodySmall!.copyWith(height: 1.2),
                         ),
                       ),
@@ -273,8 +321,8 @@ abstract class FilterNumber extends ConditionFilter {
                           return Checkbox(
                             value: extra,
                             onChanged: (value) {
-                              extra = value??false;
-                              checkboxSetState((){});
+                              extra = value ?? false;
+                              checkboxSetState(() {});
                               onValueChanged?.call();
                             },
                           );
@@ -287,10 +335,13 @@ abstract class FilterNumber extends ConditionFilter {
             ),
           ),
           Positioned(
-            right: 2, top: 0, bottom: 0,
+            right: 2,
+            top: 0,
+            bottom: 0,
             child: Center(
               child: TooltipFromZero(
-                message: '${FromZeroLocalizations.of(context).translate('delete')} ${FromZeroLocalizations.of(context).translate('filter')}',
+                message:
+                    '${FromZeroLocalizations.of(context).translate('delete')} ${FromZeroLocalizations.of(context).translate('filter')}',
                 child: IconButton(
                   icon: const Icon(Icons.close),
                   splashRadius: 20,
@@ -305,75 +356,80 @@ abstract class FilterNumber extends ConditionFilter {
   }
 }
 
-
 class FilterNumberEqualTo extends FilterNumber {
   FilterNumberEqualTo({
     bool inverse = false,
     super.query,
-  }) : super(extra: inverse,);
+  }) : super(
+          extra: inverse,
+        );
   @override
   String getUiName(BuildContext context) => 'Número igual a'; //Number equal to // TODO 3 internationalize
   @override
   String getExtraUiName(BuildContext context) => 'Invertir'; //Reverse // TODO 3 internationalize
   @override
-  String getExtraUiTooltipFromZero(BuildContext context) => 'Incluir valores distintos al valor especificado'; // TODO 3 internationalize
+  String getExtraUiTooltipFromZero(BuildContext context) =>
+      'Incluir valores distintos al valor especificado'; // TODO 3 internationalize
   @override
   bool isAllowed(row, key, col) {
-    if (query==null) return true;
-    final v = col!=null ? col.getValue(row, key) : row.values[key];
+    if (query == null) return true;
+    final v = col != null ? col.getValue(row, key) : row.values[key];
     final value = (v is ContainsValue) ? v.value : v;
     if (value is! num) return false;
-    bool result = extra ? value!=query : value==query;
+    bool result = extra ? value != query : value == query;
     return result;
   }
 }
-
 
 class FilterNumberGreaterThan extends FilterNumber {
   FilterNumberGreaterThan({
     bool inclusive = true,
     super.query,
-  }) : super(extra: inclusive,);
+  }) : super(
+          extra: inclusive,
+        );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_number_greater');
   @override
   String getExtraUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('include');
   @override
-  String getExtraUiTooltipFromZero(BuildContext context) => FromZeroLocalizations.of(context).translate('include_tooltip');
+  String getExtraUiTooltipFromZero(BuildContext context) =>
+      FromZeroLocalizations.of(context).translate('include_tooltip');
   @override
   bool isAllowed(row, key, col) {
-    if (query==null) return true;
-    final v = col!=null ? col.getValue(row, key) : row.values[key];
+    if (query == null) return true;
+    final v = col != null ? col.getValue(row, key) : row.values[key];
     final value = (v is ContainsValue) ? v.value : v;
     if (value is! num) return false;
-    bool result = extra ? value>=query! : value>query!;
+    bool result = extra ? value >= query! : value > query!;
     return result;
   }
 }
-
 
 class FilterNumberLessThan extends FilterNumber {
   FilterNumberLessThan({
     bool inclusive = true,
     super.query,
-  }) : super(extra: inclusive,);
+  }) : super(
+          extra: inclusive,
+        );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_number_less');
   @override
   String getExtraUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('include');
   @override
-  String getExtraUiTooltipFromZero(BuildContext context) => FromZeroLocalizations.of(context).translate('include_tooltip');
+  String getExtraUiTooltipFromZero(BuildContext context) =>
+      FromZeroLocalizations.of(context).translate('include_tooltip');
   @override
   bool isAllowed(row, key, col) {
-    if (query==null) return true;
-    final v = col!=null ? col.getValue(row, key) : row.values[key];
+    if (query == null) return true;
+    final v = col != null ? col.getValue(row, key) : row.values[key];
     final value = (v is ContainsValue) ? v.value : v;
     if (value is! num) return false;
-    bool result = extra ? value<=query! : value<query!;
+    bool result = extra ? value <= query! : value < query!;
     return result;
   }
 }
-
 
 abstract class FilterDate extends ConditionFilter {
   DateTime? _query;
@@ -382,6 +438,7 @@ abstract class FilterDate extends ConditionFilter {
     _query = value;
     _queryDate = value?.toDate();
   }
+
   Date? _queryDate;
   Date? get queryDate => _queryDate;
 
@@ -392,10 +449,16 @@ abstract class FilterDate extends ConditionFilter {
         _queryDate = query?.toDate();
 
   @override
-  Widget buildFormWidget({required BuildContext context, VoidCallback? onValueChanged, VoidCallback? onDelete,}) {
+  Widget buildFormWidget({
+    required BuildContext context,
+    VoidCallback? onValueChanged,
+    VoidCallback? onDelete,
+  }) {
     return Container(
       height: 40,
-      padding: const EdgeInsets.only(bottom: 2,),
+      padding: const EdgeInsets.only(
+        bottom: 2,
+      ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -411,7 +474,7 @@ abstract class FilterDate extends ConditionFilter {
                 lastDate: DateTime(2200),
                 onSelected: (v) {
                   onValueChanged?.call();
-                  datePickerSetState((){
+                  datePickerSetState(() {
                     query = v;
                   });
                 },
@@ -422,16 +485,22 @@ abstract class FilterDate extends ConditionFilter {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const SizedBox(width: 4,),
+                        const SizedBox(
+                          width: 4,
+                        ),
                         Expanded(
                           child: MaterialKeyValuePair(
                             title: title,
                             titleStyle: Theme.of(context).textTheme.bodySmall!.copyWith(height: 0.8),
-                            value: value==null ? '' : formatter.format(value),
-                            valueStyle: const TextStyle(fontSize: 15,),
+                            value: value == null ? '' : formatter.format(value),
+                            valueStyle: const TextStyle(
+                              fontSize: 15,
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 4,),
+                        const SizedBox(
+                          width: 4,
+                        ),
                       ],
                     ),
                   );
@@ -440,7 +509,9 @@ abstract class FilterDate extends ConditionFilter {
             },
           ),
           Positioned(
-            right: 38, top: 0, bottom: 0,
+            right: 38,
+            top: 0,
+            bottom: 0,
             child: Center(
               child: TooltipFromZero(
                 message: getExtraUiTooltipFromZero(context),
@@ -448,9 +519,12 @@ abstract class FilterDate extends ConditionFilter {
                   clipBehavior: Clip.none,
                   children: [
                     Positioned(
-                      top: 0, left: -32, right: -32,
+                      top: 0,
+                      left: -32,
+                      right: -32,
                       child: Center(
-                        child: Text(getExtraUiName(context),
+                        child: Text(
+                          getExtraUiName(context),
                           style: Theme.of(context).textTheme.bodySmall!.copyWith(height: 1.2),
                         ),
                       ),
@@ -462,8 +536,8 @@ abstract class FilterDate extends ConditionFilter {
                           return Checkbox(
                             value: extra,
                             onChanged: (value) {
-                              extra = value??false;
-                              checkboxSetState((){});
+                              extra = value ?? false;
+                              checkboxSetState(() {});
                               onValueChanged?.call();
                             },
                           );
@@ -476,10 +550,13 @@ abstract class FilterDate extends ConditionFilter {
             ),
           ),
           Positioned(
-            right: 2, top: 0, bottom: 0,
+            right: 2,
+            top: 0,
+            bottom: 0,
             child: Center(
               child: TooltipFromZero(
-                message: '${FromZeroLocalizations.of(context).translate('delete')} ${FromZeroLocalizations.of(context).translate('filter')}',
+                message:
+                    '${FromZeroLocalizations.of(context).translate('delete')} ${FromZeroLocalizations.of(context).translate('filter')}',
                 child: IconButton(
                   icon: const Icon(Icons.close),
                   splashRadius: 20,
@@ -493,10 +570,10 @@ abstract class FilterDate extends ConditionFilter {
     );
   }
 }
+
 bool _isSameDay(DateTime a, DateTime b) {
   return a.year == b.year && a.month == b.month && a.day == b.day;
 }
-
 
 // class FilterDateExactDay extends ConditionFilter {
 //   DateTime? query;
@@ -518,54 +595,58 @@ bool _isSameDay(DateTime a, DateTime b) {
 //   }
 // }
 
-
 class FilterDateAfter extends FilterDate {
   FilterDateAfter({
     bool inclusive = true,
     super.query,
-  }) : super(extra: inclusive,);
+  }) : super(
+          extra: inclusive,
+        );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_date_after');
   @override
   String getExtraUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('include');
   @override
-  String getExtraUiTooltipFromZero(BuildContext context) => FromZeroLocalizations.of(context).translate('include_tooltip');
+  String getExtraUiTooltipFromZero(BuildContext context) =>
+      FromZeroLocalizations.of(context).translate('include_tooltip');
   @override
   bool isAllowed(row, key, col) {
-    if (query==null) return true;
-    final v = col!=null ? col.getValue(row, key) : row.values[key];
+    if (query == null) return true;
+    final v = col != null ? col.getValue(row, key) : row.values[key];
     final value = (v is ContainsValue) ? v.value : v;
     if (value is DateTime) {
-      return value.isAfter(query!) || (extra&&_isSameDay(value, query!));
+      return value.isAfter(query!) || (extra && _isSameDay(value, query!));
     } else if (value is Date) {
-      return value.isAfter(queryDate!) || (extra&&value==queryDate!);
+      return value.isAfter(queryDate!) || (extra && value == queryDate!);
     } else {
       return false;
     }
   }
 }
 
-
 class FilterDateBefore extends FilterDate {
   FilterDateBefore({
     bool inclusive = true,
     super.query,
-  }) : super(extra: inclusive,);
+  }) : super(
+          extra: inclusive,
+        );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_date_before');
   @override
   String getExtraUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('include');
   @override
-  String getExtraUiTooltipFromZero(BuildContext context) => FromZeroLocalizations.of(context).translate('include_tooltip');
+  String getExtraUiTooltipFromZero(BuildContext context) =>
+      FromZeroLocalizations.of(context).translate('include_tooltip');
   @override
   bool isAllowed(row, key, col) {
-    if (query==null) return true;
-    final v = col!=null ? col.getValue(row, key) : row.values[key];
+    if (query == null) return true;
+    final v = col != null ? col.getValue(row, key) : row.values[key];
     final value = (v is ContainsValue) ? v.value : v;
     if (value is DateTime) {
-      return value.isBefore(query!) || (extra&&_isSameDay(value, query!));
+      return value.isBefore(query!) || (extra && _isSameDay(value, query!));
     } else if (value is Date) {
-      return value.isBefore(queryDate!) || (extra&&value==queryDate!);
+      return value.isBefore(queryDate!) || (extra && value == queryDate!);
     } else {
       return false;
     }
