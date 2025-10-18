@@ -18,7 +18,6 @@ import 'package:preload_page_view/preload_page_view.dart';
 part 'field.dart';
 part 'lazy_dao.dart';
 
-
 typedef OnSaveCallback<ModelType> = FutureOr<ModelType?> Function(BuildContext context, DAO<ModelType> e);
 typedef OnSaveAPICallback<ModelType> = ApiState<ModelType?> Function(BuildContext context, DAO<ModelType> e);
 typedef OnDidSaveCallback<ModelType> = void Function(BuildContext context, ModelType? model, DAO<ModelType> dao);
@@ -35,27 +34,29 @@ enum DoubleColumnLayoutType {
 }
 
 class DAO<ModelType> extends ChangeNotifier implements Comparable {
-
   static bool ignoreBlockingErrors = false; // VERY careful with this
-  dynamic id; // TODO 3 id type should be declared as <>
+  covariant dynamic id; // TODO 3 id type should be declared as <>
   late DAOValueGetter<String, ModelType> classUiNameGetter;
   String get classUiName => classUiNameGetter(this);
   DAOValueGetter<String, ModelType>? classUiNamePluralGetter;
   String get classUiNamePlural => classUiNamePluralGetter?.call(this) ?? classUiName;
   late DAOValueGetter<String, ModelType> uiNameGetter;
   String get uiName => uiNameGetter(this);
-  DAOValueGetter<String, ModelType>? uiNameDenseGetter; /// used in table, or whenever build is called with dense=true
+  DAOValueGetter<String, ModelType>? uiNameDenseGetter;
+
+  /// used in table, or whenever build is called with dense=true
   String get uiNameDense => uiNameDenseGetter?.call(this) ?? uiName;
   DAOValueGetter<String, ModelType>? searchNameGetter;
   String get searchName => searchNameGetter?.call(this) ?? uiName;
+
   /// props shouldn't be added or removed manually, only changes at construction and on load()
   late List<FieldGroup> fieldGroups;
   Map<String, Field> get props {
     return {
-      if (fieldGroups.isNotEmpty)
-        ...fieldGroups.map((e) => e.props).reduce((value, element) => {...value, ...element}),
+      if (fieldGroups.isNotEmpty) ...fieldGroups.map((e) => e.props).reduce((value, element) => {...value, ...element}),
     };
   }
+
   OnSaveCallback<ModelType>? onSave;
   OnSaveAPICallback<ModelType>? onSaveAPI;
   OnDidSaveCallback<ModelType>? onDidSave;
@@ -76,13 +77,14 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
   late bool enableUndoRedoMechanism;
   late bool showConfirmDialogWithBlockingErrors;
   DAOValueGetter<DoubleColumnLayoutType, ModelType>? doubleColumnLayoutType;
-  DAO? parentDAO; /// if not null, undo/redo calls will be relayed to the parent
+  DAO? parentDAO;
+
+  /// if not null, undo/redo calls will be relayed to the parent
   DAOValueGetter<String, ModelType>? editDialogTitle;
   DAOValueGetter<String, ModelType>? saveButtonTitle;
   DAOValueGetter<String, ModelType>? saveConfirmationDialogTitle;
   DAOValueGetter<Widget, ModelType>? saveConfirmationDialogDescription;
   FutureOr<String>? get defaultExportPath => null;
-
 
   DAO({
     required this.classUiNameGetter,
@@ -118,23 +120,20 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     this.saveConfirmationDialogTitle,
     this.saveButtonTitle,
     this.saveConfirmationDialogDescription,
-  }) :  _undoRecord = undoRecord ?? [],
-        _redoRecord = redoRecord ?? []
-        {
-          this.props.forEach((key, value) {
-            value.dao = this;
-            value.addListener(notifyListeners);
-          });
-          addListener(() {
-            for (final element in _selfUpdateListeners) {
-              element(this);
-            }
-          });
-        }
-
+  })  : _undoRecord = undoRecord ?? [],
+        _redoRecord = redoRecord ?? [] {
+    this.props.forEach((key, value) {
+      value.dao = this;
+      value.addListener(notifyListeners);
+    });
+    addListener(() {
+      for (final element in _selfUpdateListeners) {
+        element(this);
+      }
+    });
+  }
 
   DAO._uninitialized();
-
 
   /// @mustOverride
   DAO<ModelType> copyWith({
@@ -172,33 +171,34 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     DAOValueGetter<Widget, ModelType>? saveConfirmationDialogDescription,
   }) {
     final result = DAO<ModelType>(
-      id: id??this.id,
-      classUiNameGetter: classUiNameGetter??this.classUiNameGetter,
-      fieldGroups: fieldGroups??this.fieldGroups.map((e) => e.copyWith()).toList(),
-      classUiNamePluralGetter: classUiNamePluralGetter??this.classUiNamePluralGetter,
-      uiNameGetter: uiNameGetter??this.uiNameGetter,
-      uiNameDenseGetter: uiNameDenseGetter??this.uiNameDenseGetter,
-      onSave: onSave??this.onSave,
-      onSaveAPI: onSaveAPI??this.onSaveAPI,
-      onDidSave: onDidSave??this.onDidSave,
-      onDelete: onDelete??this.onDelete,
-      onDeleteAPI: onDeleteAPI??this.onDeleteAPI,
-      onDidDelete: onDidDelete??this.onDidDelete,
-      viewWidgetBuilder: viewWidgetBuilder??this.viewWidgetBuilder,
-      viewDialogExtraActions: viewDialogExtraActions??this.viewDialogExtraActions,
-      formDialogExtraActions: formDialogExtraActions??this.formDialogExtraActions,
-      viewDialogWidth: viewDialogWidth??this.viewDialogWidth,
-      formDialogWidth: formDialogWidth??this.formDialogWidth,
-      viewDialogLinksToInnerDAOs: viewDialogLinksToInnerDAOs??this.viewDialogLinksToInnerDAOs,
-      viewDialogShowsViewButtons: viewDialogShowsViewButtons??this.viewDialogShowsViewButtons,
-      viewDialogShowsEditButton: viewDialogShowsEditButton??this.viewDialogShowsEditButton,
-      viewDialogShowsDeleteButton: viewDialogShowsDeleteButton??this.viewDialogShowsDeleteButton,
-      wantsLinkToSelfFromOtherDAOs: wantsLinkToSelfFromOtherDAOs??this.wantsLinkToSelfFromOtherDAOs,
-      undoRecord: undoRecord??this._undoRecord,
-      redoRecord: redoRecord??this._redoRecord,
-      showConfirmDialogWithBlockingErrors: showConfirmDialogWithBlockingErrors??this.showConfirmDialogWithBlockingErrors,
-      parentDAO: parentDAO??this.parentDAO,
-      doubleColumnLayoutType: enableDoubleColumnLayout??this.doubleColumnLayoutType,
+      id: id ?? this.id,
+      classUiNameGetter: classUiNameGetter ?? this.classUiNameGetter,
+      fieldGroups: fieldGroups ?? this.fieldGroups.map((e) => e.copyWith()).toList(),
+      classUiNamePluralGetter: classUiNamePluralGetter ?? this.classUiNamePluralGetter,
+      uiNameGetter: uiNameGetter ?? this.uiNameGetter,
+      uiNameDenseGetter: uiNameDenseGetter ?? this.uiNameDenseGetter,
+      onSave: onSave ?? this.onSave,
+      onSaveAPI: onSaveAPI ?? this.onSaveAPI,
+      onDidSave: onDidSave ?? this.onDidSave,
+      onDelete: onDelete ?? this.onDelete,
+      onDeleteAPI: onDeleteAPI ?? this.onDeleteAPI,
+      onDidDelete: onDidDelete ?? this.onDidDelete,
+      viewWidgetBuilder: viewWidgetBuilder ?? this.viewWidgetBuilder,
+      viewDialogExtraActions: viewDialogExtraActions ?? this.viewDialogExtraActions,
+      formDialogExtraActions: formDialogExtraActions ?? this.formDialogExtraActions,
+      viewDialogWidth: viewDialogWidth ?? this.viewDialogWidth,
+      formDialogWidth: formDialogWidth ?? this.formDialogWidth,
+      viewDialogLinksToInnerDAOs: viewDialogLinksToInnerDAOs ?? this.viewDialogLinksToInnerDAOs,
+      viewDialogShowsViewButtons: viewDialogShowsViewButtons ?? this.viewDialogShowsViewButtons,
+      viewDialogShowsEditButton: viewDialogShowsEditButton ?? this.viewDialogShowsEditButton,
+      viewDialogShowsDeleteButton: viewDialogShowsDeleteButton ?? this.viewDialogShowsDeleteButton,
+      wantsLinkToSelfFromOtherDAOs: wantsLinkToSelfFromOtherDAOs ?? this.wantsLinkToSelfFromOtherDAOs,
+      undoRecord: undoRecord ?? this._undoRecord,
+      redoRecord: redoRecord ?? this._redoRecord,
+      showConfirmDialogWithBlockingErrors:
+          showConfirmDialogWithBlockingErrors ?? this.showConfirmDialogWithBlockingErrors,
+      parentDAO: parentDAO ?? this.parentDAO,
+      doubleColumnLayoutType: enableDoubleColumnLayout ?? this.doubleColumnLayoutType,
       searchNameGetter: searchNameGetter ?? this.searchNameGetter,
       editDialogTitle: editDialogTitle ?? this.editDialogTitle,
       saveConfirmationDialogTitle: saveConfirmationDialogTitle ?? this.saveConfirmationDialogTitle,
@@ -209,12 +209,12 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     return result;
   }
 
-  bool get isNew => id==null;
+  bool get isNew => id == null;
   bool get isEdited => props.values.any((e) => e.isEdited);
   bool get userInteracted => props.values.any((e) => e.userInteracted);
   List<ValidationError> get validationErrors => props.values.map((e) => e.validationErrors).flatten().toList();
-  bool get canSave => onSave!=null || onSaveAPI!=null;
-  bool get canDelete => onDelete!=null || onDeleteAPI!=null;
+  bool get canSave => onSave != null || onSaveAPI != null;
+  bool get canDelete => onDelete != null || onDeleteAPI != null;
 
   @override
   int compareTo(other) => (other is DAO) ? uiName.compareTo(other.uiName) : -1;
@@ -223,14 +223,11 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
   String toString() => uiName;
 
   @override
-  bool operator == (Object other) => (other is DAO)
-      && (id==null
-          ? this.hashCode==other.hashCode
-          : this.id==other.id);
+  bool operator ==(Object other) =>
+      (other is DAO) && (id == null ? this.hashCode == other.hashCode : this.id == other.id);
 
   @override
-  int get hashCode => id==null ? super.hashCode : id.hashCode;
-
+  int get hashCode => id == null ? super.hashCode : id.hashCode;
 
   bool blockNotifyListeners = false;
   BuildContext? _contextForValidation;
@@ -244,12 +241,12 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     super.notifyListeners();
   }
 
-
   void addOnUpdate(ValueChanged<DAO> o) {
     if (!_selfUpdateListeners.contains(o)) {
       _selfUpdateListeners.add(o);
     }
   }
+
   bool removeOnUpdate(ValueChanged<DAO> o) {
     return _selfUpdateListeners.remove(o);
   }
@@ -263,7 +260,6 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     notifyListeners();
   }
 
-
   late List<List<Field>> _undoRecord;
   late List<List<Field>> _redoRecord;
   List<Field>? _undoTransaction;
@@ -272,6 +268,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
   void beginUndoTransaction() {
     _undoTransaction = [];
   }
+
   void beginRedoTransaction() {
     _redoTransaction = [];
   }
@@ -279,7 +276,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
   void commitUndoTransaction({
     bool clearRedo = true,
   }) {
-    assert(_undoTransaction!=null, 'beginUndoTransaction was not called');
+    assert(_undoTransaction != null, 'beginUndoTransaction was not called');
     if (_undoTransaction!.isNotEmpty) {
       _undoRecord.add(_undoTransaction!);
       if (clearRedo) {
@@ -288,18 +285,20 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     }
     _undoTransaction = null;
   }
+
   void commitRedoTransaction() {
-    assert(_redoTransaction!=null, 'beginRedoTransaction was not called');
+    assert(_redoTransaction != null, 'beginRedoTransaction was not called');
     if (_redoTransaction!.isNotEmpty) {
       _redoRecord.add(_redoTransaction!);
     }
     _redoTransaction = null;
   }
 
-  void addUndoEntry(Field field, {
+  void addUndoEntry(
+    Field field, {
     bool clearRedo = true,
   }) {
-    if (parentDAO!=null) {
+    if (parentDAO != null) {
       parentDAO!.addUndoEntry(field, clearRedo: clearRedo);
     } else {
       if (_undoTransaction != null) {
@@ -312,11 +311,12 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       }
     }
   }
+
   void addRedoEntry(Field field) {
-    if (parentDAO!=null) {
+    if (parentDAO != null) {
       parentDAO!.addRedoEntry(field);
     } else {
-      if (_redoTransaction!=null) {
+      if (_redoTransaction != null) {
         _redoTransaction!.add(field);
       } else {
         _redoRecord.add([field]);
@@ -326,9 +326,9 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
 
   void removeLastUndoEntry(Field field) {
     int index = -1;
-    for (int i=_undoRecord.lastIndex; i>=0 && index==-1; i--) {
+    for (int i = _undoRecord.lastIndex; i >= 0 && index == -1; i--) {
       index = _undoRecord[i].lastIndexOf(field);
-      if (index!=-1) {
+      if (index != -1) {
         _undoRecord[i].removeAt(index);
       }
       if (_undoRecord[i].isEmpty) {
@@ -336,11 +336,12 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       }
     }
   }
+
   void removeLastRedoEntry(Field field) {
     int index = -1;
-    for (int i=_redoRecord.lastIndex; i>=0 && index==-1; i--) {
+    for (int i = _redoRecord.lastIndex; i >= 0 && index == -1; i--) {
       index = _redoRecord[i].lastIndexOf(field);
-      if (index!=-1) {
+      if (index != -1) {
         _redoRecord[i].removeAt(index);
       }
       if (_redoRecord[i].isEmpty) {
@@ -350,16 +351,17 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
   }
 
   void removeAllUndoEntries(Field field) {
-    for (int i=_undoRecord.lastIndex; i>=0; i--) {
-      _undoRecord[i].removeWhere((e) => e==field);
+    for (int i = _undoRecord.lastIndex; i >= 0; i--) {
+      _undoRecord[i].removeWhere((e) => e == field);
       if (_undoRecord[i].isEmpty) {
         _undoRecord.removeAt(i);
       }
     }
   }
+
   void removeAllRedoEntries(Field field) {
-    for (int i=_redoRecord.lastIndex; i>=0; i--) {
-      _redoRecord[i].removeWhere((e) => e==field);
+    for (int i = _redoRecord.lastIndex; i >= 0; i--) {
+      _redoRecord[i].removeWhere((e) => e == field);
       if (_redoRecord[i].isEmpty) {
         _redoRecord.removeAt(i);
       }
@@ -370,58 +372,69 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     assert(_undoRecord.isNotEmpty);
     blockNotifyListeners = true;
     beginRedoTransaction();
-    for (int i=0; i<_undoRecord.last.length; i++) {
+    for (int i = 0; i < _undoRecord.last.length; i++) {
       _undoRecord.last[i].undo(
         removeEntryFromDAO: false,
-        requestFocus: i==0,
+        requestFocus: i == 0,
       );
     }
     _undoRecord.removeLast();
     commitRedoTransaction();
     blockNotifyListeners = false;
-    validate(contextForValidation, validateNonEditedFields: false,);
+    validate(
+      contextForValidation,
+      validateNonEditedFields: false,
+    );
     notifyListeners();
   }
+
   void redo() {
     assert(_redoRecord.isNotEmpty);
     blockNotifyListeners = true;
     beginUndoTransaction();
-    for (int i=0; i<_redoRecord.last.length; i++) {
+    for (int i = 0; i < _redoRecord.last.length; i++) {
       _redoRecord.last[i].redo(
         removeEntryFromDAO: false,
-        requestFocus: i==0,
+        requestFocus: i == 0,
       );
     }
     _redoRecord.removeLast();
-    commitUndoTransaction(clearRedo: false,);
+    commitUndoTransaction(
+      clearRedo: false,
+    );
     blockNotifyListeners = false;
-    validate(contextForValidation, validateNonEditedFields: false,);
+    validate(
+      contextForValidation,
+      validateNonEditedFields: false,
+    );
     notifyListeners();
   }
 
-
   int _validationCallCount = 0;
-  int get validationCallCount => parentDAO==null
-      ? _validationCallCount : parentDAO!.validationCallCount;
+  int get validationCallCount => parentDAO == null ? _validationCallCount : parentDAO!.validationCallCount;
   set validationCallCount(int value) {
     _validationCallCount = value;
   }
-  Future<bool> validate(context, {
+
+  Future<bool> validate(
+    context, {
     bool validateNonEditedFields = true,
   }) async {
     final currentValidationId = ++validationCallCount;
     if (blockNotifyListeners) {
       return false;
     }
-    if (parentDAO!=null) {
-      return parentDAO!.validate(parentDAO!.contextForValidation,
+    if (parentDAO != null) {
+      return parentDAO!.validate(
+        parentDAO!.contextForValidation,
         validateNonEditedFields: validateNonEditedFields,
       );
     }
     bool success = true;
     List<Future<bool>> results = [];
     for (final e in props.values) {
-      if (validateNonEditedFields) { // await syncing text controllers when saving
+      if (validateNonEditedFields) {
+        // await syncing text controllers when saving
         if (e is StringField) {
           e.valUpdateTimer?.cancel();
           if (e.controller.text != e.value) {
@@ -445,22 +458,24 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
           }
         }
       }
-      if (currentValidationId!=validationCallCount) return false;
-      final future = e.validate(
+      if (currentValidationId != validationCallCount) return false;
+      final future = e
+          .validate(
         contextForValidation!,
         this,
         currentValidationId,
         validateIfNotEdited: validateNonEditedFields,
-      ).then((v) {
+      )
+          .then((v) {
         e.notifyListeners();
         return v;
       });
       results.add(future);
     }
-    if (currentValidationId!=validationCallCount) return false;
+    if (currentValidationId != validationCallCount) return false;
     for (final e in results) {
       success = await e;
-      if (currentValidationId!=validationCallCount) return false;
+      if (currentValidationId != validationCallCount) return false;
       if (!success) {
         break;
       }
@@ -468,27 +483,29 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     notifyListeners();
     return success && validationErrors.where((e) => e.isBlocking).isEmpty;
   }
+
   void focusFirstBlockingError() {
     final validationErrors = this.validationErrors;
     validationErrors.sort((a, b) => a.severity.weight.compareTo(b.severity.weight));
     final error = validationErrors.firstOrNull;
-    if (error!=null) {
+    if (error != null) {
       focusError(error);
     }
   }
+
   void focusError(ValidationError error) {
     error.field.requestFocus();
     try {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         error.animationController?.forward(from: 0);
         // if the field is disabled, it can't be focused, so we need to manually scroll to it
-        if (!error.field.enabled && error.field.fieldGlobalKey.currentContext!=null) {
+        if (!error.field.enabled && error.field.fieldGlobalKey.currentContext != null) {
           EnsureVisibleWhenFocusedState.ensureVisibleForContext(
             context: error.field.fieldGlobalKey.currentContext!,
           );
         }
       });
-    } catch(_) {}
+    } catch (_) {}
   }
 
   bool hasFocus() {
@@ -500,17 +517,18 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     return false;
   }
 
-
-  Future<ModelType?> maybeSave(BuildContext context, {
-    bool updateDbValuesAfterSuccessfulSave=true,
-    bool showDefaultSnackBars=true,
+  Future<ModelType?> maybeSave(
+    BuildContext context, {
+    bool updateDbValuesAfterSuccessfulSave = true,
+    bool showDefaultSnackBars = true,
     bool? snackBarCancellable,
-    bool askForSaveConfirmation=true,
+    bool askForSaveConfirmation = true,
     bool skipValidation = false,
   }) async {
     final validationFuture = skipValidation
         ? Future.value(true)
-        : validate(context,
+        : validate(
+            context,
             validateNonEditedFields: true,
           );
     bool? confirm = await showModalFromZero(
@@ -518,7 +536,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       builder: (context) {
         final GlobalKey timerGlobalKey = GlobalKey();
         return SizedBox(
-          width: formDialogWidth-32,
+          width: formDialogWidth - 32,
           child: ResponsiveInsetsDialog(
             clipBehavior: Clip.hardEdge,
             child: FutureBuilderFromZero<bool>(
@@ -533,8 +551,11 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 18,),
-                        Text('Validando Datos...', // TODO 3 internationalize
+                        const SizedBox(
+                          height: 18,
+                        ),
+                        Text(
+                          'Validando Datos...', // TODO 3 internationalize
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         Expanded(
@@ -556,19 +577,27 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 18,),
+                      const SizedBox(
+                        height: 18,
+                      ),
                       ApiProviderBuilder.defaultErrorBuilder(context, error, stackTrace as StackTrace?, null),
-                      const SizedBox(height: 12,),
+                      const SizedBox(
+                        height: 12,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           DialogButton.cancel(
                             child: Text(FromZeroLocalizations.of(context).translate("close_caps")),
                           ),
-                          const SizedBox(width: 2,),
+                          const SizedBox(
+                            width: 2,
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 12,),
+                      const SizedBox(
+                        height: 12,
+                      ),
                     ],
                   ),
                 );
@@ -576,26 +605,31 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
               successBuilder: (context, validation) {
                 validation = skipValidation
                     ? true
-                    : validation && validationErrors.firstOrNullWhere((e) => e.isBlocking)==null;
-                if (!showConfirmDialogWithBlockingErrors && !validation) {  // TODO 3 implement a parameter for always allowing to save, even on error
+                    : validation && validationErrors.firstOrNullWhere((e) => e.isBlocking) == null;
+                if (!showConfirmDialogWithBlockingErrors && !validation) {
+                  // TODO 3 implement a parameter for always allowing to save, even on error
                   Navigator.of(context).pop(null);
                 }
-                if (!askForSaveConfirmation && validationErrors.where((e) => e.isBlocking || e.isVisibleAsSaveConfirmation).isEmpty) {
+                if (!askForSaveConfirmation &&
+                    validationErrors.where((e) => e.isBlocking || e.isVisibleAsSaveConfirmation).isEmpty) {
                   Navigator.of(context).pop(true);
                 }
                 String shownName = uiName;
                 if (shownName.isNullOrEmpty) shownName = classUiName;
-                Duration timedOverlayRemaining = Duration.zero; // hack to make ctrl+enter action also wait for TimedOverlay countdown
+                Duration timedOverlayRemaining =
+                    Duration.zero; // hack to make ctrl+enter action also wait for TimedOverlay countdown
                 return DialogFromZero(
                   includeDialogWidget: false,
                   maxWidth: 512,
                   acceptCallback: () {
-                    if (!ignoreBlockingErrors && (timedOverlayRemaining!=Duration.zero || !validation)) return;
+                    if (!ignoreBlockingErrors && (timedOverlayRemaining != Duration.zero || !validation)) return;
                     Navigator.of(context).pop(true);
                   },
-                  title: Text(validation
-                      ? (saveConfirmationDialogTitle?.call(this) ?? FromZeroLocalizations.of(context).translate("confirm_save_title"))
-                      : 'Error de Validación', // TODO 3 internationalize
+                  title: Text(
+                    validation
+                        ? (saveConfirmationDialogTitle?.call(this) ??
+                            FromZeroLocalizations.of(context).translate("confirm_save_title"))
+                        : 'Error de Validación', // TODO 3 internationalize
                   ),
                   content: AnimatedBuilder(
                     animation: this,
@@ -606,8 +640,12 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             validation
-                                ? (saveConfirmationDialogDescription?.call(this) ?? Text("${FromZeroLocalizations.of(context).translate("confirm_save_desc")}\r\n$shownName"))
-                                : const Text('Debe resolver los siguientes errores de validación:',), // TODO 3 internationalize
+                                ? (saveConfirmationDialogDescription?.call(this) ??
+                                    Text(
+                                        "${FromZeroLocalizations.of(context).translate("confirm_save_desc")}\r\n$shownName"))
+                                : const Text(
+                                    'Debe resolver los siguientes errores de validación:',
+                                  ), // TODO 3 internationalize
                             SaveConfirmationValidationMessage(allErrors: validationErrors),
                           ],
                         ),
@@ -620,22 +658,34 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                       key: timerGlobalKey,
                       duration: validationErrors.isEmpty || !validation
                           ? Duration.zero
-                          : Duration(milliseconds: (1000 + 500*Set.from(validationErrors.where((e) => e.isVisibleAsSaveConfirmation).map((e) => e.error)).length).clamp(0, 10000)),
+                          : Duration(
+                              milliseconds: (1000 +
+                                      500 *
+                                          Set.from(validationErrors
+                                              .where((e) => e.isVisibleAsSaveConfirmation)
+                                              .map((e) => e.error)).length)
+                                  .clamp(0, 10000)),
                       borderRadius: const BorderRadius.all(Radius.circular(999)),
-                      builder: (context, {
+                      builder: (
+                        context, {
                         required Duration elapsed,
                         required Duration remaining,
                       }) {
                         timedOverlayRemaining = remaining;
-                        final callback = !ignoreBlockingErrors && (remaining!=Duration.zero || !validation) ? null : () {
-                          Navigator.of(context).pop(true);
-                        };
+                        final callback = !ignoreBlockingErrors && (remaining != Duration.zero || !validation)
+                            ? null
+                            : () {
+                                Navigator.of(context).pop(true);
+                              };
                         Widget result = DialogButton.accept(
-                          tooltip: validation ? null : 'No se puede guardar hasta resolver los errores de validación', // TODO 3 internationalize
+                          tooltip: validation
+                              ? null
+                              : 'No se puede guardar hasta resolver los errores de validación', // TODO 3 internationalize
                           onPressed: callback,
-                          child: Text((saveButtonTitle?.call(this).toUpperCase() ?? FromZeroLocalizations.of(context).translate("save_caps"))),
+                          child: Text((saveButtonTitle?.call(this).toUpperCase() ??
+                              FromZeroLocalizations.of(context).translate("save_caps"))),
                         );
-                        if (remaining==Duration.zero) {
+                        if (remaining == Duration.zero) {
                           result = DefaultDialogAction(
                             child: result,
                           );
@@ -651,15 +701,16 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         );
       },
     );
-    if (confirm??false) {
-      return save(context,
+    if (confirm ?? false) {
+      return save(
+        context,
         skipValidation: true,
         updateDbValuesAfterSuccessfulSave: updateDbValuesAfterSuccessfulSave,
         showDefaultSnackBar: showDefaultSnackBars,
         snackBarCancellable: snackBarCancellable,
       );
-    } else if (confirm==null) {
-      final errors = validationErrors.where((e) => e.severity!=ValidationErrorSeverity.unfinished).toList();
+    } else if (confirm == null) {
+      final errors = validationErrors.where((e) => e.severity != ValidationErrorSeverity.unfinished).toList();
       if (errors.isNotEmpty) {
         errors.sort((a, b) => a.severity.weight.compareTo(b.severity.weight));
         focusError(errors.first);
@@ -668,14 +719,16 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     return null;
   }
 
-  Future<ModelType?> save(BuildContext context, {
-    bool updateDbValuesAfterSuccessfulSave=true,
-    bool showDefaultSnackBar=true,
+  Future<ModelType?> save(
+    BuildContext context, {
+    bool updateDbValuesAfterSuccessfulSave = true,
+    bool showDefaultSnackBar = true,
     bool? snackBarCancellable,
-    bool skipValidation=false,
+    bool skipValidation = false,
   }) async {
     if (!skipValidation) {
-      bool validation = await validate(context,
+      bool validation = await validate(
+        context,
         validateNonEditedFields: true,
       );
       if (!validation) {
@@ -685,14 +738,14 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     }
     for (final e in props.values) {
       if (e is StringField && e.trimOnSave) {
-        e.commitValue((e.value??'').trim());
+        e.commitValue((e.value ?? '').trim());
       }
     }
-    bool newInstance = id==null || id==-1;
+    bool newInstance = id == null || id == -1;
     bool success = false;
     ModelType? model;
-    if (onSaveAPI!=null) {
-      final stateNotifier = onSaveAPI!.call(contextForValidation??context, this);
+    if (onSaveAPI != null) {
+      final stateNotifier = onSaveAPI!.call(contextForValidation ?? context, this);
       final Completer completer = Completer();
       final removeListener = stateNotifier.addListener((state) {
         state.mapOrNull(
@@ -709,22 +762,22 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         stateNotifier: stateNotifier,
         duration: showDefaultSnackBar ? 3.seconds : Duration.zero,
         cancelable: snackBarCancellable,
-        successTitle: '$classUiName ${newInstance ? FromZeroLocalizations.of(context).translate("added")
-            : FromZeroLocalizations.of(context).translate("edited")} ${FromZeroLocalizations.of(context).translate("successfully")}.',
+        successTitle:
+            '$classUiName ${newInstance ? FromZeroLocalizations.of(context).translate("added") : FromZeroLocalizations.of(context).translate("edited")} ${FromZeroLocalizations.of(context).translate("successfully")}.',
       ).show();
       try {
         await Future.any([controller.closed, completer.future]);
-        success = model!=null;
+        success = model != null;
       } catch (e, st) {
         log(LgLvl.error, 'Error while saving $classUiName: $uiName', e: e, st: st, type: FzLgType.dao);
       }
       removeListener();
-    } else if (onSave==null) {
+    } else if (onSave == null) {
       success = true;
     } else {
       try {
-        model = await onSave!.call(contextForValidation??context, this);
-        success = model!=null;
+        model = await onSave!.call(contextForValidation ?? context, this);
+        success = model != null;
       } catch (e, st) {
         success = false;
         log(LgLvl.error, 'Error while saving $classUiName: $uiName', e: e, st: st, type: FzLgType.dao);
@@ -742,14 +795,15 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       _undoRecord.clear();
       _redoRecord.clear();
     }
-    if (onSaveAPI==null && showDefaultSnackBar) {
+    if (onSaveAPI == null && showDefaultSnackBar) {
       SnackBarFromZero(
         context: context,
         type: success ? SnackBarFromZero.success : SnackBarFromZero.error,
-        title: Text(success
-            ? '$classUiName ${newInstance ? FromZeroLocalizations.of(context).translate("added")
-            : FromZeroLocalizations.of(context).translate("edited")} ${FromZeroLocalizations.of(context).translate("successfully")}.'
-            : FromZeroLocalizations.of(context).translate("connection_error_long"),),
+        title: Text(
+          success
+              ? '$classUiName ${newInstance ? FromZeroLocalizations.of(context).translate("added") : FromZeroLocalizations.of(context).translate("edited")} ${FromZeroLocalizations.of(context).translate("successfully")}.'
+              : FromZeroLocalizations.of(context).translate("connection_error_long"),
+        ),
       ).show();
     }
     return model;
@@ -757,39 +811,41 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
 
   @mustCallSuper
   void didSave(BuildContext context, ModelType? model) {
-    onDidSave?.call(contextForValidation??context, model, this);
+    onDidSave?.call(contextForValidation ?? context, model, this);
   }
 
-
-  Future<bool> maybeDelete(BuildContext context, {
+  Future<bool> maybeDelete(
+    BuildContext context, {
     bool? showDefaultSnackBars,
   }) async {
     bool confirm = true;
     bool askForDeleteConfirmation = true;
     if (askForDeleteConfirmation) {
       confirm = await showModalFromZero(
-        context: context,
-        builder: (context) {
-          return DialogFromZero(
-            maxWidth: formDialogWidth-32,
-            title: Text(FromZeroLocalizations.of(context).translate('confirm_delete_title')),
-            content: Text('${FromZeroLocalizations.of(context).translate('confirm_delete_desc')} $uiName?'),
-            dialogActions: [
-              const DialogButton.cancel(),
-              DialogButton(
-                color: Colors.red,
-                onPressed: () {
-                  Navigator.of(context).pop(true); // Dismiss alert dialog
-                },
-                child: Text(FromZeroLocalizations.of(context).translate('delete_caps')),
-              ),
-            ],
-          );
-        },
-      ) ?? false;
+            context: context,
+            builder: (context) {
+              return DialogFromZero(
+                maxWidth: formDialogWidth - 32,
+                title: Text(FromZeroLocalizations.of(context).translate('confirm_delete_title')),
+                content: Text('${FromZeroLocalizations.of(context).translate('confirm_delete_desc')} $uiName?'),
+                dialogActions: [
+                  const DialogButton.cancel(),
+                  DialogButton(
+                    color: Colors.red,
+                    onPressed: () {
+                      Navigator.of(context).pop(true); // Dismiss alert dialog
+                    },
+                    child: Text(FromZeroLocalizations.of(context).translate('delete_caps')),
+                  ),
+                ],
+              );
+            },
+          ) ??
+          false;
     }
     if (confirm) {
-      return delete(context,
+      return delete(
+        context,
         showDefaultSnackBar: showDefaultSnackBars,
       );
     } else {
@@ -797,14 +853,15 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     }
   }
 
-  Future<bool> delete(BuildContext context, {
+  Future<bool> delete(
+    BuildContext context, {
     bool? showDefaultSnackBar,
   }) async {
     bool success = false;
     String? errorString;
     showDefaultSnackBar = showDefaultSnackBar ?? canDelete;
-    if (onDeleteAPI!=null) {
-      final stateNotifier = onDeleteAPI!.call(contextForValidation??context, this);
+    if (onDeleteAPI != null) {
+      final stateNotifier = onDeleteAPI!.call(contextForValidation ?? context, this);
       final Completer completer = Completer();
       final removeListener = stateNotifier.addListener((state) {
         state.mapOrNull(
@@ -819,7 +876,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       final controller = APISnackBar(
         context: context,
         stateNotifier: stateNotifier,
-        successTitle: '$classUiName ${FromZeroLocalizations.of(context).translate("deleted")} ${FromZeroLocalizations.of(context).translate("successfully")}.',
+        successTitle:
+            '$classUiName ${FromZeroLocalizations.of(context).translate("deleted")} ${FromZeroLocalizations.of(context).translate("successfully")}.',
       ).show();
       try {
         await Future.any([controller.closed, completer.future]);
@@ -829,8 +887,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       removeListener();
     } else {
       try {
-        errorString = await onDelete?.call(contextForValidation??context, this);
-        success = errorString==null;
+        errorString = await onDelete?.call(contextForValidation ?? context, this);
+        success = errorString == null;
       } catch (e, st) {
         success = false;
         log(LgLvl.error, 'Error while deleting $classUiName: $uiName', e: e, st: st, type: FzLgType.dao);
@@ -839,25 +897,28 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         SnackBarFromZero(
           context: context,
           type: success ? SnackBarFromZero.success : SnackBarFromZero.error,
-          title: Text(success
-              ? '$classUiName ${FromZeroLocalizations.of(context).translate("deleted")} ${FromZeroLocalizations.of(context).translate("successfully")}.'
-              : (errorString ?? FromZeroLocalizations.of(context).translate("connection_error_long")),),
+          title: Text(
+            success
+                ? '$classUiName ${FromZeroLocalizations.of(context).translate("deleted")} ${FromZeroLocalizations.of(context).translate("successfully")}.'
+                : (errorString ?? FromZeroLocalizations.of(context).translate("connection_error_long")),
+          ),
         ).show();
       }
     }
     if (success) {
-      onDidDelete?.call(contextForValidation??context, this);
+      onDidDelete?.call(contextForValidation ?? context, this);
     }
     return success;
   }
 
   void applyDefaultValues(List<InvalidatingError> invalidatingErrors) {
     if (ignoreBlockingErrors) return;
-    bool keepUndo = _undoRecord.isNotEmpty; // don't keep undo record if the invalidation error is thrown when opening dialog
+    bool keepUndo =
+        _undoRecord.isNotEmpty; // don't keep undo record if the invalidation error is thrown when opening dialog
     beginUndoTransaction();
     Map<Object, List<InvalidatingError>> map = {};
     for (final e in invalidatingErrors) {
-      map[e.field.fieldGlobalKey] = [...(map[e.field.fieldGlobalKey]??[]), e];
+      map[e.field.fieldGlobalKey] = [...(map[e.field.fieldGlobalKey] ?? []), e];
     }
     for (final errorList in map.values) {
       final error = errorList.first;
@@ -876,9 +937,10 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     commitUndoTransaction();
     if (fuse) fuseLastTwoUndoRecords();
   }
+
   void fuseLastTwoUndoRecords() {
-    if (_undoRecord.length>1) {
-      final previousRecord = _undoRecord[_undoRecord.length-2];
+    if (_undoRecord.length > 1) {
+      final previousRecord = _undoRecord[_undoRecord.length - 2];
       previousRecord.addAll(_undoRecord.removeLast());
     }
   }
@@ -903,14 +965,15 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         );
       },
     );
-    if (revert??false) {
+    if (revert ?? false) {
       revertChanges();
     }
   }
 
   /// this code assumes it is called only once on showModal, if it is called multiple times inside a build() method it will behave weirdly
   late final List<int> _tabBarAnimationLocks = [];
-  Widget buildEditModalWidget(BuildContext context, {
+  Widget buildEditModalWidget(
+    BuildContext context, {
     bool showDefaultSnackBars = true,
     bool showRevertChanges = false,
     bool? askForSaveConfirmation,
@@ -927,7 +990,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     _redoRecord.clear();
     _contextForValidation = _contextForValidation ?? context;
     Map<String, ValueNotifier<Size?>> secondarySizeNotifiers = {}; // this needs to persist between rebuilds
-    final initialValidation = validate(context,
+    final initialValidation = validate(
+      context,
       validateNonEditedFields: false,
     );
     final focusNode = FocusNode();
@@ -937,10 +1001,10 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         Widget result = AnimatedBuilder(
           animation: this,
           builder: (context, child) {
-            double widescreenDialogWidth = formDialogWidth*2+32+24+16+32+16+38;
-            final doubleColumnLayoutType = this.doubleColumnLayoutType?.call(this)??DoubleColumnLayoutType.tabbed;
-            bool widescreen = doubleColumnLayoutType!=DoubleColumnLayoutType.none
-                && constraints.maxWidth>=widescreenDialogWidth;
+            double widescreenDialogWidth = formDialogWidth * 2 + 32 + 24 + 16 + 32 + 16 + 38;
+            final doubleColumnLayoutType = this.doubleColumnLayoutType?.call(this) ?? DoubleColumnLayoutType.tabbed;
+            bool widescreen =
+                doubleColumnLayoutType != DoubleColumnLayoutType.none && constraints.maxWidth >= widescreenDialogWidth;
             ScrollController primaryScrollController = ScrollController();
             ScrollController tabBarScrollController = ScrollController();
             Map<String, ScrollController> secondaryScrollControllers = {};
@@ -951,7 +1015,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
             for (final e in fieldGroups) {
               if (e.props.values.where((e) => !e.hiddenInForm).isNotEmpty) {
                 bool asPrimary = !widescreen || e.primary;
-                final name = doubleColumnLayoutType==DoubleColumnLayoutType.tabbed
+                final name = doubleColumnLayoutType == DoubleColumnLayoutType.tabbed
                     ? e.name ?? 'Grupo $i'
                     : 'Grupo 1'; // TODO 3 internationalize
                 final scrollController = asPrimary ? primaryScrollController : ScrollController();
@@ -973,7 +1037,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                 } else {
                   secondaryScrollControllers[name] = scrollController;
                   secondarySizeNotifiers[name] ??= ValueNotifier(Size.zero);
-                  if (doubleColumnLayoutType==DoubleColumnLayoutType.tabbed) {
+                  if (doubleColumnLayoutType == DoubleColumnLayoutType.tabbed) {
                     secondaryFormWidgets[name] = FocusTraversalOrder(
                       order: NumericFocusOrder(i.toDouble()),
                       child: groupWidget,
@@ -984,7 +1048,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                       order: NumericFocusOrder(i.toDouble()),
                       child: Column(
                         children: [
-                          ...(((secondaryFormWidgets[name] as FocusTraversalOrder?)?.child as Column?)?.children??[]),
+                          ...(((secondaryFormWidgets[name] as FocusTraversalOrder?)?.child as Column?)?.children ?? []),
                           groupWidget,
                         ],
                       ),
@@ -993,7 +1057,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                 }
               }
             }
-            List<Widget> formActions = buildActionButtons(context,
+            List<Widget> formActions = buildActionButtons(
+              context,
               showCancelActionToPop: true,
               showDefaultSnackBars: showDefaultSnackBars,
               showRevertChanges: showRevertChanges,
@@ -1006,7 +1071,9 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
             final primaryFormBuiltWidget = ScrollbarFromZero(
               controller: primaryScrollController,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12,),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                ),
                 child: SingleChildScrollView(
                   controller: primaryScrollController,
                   child: Padding(
@@ -1024,7 +1091,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                 ),
               ),
             );
-            Widget result = DialogFromZero( // take advantage of DialogFromZero layout, to always have intrinsic height (without using the IntrinsicHeight widget)
+            Widget result = DialogFromZero(
+              // take advantage of DialogFromZero layout, to always have intrinsic height (without using the IntrinsicHeight widget)
               includeDialogWidget: false,
               contentPadding: EdgeInsets.zero,
               scrollController: ScrollController(), // disable default DialogFromZero scrolling
@@ -1038,14 +1106,14 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                   toolbarHeight: 56 + 12,
                   paddingRight: 18,
                   title: OverflowScroll(
-                    child: Text(editDialogTitle?.call(this) ?? '${id==null
-                        ? FromZeroLocalizations.of(context).translate("add")
-                        : FromZeroLocalizations.of(context).translate("edit")} $shownName',
+                    child: Text(
+                      editDialogTitle?.call(this) ??
+                          '${id == null ? FromZeroLocalizations.of(context).translate("add") : FromZeroLocalizations.of(context).translate("edit")} $shownName',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
                   actions: [
-                    ...(formDialogExtraActions?.call(contextForValidation??context, this) ?? []),
+                    ...(formDialogExtraActions?.call(contextForValidation ?? context, this) ?? []),
                     ...buildFormDialogDefaultActions(context, showUndoRedo: showUndoRedo),
                   ],
                 ),
@@ -1053,149 +1121,164 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
               content: FocusScope(
                 child: FocusTraversalGroup(
                   policy: OrderedTraversalPolicy(),
-                  child: secondaryFormWidgets.keys.isEmpty ? primaryFormBuiltWidget : DefaultTabController(
-                    length: secondaryFormWidgets.keys.length,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: secondaryFormWidgets.keys.isNotEmpty ? 12 : 0),
-                          child: SizedBox(
-                            width: formDialogWidth+24,
-                            child: primaryFormBuiltWidget,
-                          ),
-                        ),
-                        if (secondaryFormWidgets.keys.isNotEmpty)
-                          const Expanded(child: SizedBox.shrink()),
-                        if (secondaryFormWidgets.keys.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 24),
-                            child: SizedBox(
-                              width: formDialogWidth+24+16,
-                              child: DialogFromZero( // take advantage of DialogFromZero layout, to always have intrinsic height (without using the IntrinsicHeight widget)
-                                includeDialogWidget: false,
-                                contentPadding: EdgeInsets.zero,
-                                scrollController: ScrollController(), // disable default DialogFromZero scrolling
-                                appBar: Column(
-                                  children: [
-                                    if (secondaryFormWidgets.length>1 || secondaryFormWidgets.keys.first!='Grupo 1') // TODO 3 internationalize
-                                      ExcludeFocus(
-                                        child: ScrollbarFromZero(
-                                          controller: tabBarScrollController,
-                                          opacityGradientDirection: OpacityGradient.horizontal,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(right: 12, bottom: PlatformExtended.isDesktop ? 8 : 0,),
-                                            child: SingleChildScrollView(
-                                              scrollDirection: Axis.horizontal,
-                                              controller: tabBarScrollController,
-                                              child: IntrinsicWidth(
-                                                child: Card(
-                                                  clipBehavior: Clip.hardEdge,
-                                                  child: Builder(
-                                                    builder: (context) {
-                                                      return TabBar( // TODO 3 replace this with an actual widget: PageIndicatorFromzero. Allow to have an indicator + building children dinamically according to selected
-                                                        isScrollable: true,
-                                                        indicatorWeight: 3,
-                                                        tabs: secondaryFormWidgets.keys.map((e) {
-                                                          return Container(
-                                                            height: 32,
-                                                            alignment: Alignment.center,
-                                                            child: Text(e, style: Theme.of(context).textTheme.titleMedium,),
-                                                          );
-                                                        }).toList(),
-                                                        onTap: (value) async {
-                                                          DefaultTabController.of(context).index = value;
-                                                          pageController ??= PreloadPageController();
-                                                          final future = pageController!.animateToPage(value,
-                                                            duration: kTabScrollDuration,
-                                                            curve: Curves.ease,
-                                                          );
-                                                          _tabBarAnimationLocks.add(future.hashCode);
-                                                          await future;
-                                                          _tabBarAnimationLocks.remove(future.hashCode);
-                                                        },
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    SizedBox(
-                                      height: 0,
-                                      child: TabBarView(
-                                        children: List.filled(secondaryFormWidgets.keys.length, Container()),
-                                      ),
-                                    ),
-                                  ],
+                  child: secondaryFormWidgets.keys.isEmpty
+                      ? primaryFormBuiltWidget
+                      : DefaultTabController(
+                          length: secondaryFormWidgets.keys.length,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: secondaryFormWidgets.keys.isNotEmpty ? 12 : 0),
+                                child: SizedBox(
+                                  width: formDialogWidth + 24,
+                                  child: primaryFormBuiltWidget,
                                 ),
-                                content: Builder(
-                                  builder: (context) {
-                                    final tabController = DefaultTabController.of(context);
-                                    pageController ??= PreloadPageController(initialPage: tabController.index);
-                                    return AnimatedBuilder(
-                                      animation: tabController,
-                                      builder: (context, child) {
-                                        final currentIndex = tabController.index;
-                                        final currentKey = secondaryFormWidgets.keys.toList()[currentIndex];
-                                        return RelayedFiller(
-                                          duration: kTabScrollDuration,
-                                          notifier: secondarySizeNotifiers[currentKey]!,
-                                          applyWidth: false,
-                                          child: child,
-                                        );
-                                      },
-                                      child: PreloadPageView(
-                                        controller: pageController,
-                                        preloadPagesCount: 999,
-                                        onPageChanged: (value) {
-                                          if (_tabBarAnimationLocks.isEmpty) {
-                                            tabController.animateTo(value);
-                                          }
-                                        },
-                                        children: secondaryFormWidgets.keys.map((e) {
-                                          return ScrollbarFromZero(
-                                            controller: secondaryScrollControllers[e],
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                                              child: FocusTraversalGroup(
-                                                child: SingleChildScrollView(
-                                                  controller: secondaryScrollControllers[e],
-                                                  child: FillerRelayer(
-                                                    notifier: secondarySizeNotifiers[e]!,
-                                                    child: Padding(
-                                                      padding: EdgeInsets.only(
-                                                        top: secondaryFormWidgets.length==1 && secondaryFormWidgets.keys.first=='Grupo 1'
-                                                            ? 12 : 0,
-                                                        bottom: 28,
+                              ),
+                              if (secondaryFormWidgets.keys.isNotEmpty) const Expanded(child: SizedBox.shrink()),
+                              if (secondaryFormWidgets.keys.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 24),
+                                  child: SizedBox(
+                                    width: formDialogWidth + 24 + 16,
+                                    child: DialogFromZero(
+                                      // take advantage of DialogFromZero layout, to always have intrinsic height (without using the IntrinsicHeight widget)
+                                      includeDialogWidget: false,
+                                      contentPadding: EdgeInsets.zero,
+                                      scrollController: ScrollController(), // disable default DialogFromZero scrolling
+                                      appBar: Column(
+                                        children: [
+                                          if (secondaryFormWidgets.length > 1 ||
+                                              secondaryFormWidgets.keys.first != 'Grupo 1') // TODO 3 internationalize
+                                            ExcludeFocus(
+                                              child: ScrollbarFromZero(
+                                                controller: tabBarScrollController,
+                                                opacityGradientDirection: OpacityGradient.horizontal,
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                    right: 12,
+                                                    bottom: PlatformExtended.isDesktop ? 8 : 0,
+                                                  ),
+                                                  child: SingleChildScrollView(
+                                                    scrollDirection: Axis.horizontal,
+                                                    controller: tabBarScrollController,
+                                                    child: IntrinsicWidth(
+                                                      child: Card(
+                                                        clipBehavior: Clip.hardEdge,
+                                                        child: Builder(
+                                                          builder: (context) {
+                                                            return TabBar(
+                                                              // TODO 3 replace this with an actual widget: PageIndicatorFromzero. Allow to have an indicator + building children dinamically according to selected
+                                                              isScrollable: true,
+                                                              indicatorWeight: 3,
+                                                              tabs: secondaryFormWidgets.keys.map((e) {
+                                                                return Container(
+                                                                  height: 32,
+                                                                  alignment: Alignment.center,
+                                                                  child: Text(
+                                                                    e,
+                                                                    style: Theme.of(context).textTheme.titleMedium,
+                                                                  ),
+                                                                );
+                                                              }).toList(),
+                                                              onTap: (value) async {
+                                                                DefaultTabController.of(context).index = value;
+                                                                pageController ??= PreloadPageController();
+                                                                final future = pageController!.animateToPage(
+                                                                  value,
+                                                                  duration: kTabScrollDuration,
+                                                                  curve: Curves.ease,
+                                                                );
+                                                                _tabBarAnimationLocks.add(future.hashCode);
+                                                                await future;
+                                                                _tabBarAnimationLocks.remove(future.hashCode);
+                                                              },
+                                                            );
+                                                          },
+                                                        ),
                                                       ),
-                                                      child: secondaryFormWidgets[e],
                                                     ),
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          );
-                                        }).toList(),
+                                          SizedBox(
+                                            height: 0,
+                                            child: TabBarView(
+                                              children: List.filled(secondaryFormWidgets.keys.length, Container()),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    );
-                                  },
+                                      content: Builder(
+                                        builder: (context) {
+                                          final tabController = DefaultTabController.of(context);
+                                          pageController ??= PreloadPageController(initialPage: tabController.index);
+                                          return AnimatedBuilder(
+                                            animation: tabController,
+                                            builder: (context, child) {
+                                              final currentIndex = tabController.index;
+                                              final currentKey = secondaryFormWidgets.keys.toList()[currentIndex];
+                                              return RelayedFiller(
+                                                duration: kTabScrollDuration,
+                                                notifier: secondarySizeNotifiers[currentKey]!,
+                                                applyWidth: false,
+                                                child: child,
+                                              );
+                                            },
+                                            child: PreloadPageView(
+                                              controller: pageController,
+                                              preloadPagesCount: 999,
+                                              onPageChanged: (value) {
+                                                if (_tabBarAnimationLocks.isEmpty) {
+                                                  tabController.animateTo(value);
+                                                }
+                                              },
+                                              children: secondaryFormWidgets.keys.map((e) {
+                                                return ScrollbarFromZero(
+                                                  controller: secondaryScrollControllers[e],
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                    child: FocusTraversalGroup(
+                                                      child: SingleChildScrollView(
+                                                        controller: secondaryScrollControllers[e],
+                                                        child: FillerRelayer(
+                                                          notifier: secondarySizeNotifiers[e]!,
+                                                          child: Padding(
+                                                            padding: EdgeInsets.only(
+                                                              top: secondaryFormWidgets.length == 1 &&
+                                                                      secondaryFormWidgets.keys.first == 'Grupo 1'
+                                                                  ? 12
+                                                                  : 0,
+                                                              bottom: 28,
+                                                            ),
+                                                            child: secondaryFormWidgets[e],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
+                            ],
                           ),
-                      ],
-                    ),
-                  ),
+                        ),
                 ),
               ),
-              dialogActions: [Column(
-                mainAxisSize: MainAxisSize.min,
-                children: formActions,
-              ),],
+              dialogActions: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: formActions,
+                ),
+              ],
             );
             Map<InvalidatingError, Field> invalidatingErrors = {};
             List<InvalidatingError> autoResolveInvalidatingErrors = [];
@@ -1204,7 +1287,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
             for (final Field e in props.values) {
               final errors = e.validationErrors.whereType<InvalidatingError>();
               for (final error in errors) {
-                allowSetInvalidatingFieldsToDefaultValues = allowSetInvalidatingFieldsToDefaultValues && error.allowSetThisFieldToDefaultValue;
+                allowSetInvalidatingFieldsToDefaultValues =
+                    allowSetInvalidatingFieldsToDefaultValues && error.allowSetThisFieldToDefaultValue;
                 allowUndoInvalidatingChanges = allowUndoInvalidatingChanges && error.allowUndoInvalidatingChange;
                 if (error.showVisualConfirmation) {
                   invalidatingErrors[error] = error.field;
@@ -1233,9 +1317,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                     clipBehavior: Clip.hardEdge,
                     alignment: Alignment.centerLeft,
                     child: SizedBox(
-                      width: secondaryFormWidgets.keys.isEmpty
-                          ? formDialogWidth+32+24+16
-                          : widescreenDialogWidth,
+                      width: secondaryFormWidgets.keys.isEmpty ? formDialogWidth + 32 + 24 + 16 : widescreenDialogWidth,
                       child: ResponsiveInsetsDialog(
                         backgroundColor: Theme.of(context).canvasColor,
                         clipBehavior: Clip.hardEdge,
@@ -1254,103 +1336,138 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                       child: child,
                     );
                   },
-                  child: invalidatingErrors.isEmpty ? const SizedBox() : ColoredBox(
-                    color: Colors.black38,
-                    child: Center(
-                      child: SizedBox(
-                        width: formDialogWidth-32,
-                        child: ResponsiveInsetsDialog(
-                          child: IntrinsicHeight(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 24, left: 32, right: 32, bottom: 8,),
-                                  child: OverflowScroll(
-                                    child: Text(FromZeroLocalizations.of(context).translate("confirm_invalidating_change_title"),
-                                      style: Theme.of(context).textTheme.titleLarge,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: ScrollbarFromZero(
-                                    controller: invalidatingDialogScrollController,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12,),
-                                      child: SingleChildScrollView(
-                                        controller: invalidatingDialogScrollController,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(FromZeroLocalizations.of(context).translate("confirm_invalidating_change_description1")),
-                                            if (_undoRecord.isEmpty)
-                                              Text(FromZeroLocalizations.of(context).translate("confirm_invalidating_no_undo_record")),
-                                            if (_undoRecord.isNotEmpty)
-                                              ..._undoRecord.last.map((e) => FieldDiffMessage(
-                                                field: e,
-                                                oldValue: e.undoValues.last,
-                                                newValue: e.value,
-                                              ),),
-                                            const SizedBox(height: 24,),
-                                            Text(FromZeroLocalizations.of(context).translate(!allowSetInvalidatingFieldsToDefaultValues ? "confirm_invalidating_change_description2_1" : "confirm_invalidating_change_description2_2")),
-                                            const SizedBox(height: 6,),
-                                            ValidationMessage(
-                                              errors: invalidatingErrors.keys.toList(),
-                                              passedFirstEdit: true,
-                                              errorTextStyle: Theme.of(context).textTheme.bodyLarge,
-                                              animate: false,
+                  child: invalidatingErrors.isEmpty
+                      ? const SizedBox()
+                      : ColoredBox(
+                          color: Colors.black38,
+                          child: Center(
+                            child: SizedBox(
+                              width: formDialogWidth - 32,
+                              child: ResponsiveInsetsDialog(
+                                child: IntrinsicHeight(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          top: 24,
+                                          left: 32,
+                                          right: 32,
+                                          bottom: 8,
+                                        ),
+                                        child: OverflowScroll(
+                                          child: Text(
+                                            FromZeroLocalizations.of(context)
+                                                .translate("confirm_invalidating_change_title"),
+                                            style: Theme.of(context).textTheme.titleLarge,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: ScrollbarFromZero(
+                                          controller: invalidatingDialogScrollController,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 12,
                                             ),
-                                            if (allowSetInvalidatingFieldsToDefaultValues)
-                                              Padding(
-                                                padding: const EdgeInsets.only(top: 24),
-                                                child: Text(FromZeroLocalizations.of(context).translate(!allowUndoInvalidatingChanges ? "confirm_invalidating_change_description3_1" : "confirm_invalidating_change_description3_2")),
+                                            child: SingleChildScrollView(
+                                              controller: invalidatingDialogScrollController,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(FromZeroLocalizations.of(context)
+                                                      .translate("confirm_invalidating_change_description1")),
+                                                  if (_undoRecord.isEmpty)
+                                                    Text(FromZeroLocalizations.of(context)
+                                                        .translate("confirm_invalidating_no_undo_record")),
+                                                  if (_undoRecord.isNotEmpty)
+                                                    ..._undoRecord.last.map(
+                                                      (e) => FieldDiffMessage(
+                                                        field: e,
+                                                        oldValue: e.undoValues.last,
+                                                        newValue: e.value,
+                                                      ),
+                                                    ),
+                                                  const SizedBox(
+                                                    height: 24,
+                                                  ),
+                                                  Text(FromZeroLocalizations.of(context).translate(
+                                                      !allowSetInvalidatingFieldsToDefaultValues
+                                                          ? "confirm_invalidating_change_description2_1"
+                                                          : "confirm_invalidating_change_description2_2")),
+                                                  const SizedBox(
+                                                    height: 6,
+                                                  ),
+                                                  ValidationMessage(
+                                                    errors: invalidatingErrors.keys.toList(),
+                                                    passedFirstEdit: true,
+                                                    errorTextStyle: Theme.of(context).textTheme.bodyLarge,
+                                                    animate: false,
+                                                  ),
+                                                  if (allowSetInvalidatingFieldsToDefaultValues)
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(top: 24),
+                                                      child: Text(FromZeroLocalizations.of(context).translate(
+                                                          !allowUndoInvalidatingChanges
+                                                              ? "confirm_invalidating_change_description3_1"
+                                                              : "confirm_invalidating_change_description3_2")),
+                                                    ),
+                                                  if (allowSetInvalidatingFieldsToDefaultValues)
+                                                    ...invalidatingErrors.map((key, value) {
+                                                      return MapEntry(
+                                                        key,
+                                                        FieldDiffMessage(
+                                                          field: value,
+                                                          oldValue: value.value,
+                                                          newValue: key.defaultValue,
+                                                        ),
+                                                      );
+                                                    }).values,
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 12,
+                                          right: 12,
+                                          left: 12,
+                                          top: 8,
+                                        ),
+                                        alignment: Alignment.centerRight,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            if (allowUndoInvalidatingChanges)
+                                              DialogButton.cancel(
+                                                onPressed: () {
+                                                  beginRedoTransaction();
+                                                  undo();
+                                                  beginRedoTransaction();
+                                                  commitRedoTransaction(); // discard redo
+                                                },
                                               ),
                                             if (allowSetInvalidatingFieldsToDefaultValues)
-                                              ...invalidatingErrors.map((key, value) {
-                                                return MapEntry(key, FieldDiffMessage(
-                                                  field: value,
-                                                  oldValue: value.value,
-                                                  newValue: key.defaultValue,
-                                                ),);
-                                              }).values,
+                                              DialogButton.accept(
+                                                onPressed: () {
+                                                  applyDefaultValues(invalidatingErrors.keys.toList());
+                                                },
+                                              ),
                                           ],
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.only(bottom: 12, right: 12, left: 12, top: 8,),
-                                  alignment: Alignment.centerRight,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (allowUndoInvalidatingChanges)
-                                        DialogButton.cancel(
-                                          onPressed: () {
-                                            beginRedoTransaction();
-                                            undo();
-                                            beginRedoTransaction(); commitRedoTransaction(); // discard redo
-                                          },
-                                        ),
-                                      if (allowSetInvalidatingFieldsToDefaultValues)
-                                        DialogButton.accept(
-                                          onPressed: () {
-                                            applyDefaultValues(invalidatingErrors.keys.toList());
-                                          },
-                                        ),
                                     ],
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
                 ),
               ],
             );
@@ -1390,11 +1507,12 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       bindings: {
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.enter): () async {
           if (!isEdited) return;
-          ModelType? result = await maybeSave(context,
+          ModelType? result = await maybeSave(
+            context,
             showDefaultSnackBars: showDefaultSnackBars,
             askForSaveConfirmation: askForSaveConfirmation!,
           );
-          if (result!=null) {
+          if (result != null) {
             Navigator.of(context).pop(result);
           }
         },
@@ -1419,8 +1537,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     );
   }
 
-
-  List<Widget> buildViewDialogDefaultActions(BuildContext context, {
+  List<Widget> buildViewDialogDefaultActions(
+    BuildContext context, {
     bool? showEditButton,
     bool? showDeleteButton,
     bool showDefaultSnackBars = true,
@@ -1433,7 +1551,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
           icon: const Icon(Icons.edit_outlined),
           onTap: (context) async {
             final tempDao = copyWith();
-            final result = await tempDao.maybeEdit(context,
+            final result = await tempDao.maybeEdit(
+              context,
               showDefaultSnackBars: showDefaultSnackBars,
             );
             if (result != null) {
@@ -1447,7 +1566,9 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
             }
           },
         ),
-      if (showDeleteButton ?? viewDialogShowsDeleteButton ?? false) // always default false for now, to avoid breaking existing DAOs, should be ?? canDelete
+      if (showDeleteButton ??
+          viewDialogShowsDeleteButton ??
+          false) // always default false for now, to avoid breaking existing DAOs, should be ?? canDelete
         ActionFromZero(
           title: FromZeroLocalizations.of(context).translate('delete'),
           icon: const Icon(Icons.delete_forever),
@@ -1462,38 +1583,48 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     ];
   }
 
-  List<Widget> buildFormDialogDefaultActions(BuildContext context, {
+  List<Widget> buildFormDialogDefaultActions(
+    BuildContext context, {
     bool showUndoRedo = true,
   }) {
     return [
       if (enableUndoRedoMechanism && showUndoRedo)
         ActionFromZero(
           title: FromZeroLocalizations.of(context).translate("undo"),
-          icon: const Icon(MaterialCommunityIcons.undo_variant,),
+          icon: const Icon(
+            MaterialCommunityIcons.undo_variant,
+          ),
           breakpoints: {
             ScaffoldFromZero.screenSizeSmall: ActionState.overflow,
             ScaffoldFromZero.screenSizeMedium: ActionState.icon,
           },
-          onTap: _undoRecord.isEmpty ? null : (context) {
-            undo();
-          },
+          onTap: _undoRecord.isEmpty
+              ? null
+              : (context) {
+                  undo();
+                },
         ),
       if (enableUndoRedoMechanism && showUndoRedo)
         ActionFromZero(
           title: FromZeroLocalizations.of(context).translate("redo"),
-          icon: const Icon(MaterialCommunityIcons.redo_variant,),
+          icon: const Icon(
+            MaterialCommunityIcons.redo_variant,
+          ),
           breakpoints: {
             ScaffoldFromZero.screenSizeSmall: ActionState.overflow,
             ScaffoldFromZero.screenSizeMedium: ActionState.icon,
           },
-          onTap: _redoRecord.isEmpty ? null : (context) {
-            redo();
-          },
+          onTap: _redoRecord.isEmpty
+              ? null
+              : (context) {
+                  redo();
+                },
         ),
     ];
   }
 
-  Future<ModelType?> maybeEdit(BuildContext context, {
+  Future<ModelType?> maybeEdit(
+    BuildContext context, {
     bool showDefaultSnackBars = true,
     bool showRevertChanges = false,
     bool? askForSaveConfirmation,
@@ -1510,7 +1641,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         return Consumer(
           builder: (context, ref, child) {
             _contextForValidation = context;
-            return buildEditModalWidget(context,
+            return buildEditModalWidget(
+              context,
               showDefaultSnackBars: showDefaultSnackBars,
               showRevertChanges: showRevertChanges,
               askForSaveConfirmation: askForSaveConfirmation,
@@ -1523,17 +1655,21 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     return confirm;
   }
 
-
-  Future<dynamic> pushViewDialog(BuildContext passedContext, {
+  Future<dynamic> pushViewDialog(
+    BuildContext passedContext, {
     bool? showEditButton,
     bool? showDeleteButton,
     bool? useIntrinsicWidth,
     bool showDefaultSnackBars = true,
   }) {
-    if (useIntrinsicWidth==null && props.values.where((e) => e is ListField && !e.hiddenInView && (e.buildViewWidgetAsTable || e.objects.length>50)).isNotEmpty) {
+    if (useIntrinsicWidth == null &&
+        props.values
+            .where((e) => e is ListField && !e.hiddenInView && (e.buildViewWidgetAsTable || e.objects.length > 50))
+            .isNotEmpty) {
       useIntrinsicWidth = false;
     }
-    return showModalFromZero(context: passedContext,
+    return showModalFromZero(
+      context: passedContext,
       builder: (context) {
         return Consumer(
           builder: (mainContext, ref, child) {
@@ -1543,12 +1679,15 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                 final scrollController = ScrollController();
                 Widget result = SingleChildScrollView(
                   controller: scrollController,
-                  child: buildViewWidget(mainContext,
+                  child: buildViewWidget(
+                    mainContext,
                     mainScrollController: scrollController,
                   ),
                 );
                 if (useIntrinsicWidth ?? true) {
-                  result = IntrinsicWidth(child: result,);
+                  result = IntrinsicWidth(
+                    child: result,
+                  );
                 }
                 return DialogFromZero(
                   contentPadding: EdgeInsets.zero,
@@ -1559,11 +1698,13 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SelectableText(uiName,
+                      SelectableText(
+                        uiName,
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      if (uiName!=classUiName)
-                        SelectableText(classUiName,
+                      if (uiName != classUiName)
+                        SelectableText(
+                          classUiName,
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                     ],
@@ -1574,7 +1715,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                     ),
                   ],
                   appBarActions: [
-                    ...buildViewDialogDefaultActions(context,
+                    ...buildViewDialogDefaultActions(
+                      context,
                       showEditButton: showEditButton,
                       showDeleteButton: showDeleteButton,
                       showDefaultSnackBars: showDefaultSnackBars,
@@ -1589,7 +1731,9 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       },
     );
   }
-  Widget buildViewWidget(BuildContext context, {
+
+  Widget buildViewWidget(
+    BuildContext context, {
     List<FieldGroup>? fieldGroups,
     ScrollController? mainScrollController,
     bool? useIntrinsicWidth,
@@ -1599,10 +1743,12 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     bool applyAlternateBackground = true,
     bool initialAlternateBackground = false,
   }) {
-    if (viewWidgetBuilder!=null) {
+    if (viewWidgetBuilder != null) {
       return viewWidgetBuilder!(context, this);
     } else {
-      return defaultBuildViewWidget(context, this,
+      return defaultBuildViewWidget(
+        context,
+        this,
         fieldGroups: fieldGroups,
         mainScrollController: mainScrollController,
         useIntrinsicWidth: useIntrinsicWidth,
@@ -1614,7 +1760,10 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       );
     }
   }
-  static Widget defaultBuildViewWidget<T>(BuildContext context, DAO<T> dao, {
+
+  static Widget defaultBuildViewWidget<T>(
+    BuildContext context,
+    DAO<T> dao, {
     List<FieldGroup>? fieldGroups,
     ScrollController? mainScrollController,
     bool? useIntrinsicWidth,
@@ -1624,8 +1773,9 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     bool applyAlternateBackground = true,
     bool initialAlternateBackground = false,
   }) {
-    if (useIntrinsicWidth==null && (titleMaxWidth!=null
-        || dao.props.values.where((e) => e is ListField && e.buildViewWidgetAsTable).isNotEmpty)) {
+    if (useIntrinsicWidth == null &&
+        (titleMaxWidth != null ||
+            dao.props.values.where((e) => e is ListField && e.buildViewWidgetAsTable).isNotEmpty)) {
       useIntrinsicWidth ??= false;
     }
     fieldGroups ??= dao.fieldGroups;
@@ -1649,27 +1799,37 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
               return ListField.tableAsViewBuilder(dao, e, context, mainScrollController);
             } else {
               final title = Container(
-                padding: const EdgeInsets.only(bottom: 6, top: 8, left: 12, right: 12,),
+                padding: const EdgeInsets.only(
+                  bottom: 6,
+                  top: 8,
+                  left: 12,
+                  right: 12,
+                ),
                 // alignment: Alignment.centerRight,
-                child: SelectableText(e.uiName,
+                child: SelectableText(
+                  e.uiName,
                   style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                    color: Theme.of(context).textTheme.bodyLarge!.color!
-                        .withValues(alpha: Theme.of(context).brightness==Brightness.light ? 0.7 : 0.8),
-                    wordSpacing: 0.4, // hack to fix soft-wrap bug with intrinsicHeight
-                    height: 1.1,
-                  ),
+                        color: Theme.of(context)
+                            .textTheme
+                            .bodyLarge!
+                            .color!
+                            .withValues(alpha: Theme.of(context).brightness == Brightness.light ? 0.7 : 0.8),
+                        wordSpacing: 0.4, // hack to fix soft-wrap bug with intrinsicHeight
+                        height: 1.1,
+                      ),
                   textAlign: TextAlign.right,
                 ),
               );
               final value = Container(
                 alignment: Alignment.centerLeft,
-                child: e.buildViewWidget(context,
+                child: e.buildViewWidget(
+                  context,
                   linkToInnerDAOs: dao.viewDialogLinksToInnerDAOs,
                   showViewButtons: dao.viewDialogShowsViewButtons,
                 ),
               );
               Widget layout;
-              if (titleMaxWidth==null) {
+              if (titleMaxWidth == null) {
                 layout = IntrinsicHeight(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1680,7 +1840,9 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                       ),
                       const SizedBox(
                         height: 24,
-                        child: VerticalDivider(width: 0,),
+                        child: VerticalDivider(
+                          width: 0,
+                        ),
                       ),
                       Expanded(
                         flex: valueFlex,
@@ -1700,10 +1862,13 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                       child: title,
                     ),
                     const FlexibleLayoutItemFromZero(
-                      minSize: 1, maxSize: 1,
+                      minSize: 1,
+                      maxSize: 1,
                       child: SizedBox(
                         height: 24,
-                        child: VerticalDivider(width: 0,),
+                        child: VerticalDivider(
+                          width: 0,
+                        ),
                       ),
                     ),
                     FlexibleLayoutItemFromZero(
@@ -1714,15 +1879,17 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                 );
               }
               return Material(
-                color: !applyAlternateBackground ? Colors.transparent
-                    : clear ? Theme.of(context).cardColor
-                    : Color.alphaBlend(Theme.of(context).cardColor.withValues(alpha: 0.965), Colors.black),
+                color: !applyAlternateBackground
+                    ? Colors.transparent
+                    : clear
+                        ? Theme.of(context).cardColor
+                        : Color.alphaBlend(Theme.of(context).cardColor.withValues(alpha: 0.965), Colors.black),
                 child: layout,
               );
             }
           }).toList(),
         );
-        if (!first || group.name!=null) {
+        if (!first || group.name != null) {
           result = Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1734,13 +1901,14 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                   titleMaxWidth: titleMaxWidth,
                   goBelow: false,
                 ),
-              if (group.name!=null)
+              if (group.name != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 12),
-                  child: Text(group.name!,
+                  child: Text(
+                    group.name!,
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                 ),
               result,
@@ -1751,8 +1919,10 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         return result;
       }).toList(),
     );
-    if (useIntrinsicWidth??true) {
-      result = IntrinsicWidth(child: result,);
+    if (useIntrinsicWidth ?? true) {
+      result = IntrinsicWidth(
+        child: result,
+      );
     }
     return result;
   }
@@ -1761,15 +1931,15 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     required BuildContext context,
     required FieldGroup group,
     ScrollController? mainScrollController,
-    bool showActionButtons=true,
-    bool showRevertChanges=false,
-    bool popAfterSuccessfulSave=true,
-    bool showCancelActionToPop=false,
-    bool expandToFillContainer=true,
-    bool showDefaultSnackBars=true,
-    bool askForSaveConfirmation=true,
-    bool firstIteration=true,
-    bool wrapInLayoutFromZeroItem=false,
+    bool showActionButtons = true,
+    bool showRevertChanges = false,
+    bool popAfterSuccessfulSave = true,
+    bool showCancelActionToPop = false,
+    bool expandToFillContainer = true,
+    bool showDefaultSnackBars = true,
+    bool askForSaveConfirmation = true,
+    bool firstIteration = true,
+    bool wrapInLayoutFromZeroItem = false,
     FocusNode? focusNode,
     int groupBorderNestingCount = 0,
   }) {
@@ -1779,45 +1949,46 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       return const SizedBox.shrink();
     }
     bool verticalLayout = firstIteration || group.primary;
-    bool addBorder = group.name!=null && group.props.length>1;
+    bool addBorder = group.name != null && group.props.length > 1;
     groupBorderNestingCount += (addBorder ? 1 : 0);
     List<Widget> getChildren({bool useLayoutFromZero = false}) => [
-      ...buildFormWidgets(context,
-        props: fields,
-        showCancelActionToPop: true,
-        mainScrollController: mainScrollController,
-        expandToFillContainer: verticalLayout && expandToFillContainer,
-        asSlivers: false,
-        focusNode: firstIteration && group.primary ? focusNode : null,
-        showDefaultSnackBars: showDefaultSnackBars,
-        showRevertChanges: showRevertChanges,
-        askForSaveConfirmation: askForSaveConfirmation,
-        showActionButtons: false,
-        wrapInLayoutFromZeroItem: useLayoutFromZero,
-      ),
-      ...childGroups.map((e) {
-        return buildGroupWidget(
-          context: context,
-          group: e,
-          showCancelActionToPop: true,
-          mainScrollController: mainScrollController,
-          expandToFillContainer: verticalLayout && expandToFillContainer,
-          focusNode: focusNode,
-          showDefaultSnackBars: showDefaultSnackBars,
-          showRevertChanges: showRevertChanges,
-          askForSaveConfirmation: askForSaveConfirmation,
-          showActionButtons: false,
-          popAfterSuccessfulSave: popAfterSuccessfulSave,
-          firstIteration: false,
-          wrapInLayoutFromZeroItem: useLayoutFromZero,
-          groupBorderNestingCount: groupBorderNestingCount,
-        );
-      }),
-    ];
+          ...buildFormWidgets(
+            context,
+            props: fields,
+            showCancelActionToPop: true,
+            mainScrollController: mainScrollController,
+            expandToFillContainer: verticalLayout && expandToFillContainer,
+            asSlivers: false,
+            focusNode: firstIteration && group.primary ? focusNode : null,
+            showDefaultSnackBars: showDefaultSnackBars,
+            showRevertChanges: showRevertChanges,
+            askForSaveConfirmation: askForSaveConfirmation,
+            showActionButtons: false,
+            wrapInLayoutFromZeroItem: useLayoutFromZero,
+          ),
+          ...childGroups.map((e) {
+            return buildGroupWidget(
+              context: context,
+              group: e,
+              showCancelActionToPop: true,
+              mainScrollController: mainScrollController,
+              expandToFillContainer: verticalLayout && expandToFillContainer,
+              focusNode: focusNode,
+              showDefaultSnackBars: showDefaultSnackBars,
+              showRevertChanges: showRevertChanges,
+              askForSaveConfirmation: askForSaveConfirmation,
+              showActionButtons: false,
+              popAfterSuccessfulSave: popAfterSuccessfulSave,
+              firstIteration: false,
+              wrapInLayoutFromZeroItem: useLayoutFromZero,
+              groupBorderNestingCount: groupBorderNestingCount,
+            );
+          }),
+        ];
     Widget result;
     if (verticalLayout) {
       final children = getChildren();
-      if (children.length==1) {
+      if (children.length == 1) {
         result = children.first;
       } else {
         result = Column(
@@ -1829,7 +2000,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     } else {
       if (group.useLayoutFromZero) {
         final children = getChildren(useLayoutFromZero: true).cast<FlexibleLayoutItemFromZero>();
-        if (children.length==1) {
+        if (children.length == 1) {
           result = children.first;
         } else {
           result = ValidationMessageProxy(
@@ -1842,7 +2013,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         }
       } else {
         final children = getChildren();
-        if (children.length==1) {
+        if (children.length == 1) {
           result = children.first;
         } else {
           ScrollController scrollController = ScrollController();
@@ -1877,8 +2048,10 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         child: Stack(
           children: [
             Positioned(
-              bottom: 12, top: 20,
-              left: 2, right: 2,
+              bottom: 12,
+              top: 20,
+              left: 2,
+              right: 2,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.all(Radius.circular(16)),
@@ -1890,11 +2063,17 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
               ),
             ),
             Positioned(
-              top: 0, left: 18,
+              top: 0,
+              left: 18,
               child: Text(group.name!),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 24, bottom: 18, left: 8, right: 8,),
+              padding: const EdgeInsets.only(
+                top: 24,
+                bottom: 18,
+                left: 8,
+                right: 8,
+              ),
               child: result,
             ),
           ],
@@ -1902,7 +2081,10 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       );
     } else if (group.primary && firstIteration) {
       result = Padding(
-        padding: const EdgeInsets.only(top: 12, bottom: 12,),
+        padding: const EdgeInsets.only(
+          top: 12,
+          bottom: 12,
+        ),
         child: result,
       );
     }
@@ -1916,18 +2098,19 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     return result;
   }
 
-  List<Widget> buildFormWidgets(BuildContext context, {
+  List<Widget> buildFormWidgets(
+    BuildContext context, {
     Map<String, Field>? props,
     ScrollController? mainScrollController,
-    bool asSlivers=true,
-    bool showActionButtons=true,
-    bool showRevertChanges=false,
-    bool popAfterSuccessfulSave=true,
-    bool showCancelActionToPop=false,
-    bool expandToFillContainer=true,
-    bool showDefaultSnackBars=true,
-    bool askForSaveConfirmation=true,
-    bool wrapInLayoutFromZeroItem=false,
+    bool asSlivers = true,
+    bool showActionButtons = true,
+    bool showRevertChanges = false,
+    bool popAfterSuccessfulSave = true,
+    bool showCancelActionToPop = false,
+    bool expandToFillContainer = true,
+    bool showDefaultSnackBars = true,
+    bool askForSaveConfirmation = true,
+    bool wrapInLayoutFromZeroItem = false,
     FocusNode? focusNode,
   }) {
     assert(!asSlivers || !wrapInLayoutFromZeroItem, 'FlexibleLayoutFromZero does not support slivers.');
@@ -1935,11 +2118,14 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     bool first = true;
     List<Widget> result = [
       ...props.values.map((e) {
-        List<Widget> result = e.buildFieldEditorWidgets(context,
+        List<Widget> result = e.buildFieldEditorWidgets(
+          context,
           addCard: true,
           asSliver: asSlivers,
-          expandToFillContainer: e is ListField && !asSlivers // it will never make sense to build a ListView inside a FormGroup
-              ? false : expandToFillContainer,
+          expandToFillContainer:
+              e is ListField && !asSlivers // it will never make sense to build a ListView inside a FormGroup
+                  ? false
+                  : expandToFillContainer,
           focusNode: first ? focusNode : null,
           mainScrollController: mainScrollController,
         );
@@ -1964,48 +2150,50 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                 ? const SizedBox.shrink()
                 : Padding(
                     padding: EdgeInsets.only(
-                      top: i==0 ? fieldVerticalPadding : 0,
-                      bottom: i==result.lastIndex ? fieldVerticalPadding : 0,
+                      top: i == 0 ? fieldVerticalPadding : 0,
+                      bottom: i == result.lastIndex ? fieldVerticalPadding : 0,
                     ),
                     child: w,
                   );
-              }).toList();
+          }).toList();
           if (wrapInLayoutFromZeroItem) {
             result = [
               FlexibleLayoutItemFromZero(
                 maxSize: hidden ? 0 : e.maxWidth,
                 minSize: hidden ? 0 : e.minWidth,
                 flex: hidden ? 0 : e.flex,
-                child: hidden ? const SizedBox.shrink() : AnimatedSwitcher(
-                  duration: 300.milliseconds,
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  child: e.hiddenInForm
-                      ? const SizedBox.shrink()
-                      : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: result,
-                  ),
-                  transitionBuilder: (child, animation) {
-                    return SizeTransition(
-                      sizeFactor: animation,
-                      axis: Axis.vertical,
-                      axisAlignment: -1,
-                      child: Center(child: child),
-                    );
-                  },
-                  layoutBuilder: (currentChild, previousChildren) {
-                    // only allow 2 widgets to be here, to avoid building the widet
-                    // for the same Field twice, which causes duplicate GlobalKey assertion
-                    return Stack(
-                      alignment: Alignment.center,
-                      children: <Widget>[
-                        if (previousChildren.isNotEmpty) previousChildren.last,
-                        if (currentChild != null) currentChild,
-                      ],
-                    );
-                  },
-                ),
+                child: hidden
+                    ? const SizedBox.shrink()
+                    : AnimatedSwitcher(
+                        duration: 300.milliseconds,
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        child: e.hiddenInForm
+                            ? const SizedBox.shrink()
+                            : Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: result,
+                              ),
+                        transitionBuilder: (child, animation) {
+                          return SizeTransition(
+                            sizeFactor: animation,
+                            axis: Axis.vertical,
+                            axisAlignment: -1,
+                            child: Center(child: child),
+                          );
+                        },
+                        layoutBuilder: (currentChild, previousChildren) {
+                          // only allow 2 widgets to be here, to avoid building the widet
+                          // for the same Field twice, which causes duplicate GlobalKey assertion
+                          return Stack(
+                            alignment: Alignment.center,
+                            children: <Widget>[
+                              if (previousChildren.isNotEmpty) previousChildren.last,
+                              if (currentChild != null) currentChild,
+                            ],
+                          );
+                        },
+                      ),
               ),
             ];
           }
@@ -2013,7 +2201,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         return result;
       }).flatten(),
       if (showActionButtons)
-        ...buildActionButtons(context,
+        ...buildActionButtons(
+          context,
           showRevertChanges: showRevertChanges,
           popAfterSuccessfulSave: popAfterSuccessfulSave,
           showCancelActionToPop: showCancelActionToPop,
@@ -2027,40 +2216,44 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     return result;
   }
 
-  List<Widget> buildActionButtons(BuildContext context, {
-    bool showRevertChanges=false,
-    bool popAfterSuccessfulSave=true,
-    bool showCancelActionToPop=false,
-    bool showDefaultSnackBars=true,
-    bool askForSaveConfirmation=true,
+  List<Widget> buildActionButtons(
+    BuildContext context, {
+    bool showRevertChanges = false,
+    bool popAfterSuccessfulSave = true,
+    bool showCancelActionToPop = false,
+    bool showDefaultSnackBars = true,
+    bool askForSaveConfirmation = true,
     double topSpace = 6,
     double bottomSpace = 24,
   }) {
     return [
-      SizedBox(height: topSpace,),
+      SizedBox(
+        height: topSpace,
+      ),
       Center(
         child: WillPopScope(
           onWillPop: () async {
             if (!userInteracted || !isEdited) return true;
             bool? pop = (await showModalFromZero(
-              context: context,
-              builder: (modalContext) {
-                return DialogFromZero(
-                  title: Text(FromZeroLocalizations.of(context).translate("confirm_close_title")),
-                  content: Text(FromZeroLocalizations.of(context).translate("confirm_close_desc")),
-                  dialogActions: [
-                    const DialogButton.cancel(),
-                    DialogButton(
-                      color: Colors.red,
-                      onPressed: () {
-                        Navigator.of(modalContext).pop(true); // Dismiss alert dialog
-                      },
-                      child: Text(FromZeroLocalizations.of(context).translate("close_caps")),
-                    ),
-                  ],
-                );
-              },
-            )) ?? false;
+                  context: context,
+                  builder: (modalContext) {
+                    return DialogFromZero(
+                      title: Text(FromZeroLocalizations.of(context).translate("confirm_close_title")),
+                      content: Text(FromZeroLocalizations.of(context).translate("confirm_close_desc")),
+                      dialogActions: [
+                        const DialogButton.cancel(),
+                        DialogButton(
+                          color: Colors.red,
+                          onPressed: () {
+                            Navigator.of(modalContext).pop(true); // Dismiss alert dialog
+                          },
+                          child: Text(FromZeroLocalizations.of(context).translate("close_caps")),
+                        ),
+                      ],
+                    );
+                  },
+                )) ??
+                false;
             if (pop) {
               revertChanges();
             }
@@ -2079,8 +2272,11 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(6.0),
-                          child: Text(FromZeroLocalizations.of(context).translate("cancel_caps"),
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,
+                          child: Text(
+                            FromZeroLocalizations.of(context).translate("cancel_caps"),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                               color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.8),
                             ),
                           ),
@@ -2091,51 +2287,70 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                       ),
                     ),
                   if (showCancelActionToPop)
-                    const SizedBox(width: 12,),
+                    const SizedBox(
+                      width: 12,
+                    ),
                   if (showRevertChanges)
                     Expanded(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey,
                         ),
-                        onPressed: isEdited && userInteracted ? () {
-                          maybeRevertChanges(context);
-                        } : null,
+                        onPressed: isEdited && userInteracted
+                            ? () {
+                                maybeRevertChanges(context);
+                              }
+                            : null,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Text(FromZeroLocalizations.of(context).translate("reverse_changes_caps"),
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600,),
+                          child: Text(
+                            FromZeroLocalizations.of(context).translate("reverse_changes_caps"),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   if (showRevertChanges)
-                    const SizedBox(width: 12,),
+                    const SizedBox(
+                      width: 12,
+                    ),
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: userInteracted
-                            ? Color.alphaBlend(Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2), Theme.of(context).cardColor)
+                            ? Color.alphaBlend(Theme.of(context).colorScheme.secondary.withValues(alpha: 0.2),
+                                Theme.of(context).cardColor)
                             : Theme.of(context).canvasColor,
                         foregroundColor: userInteracted
                             ? Theme.of(context).textTheme.bodyLarge!.color
                             : Theme.of(context).disabledColor,
                       ),
-                      onPressed: isEdited ? () async {
-                        ModelType? result = await maybeSave(context,
-                          showDefaultSnackBars: showDefaultSnackBars,
-                          askForSaveConfirmation: askForSaveConfirmation,
-                        );
-                        if (result!=null) {
-                          if (popAfterSuccessfulSave) {
-                            Navigator.of(context).pop(result);
-                          }
-                        }
-                      } : null,
+                      onPressed: isEdited
+                          ? () async {
+                              ModelType? result = await maybeSave(
+                                context,
+                                showDefaultSnackBars: showDefaultSnackBars,
+                                askForSaveConfirmation: askForSaveConfirmation,
+                              );
+                              if (result != null) {
+                                if (popAfterSuccessfulSave) {
+                                  Navigator.of(context).pop(result);
+                                }
+                              }
+                            }
+                          : null,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Text((saveButtonTitle?.call(this).toUpperCase() ?? FromZeroLocalizations.of(context).translate("save_caps")),
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600,),
+                        child: Text(
+                          (saveButtonTitle?.call(this).toUpperCase() ??
+                              FromZeroLocalizations.of(context).translate("save_caps")),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
@@ -2146,18 +2361,15 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
           ),
         ),
       ),
-      SizedBox(height: bottomSpace,),
+      SizedBox(
+        height: bottomSpace,
+      ),
     ];
   }
 
   /// should be overriden by children to provide retry functionalities for errors that occur during validation
   Widget buildValidationInternalErrorRetryButton(InternalError e) => const SizedBox.shrink();
-  
 }
-
-
-
-
 
 class DAOViewDividerWidget extends StatelessWidget {
   final int titleFlex;
@@ -2176,7 +2388,7 @@ class DAOViewDividerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (titleMaxWidth==null) {
+    if (titleMaxWidth == null) {
       return IntrinsicHeight(
         child: Stack(
           children: [
@@ -2190,8 +2402,10 @@ class DAOViewDividerWidget extends StatelessWidget {
                     child: const SizedBox.expand(),
                   ),
                   SizedBox(
-                    height: goBelow ? height : height/2,
-                    child: const VerticalDivider(width: 0,),
+                    height: goBelow ? height : height / 2,
+                    child: const VerticalDivider(
+                      width: 0,
+                    ),
                   ),
                   Expanded(
                     flex: valueFlex,
@@ -2218,10 +2432,13 @@ class DAOViewDividerWidget extends StatelessWidget {
                   child: const SizedBox.expand(),
                 ),
                 FlexibleLayoutItemFromZero(
-                  minSize: 1, maxSize: 1,
+                  minSize: 1,
+                  maxSize: 1,
                   child: SizedBox(
-                    height: goBelow ? height : height/2,
-                    child: const VerticalDivider(width: 0,),
+                    height: goBelow ? height : height / 2,
+                    child: const VerticalDivider(
+                      width: 0,
+                    ),
                   ),
                 ),
                 FlexibleLayoutItemFromZero(
@@ -2236,4 +2453,3 @@ class DAOViewDividerWidget extends StatelessWidget {
     }
   }
 }
-
