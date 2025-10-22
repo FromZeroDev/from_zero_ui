@@ -109,7 +109,7 @@ class Export extends StatefulWidget {
         exportThemeData = (themeParameters?.lightTheme ?? ThemeData()).copyWith(
           canvasColor: Colors.white,
           cardColor: Colors.white,
-          cardTheme: const CardTheme(
+          cardTheme: const CardThemeData(
             elevation: 0,
             color: Colors.white,
 //            shape: Border.all(style: BorderStyle.none),
@@ -161,7 +161,7 @@ class Export extends StatefulWidget {
         exportThemeData = (themeParameters?.lightTheme ?? ThemeData()).copyWith(
           canvasColor: Colors.white,
           cardColor: Colors.white,
-          cardTheme: const CardTheme(
+          cardTheme: const CardThemeData(
             elevation: 0,
             color: Colors.white,
 //            shape: Border.all(style: BorderStyle.none),

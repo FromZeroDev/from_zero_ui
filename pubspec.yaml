@@ -37,6 +37,7 @@ dependencies:
   extended_image: ^8.1.0  # it might be a lot of work to update this because our routing solution is tightly coupled to it
   google_fonts: ^6.2.1 # used in from_zero_logo
   sliver_tools: ^0.2.12
+  value_layout_builder: ^0.5.0 # required by my_sliver_sticky_header. If everything is migrated to use sliver_tools, this can be removed
   humanizer: ^2.2.0
 #  keframe: ^3.0.0 # unused for now, but very interesting package...
   preload_page_view: ^0.2.0
