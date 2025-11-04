@@ -6,9 +6,10 @@ import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/util/copied_flutter_widgets/my_ensure_visible_when_focused.dart';
 import 'package:from_zero_ui/util/hack_focus_traversal.dart';
 
-class BoolComparable implements Comparable {
+class BoolComparable implements Comparable<dynamic> {
   final bool value;
 
+  // ignore: avoid_positional_boolean_parameters
   const BoolComparable(this.value);
 
   @override

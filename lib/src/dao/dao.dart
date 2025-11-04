@@ -1170,7 +1170,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                                                           builder: (context) {
                                                             return TabBar(
                                                               // TODO 3 replace this with an actual widget: PageIndicatorFromzero. Allow to have an indicator + building children dinamically according to selected
-                                                              isScrollable: true,
+                                                              isScrollable: false,
                                                               indicatorWeight: 3,
                                                               tabs: secondaryFormWidgets.keys.map((e) {
                                                                 return Container(
