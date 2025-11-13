@@ -563,59 +563,63 @@ class BoolField extends Field<BoolComparable> {
               child: OverflowBox(
                 minWidth: minWidth.coerceAtMost(maxWidth),
                 maxWidth: maxWidth,
-                child: Stack(
-                  children: [
-                    CheckboxListTile(
-                      focusNode: focusNode,
-                      value: value!.value,
-                      dense: true,
-                      subtitle: const SizedBox.shrink(),
-                      controlAffinity: ListTileControlAffinity.leading,
-                      contentPadding:
-                          EdgeInsets.only(left: ((maxWidth / 2) - 16).coerceAtLeast(0), top: dense ? 8 : 14),
-                      tileColor: dense && visibleValidationErrors.isNotEmpty
-                          ? ValidationMessage
-                              .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
-                              .withValues(alpha: 0.2)
-                          : backgroundColor?.call(context, this, dao),
-                      checkColor: selectedColor?.call(context, this, dao),
-                      onChanged: !enabled
-                          ? null
-                          : (value) {
-                              focusNode.requestFocus();
-                              userInteracted = true;
-                              this.value = value!.comparable;
-                            },
-                    ),
-                    Positioned.fill(
-                      child: IgnorePointer(
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 2, right: 2, top: 0, bottom: dense ? 30 : 22),
-                          child: Center(
-                            child: AutoSizeText(
-                              uiNameValue,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              softWrap: false,
-                              style: TextStyle(
-                                height: 1,
-                                color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
-                              ),
-                              overflowReplacement: AutoSizeText(
-                                uiNameValue,
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                style: TextStyle(
-                                  height: 1,
-                                  color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
-                                ),
-                              ),
+                child: Material(
+                  type: MaterialType.transparency,
+                  color: dense && visibleValidationErrors.isNotEmpty
+                      ? ValidationMessage
+                          .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
+                          .withValues(alpha: 0.2)
+                      : backgroundColor?.call(context, this, dao),
+                  child: InkWell(
+                    onTap: !enabled
+                        ? null
+                        : () {
+                            focusNode.requestFocus();
+                            userInteracted = true;
+                            value = (!value!.value).comparable;
+                          },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        AutoSizeText(
+                          uiNameValue,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          softWrap: false,
+                          style: TextStyle(
+                            height: 1,
+                            color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
+                          ),
+                          overflowReplacement: AutoSizeText(
+                            uiNameValue,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            style: TextStyle(
+                              height: 1,
+                              color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                             ),
                           ),
                         ),
-                      ),
+                        SizedBox.square(
+                          dimension: 24,
+                          child: Checkbox(
+                            focusNode: focusNode,
+                            value: value!.value,
+                            checkColor: selectedColor?.call(context, this, dao),
+                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            onChanged: !enabled
+                                ? null
+                                : (value) {
+                                    focusNode.requestFocus();
+                                    userInteracted = true;
+                                    this.value = value!.comparable;
+                                  },
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             );
