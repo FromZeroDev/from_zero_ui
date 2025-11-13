@@ -582,22 +582,25 @@ class BoolField extends Field<BoolComparable> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        AutoSizeText(
-                          uiNameValue,
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          softWrap: false,
-                          style: TextStyle(
-                            height: 1,
-                            color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
-                          ),
-                          overflowReplacement: AutoSizeText(
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: AutoSizeText(
                             uiNameValue,
                             textAlign: TextAlign.center,
-                            maxLines: 2,
+                            maxLines: 1,
+                            softWrap: false,
                             style: TextStyle(
                               height: 1,
                               color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
+                            ),
+                            overflowReplacement: AutoSizeText(
+                              uiNameValue,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              style: TextStyle(
+                                height: 1,
+                                color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
+                              ),
                             ),
                           ),
                         ),
