@@ -1898,100 +1898,104 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           controller: tabBarScrollController,
-                          child: TabBar(
-                            // TODO 3 replace this with an actual widget: PageIndicatorFromzero. Allow to have an indicator + building children dinamically according to selected
-                            isScrollable: true,
-                            indicatorWeight: 4,
-                            tabs: objects.mapIndexed((i, e) {
-                              String name = e.toString();
-                              if (name.isBlank) {
-                                name = 'Pág. ${i + 1}'; // TODO 3 internationalize
-                              }
-                              return ContextMenuFromZero(
-                                enabled: enabled,
-                                addOnTapDown: false,
-                                onShowMenu: () => focusNode!.requestFocus(),
-                                actions: [
-                                  if ((allowAddNew || hasAvailableObjectsPool))
+                          child: IntrinsicWidth(
+                            child: TabBar(
+                              // TODO 3 replace this with an actual widget: PageIndicatorFromzero. Allow to have an indicator + building children dinamically according to selected
+                              isScrollable: false,
+                              indicatorWeight: 4,
+                              tabs: objects.mapIndexed((i, e) {
+                                String name = e.toString();
+                                if (name.isBlank) {
+                                  name = 'Pág. ${i + 1}'; // TODO 3 internationalize
+                                }
+                                return ContextMenuFromZero(
+                                  enabled: enabled,
+                                  addOnTapDown: false,
+                                  onShowMenu: () => focusNode!.requestFocus(),
+                                  actions: [
+                                    if ((allowAddNew || hasAvailableObjectsPool))
+                                      ActionFromZero(
+                                        title:
+                                            '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate.uiName}',
+                                        icon: Icon(Icons.add, color: Theme.of(context).colorScheme.secondary),
+                                        breakpoints: {
+                                          0: ActionState.popup,
+                                        },
+                                        onTap: (context) async {
+                                          final result =
+                                              await maybeAddRow(dao.contextForValidation ?? context, insertIndex: i);
+                                          if (result != null) {
+                                            userInteracted = true;
+                                          }
+                                          pageNotifier!.value = i + 1;
+                                        },
+                                      ),
+                                    if ((allowAddNew || hasAvailableObjectsPool)) ActionFromZero.divider(),
                                     ActionFromZero(
-                                      title:
-                                          '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate.uiName}',
-                                      icon: Icon(Icons.add, color: Theme.of(context).colorScheme.secondary),
-                                      breakpoints: {
-                                        0: ActionState.popup,
-                                      },
+                                      icon: const Icon(Icons.edit_outlined),
+                                      title: FromZeroLocalizations.of(context).translate('edit'),
+                                      breakpoints: actionEditBreakpoints,
                                       onTap: (context) async {
-                                        final result =
-                                            await maybeAddRow(dao.contextForValidation ?? context, insertIndex: i);
+                                        final copy = e.copyWith() as T;
+                                        copy.parentDAO = null;
+                                        copy.contextForValidation = dao.contextForValidation;
+                                        final result = await copy.maybeEdit(
+                                          dao.contextForValidation ?? context,
+                                          showDefaultSnackBars: showDefaultSnackBars,
+                                        );
                                         if (result != null) {
+                                          replaceRow(e, copy);
                                           userInteracted = true;
-                                        }
-                                        pageNotifier!.value = i + 1;
-                                      },
-                                    ),
-                                  if ((allowAddNew || hasAvailableObjectsPool)) ActionFromZero.divider(),
-                                  ActionFromZero(
-                                    icon: const Icon(Icons.edit_outlined),
-                                    title: FromZeroLocalizations.of(context).translate('edit'),
-                                    breakpoints: actionEditBreakpoints,
-                                    onTap: (context) async {
-                                      final copy = e.copyWith() as T;
-                                      copy.parentDAO = null;
-                                      copy.contextForValidation = dao.contextForValidation;
-                                      final result = await copy.maybeEdit(dao.contextForValidation ?? context,
-                                          showDefaultSnackBars: showDefaultSnackBars);
-                                      if (result != null) {
-                                        replaceRow(e, copy);
-                                        userInteracted = true;
-                                        notifyListeners();
-                                      }
-                                    },
-                                  ),
-                                  ActionFromZero(
-                                    icon: const Icon(
-                                      MaterialCommunityIcons.content_duplicate,
-                                      size: 21,
-                                    ),
-                                    title: FromZeroLocalizations.of(context).translate('duplicate'),
-                                    breakpoints: actionDuplicateBreakpoints,
-                                    onTap: (context) async {
-                                      userInteracted = true;
-                                      duplicateRows([e]);
-                                    },
-                                  ),
-                                  if (objectTemplate.canDelete || hasAvailableObjectsPool)
-                                    ActionFromZero(
-                                      icon:
-                                          Icon(!hasAvailableObjectsPool ? Icons.delete_forever_outlined : Icons.clear),
-                                      title: FromZeroLocalizations.of(context).translate('delete'),
-                                      breakpoints: actionDeleteBreakpoints,
-                                      onTap: (context) async {
-                                        if (await maybeDelete(
-                                          context,
-                                          [e],
-                                        )) {
-                                          focusNode!.requestFocus();
-                                          userInteracted = true;
-                                          passedFirstEdit = true;
                                           notifyListeners();
                                         }
                                       },
                                     ),
-                                ],
-                                child: Container(
-                                  height: 38,
-                                  padding: const EdgeInsets.only(bottom: 6),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    name,
-                                    style: Theme.of(context).textTheme.titleMedium,
+                                    ActionFromZero(
+                                      icon: const Icon(
+                                        MaterialCommunityIcons.content_duplicate,
+                                        size: 21,
+                                      ),
+                                      title: FromZeroLocalizations.of(context).translate('duplicate'),
+                                      breakpoints: actionDuplicateBreakpoints,
+                                      onTap: (context) async {
+                                        userInteracted = true;
+                                        duplicateRows([e]);
+                                      },
+                                    ),
+                                    if (objectTemplate.canDelete || hasAvailableObjectsPool)
+                                      ActionFromZero(
+                                        icon: Icon(
+                                            !hasAvailableObjectsPool ? Icons.delete_forever_outlined : Icons.clear),
+                                        title: FromZeroLocalizations.of(context).translate('delete'),
+                                        breakpoints: actionDeleteBreakpoints,
+                                        onTap: (context) async {
+                                          if (await maybeDelete(
+                                            context,
+                                            [e],
+                                          )) {
+                                            focusNode!.requestFocus();
+                                            userInteracted = true;
+                                            passedFirstEdit = true;
+                                            notifyListeners();
+                                          }
+                                        },
+                                      ),
+                                  ],
+                                  child: Container(
+                                    height: 38,
+                                    padding: const EdgeInsets.only(bottom: 6),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      name,
+                                      style: Theme.of(context).textTheme.titleMedium,
+                                    ),
                                   ),
-                                ),
-                              );
-                            }).toList(),
-                            onTap: (value) {
-                              pageNotifier!.value = value;
-                            },
+                                );
+                              }).toList(),
+                              onTap: (value) {
+                                pageNotifier!.value = value;
+                              },
+                            ),
                           ),
                         ),
                       ),
