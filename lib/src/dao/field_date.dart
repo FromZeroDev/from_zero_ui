@@ -49,12 +49,13 @@ class DateField extends Field<DateTime> {
     super.viewWidgetBuilder,
     super.onValueChanged,
     this.type = DateTimePickerType.date,
-  })  : firstDate = firstDate ?? defaultFirstDate,
-        lastDate = lastDate ?? defaultLastDate,
-        formatter = formatter ?? (type == DateTimePickerType.time ? defaultTimeFormatter : defaultFormatter),
-        formatterDense = formatterDense ??
-            formatter ??
-            (type == DateTimePickerType.time ? defaultTimeFormatter : defaultDenseFormatter);
+  }) : firstDate = firstDate ?? defaultFirstDate,
+       lastDate = lastDate ?? defaultLastDate,
+       formatter = formatter ?? (type == DateTimePickerType.time ? defaultTimeFormatter : defaultFormatter),
+       formatterDense =
+           formatterDense ??
+           formatter ??
+           (type == DateTimePickerType.time ? defaultTimeFormatter : defaultDenseFormatter);
 
   @override
   DateField copyWith({
@@ -127,8 +128,8 @@ class DateField extends Field<DateTime> {
   String toString() => value == null
       ? ''
       : type == DateTimePickerType.time && dao.contextForValidation != null
-          ? TimeOfDay.fromDateTime(value!).format(dao.contextForValidation!)
-          : formatter.format(value!);
+      ? TimeOfDay.fromDateTime(value!).format(dao.contextForValidation!)
+      : formatter.format(value!);
 
   @override
   List<Widget> buildFieldEditorWidgets(
@@ -203,8 +204,9 @@ class DateField extends Field<DateTime> {
       animation: this,
       builder: (context, child) {
         final enabled = this.enabled;
-        final visibleValidationErrors =
-            passedFirstEdit ? validationErrors : validationErrors.where((e) => e.isBeforeEditing);
+        final visibleValidationErrors = passedFirstEdit
+            ? validationErrors
+            : validationErrors.where((e) => e.isBeforeEditing);
         Widget result = DatePickerFromZero(
           focusNode: focusNode,
           enabled: enabled,
@@ -228,7 +230,8 @@ class DateField extends Field<DateTime> {
           buttonChildBuilder: (context, title, hint, value, formatter, enabled, clearable) {
             return Padding(
               padding: EdgeInsets.only(
-                  right: dense ? 0 : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40),
+                right: dense ? 0 : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40,
+              ),
               child: _buttonContentBuilder(
                 context,
                 title,
@@ -247,23 +250,24 @@ class DateField extends Field<DateTime> {
           duration: const Duration(milliseconds: 300),
           color: dense && visibleValidationErrors.isNotEmpty
               ? ValidationMessage
-                  .severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!
-                  .withValues(alpha: 0.2)
+                    .severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!
+                    .withValues(alpha: 0.2)
               : backgroundColor?.call(context, this, dao),
           curve: Curves.easeOut,
           child: result,
         );
         result = TooltipFromZero(
-          message: (dense
-                  ? visibleValidationErrors
-                  : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
-              .fold('', (a, b) {
-            return a.toString().trim().isEmpty
-                ? b.toString()
-                : b.toString().trim().isEmpty
-                    ? a.toString()
-                    : '$a\n$b';
-          }),
+          message:
+              (dense
+                      ? visibleValidationErrors
+                      : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
+                  .fold('', (a, b) {
+                    return a.toString().trim().isEmpty
+                        ? b.toString()
+                        : b.toString().trim().isEmpty
+                        ? a.toString()
+                        : '$a\n$b';
+                  }),
           waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
           child: result,
         );
@@ -360,8 +364,8 @@ class DateField extends Field<DateTime> {
     final formattedValue = value == null
         ? null
         : type == DateTimePickerType.time
-            ? TimeOfDay.fromDateTime(value).format(context)
-            : formatter.format(value);
+        ? TimeOfDay.fromDateTime(value).format(context)
+        : formatter.format(value);
     return ComboField.buttonContentBuilder(
       context,
       title,

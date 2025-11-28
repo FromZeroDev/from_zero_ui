@@ -31,8 +31,8 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
   ApiState(
     AutoDisposeRef ref,
     this._create,
-  )   : _ref = ref,
-        super(AsyncValue.loading()) {
+  ) : _ref = ref,
+      super(AsyncValue.loading()) {
     // ignore: prefer_const_constructors
     // declaring const here breaks at runtime for some reason, at least on riverpod 2.0.0-dev.9
     init();
@@ -192,8 +192,11 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
     double? result = selfTotalNotifier.value;
     if (result != null && _ref != null) {
       for (final e in _watching) {
-        final partial = _ref!.read(e.notifier).wholeTotalNotifier.value ??
-            _ref!.read(e).maybeWhen<double?>(
+        final partial =
+            _ref!.read(e.notifier).wholeTotalNotifier.value ??
+            _ref!
+                .read(e)
+                .maybeWhen<double?>(
                   data: (_) => 0,
                   orElse: () => null,
                 );
@@ -212,8 +215,11 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
     double? result = selfProgressNotifier.value;
     if (result != null && _ref != null) {
       for (final e in _watching) {
-        final partial = _ref!.read(e.notifier).wholeProgressNotifier.value ??
-            _ref!.read(e).maybeWhen<double?>(
+        final partial =
+            _ref!.read(e.notifier).wholeProgressNotifier.value ??
+            _ref!
+                .read(e)
+                .maybeWhen<double?>(
                   data: (_) => 0,
                   orElse: () => null,
                 );
@@ -240,8 +246,8 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
       result = total == null
           ? null
           : progress == null || total == 0
-              ? 0
-              : progress / total;
+          ? 0
+          : progress / total;
       final allWatching = List<ApiProvider>.from(_watching);
       for (int i = 0; i < allWatching.length; i++) {
         for (final e in _ref!.read(allWatching[i].notifier)._watching) {
@@ -258,8 +264,8 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
         double? partial = partialTotal == null
             ? null
             : partialTotal == 0 || partialProgress == null
-                ? 0
-                : partialProgress / partialTotal;
+            ? 0
+            : partialProgress / partialTotal;
         allNull = allNull && partial == null;
         partial ??= notifier.state.maybeWhen<double>(
           data: (_) => 1,
@@ -280,8 +286,8 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
 }
 
 typedef ApiLoadingBuilder = Widget Function(BuildContext context, ValueListenable<double?>? progress);
-typedef ApiErrorBuilder = Widget Function(
-    BuildContext context, Object error, StackTrace? stackTrace, VoidCallback? onRetry);
+typedef ApiErrorBuilder =
+    Widget Function(BuildContext context, Object error, StackTrace? stackTrace, VoidCallback? onRetry);
 
 class ApiProviderBuilder<T> extends ConsumerWidget {
   final AutoDisposeStateNotifierProvider<ApiState<T>, AsyncValue<T>> provider;
@@ -374,7 +380,11 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
   }
 
   static Widget defaultErrorBuilder(
-      BuildContext context, Object? error, StackTrace? stackTrace, VoidCallback? onRetry) {
+    BuildContext context,
+    Object? error,
+    StackTrace? stackTrace,
+    VoidCallback? onRetry,
+  ) {
     final isRetryable = isErrorRetryable(error, stackTrace);
     return ErrorSign(
       key: ValueKey(error),
@@ -494,9 +504,13 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
   }
 
   static Widget Function(BuildContext context, Object? error, StackTrace? stackTrace, [VoidCallback? onRetry])
-      buildErrorDetailsButton = defaltBuildErrorDetailsButton;
-  static Widget defaltBuildErrorDetailsButton(BuildContext context, Object? error, StackTrace? stackTrace,
-      [VoidCallback? onRetry]) {
+  buildErrorDetailsButton = defaltBuildErrorDetailsButton;
+  static Widget defaltBuildErrorDetailsButton(
+    BuildContext context,
+    Object? error,
+    StackTrace? stackTrace, [
+    VoidCallback? onRetry,
+  ]) {
     Widget result = DialogButton.cancel(
       leading: const Icon(Icons.info_outlined),
       child: const Text('Detalles del Error'), // TODO 3 internationalize
@@ -553,8 +567,8 @@ class SliverApiProviderBuilder<T> extends ApiProviderBuilder<T> {
     /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-          applyAnimatedContainerFromChildSize: false,
-        );
+         applyAnimatedContainerFromChildSize: false,
+       );
 
   static Widget defaultLoadingBuilder(BuildContext context, ValueListenable<double?>? progress) {
     return SliverToBoxAdapter(
@@ -566,7 +580,11 @@ class SliverApiProviderBuilder<T> extends ApiProviderBuilder<T> {
   }
 
   static Widget defaultErrorBuilder(
-      BuildContext context, Object? error, StackTrace? stackTrace, VoidCallback? onRetry) {
+    BuildContext context,
+    Object? error,
+    StackTrace? stackTrace,
+    VoidCallback? onRetry,
+  ) {
     return SliverToBoxAdapter(
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 256),
@@ -618,16 +636,18 @@ class ApiProviderMultiBuilder<T> extends ConsumerWidget {
       final stateNotifier = ref.watch(e.notifier);
       ref.watch(e);
       stateNotifiers.add(stateNotifier);
-      values.add(stateNotifier
-          .state); // using stateNotifier.state instead of value because value is kept when realoading, so loading state is never shown
+      values.add(
+        stateNotifier.state,
+      ); // using stateNotifier.state instead of value because value is kept when realoading, so loading state is never shown
     }
     final listenables = stateNotifiers.map((e) => e.wholePercentageNotifier);
     final unifiedListenable = UnitedValueListenable(listenables, (values) {
       double? percentage;
       try {
         final meaningfulValues = values.whereType<double>().toList();
-        percentage =
-            meaningfulValues.isEmpty ? null : meaningfulValues.reduce((v, e) => v + e) / meaningfulValues.length;
+        percentage = meaningfulValues.isEmpty
+            ? null
+            : meaningfulValues.reduce((v, e) => v + e) / meaningfulValues.length;
       } catch (_) {}
       return percentage;
     });
@@ -672,8 +692,8 @@ class SliverApiProviderMultiBuilder<T> extends ApiProviderMultiBuilder<T> {
     /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-          applyAnimatedContainerFromChildSize: false,
-        );
+         applyAnimatedContainerFromChildSize: false,
+       );
 }
 
 class MultiValueListenable<T> extends ChangeNotifier {
@@ -810,6 +830,6 @@ class SliverApiStateBuilder<T> extends ApiStateBuilder<T> {
     /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-          applyAnimatedContainerFromChildSize: false,
-        );
+         applyAnimatedContainerFromChildSize: false,
+       );
 }

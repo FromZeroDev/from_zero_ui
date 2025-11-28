@@ -59,8 +59,9 @@ class ExtendedNumberFormat extends MyNumberFormat {
       _formatter!.parseWith<R, P>(parserGenerator, text);
   @override
   R? tryParseWith<R, P extends NumberParserBase<R>>(
-          P Function(NumberFormat p1, String p2) parserGenerator, String text) =>
-      _formatter!.tryParseWith<R, P>(parserGenerator, text);
+    P Function(NumberFormat p1, String p2) parserGenerator,
+    String text,
+  ) => _formatter!.tryParseWith<R, P>(parserGenerator, text);
 }
 
 class EmptyNumberFormat extends MyNumberFormat {
@@ -93,8 +94,9 @@ class EmptyNumberFormat extends MyNumberFormat {
       _formatter.parseWith<R, P>(parserGenerator, text);
   @override
   R? tryParseWith<R, P extends NumberParserBase<R>>(
-          P Function(NumberFormat p1, String p2) parserGenerator, String text) =>
-      _formatter.tryParseWith<R, P>(parserGenerator, text);
+    P Function(NumberFormat p1, String p2) parserGenerator,
+    String text,
+  ) => _formatter.tryParseWith<R, P>(parserGenerator, text);
 }
 
 abstract class MyNumberFormat implements NumberFormat {

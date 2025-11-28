@@ -31,20 +31,21 @@ abstract class TableFromZeroManagePopup {
                 builder: (context, setState) {
                   final visibleColumns = columnKeys.where((e) => columnVisibility[e]!);
                   final isAnyColHidden = columnVisibility.any((key, value) => !value);
-                  final clearFiltersAction = TableFromZeroState.getClearAllFiltersAction(
-                    controller: controller,
-                    skipConditions: true,
-                    updateStateIfModified: false,
-                    onDidTap: () {
-                      modifiedFilters = true;
-                      setState(() {});
-                    },
-                  )?.copyWith(
-                    breakpoints: {
-                      0: ActionState.icon,
-                      ScaffoldFromZero.screenSizeLarge: ActionState.button,
-                    },
-                  );
+                  final clearFiltersAction =
+                      TableFromZeroState.getClearAllFiltersAction(
+                        controller: controller,
+                        skipConditions: true,
+                        updateStateIfModified: false,
+                        onDidTap: () {
+                          modifiedFilters = true;
+                          setState(() {});
+                        },
+                      )?.copyWith(
+                        breakpoints: {
+                          0: ActionState.icon,
+                          ScaffoldFromZero.screenSizeLarge: ActionState.button,
+                        },
+                      );
                   return Stack(
                     children: [
                       CustomScrollView(
@@ -62,7 +63,8 @@ abstract class TableFromZeroManagePopup {
                                     child: FadeTransition(
                                       opacity: animation,
                                       child: ColoredBox(
-                                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
+                                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                                      ),
                                     ),
                                   ),
                                   child,
@@ -94,8 +96,10 @@ abstract class TableFromZeroManagePopup {
                                     );
                                   }
                                   final subtitleText = col.getMetadataText(context, controller.filtered, key);
-                                  final dividerColor =
-                                      Color.alphaBlend(Theme.of(context).dividerColor, Theme.of(context).cardColor);
+                                  final dividerColor = Color.alphaBlend(
+                                    Theme.of(context).dividerColor,
+                                    Theme.of(context).cardColor,
+                                  );
                                   final dividerIndent = isDesktop ? 48.0 : 0.0;
                                   Widget result = Column(
                                     children: [
@@ -141,24 +145,26 @@ abstract class TableFromZeroManagePopup {
                                                 builder: (context, child) {
                                                   return Container(
                                                     key: filterButtonGlobalKeys[key],
-                                                    child: TableFromZeroState.getOpenFilterPopupAction(
-                                                      context,
-                                                      controller: controller,
-                                                      col: col,
-                                                      colKey: key,
-                                                      globalKey: filterButtonGlobalKeys[key],
-                                                      updateStateIfModified: false,
-                                                      onPopupResult: (value) {
-                                                        modifiedFilters = modifiedFilters || value;
-                                                        if (value) {
-                                                          // itemSetState(() {});
-                                                          setState(
-                                                              () {}); // need to setState for the whole widget to update clearAllFilters button
-                                                        }
-                                                      },
-                                                    ).buildIcon(
-                                                      context,
-                                                    ),
+                                                    child:
+                                                        TableFromZeroState.getOpenFilterPopupAction(
+                                                          context,
+                                                          controller: controller,
+                                                          col: col,
+                                                          colKey: key,
+                                                          globalKey: filterButtonGlobalKeys[key],
+                                                          updateStateIfModified: false,
+                                                          onPopupResult: (value) {
+                                                            modifiedFilters = modifiedFilters || value;
+                                                            if (value) {
+                                                              // itemSetState(() {});
+                                                              setState(
+                                                                () {},
+                                                              ); // need to setState for the whole widget to update clearAllFilters button
+                                                            }
+                                                          },
+                                                        ).buildIcon(
+                                                          context,
+                                                        ),
                                                   );
                                                 },
                                               ),

@@ -106,28 +106,31 @@ class PageLightweightTableState extends State<PageLightweightTable> {
       enableStickyHeaders: false,
       minWidthGetter: (currentColumnKeys) => 640,
       alternateRowBackgroundBrightness: true,
-      rows: List.generate(
-          100,
-          (index) => [
-                "Dummy data $index",
-                "Dummy data",
-                "Dummy data",
-                "Dummy data",
-                "Dummy data",
-              ]).map((e) {
-        return SimpleRowModel<dynamic>(
-          id: e,
-          values: e.asMap(),
-          rowAddon: const Text('ADDON ASDFG fsgfad gadfsgkadfs glasdnfgklanfsgAFSG DAFG AFSD GADSF GADFGA DFSG'),
-          onRowTap: (row) {},
-          onCellTap: (
-            row,
-          ) {},
-          // actions: [
-          //   Container(width: 32, height: 32, color: Colors.red,),
-          // ],
-        );
-      }).toList(),
+      rows:
+          List.generate(
+            100,
+            (index) => [
+              "Dummy data $index",
+              "Dummy data",
+              "Dummy data",
+              "Dummy data",
+              "Dummy data",
+            ],
+          ).map((e) {
+            return SimpleRowModel<dynamic>(
+              id: e,
+              values: e.asMap(),
+              rowAddon: const Text('ADDON ASDFG fsgfad gadfsgkadfs glasdnfgklanfsgAFSG DAFG AFSD GADSF GADFGA DFSG'),
+              onRowTap: (row) {},
+              onCellTap:
+                  (
+                    row,
+                  ) {},
+              // actions: [
+              //   Container(width: 32, height: 32, color: Colors.red,),
+              // ],
+            );
+          }).toList(),
       columns: ["Col 1", "Col 2", "Col 3", "Col 4", "Col 5"]
           .map((e) {
             return SimpleColModel(
@@ -314,52 +317,52 @@ class ComplicatedTableState extends State<ComplicatedTable> {
   @override
   Widget build(BuildContext context) {
     return const SizedBox.shrink();
-//     return TableFromZero.fromRowList(
-//       layoutWidgetType: TableFromZero.animatedColumn,
-//       columnNames: ["Col 1", "Col 2", "Col 3", "Col 4", "Very long column title 5"],
-//       rows: rows,
-//       rowIdsForAnimation: rowsIds,
-//       colBackgroundColors: [null, null, null, Colors.green.withValues(alpha: 0.4), Colors.red.withValues(alpha: 0.4)],
-//       rowBackgroundColors: [null, null, null, null, Colors.indigo.withValues(alpha: 0.4)],
-//       rowTakesPriorityOverColumn: false,
-//       columnAlignments: [null, null, null, null, TextAlign.right],
-//       colStyles: [null, null, null, null, Theme.of(context).textTheme.bodySmall],
-//       rowStyles: [null, null, null, null, Theme.of(context).textTheme.titleLarge],
-//       columnFlexes: [2, 1, 1, 1, 1],
-//       onRowTap: (RowModel row) {
-//         log("Row ${row.values[0]} tapped");
-//       },
-//       onCheckBoxSelected: (row, focused) {
-//         Future<dynamic>.delayed(Duration(seconds: 2)).then((value) {
-//           setState(() {
-//             selected[rowsIds.indexOf(row.id)] = focused;
-//           });
-//         });
-//         setState(() {
-//           selected[rowsIds.indexOf(row.id)] = null;
-//         });
-//       },
-//       onAllSelected: (value) {
-//         setState(() {
-//           selected = List.generate(selected.length, (index) => value);
-//         });
-//       },
-//       itemPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-//       initialSortedColumnIndex: 0,
-//       selectedRows: selected,
-//       verticalDivider: null,
-// //                        horizontalDivider: null,
-//       showFirstHorizontalDivider: false,
-//       actions: [
-//         IconButton(icon: Icon(Icons.edit), tooltip: "Edit", splashRadius: 24, onPressed: (){ },),
-//         IconButton(icon: Icon(Icons.delete_forever), tooltip: "Delete", splashRadius: 24, onPressed: (){
-//           setState(() {
-//             rows.removeAt(2);
-//             rowsIds.removeAt(2);
-//             selected.removeAt(2);
-//           });
-//         },),
-//       ],
-//     );
+    //     return TableFromZero.fromRowList(
+    //       layoutWidgetType: TableFromZero.animatedColumn,
+    //       columnNames: ["Col 1", "Col 2", "Col 3", "Col 4", "Very long column title 5"],
+    //       rows: rows,
+    //       rowIdsForAnimation: rowsIds,
+    //       colBackgroundColors: [null, null, null, Colors.green.withValues(alpha: 0.4), Colors.red.withValues(alpha: 0.4)],
+    //       rowBackgroundColors: [null, null, null, null, Colors.indigo.withValues(alpha: 0.4)],
+    //       rowTakesPriorityOverColumn: false,
+    //       columnAlignments: [null, null, null, null, TextAlign.right],
+    //       colStyles: [null, null, null, null, Theme.of(context).textTheme.bodySmall],
+    //       rowStyles: [null, null, null, null, Theme.of(context).textTheme.titleLarge],
+    //       columnFlexes: [2, 1, 1, 1, 1],
+    //       onRowTap: (RowModel row) {
+    //         log("Row ${row.values[0]} tapped");
+    //       },
+    //       onCheckBoxSelected: (row, focused) {
+    //         Future<dynamic>.delayed(Duration(seconds: 2)).then((value) {
+    //           setState(() {
+    //             selected[rowsIds.indexOf(row.id)] = focused;
+    //           });
+    //         });
+    //         setState(() {
+    //           selected[rowsIds.indexOf(row.id)] = null;
+    //         });
+    //       },
+    //       onAllSelected: (value) {
+    //         setState(() {
+    //           selected = List.generate(selected.length, (index) => value);
+    //         });
+    //       },
+    //       itemPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+    //       initialSortedColumnIndex: 0,
+    //       selectedRows: selected,
+    //       verticalDivider: null,
+    // //                        horizontalDivider: null,
+    //       showFirstHorizontalDivider: false,
+    //       actions: [
+    //         IconButton(icon: Icon(Icons.edit), tooltip: "Edit", splashRadius: 24, onPressed: (){ },),
+    //         IconButton(icon: Icon(Icons.delete_forever), tooltip: "Delete", splashRadius: 24, onPressed: (){
+    //           setState(() {
+    //             rows.removeAt(2);
+    //             rowsIds.removeAt(2);
+    //             selected.removeAt(2);
+    //           });
+    //         },),
+    //       ],
+    //     );
   }
 }

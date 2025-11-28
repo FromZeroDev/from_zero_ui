@@ -7,9 +7,9 @@ import 'package:go_router/go_router.dart';
 class ResponsiveDrawerMenuDivider extends ResponsiveDrawerMenuItem {
   Widget? widget;
   ResponsiveDrawerMenuDivider({String? title, this.widget})
-      : super(
-          title: title ?? '',
-        );
+    : super(
+        title: title ?? '',
+      );
 }
 
 class ResponsiveDrawerMenuItem {
@@ -562,7 +562,9 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
                             }
                           } else {
                             goRouter.maybePopUntil(
-                                context, (match) => (match.route as GoRoute).name == widget.homeRoute);
+                              context,
+                              (match) => (match.route as GoRoute).name == widget.homeRoute,
+                            );
                           }
                         } else {
                           if (navigator.canPop() &&
@@ -748,7 +750,8 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
                       icon: tabs[i].icon ?? const SizedBox.shrink(),
                       softWrap: widget.style != DrawerMenuFromZero.styleTree,
                       contentPadding: EdgeInsets.only(
-                        left: addedPaddingLeft +
+                        left:
+                            addedPaddingLeft +
                             widget.depth * 20.0 +
                             (widget.style == DrawerMenuFromZero.styleTree ? 16 : 0),
                         right: widget.paddingRight + (widget.style == DrawerMenuFromZero.styleDrawerMenu ? 42 : 0),
@@ -768,7 +771,10 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
                   children: [
                     if (widget.style == DrawerMenuFromZero.styleDrawerMenu)
                       Positioned(
-                        left: 0, right: 0, bottom: 0, top: 0, // -8
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        top: 0, // -8
                         child: IgnorePointer(
                           child: Container(
                             padding: EdgeInsets.only(left: widget.depth * 21.0),
@@ -778,8 +784,9 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
                               decoration: BoxDecoration(
                                 borderRadius: const BorderRadius.only(topRight: Radius.circular(16)),
                                 color: Color.alphaBlend(
-                                    theme.dividerColor.withValues(alpha: theme.dividerColor.opacity * 0.5),
-                                    Material.maybeOf(context)?.color ?? theme.cardColor),
+                                  theme.dividerColor.withValues(alpha: theme.dividerColor.opacity * 0.5),
+                                  Material.maybeOf(context)?.color ?? theme.cardColor,
+                                ),
                                 // color: Color.alphaBlend(
                                 //   selected!=i
                                 //       ? theme.dividerColor
@@ -1011,31 +1018,32 @@ class DrawerMenuButtonFromZeroState extends State<DrawerMenuButtonFromZero> {
         title: AnimatedDefaultTextStyle(
           duration: const Duration(milliseconds: 100),
           style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                fontSize: dense
-                    ? widget.selected
-                        ? 17
-                        : 14
-                    : widget.selected
-                        ? 17
-                        : 16,
-                color: dense
-                    ? widget.selected
-                        ? selectedTextColor.withValues(alpha: 0.75)
-                        : theme.textTheme.bodySmall!.color
-                    : widget.selected
-                        ? selectedTextColor
-                        : theme.textTheme.bodyLarge!.color,
-                fontWeight: widget.selected
-                    ? FontWeight.w700
-                    : dense
-                        ? FontWeight.w400
-                        : null,
-              ),
+            fontSize: dense
+                ? widget.selected
+                      ? 17
+                      : 14
+                : widget.selected
+                ? 17
+                : 16,
+            color: dense
+                ? widget.selected
+                      ? selectedTextColor.withValues(alpha: 0.75)
+                      : theme.textTheme.bodySmall!.color
+                : widget.selected
+                ? selectedTextColor
+                : theme.textTheme.bodyLarge!.color,
+            fontWeight: widget.selected
+                ? FontWeight.w700
+                : dense
+                ? FontWeight.w400
+                : null,
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: widget.titleWidget ??
+                child:
+                    widget.titleWidget ??
                     Text(
                       dense ? (widget.denseTitle ?? widget.title) : widget.title,
                       maxLines: dense ? 1 : null,
@@ -1153,8 +1161,8 @@ class DrawerMenuButtonFromZeroState extends State<DrawerMenuButtonFromZero> {
                           color: widget.selected
                               ? selectedTextColor
                               : theme.brightness == Brightness.light
-                                  ? Colors.black45
-                                  : null,
+                              ? Colors.black45
+                              : null,
                           size: dense ? 18 : null,
                         ),
                         child: result,

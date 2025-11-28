@@ -49,9 +49,9 @@ class ValidationError {
     bool? isVisibleAsSaveConfirmation,
     bool? isVisibleAsHintMessage,
     bool? isVisibleAsTooltip,
-  })  : _isVisibleAsSaveConfirmation = isVisibleAsSaveConfirmation,
-        _isVisibleAsHintMessage = isVisibleAsHintMessage,
-        _isVisibleAsTooltip = isVisibleAsTooltip;
+  }) : _isVisibleAsSaveConfirmation = isVisibleAsSaveConfirmation,
+       _isVisibleAsHintMessage = isVisibleAsHintMessage,
+       _isVisibleAsTooltip = isVisibleAsTooltip;
 
   @override
   String toString() => error;
@@ -93,10 +93,10 @@ class InvalidatingError<T extends Comparable> extends ValidationError {
     super.isVisibleAsSaveConfirmation,
     super.isVisibleAsHintMessage,
     super.isVisibleAsTooltip,
-  })  : assert(showVisualConfirmation || allowUndoInvalidatingChange),
-        super(
-          severity: ValidationErrorSeverity.invalidating,
-        );
+  }) : assert(showVisualConfirmation || allowUndoInvalidatingChange),
+       super(
+         severity: ValidationErrorSeverity.invalidating,
+       );
 
   @override
   InvalidatingError<T> copyWith({
@@ -131,11 +131,11 @@ class ForcedValueError<T extends Comparable> extends InvalidatingError<T> {
     super.isVisibleAsTooltip,
     this.comparator,
   }) : super(
-          field: field,
-          defaultValue: defaultValue,
-          allowSetThisFieldToDefaultValue: true,
-          allowUndoInvalidatingChange: true,
-        ) {
+         field: field,
+         defaultValue: defaultValue,
+         allowSetThisFieldToDefaultValue: true,
+         allowUndoInvalidatingChange: true,
+       ) {
     severity = (comparator?.call(field.value, defaultValue) ?? field.value == defaultValue)
         ? ValidationErrorSeverity.disabling
         : ValidationErrorSeverity.invalidating;
@@ -185,8 +185,8 @@ class MultiValidationError extends ValidationError {
     required super.field,
     required this.errors,
   }) : super(
-          error: '',
-        );
+         error: '',
+       );
 }
 
 ValidationError? fieldValidatorRequired<T extends Comparable>(
@@ -200,7 +200,8 @@ ValidationError? fieldValidatorRequired<T extends Comparable>(
   return field.value == null || field.value!.toString().trim().isEmpty
       ? ValidationError(
           field: field,
-          error: errorMessage ??
+          error:
+              errorMessage ??
               ('${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_required")}'),
           severity: severity,
         )
@@ -217,7 +218,8 @@ ValidationError? fieldValidatorListNotEmpty<T extends Comparable>(
   return field is ListField && (field.value! as ComparableList).list.isEmpty
       ? ValidationError(
           field: field,
-          error: errorMessage ??
+          error:
+              errorMessage ??
               'At least one ${(field as ListField).objectTemplate.classUiName} required', // TODO 3 internationalize
           severity: severity,
         )
@@ -234,13 +236,14 @@ ValidationError? fieldValidatorNumberNotNegative(
   return field.value == null
       ? null
       : field.value! < 0
-          ? ValidationError(
-              field: field,
-              error: errorMessage ??
-                  ('${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_not_negative")}'),
-              severity: severity,
-            )
-          : null;
+      ? ValidationError(
+          field: field,
+          error:
+              errorMessage ??
+              ('${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_not_negative")}'),
+          severity: severity,
+        )
+      : null;
 }
 
 ValidationError? fieldValidatorNumberNotZero(
@@ -253,13 +256,14 @@ ValidationError? fieldValidatorNumberNotZero(
   return field.value == null
       ? null
       : field.value == 0
-          ? ValidationError(
-              field: field,
-              error: errorMessage ??
-                  ('${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_not_zero")}'),
-              severity: severity,
-            )
-          : null;
+      ? ValidationError(
+          field: field,
+          error:
+              errorMessage ??
+              ('${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_not_zero")}'),
+          severity: severity,
+        )
+      : null;
 }
 
 ValidationError? fieldValidatorStringIsEmail(
@@ -274,13 +278,14 @@ ValidationError? fieldValidatorStringIsEmail(
       : EmailValidator.validate(
           field.value!.trim(),
         )
-          ? null
-          : ValidationError(
-              field: field,
-              error: errorMessage ??
-                  '${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_email")}',
-              severity: severity,
-            );
+      ? null
+      : ValidationError(
+          field: field,
+          error:
+              errorMessage ??
+              '${field.uiName} ${FromZeroLocalizations.of(context).translate("validation_error_email")}',
+          severity: severity,
+        );
 }
 
 class FieldDiffMessage<T extends Comparable> extends StatelessWidget {
@@ -875,8 +880,9 @@ class SaveConfirmationValidationMessageGroup extends StatelessWidget {
                   Expanded(
                     child: Text(
                       name!,
-                      style:
-                          isBlocking ? Theme.of(context).textTheme.titleLarge : Theme.of(context).textTheme.titleMedium,
+                      style: isBlocking
+                          ? Theme.of(context).textTheme.titleLarge
+                          : Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
                 ],
@@ -923,22 +929,22 @@ class ValidationRequiredOverlay extends StatelessWidget {
             top: dense
                 ? 7
                 : isEmpty
-                    ? 5
-                    : 10,
+                ? 5
+                : 10,
             left: isAlignedRight
                 ? null
                 : dense
-                    ? -5
-                    : isEmpty
-                        ? 4
-                        : 5,
+                ? -5
+                : isEmpty
+                ? 4
+                : 5,
             right: !isAlignedRight
                 ? null
                 : dense
-                    ? -5
-                    : isEmpty
-                        ? 4
-                        : 5,
+                ? -5
+                : isEmpty
+                ? 4
+                : 5,
             child: TooltipFromZero(
               message: visibleErrors.isEmpty ? '' : visibleErrors.map((e) => e.error).reduce((v, e) => '$v, $e'),
               child: IgnorePointer(
@@ -947,8 +953,8 @@ class ValidationRequiredOverlay extends StatelessWidget {
                   size: dense
                       ? 11
                       : isEmpty
-                          ? 14
-                          : 8,
+                      ? 14
+                      : 8,
                   color: isEmpty
                       ? Theme.of(context).colorScheme.error
                       : Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75),

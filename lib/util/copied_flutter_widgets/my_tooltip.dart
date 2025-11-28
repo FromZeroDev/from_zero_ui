@@ -249,15 +249,25 @@ class TooltipFromZero extends StatefulWidget {
     properties.add(DiagnosticsProperty<EdgeInsetsGeometry>('padding', padding, defaultValue: null));
     properties.add(DiagnosticsProperty<EdgeInsetsGeometry>('margin', margin, defaultValue: null));
     properties.add(DoubleProperty('vertical offset', verticalOffset, defaultValue: null));
-    properties.add(FlagProperty('position',
-        value: preferBelow, ifTrue: 'below', ifFalse: 'above', showName: true, defaultValue: null));
     properties.add(
-        FlagProperty('semantics', value: excludeFromSemantics, ifTrue: 'excluded', showName: true, defaultValue: null));
+      FlagProperty(
+        'position',
+        value: preferBelow,
+        ifTrue: 'below',
+        ifFalse: 'above',
+        showName: true,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      FlagProperty('semantics', value: excludeFromSemantics, ifTrue: 'excluded', showName: true, defaultValue: null),
+    );
     properties.add(DiagnosticsProperty<Duration>('wait duration', waitDuration, defaultValue: null));
     properties.add(DiagnosticsProperty<Duration>('show duration', showDuration, defaultValue: null));
     properties.add(DiagnosticsProperty<TooltipTriggerMode>('triggerMode', triggerMode, defaultValue: null));
-    properties
-        .add(FlagProperty('enableFeedback', value: enableFeedback, ifTrue: 'true', showName: true, defaultValue: null));
+    properties.add(
+      FlagProperty('enableFeedback', value: enableFeedback, ifTrue: 'true', showName: true, defaultValue: null),
+    );
   }
 }
 
@@ -608,7 +618,8 @@ class _TooltipFromZeroState extends State<TooltipFromZero> with SingleTickerProv
     showDuration = widget.showDuration ?? tooltipTheme.showDuration ?? _defaultShowDuration;
     hoverShowDuration = _defaultHoverShowDuration;
     // triggerMode = widget.triggerMode ?? tooltipTheme.triggerMode ?? _defaultTriggerMode;
-    triggerMode = widget.triggerMode ??
+    triggerMode =
+        widget.triggerMode ??
         (PlatformExtended.isMobile ? (tooltipTheme.triggerMode ?? _defaultTriggerMode) : TooltipTriggerMode.manual);
     enableFeedback = widget.enableFeedback ?? tooltipTheme.enableFeedback ?? _defaultEnableFeedback;
 
@@ -790,20 +801,20 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
                 child: Theme(
                   data: Theme.of(context).copyWith(
                     scrollbarTheme: Theme.of(context).scrollbarTheme.copyWith(
-                          crossAxisMargin: 4,
-                          trackColor: WidgetStateProperty.resolveWith((states) {
-                            return widget.textStyle?.color?.withValues(alpha: 0.2);
-                          }),
-                          thumbColor: WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.dragged)) {
-                              return widget.textStyle?.color?.withValues(alpha: 0.6);
-                            }
-                            if (states.contains(WidgetState.hovered)) {
-                              return widget.textStyle?.color?.withValues(alpha: 0.5);
-                            }
-                            return widget.textStyle?.color?.withValues(alpha: 0.4);
-                          }),
-                        ),
+                      crossAxisMargin: 4,
+                      trackColor: WidgetStateProperty.resolveWith((states) {
+                        return widget.textStyle?.color?.withValues(alpha: 0.2);
+                      }),
+                      thumbColor: WidgetStateProperty.resolveWith((states) {
+                        if (states.contains(WidgetState.dragged)) {
+                          return widget.textStyle?.color?.withValues(alpha: 0.6);
+                        }
+                        if (states.contains(WidgetState.hovered)) {
+                          return widget.textStyle?.color?.withValues(alpha: 0.5);
+                        }
+                        return widget.textStyle?.color?.withValues(alpha: 0.4);
+                      }),
+                    ),
                   ),
                   child: ScrollbarFromZero(
                     controller: scrollController,

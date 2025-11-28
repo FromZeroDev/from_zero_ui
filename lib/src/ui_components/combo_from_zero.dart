@@ -4,16 +4,24 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-typedef ButtonChildBuilder<T> = Widget Function(
-    BuildContext context, String? title, String? hint, T? value, bool enabled, bool clearable,
-    {bool showDropdownIcon});
+typedef ButtonChildBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      String? title,
+      String? hint,
+      T? value,
+      bool enabled,
+      bool clearable, {
+      bool showDropdownIcon,
+    });
 
 /// returns true if navigator should pop after (default true)
 typedef OnPopupItemSelected<T> = bool? Function(T? value);
-typedef ExtraWidgetBuilder<T> = Widget Function(
-  BuildContext context,
-  OnPopupItemSelected<T>? onSelected,
-);
+typedef ExtraWidgetBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      OnPopupItemSelected<T>? onSelected,
+    );
 
 class ComboFromZero<T> extends StatefulWidget {
   final T? value;
@@ -76,15 +84,21 @@ class ComboFromZero<T> extends StatefulWidget {
     this.showNullInSelection = false,
     this.showHintAsNullInSelection = true,
   }) : assert(
-          possibleValues != null || possibleValuesFuture != null || possibleValuesProvider != null,
-        );
+         possibleValues != null || possibleValuesFuture != null || possibleValuesProvider != null,
+       );
 
   @override
   ComboFromZeroState<T> createState() => ComboFromZeroState<T>();
 
   static Widget defaultButtonChildBuilder(
-      BuildContext context, String? title, String? hint, dynamic value, bool enabled, bool clearable,
-      {bool showDropdownIcon = true}) {
+    BuildContext context,
+    String? title,
+    String? hint,
+    dynamic value,
+    bool enabled,
+    bool clearable, {
+    bool showDropdownIcon = true,
+  }) {
     final theme = Theme.of(context);
     return IntrinsicWidth(
       child: ConstrainedBox(
@@ -496,8 +510,8 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
   @override
   Widget build(BuildContext context) {
     final defaultTextStyle = Theme.of(context).textTheme.titleMedium!.copyWith(
-          fontWeight: FontWeight.w500,
-        );
+      fontWeight: FontWeight.w500,
+    );
     final rows = widget.possibleValues.map((e) {
       return SimpleRowModel<T?>(
         id: e,
@@ -514,7 +528,7 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
         SimpleRowModel<T?>(
           id: null,
           values: {
-            0: (widget.showHintAsNullInSelection ? widget.hint : null) ?? '< Vacío >'
+            0: (widget.showHintAsNullInSelection ? widget.hint : null) ?? '< Vacío >',
           }, // TODO 3 internationalize
           height: widget.useFixedRowHeight ? widget.rowHeight : null,
           alwaysOnTop: true,
@@ -557,8 +571,8 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
                   final value = (e.id is DAO)
                       ? (e.id! as DAO).searchName.toUpperCase()
                       : e.id == null
-                          ? e.values[0]
-                          : e.id.toString().toUpperCase();
+                      ? e.values[0]
+                      : e.id.toString().toUpperCase();
                   if (value.contains(q)) {
                     if (value.startsWith(q)) {
                       starts.add(e);
@@ -593,8 +607,8 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
                         bottom: widget.extraWidget != null
                             ? 4
                             : !showSearchBox
-                                ? 12
-                                : 0,
+                            ? 12
+                            : 0,
                         left: 8,
                         right: 8,
                       ),

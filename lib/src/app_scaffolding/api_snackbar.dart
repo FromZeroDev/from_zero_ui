@@ -31,9 +31,9 @@ class APISnackBar<T> extends SnackBarFromZero {
     this.blockUIType = APISnackBarBlockUIType.whileLoadingOrError,
     super.key,
   }) : super(
-          dismissable: cancelable ?? false,
-          blockUI: blockUIType == APISnackBarBlockUIType.never ? false : true,
-        );
+         dismissable: cancelable ?? false,
+         blockUI: blockUIType == APISnackBarBlockUIType.never ? false : true,
+       );
 
   @override
   APISnackBarState<T> createState() => APISnackBarState<T>();
@@ -41,7 +41,8 @@ class APISnackBar<T> extends SnackBarFromZero {
   void updateBlockUI(AsyncValue<T> state) {
     state.whenOrNull(
       error: (error, stackTrace) {
-        bool blockUI = this.blockUIType == APISnackBarBlockUIType.always ||
+        bool blockUI =
+            this.blockUIType == APISnackBarBlockUIType.always ||
             this.blockUIType == APISnackBarBlockUIType.whileLoadingOrError;
         if (blockUI != this.blockUI.value) {
           this.blockUI.value = blockUI;
@@ -54,7 +55,8 @@ class APISnackBar<T> extends SnackBarFromZero {
         }
       },
       loading: () {
-        bool blockUI = this.blockUIType == APISnackBarBlockUIType.always ||
+        bool blockUI =
+            this.blockUIType == APISnackBarBlockUIType.always ||
             this.blockUIType == APISnackBarBlockUIType.whileLoading ||
             this.blockUIType == APISnackBarBlockUIType.whileLoadingOrError;
         if (blockUI != this.blockUI.value) {
@@ -270,9 +272,9 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
     );
     result = IconTheme(
       data: Theme.of(context).iconTheme.copyWith(
-            color: actionColor,
-            size: 32,
-          ),
+        color: actionColor,
+        size: 32,
+      ),
       child: result,
     );
     return buildWrapper(
@@ -498,9 +500,9 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
     );
     result = IconTheme(
       data: Theme.of(context).iconTheme.copyWith(
-            color: actionColor,
-            size: 32,
-          ),
+        color: actionColor,
+        size: 32,
+      ),
       child: result,
     );
     return buildWrapper(context, result: result, hasActions: actions.isNotEmpty);
@@ -511,7 +513,8 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
     required Widget result,
     bool hasActions = false,
   }) {
-    final fixed = widget.behaviour != SnackBarFromZero.behaviourFloating &&
+    final fixed =
+        widget.behaviour != SnackBarFromZero.behaviourFloating &&
         (widget.behaviour == SnackBarFromZero.behaviourFixed ||
             ref.watch(fromZeroScreenProvider.select((value) => value.isMobileLayout)));
     if (!fixed) {

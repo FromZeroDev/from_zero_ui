@@ -114,8 +114,8 @@ class SliverAsyncValueBuilder<T> extends AsyncValueBuilder<T> {
     /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-          applyAnimatedContainerFromChildSize: false,
-        );
+         applyAnimatedContainerFromChildSize: false,
+       );
 
   static Widget defaultLoadingBuilder(BuildContext context) {
     return SliverToBoxAdapter(
@@ -232,8 +232,8 @@ class SliverAsyncValueMultiBuilder<T> extends AsyncValueMultiBuilder<T> {
     /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-          applyAnimatedContainerFromChildSize: false,
-        );
+         applyAnimatedContainerFromChildSize: false,
+       );
 }
 
 class FutureProviderBuilder<T> extends ConsumerWidget {
@@ -305,8 +305,8 @@ class SliverFutureProviderBuilder<T> extends FutureProviderBuilder<T> {
     /// AnimatedSwitcherImage doesn't support slivers, because of the RepaintBoundary
     super.key,
   }) : super(
-          applyAnimatedContainerFromChildSize: false,
-        );
+         applyAnimatedContainerFromChildSize: false,
+       );
 }
 
 class AsyncBuilderAnimationWrapper extends StatelessWidget {
@@ -356,7 +356,11 @@ class AsyncBuilderAnimationWrapper extends StatelessWidget {
           transitionBuilder: (child, animation) => transitionBuilder(context, child, animation),
           layoutBuilder: (currentChild, previousChildren) {
             return layoutBuilder(
-                currentChild, previousChildren, alignment ?? Alignment.center, clipBehaviour ?? Clip.hardEdge);
+              currentChild,
+              previousChildren,
+              alignment ?? Alignment.center,
+              clipBehaviour ?? Clip.hardEdge,
+            );
           },
           child: result,
         );

@@ -5,15 +5,16 @@ import 'package:from_zero_ui/util/copied_flutter_widgets/time_picker_dialog_from
     as time_picker_dialog_from_zero;
 import 'package:intl/intl.dart';
 
-typedef DatePickerButtonChildBuilder = Widget Function(
-  BuildContext context,
-  String? title,
-  String? hint,
-  DateTime? value,
-  DateFormat formatter,
-  bool enabled,
-  bool showClearButton,
-);
+typedef DatePickerButtonChildBuilder =
+    Widget Function(
+      BuildContext context,
+      String? title,
+      String? hint,
+      DateTime? value,
+      DateFormat formatter,
+      bool enabled,
+      bool showClearButton,
+    );
 
 /// returns true if navigator should pop after (default true)
 typedef OnDateSelected = bool? Function(DateTime? value);
@@ -63,20 +64,28 @@ class DatePickerFromZero extends StatefulWidget {
     ),
     this.type = DateTimePickerType.date,
     super.key,
-  })  : showClearButton = showClearButton ?? clearable,
-        formatter = formatter ?? DateFormat(DateFormat.YEAR_MONTH_DAY);
+  }) : showClearButton = showClearButton ?? clearable,
+       formatter = formatter ?? DateFormat(DateFormat.YEAR_MONTH_DAY);
 
   @override
   DatePickerFromZeroState createState() => DatePickerFromZeroState();
 
-  static Widget defaultButtonChildBuilder(BuildContext context, String? title, String? hint, dynamic value,
-      DateTimePickerType type, DateFormat formatter, bool enabled, bool showClearButton) {
+  static Widget defaultButtonChildBuilder(
+    BuildContext context,
+    String? title,
+    String? hint,
+    dynamic value,
+    DateTimePickerType type,
+    DateFormat formatter,
+    bool enabled,
+    bool showClearButton,
+  ) {
     final theme = Theme.of(context);
     final formattedValue = value == null
         ? null
         : type == DateTimePickerType.time
-            ? TimeOfDay.fromDateTime(value).format(context)
-            : formatter.format(value);
+        ? TimeOfDay.fromDateTime(value).format(context)
+        : formatter.format(value);
     return IntrinsicWidth(
       child: ConstrainedBox(
         constraints: const BoxConstraints(
@@ -150,11 +159,26 @@ class DatePickerFromZeroState extends State<DatePickerFromZero> {
   Widget build(BuildContext context) {
     Widget child;
     if (widget.buttonChildBuilder == null) {
-      child = DatePickerFromZero.defaultButtonChildBuilder(context, widget.title, widget.hint, widget.value,
-          widget.type, widget.formatter, widget.enabled, widget.clearable && widget.showClearButton);
+      child = DatePickerFromZero.defaultButtonChildBuilder(
+        context,
+        widget.title,
+        widget.hint,
+        widget.value,
+        widget.type,
+        widget.formatter,
+        widget.enabled,
+        widget.clearable && widget.showClearButton,
+      );
     } else {
-      child = widget.buttonChildBuilder!(context, widget.title, widget.hint, widget.value, widget.formatter,
-          widget.enabled, widget.clearable && widget.showClearButton);
+      child = widget.buttonChildBuilder!(
+        context,
+        widget.title,
+        widget.hint,
+        widget.value,
+        widget.formatter,
+        widget.enabled,
+        widget.clearable && widget.showClearButton,
+      );
     }
     final onPressed = widget.enabled
         ? () async {
@@ -281,8 +305,9 @@ class DatePickerFromZeroPopupState extends State<DatePickerFromZeroPopup> {
           useLayoutBuilderInsteadOfMediaQuery: true,
           helpText: widget.title,
           onSelected: (v) {
-            bool? pop =
-                widget.onSelected?.call((widget.value ?? DateTime.now()).copyWith(hour: v.hour, minute: v.minute));
+            bool? pop = widget.onSelected?.call(
+              (widget.value ?? DateTime.now()).copyWith(hour: v.hour, minute: v.minute),
+            );
             if (pop ?? true) {
               Navigator.of(context).pop(true);
             }
@@ -312,13 +337,13 @@ class DatePickerFromZeroPopupState extends State<DatePickerFromZeroPopup> {
                 firstDate: widget.value == null
                     ? widget.firstDate
                     : widget.value!.isBefore(widget.firstDate)
-                        ? widget.value!
-                        : widget.firstDate,
+                    ? widget.value!
+                    : widget.firstDate,
                 lastDate: widget.value == null
                     ? widget.lastDate
                     : widget.value!.isAfter(widget.lastDate)
-                        ? widget.value!
-                        : widget.lastDate,
+                    ? widget.value!
+                    : widget.lastDate,
                 onDateChanged: (v) {
                   bool? pop = widget.onSelected?.call(v);
                   if (pop ?? true) {

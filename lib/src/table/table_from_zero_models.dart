@@ -24,11 +24,13 @@ class RowAction<T> extends ActionFromZero {
     super.centerExpanded,
     super.key,
     this.disablingErrorGetter,
-  })  : assert(breakpointsGetter == null || breakpoints != null,
-            'Please specify default breakpoints, that should be the max that a column can get'),
-        super(
-          onTap: (context) {},
-        );
+  }) : assert(
+         breakpointsGetter == null || breakpoints != null,
+         'Please specify default breakpoints, that should be the max that a column can get',
+       ),
+       super(
+         onTap: (context) {},
+       );
 
   RowAction.divider({
     super.key,
@@ -36,17 +38,18 @@ class RowAction<T> extends ActionFromZero {
     super.overflowBuilder = ActionFromZero.dividerOverflowBuilder,
     super.iconBuilder = ActionFromZero.dividerIconBuilder,
     super.buttonBuilder = ActionFromZero.dividerIconBuilder,
-  })  : onRowTap = null,
-        disablingErrorGetter = null,
-        breakpointsGetter = null,
-        super(
-          onTap: null,
-          title: '',
-          breakpoints: breakpoints ??
-              {
-                0: ActionState.popup,
-              },
-        );
+  }) : onRowTap = null,
+       disablingErrorGetter = null,
+       breakpointsGetter = null,
+       super(
+         onTap: null,
+         title: '',
+         breakpoints:
+             breakpoints ??
+             {
+               0: ActionState.popup,
+             },
+       );
 }
 
 abstract class RowModel<T> {
@@ -95,8 +98,10 @@ abstract class RowModel<T> {
 
   bool get isExpandable => children.isNotEmpty || (rowAddon != null && rowAddonIsExpandable);
   List<RowModel<T>> get visibleRows => [this, if (expanded) ...children.map((e) => e.visibleRows).flatten()];
-  List<RowModel<T>> get visibleFilteredRows =>
-      [this, if (expanded) ...filteredChildren.map((e) => e.visibleFilteredRows).flatten()];
+  List<RowModel<T>> get visibleFilteredRows => [
+    this,
+    if (expanded) ...filteredChildren.map((e) => e.visibleFilteredRows).flatten(),
+  ];
   List<RowModel<T>> get visibleChildren => visibleRows..removeAt(0);
   List<RowModel<T>> get allRows => [this, ...children.map((e) => e.allRows).flatten()];
   List<RowModel<T>> get allChildren => allRows..removeAt(0);
@@ -153,8 +158,8 @@ abstract class ColModel<T> {
       final List list = value is List
           ? value
           : value is ComparableList
-              ? value.list
-              : [];
+          ? value.list
+          : [];
       return ListField.listToStringAll(list);
     } else {
       return value != null ? value.toString() : "";
@@ -219,18 +224,18 @@ abstract class ColModel<T> {
 
   Widget? buildSortedIcon(BuildContext context, bool ascending) => null;
   List<ConditionFilter> getAvailableConditionFilters() => [
-        // FilterIsEmpty(),
-        // FilterTextExactly(),
-        FilterTextContains(),
-        FilterTextStartsWith(),
-        FilterTextEndsWith(),
-        // FilterNumberEqualTo(),
-        // FilterNumberGreaterThan(),
-        // FilterNumberLessThan(),
-        // FilterDateExactDay(),
-        // FilterDateAfter(),
-        // FilterDateBefore(),
-      ];
+    // FilterIsEmpty(),
+    // FilterTextExactly(),
+    FilterTextContains(),
+    FilterTextStartsWith(),
+    FilterTextEndsWith(),
+    // FilterNumberEqualTo(),
+    // FilterNumberGreaterThan(),
+    // FilterNumberLessThan(),
+    // FilterDateExactDay(),
+    // FilterDateAfter(),
+    // FilterDateBefore(),
+  ];
 
   static Object? getRowValue(RowModel row, dynamic key, ColModel? col) {
     return col?.getValue(row, key) ?? row.values[key];
@@ -245,16 +250,20 @@ abstract class ColModel<T> {
       final List list = value is List
           ? value
           : value is ComparableList
-              ? value.list
-              : [];
+          ? value.list
+          : [];
       return ListField.listToStringAll(list);
     } else {
       return value != null ? value.toString() : "";
     }
   }
 
-  List<RowModel> buildFilterPopupRowModels(List<dynamic> availableFilters,
-      Map<dynamic, Map<Object?, bool>> valueFilters, dynamic colKey, ValueNotifier<bool> modified) {
+  List<RowModel> buildFilterPopupRowModels(
+    List<dynamic> availableFilters,
+    Map<dynamic, Map<Object?, bool>> valueFilters,
+    dynamic colKey,
+    ValueNotifier<bool> modified,
+  ) {
     return availableFilters.map((e) {
       return SimpleRowModel(
         id: e,
@@ -619,8 +628,8 @@ class NumColModel<T> extends SimpleColModel<T> {
       final List list = value is List
           ? value
           : value is ComparableList
-              ? value.list
-              : [];
+          ? value.list
+          : [];
       return ListField.listToStringAll(
         list,
         converter: _format,
@@ -634,8 +643,8 @@ class NumColModel<T> extends SimpleColModel<T> {
     return value == null
         ? ''
         : (formatter != null && value is num)
-            ? formatter!.format(value)
-            : value.toString();
+        ? formatter!.format(value)
+        : value.toString();
   }
 
   @override
@@ -698,11 +707,11 @@ class NumColModel<T> extends SimpleColModel<T> {
 
   @override
   List<ConditionFilter> getAvailableConditionFilters() => [
-        // FilterIsEmpty(),
-        FilterNumberEqualTo(),
-        FilterNumberGreaterThan(),
-        FilterNumberLessThan(),
-      ];
+    // FilterIsEmpty(),
+    FilterNumberEqualTo(),
+    FilterNumberGreaterThan(),
+    FilterNumberLessThan(),
+  ];
 }
 
 class BoolColModel<T> extends SimpleColModel<T> {
@@ -893,8 +902,7 @@ class DateColModel<T> extends SimpleColModel<T> {
     List<RowModel<T>>? filtered,
     dynamic key, {
     List<RowModel<T>>? reFiltered,
-  }) =>
-      '';
+  }) => '';
   @override
   String getValueString(RowModel row, dynamic key) {
     final value = getValue(row, key);
@@ -902,8 +910,8 @@ class DateColModel<T> extends SimpleColModel<T> {
       final List list = value is List
           ? value
           : value is ComparableList
-              ? value.list
-              : [];
+          ? value.list
+          : [];
       return ListField.listToStringAll(
         list,
         converter: _format,
@@ -917,23 +925,27 @@ class DateColModel<T> extends SimpleColModel<T> {
     return value == null
         ? ''
         : (formatter != null && value is DateTime)
-            ? formatter!.format(value)
-            : (formatter != null && value is Date)
-                ? formatter!.format(value.toDateTime())
-                : value is DateField && value.value != null
-                    ? value.formatterDense.format(value.value!)
-                    : value.toString();
+        ? formatter!.format(value)
+        : (formatter != null && value is Date)
+        ? formatter!.format(value.toDateTime())
+        : value is DateField && value.value != null
+        ? value.formatterDense.format(value.value!)
+        : value.toString();
   }
 
   @override
   List<ConditionFilter> getAvailableConditionFilters() => [
-        // FilterDateExactDay(),
-        FilterDateAfter(),
-        FilterDateBefore(),
-      ];
+    // FilterDateExactDay(),
+    FilterDateAfter(),
+    FilterDateBefore(),
+  ];
   @override
-  List<RowModel> buildFilterPopupRowModels(List<dynamic> availableFilters,
-      Map<dynamic, Map<Object?, bool>> valueFilters, dynamic colKey, ValueNotifier<bool> modified) {
+  List<RowModel> buildFilterPopupRowModels(
+    List<dynamic> availableFilters,
+    Map<dynamic, Map<Object?, bool>> valueFilters,
+    dynamic colKey,
+    ValueNotifier<bool> modified,
+  ) {
     final Map<int, Map<int, List<Object>>> grouped = {};
     final List<dynamic> other = [];
     for (final e in availableFilters) {
@@ -981,7 +993,7 @@ class DateColModel<T> extends SimpleColModel<T> {
               SimpleRowModel(
                 id: month,
                 values: {
-                  colKey: ValueString(month, DateFormat("MMMM", "es").format(DateTime(year, month)))
+                  colKey: ValueString(month, DateFormat("MMMM", "es").format(DateTime(year, month))),
                 }, // TODO 3 internationalize
                 expanded: grouped[year]!.length == 1,
                 children: [

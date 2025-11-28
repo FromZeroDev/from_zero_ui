@@ -30,16 +30,16 @@ class UpdateFromZero {
     Dio? dio,
   }) : dio = dio ?? Dio() {
     this.dio.interceptors.add(
-          RetryInterceptor(
-            dio: this.dio,
-            retries: 3,
-            retryDelays: const [
-              Duration(seconds: 1),
-              Duration(seconds: 2),
-              Duration(seconds: 3),
-            ],
-          ),
-        );
+      RetryInterceptor(
+        dio: this.dio,
+        retries: 3,
+        retryDelays: const [
+          Duration(seconds: 1),
+          Duration(seconds: 2),
+          Duration(seconds: 3),
+        ],
+      ),
+    );
   }
 
   Future<UpdateFromZero>? _checkUpdate;
@@ -90,8 +90,9 @@ class UpdateFromZero {
               final bytes = await file.readAsBytes();
               final archive = ZipDecoder().decodeBytes(bytes);
               String tempDirectory = (await getTemporaryDirectory()).absolute.path;
-              File extracted =
-                  File(p.join(tempDirectory, archive.first.name.substring(0, archive.first.name.length - 1)));
+              File extracted = File(
+                p.join(tempDirectory, archive.first.name.substring(0, archive.first.name.length - 1)),
+              );
               try {
                 await extracted.delete(recursive: true);
               } catch (e, st) {
@@ -194,10 +195,14 @@ class UpdateFromZero {
       final download = dio.download(
         appDownloadUrl,
         downloadPath,
-        onReceiveProgress: onReceiveProgress ??
+        onReceiveProgress:
+            onReceiveProgress ??
             (rcv, total) {
-              log(LgLvl.finer, 'received: ${rcv.toStringAsFixed(0)} out of total: ${total.toStringAsFixed(0)}',
-                  type: FzLgType.appUpdate);
+              log(
+                LgLvl.finer,
+                'received: ${rcv.toStringAsFixed(0)} out of total: ${total.toStringAsFixed(0)}',
+                type: FzLgType.appUpdate,
+              );
             },
         deleteOnError: true,
       );
@@ -213,8 +218,11 @@ class UpdateFromZero {
             await Future<void>.delayed(const Duration(seconds: 1));
             FromZeroAppContentWrapper.exitApp(0);
           } else {
-            log(LgLvl.info, 'App Update downloaded correctly, manually extracting zip file on windows...',
-                type: FzLgType.appUpdate);
+            log(
+              LgLvl.info,
+              'App Update downloaded correctly, manually extracting zip file on windows...',
+              type: FzLgType.appUpdate,
+            );
             // Assume update is a zip file and manually extract it
             appWindow.title = FromZeroLocalizations.of(context).translate('processing_update');
             final file = File(downloadPath);
@@ -237,8 +245,9 @@ class UpdateFromZero {
             String scriptPath = Platform.script.path
                 .substring(1, Platform.script.path.indexOf(Platform.script.pathSegments.last))
                 .replaceAll('%20', ' ');
-            final executableFile =
-                await Directory(newAppDirectory).list().firstWhere((element) => element.path.endsWith('.exe'));
+            final executableFile = await Directory(
+              newAppDirectory,
+            ).list().firstWhere((element) => element.path.endsWith('.exe'));
             await argumentsFile.writeAsString("$newAppDirectory\n$scriptPath");
             log(LgLvl.fine, executableFile.absolute.path.replaceAll('/', r'\'), type: FzLgType.appUpdate);
             Process.start(
@@ -250,8 +259,11 @@ class UpdateFromZero {
             FromZeroAppContentWrapper.exitApp(0);
           }
         } else if (Platform.isAndroid) {
-          log(LgLvl.info, 'App Update downloaded correctly, requesting apk install on android...',
-              type: FzLgType.appUpdate);
+          log(
+            LgLvl.info,
+            'App Update downloaded correctly, requesting apk install on android...',
+            type: FzLgType.appUpdate,
+          );
           if (await requestDefaultFilePermission(lgType: FzLgType.appUpdate)) {
             // this requires adding the following permission to manifest, which causes problems with google play upload
             // <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"></uses-permission>
@@ -336,8 +348,8 @@ class __UpdateWidgetState extends State<_UpdateWidget> {
       title: !started
           ? Text(FromZeroLocalizations.of(context).translate('update_available'))
           : progress == 1
-              ? Text(FromZeroLocalizations.of(context).translate('processing_update'))
-              : Text(FromZeroLocalizations.of(context).translate('downloading_update')),
+          ? Text(FromZeroLocalizations.of(context).translate('processing_update'))
+          : Text(FromZeroLocalizations.of(context).translate('downloading_update')),
       content: SizedBox(
         width: 384,
         child: PageTransitionSwitcher(

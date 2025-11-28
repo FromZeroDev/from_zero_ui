@@ -51,13 +51,13 @@ class ExpansionTileFromZero extends StatefulWidget {
     this.titleBuilder,
     this.borderRadius,
     super.key,
-  })  : assert(title != null || titleBuilder != null, 'Must specify a title'),
-        assert(title == null || titleBuilder == null, 'Only 1 title must be specified'),
-        assert(
-          expandedCrossAxisAlignment != CrossAxisAlignment.baseline,
-          'CrossAxisAlignment.baseline is not supported since the expanded children '
-          'are aligned in a column, not a row. Try to use another constant.',
-        );
+  }) : assert(title != null || titleBuilder != null, 'Must specify a title'),
+       assert(title == null || titleBuilder == null, 'Only 1 title must be specified'),
+       assert(
+         expandedCrossAxisAlignment != CrossAxisAlignment.baseline,
+         'CrossAxisAlignment.baseline is not supported since the expanded children '
+         'are aligned in a column, not a row. Try to use another constant.',
+       );
 
   final bool? expanded;
   final void Function(bool)? onPostExpansionChanged;
@@ -241,7 +241,7 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
   }
 
   void setExpanded(bool expanded, [force = false]) {
-//    if (widget.expanded!=null) expanded=widget.expanded;
+    //    if (widget.expanded!=null) expanded=widget.expanded;
     if (widget.enabled && _isExpanded != expanded) {
       setState(() {
         _isExpanded = expanded;
@@ -288,14 +288,16 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
               left: widget.style == DrawerMenuFromZero.styleTree ? 0 : null,
               child: Padding(
                 padding: widget.actionPadding,
-                child: widget.leading ??
+                child:
+                    widget.leading ??
                     IconButton(
                       icon: SizedBox(
                         width: 8,
                         child: OverflowBox(
                           maxWidth: double.infinity,
                           maxHeight: double.infinity,
-                          child: widget.trailing ??
+                          child:
+                              widget.trailing ??
                               (widget.enabled
                                   ? RotationTransition(
                                       turns: _iconTurns,
@@ -355,7 +357,8 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
         onNextFrame = () {
           setState(() {});
         };
-        bool expandChildren = widget.childrenKeysForExpandCollapse != null &&
+        bool expandChildren =
+            widget.childrenKeysForExpandCollapse != null &&
             widget.childrenKeysForExpandCollapse!.where((e) => !(e.currentState?.isExpanded ?? false)).isNotEmpty;
         return ContextMenuFromZero(
           actions: [
@@ -384,9 +387,9 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
                 widget.childrenKeysForExpandCollapse != null &&
                 widget.childrenKeysForExpandCollapse!.isNotEmpty)
               ActionFromZero(
-                icon: Icon(expandChildren
-                    ? MaterialCommunityIcons.arrow_expand_down
-                    : MaterialCommunityIcons.arrow_collapse_up),
+                icon: Icon(
+                  expandChildren ? MaterialCommunityIcons.arrow_expand_down : MaterialCommunityIcons.arrow_collapse_up,
+                ),
                 title: expandChildren ? 'Expandir Descendientes' : 'Colapsar Descendientes', // TODO 3 internationalize
                 onTap: (context) {
                   bool expand = widget.childrenKeysForExpandCollapse!
@@ -418,22 +421,22 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-//          ListTileTheme.merge(
-//            iconColor: _iconColor.value,
-//            textColor: _headerColor.value,
-//            child: ListTile(
-//              onTap: _handleTap,
-//              contentPadding: widget.tilePadding,
-//              leading: widget.leading,
-//              title: widget.title,
-//              dense: true,
-//              subtitle: widget.subtitle,
-//              trailing: widget.trailing ?? RotationTransition(
-//                turns: _iconTurns,
-//                child: Icon(Icons.expand_more, color: _iconColor.value,),
-//              ),
-//            ),
-//          ),
+            //          ListTileTheme.merge(
+            //            iconColor: _iconColor.value,
+            //            textColor: _headerColor.value,
+            //            child: ListTile(
+            //              onTap: _handleTap,
+            //              contentPadding: widget.tilePadding,
+            //              leading: widget.leading,
+            //              title: widget.title,
+            //              dense: true,
+            //              subtitle: widget.subtitle,
+            //              trailing: widget.trailing ?? RotationTransition(
+            //                turns: _iconTurns,
+            //                child: Icon(Icons.expand_more, color: _iconColor.value,),
+            //              ),
+            //            ),
+            //          ),
             title,
             ClipPath(
               clipper: SideClipper(clipBottom: true, clipTop: true),

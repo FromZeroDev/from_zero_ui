@@ -26,10 +26,10 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
   dynamic get id => isInitialized
       ? super.id
       : originalModel == null
-          ? null
-          : originalModel is int
-              ? originalModel
-              : (originalModel as dynamic).id;
+      ? null
+      : originalModel is int
+      ? originalModel
+      : (originalModel as dynamic).id;
 
   LazyDAO(this.originalModel) : super._uninitialized();
 

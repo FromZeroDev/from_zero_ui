@@ -20,12 +20,14 @@ import 'package:sliver_tools/sliver_tools.dart';
 typedef OnRowHoverCallback = void Function(RowModel row, bool selected);
 typedef OnCheckBoxSelectedCallback = bool? Function(RowModel row, bool? selected);
 typedef OnHeaderHoverCallback = void Function(dynamic key, bool selected);
-typedef OnCellTapCallback = ValueChanged<RowModel>? Function(
-  dynamic key,
-);
-typedef OnCellHoverCallback = OnRowHoverCallback? Function(
-  dynamic key,
-);
+typedef OnCellTapCallback =
+    ValueChanged<RowModel>? Function(
+      dynamic key,
+    );
+typedef OnCellHoverCallback =
+    OnRowHoverCallback? Function(
+      dynamic key,
+    );
 typedef WidthGetter = double Function(List<dynamic> currentColumnKeys);
 typedef CellBuilder<T> = Widget? Function(BuildContext context, RowModel<T> row, dynamic colKey, ColModel? col);
 
@@ -65,7 +67,8 @@ class TableFromZero<T> extends ConsumerStatefulWidget {
     int index,
     double? minWidth,
     Widget Function(BuildContext context, RowModel<T> row, int index, double? minWidth) defaultRowBuilder,
-  )? rowBuilder;
+  )?
+  rowBuilder;
   final Widget? Function(BuildContext context, RowModel<dynamic> row, double? minWidth)? headerRowBuilder;
   final void Function(List<RowModel<T>> rows)? onSort;
   final List<RowModel<T>> Function(List<RowModel<T>>)? onFilter;
@@ -589,7 +592,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
               return MapEntry(
                 key,
                 _sanitizeValueForIsolate(
-                  key, value, // TODO 2 performance, maybe allow to manually disable sanitization
+                  key,
+                  value, // TODO 2 performance, maybe allow to manually disable sanitization
                   fieldAliases: fieldAliases[key]!,
                   daoAliases: daoAliases[key]!,
                 ),
@@ -605,8 +609,9 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
             return MapEntry(key, value);
           } else {
             final result = value.map((e) => fieldAliases[key]![e] ?? daoAliases[key]![e] ?? e).toList();
-            final sorted = result
-                .sortedWith((a, b) => defaultComparator(a, b, widget.columns?[key]?.defaultSortAscending ?? true));
+            final sorted = result.sortedWith(
+              (a, b) => defaultComparator(a, b, widget.columns?[key]?.defaultSortAscending ?? true),
+            );
             return MapEntry(key, sorted);
           }
         });
@@ -623,9 +628,12 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
           computedValidInitialFilters = await validInitialFiltersIsolateController!.value;
         }
       } catch (e, st) {
-        log(LgLvl.warning,
-            'TabelFromZero - Isolate creation for computing table filters failed. Computing synchronously...',
-            e: e, st: st);
+        log(
+          LgLvl.warning,
+          'TabelFromZero - Isolate creation for computing table filters failed. Computing synchronously...',
+          e: e,
+          st: st,
+        );
         initFilters(
           rows,
           computeFiltersInIsolate: false,
@@ -775,10 +783,10 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
           final list = element is List
               ? element
               : element is ComparableList
-                  ? element.list
-                  : element is ListField
-                      ? element.objects
-                      : <dynamic>[];
+              ? element.list
+              : element is ListField
+              ? element.objects
+              : <dynamic>[];
           for (final e in list) {
             available.add(e);
             if (artifitialThrottle) {
@@ -834,7 +842,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
     if (widget.columns == null) return {};
     return {
       for (final e in widget.columns!.keys)
-        e: widget.tableController?.initialValueFiltersExcludeAllElse ??
+        e:
+            widget.tableController?.initialValueFiltersExcludeAllElse ??
             widget.columns![e]!.initialValueFiltersExcludeAllElse,
     };
   }
@@ -944,23 +953,23 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
 
     Widget? header = showHeaders
         ? headerRowModel != null
-            ? headerRowModel!.values.isEmpty && headerRowModel!.rowAddon != null
-                ? LayoutBuilder(
-                    builder: (context, constraints) {
-                      return _wrapRowAddon(headerRowModel!, constraints, minWidth)!;
-                    },
-                  )
-                : _getRow(context, headerRowModel, -1, minWidth)
-            : null
+              ? headerRowModel!.values.isEmpty && headerRowModel!.rowAddon != null
+                    ? LayoutBuilder(
+                        builder: (context, constraints) {
+                          return _wrapRowAddon(headerRowModel!, constraints, minWidth)!;
+                        },
+                      )
+                    : _getRow(context, headerRowModel, -1, minWidth)
+              : null
         : headerRowModel?.rowAddon == null
-            ? null
-            : minWidth == null
-                ? headerRowModel!.rowAddon!
-                : LayoutBuilder(
-                    builder: (context, constraints) {
-                      return _wrapRowAddon(headerRowModel!, constraints, minWidth)!;
-                    },
-                  );
+        ? null
+        : minWidth == null
+        ? headerRowModel!.rowAddon!
+        : LayoutBuilder(
+            builder: (context, constraints) {
+              return _wrapRowAddon(headerRowModel!, constraints, minWidth)!;
+            },
+          );
     if (header != null) {
       result = SliverStickyHeader.builder(
         sliver: result,
@@ -1055,7 +1064,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
       return Container(
         color: _getMaterialColor(),
         padding: widget.emptyWidgetPadding,
-        child: widget.emptyWidget ??
+        child:
+            widget.emptyWidget ??
             TableEmptyWidget(
               tableController: widget.tableController ?? TableController()
                 ..currentState = this
@@ -1102,14 +1112,17 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
       }
     }
     flexibleMinWidth = flexibleMinWidth.coerceAtLeast(0);
-    int cols = (((currentColumnKeys ?? row.values.keys).length) + (_showLeadingControls ? 1 : 0)) *
+    int cols =
+        (((currentColumnKeys ?? row.values.keys).length) + (_showLeadingControls ? 1 : 0)) *
             (widget.verticalDivider == null ? 1 : 2) +
         (widget.verticalDivider == null ? 0 : 1);
 
-    final String? rowDisabledReason =
-        row == headerRowModel ? null : widget.rowDisabledValidator?.call(row as RowModel<T>);
-    final String? tooltip =
-        row == headerRowModel ? null : rowDisabledReason ?? widget.rowTooltipGetter?.call(row as RowModel<T>);
+    final String? rowDisabledReason = row == headerRowModel
+        ? null
+        : widget.rowDisabledValidator?.call(row as RowModel<T>);
+    final String? tooltip = row == headerRowModel
+        ? null
+        : rowDisabledReason ?? widget.rowTooltipGetter?.call(row as RowModel<T>);
     Widget builder(BuildContext context, BoxConstraints? constraints) {
       final Map<Widget, ActionState> rowActionStates = {
         for (final e in widget.rowActions) e: e.getStateForMaxWidth(constraints?.maxWidth ?? double.infinity),
@@ -1117,16 +1130,16 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
       List<ActionFromZero> rowActions = row == headerRowModel
           ? []
           : widget.rowActions
-              .map(
-                (e) => e.copyWith(
-                  onTap: (context) {
-                    e.onRowTap?.call(context, row as RowModel<T>);
-                  },
-                  disablingError: e.disablingErrorGetter?.call(context, row as RowModel<T>),
-                  breakpoints: e.breakpointsGetter?.call(context, row as RowModel<T>) ?? e.breakpoints,
-                ),
-              )
-              .toList();
+                .map(
+                  (e) => e.copyWith(
+                    onTap: (context) {
+                      e.onRowTap?.call(context, row as RowModel<T>);
+                    },
+                    disablingError: e.disablingErrorGetter?.call(context, row as RowModel<T>),
+                    breakpoints: e.breakpointsGetter?.call(context, row as RowModel<T>) ?? e.breakpoints,
+                  ),
+                )
+                .toList();
       for (final e in rowActions) {
         if (!rowActionStates.containsKey(e)) {
           rowActionStates[e] = e.getStateForMaxWidth(constraints?.maxWidth ?? double.infinity);
@@ -1195,7 +1208,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
           context,
           actions: rowActions,
           showFiltersLoading: showFiltersLoading,
-          controller: widget.tableController ??
+          controller:
+              widget.tableController ??
               (TableController()
                 ..currentState = this
                 ..columnKeys = columnKeys
@@ -1314,8 +1328,9 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
                             child: SelectableIcon(
                               selected: row.expanded || row.isFilteredInBecauseOfChildren,
                               icon: Icons.expand_less,
-                              selectedColor:
-                                  row.isFilteredInBecauseOfChildren ? theme.disabledColor : theme.colorScheme.secondary,
+                              selectedColor: row.isFilteredInBecauseOfChildren
+                                  ? theme.disabledColor
+                                  : theme.colorScheme.secondary,
                               unselectedOffset: 0.25,
                               selectedOffset: 0.5,
                             ),
@@ -1334,8 +1349,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
                               value: row == headerRowModel
                                   ? allFiltered.some((e) => e.selected)
                                   : row.onCheckBoxSelected != null
-                                      ? row.selected
-                                      : row.allChildren.some((e) => e.selected),
+                                  ? row.selected
+                                  : row.allChildren.some((e) => e.selected),
                               onChanged: (row == headerRowModel ? allFiltered.isEmpty : rowDisabledReason != null)
                                   ? null
                                   : (value) {
@@ -1355,7 +1370,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
                                               checkboxSetState(() {});
                                             } else {
                                               setState(
-                                                  () {}); // nested rows need to set state for whole table, so parents can react to potential changes
+                                                () {},
+                                              ); // nested rows need to set state for whole table, so parents can react to potential changes
                                             }
                                           }
                                         } else {
@@ -1395,22 +1411,28 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
           padding: row == headerRowModel
               ? null
               : row.depth > 0 && j == 0
-                  ? widget.cellPadding.copyWith(left: widget.cellPadding.left + row.depth * _depthPadding)
-                  : widget.cellPadding,
+              ? widget.cellPadding.copyWith(left: widget.cellPadding.left + row.depth * _depthPadding)
+              : widget.cellPadding,
           child: SizedBox(
             width: double.infinity,
             child: row == headerRowModel
                 ? defaultHeaderCellBuilder(context, headerRowModel!, colKey)
                 : widget.cellBuilder?.call(context, row as RowModel<T>, colKey, col) ??
-                    TableFromZeroState.defaultCellBuilder<T>(
-                      context,
-                      row as RowModel<T>,
-                      colKey,
-                      col,
-                      getStyle(
-                          context, row, colKey, col, widget.rowStyleTakesPriorityOverColumn, rowDisabledReason != null),
-                      getAlignment(colKey, col),
-                    ),
+                      TableFromZeroState.defaultCellBuilder<T>(
+                        context,
+                        row as RowModel<T>,
+                        colKey,
+                        col,
+                        getStyle(
+                          context,
+                          row,
+                          colKey,
+                          col,
+                          widget.rowStyleTakesPriorityOverColumn,
+                          rowDisabledReason != null,
+                        ),
+                        getAlignment(colKey, col),
+                      ),
           ),
         );
         if (row.onCellTap != null ||
@@ -1612,8 +1634,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
                 stickOffset: row is! RowModel<T>
                     ? 0
                     : index == 0
-                        ? 0
-                        : widget.stickyOffset + (row.height ?? 0),
+                    ? 0
+                    : widget.stickyOffset + (row.height ?? 0),
               ),
             ],
           );
@@ -1666,8 +1688,10 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
       if (row != headerRowModel) {
         result = ContextMenuFromZero(
           onShowMenu: () => row.focusNode.requestFocus(),
-          actions:
-              rowActions.where((e) => (rowActionStates[e] ?? ActionState.popup) != ActionState.none).toList().cast(),
+          actions: rowActions
+              .where((e) => (rowActionStates[e] ?? ActionState.popup) != ActionState.none)
+              .toList()
+              .cast(),
           child: result,
         );
       }
@@ -1727,18 +1751,18 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
         onTap: !widget.enabled
             ? null
             : row.onRowTap != null
-                ? () => row.onRowTap!(row)
-                : row.onCheckBoxSelected != null
-                    ? () {
-                        if (row.onCheckBoxSelected!(row, !(row.selected ?? false)) ?? false) {
-                          setState(() {});
-                        }
-                      }
-                    : row.isExpandable && !row.isFilteredInBecauseOfChildren
-                        ? () {
-                            toggleRowExpanded(row, index);
-                          }
-                        : null,
+            ? () => row.onRowTap!(row)
+            : row.onCheckBoxSelected != null
+            ? () {
+                if (row.onCheckBoxSelected!(row, !(row.selected ?? false)) ?? false) {
+                  setState(() {});
+                }
+              }
+            : row.isExpandable && !row.isFilteredInBecauseOfChildren
+            ? () {
+                toggleRowExpanded(row, index);
+              }
+            : null,
         onDoubleTap: widget.enabled && row.onRowDoubleTap != null ? () => row.onRowDoubleTap!(row) : null,
         onLongPress: widget.enabled && row.onRowLongPress != null ? () => row.onRowLongPress!(row) : null,
         onHover: widget.enabled && row.onRowHover != null ? (value) => row.onRowHover!(row, value) : null,
@@ -1829,7 +1853,9 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
       );
     } else {
       return _defaultHeaderCellBuilder(
-        context, row, colKey,
+        context,
+        row,
+        colKey,
         availableFilters: null, // doesn't matter
         autoSizeTextMaxLines: autoSizeTextMaxLines,
       );
@@ -1860,8 +1886,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
       alignment: alignment == TextAlign.center
           ? Alignment.center
           : alignment == TextAlign.left || alignment == TextAlign.start
-              ? Alignment.centerLeft
-              : Alignment.centerRight,
+          ? Alignment.centerLeft
+          : Alignment.centerRight,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -1914,14 +1940,14 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
                 switchInCurve: Curves.easeOut,
                 child: (widget.enabled && !export && sortedColumn == colKey)
                     ? col?.buildSortedIcon(context, sortedAscending) ??
-                        Icon(
-                          sortedAscending
-                              ? MaterialCommunityIcons.sort_ascending
-                              : MaterialCommunityIcons.sort_descending,
-                          size: 20,
-                          key: ValueKey(sortedAscending),
-                          color: theme.colorScheme.secondary,
-                        )
+                          Icon(
+                            sortedAscending
+                                ? MaterialCommunityIcons.sort_ascending
+                                : MaterialCommunityIcons.sort_descending,
+                            size: 20,
+                            key: ValueKey(sortedAscending),
+                            color: theme.colorScheme.secondary,
+                          )
                     : const SizedBox(
                         height: 24,
                       ),
@@ -1964,8 +1990,9 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
                             icon: MaterialCommunityIcons.filter_outline,
                             selectedIcon: MaterialCommunityIcons.filter,
                             selectedColor: theme.colorScheme.secondary,
-                            unselectedColor: theme.textTheme.bodyLarge!.color!
-                                .withValues(alpha: theme.brightness == Brightness.light ? 0.7 : 0.8),
+                            unselectedColor: theme.textTheme.bodyLarge!.color!.withValues(
+                              alpha: theme.brightness == Brightness.light ? 0.7 : 0.8,
+                            ),
                             unselectedOffset: 0,
                             selectedOffset: 0,
                           ),
@@ -2069,7 +2096,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
         context,
         actions: colActions,
         showFiltersLoading: showFiltersLoading,
-        controller: widget.tableController ??
+        controller:
+            widget.tableController ??
             (TableController()
               ..currentState = this
               ..columnKeys = columnKeys
@@ -2193,11 +2221,13 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
     bool isHeader = row == headerRowModel;
     Color? backgroundColor = _getBackgroundColor(row, colKey, isHeader);
     if (backgroundColor != null) {
-      bool applyDarker = widget.alternateRowBackgroundBrightness &&
+      bool applyDarker =
+          widget.alternateRowBackgroundBrightness &&
           _shouldApplyDarkerBackground(backgroundColor, row, index, colKey, isHeader);
       if (backgroundColor.opacity < 1 && widget.alternateRowBackgroundBrightness) {
-        backgroundColor =
-            backgroundColor.opacity == 0 ? _getMaterialColor() : Color.alphaBlend(backgroundColor, _getMaterialColor());
+        backgroundColor = backgroundColor.opacity == 0
+            ? _getMaterialColor()
+            : Color.alphaBlend(backgroundColor, _getMaterialColor());
       }
       if (applyDarker) {
         backgroundColor = Color.alphaBlend(backgroundColor.withValues(alpha: 0.965), Colors.black);
@@ -2247,8 +2277,14 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
     return col?.alignment ?? TextAlign.left;
   }
 
-  static TextStyle? getStyle(BuildContext context, RowModel row, dynamic colKey, ColModel? col,
-      bool rowStyleTakesPriorityOverColumn, bool isDisabled) {
+  static TextStyle? getStyle(
+    BuildContext context,
+    RowModel row,
+    dynamic colKey,
+    ColModel? col,
+    bool rowStyleTakesPriorityOverColumn,
+    bool isDisabled,
+  ) {
     TextStyle? style;
     if (rowStyleTakesPriorityOverColumn) {
       style = row.textStyle ?? col?.textStyle;
@@ -2559,10 +2595,12 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
         if (bVal == null) {
           return sortNullOnTop ? -1 : 1;
         }
-        final Comparable<dynamic> aCompVal =
-            aVal! is Comparable ? aVal : ColModel.getRowValueString(a, sortedColumnKey, col);
-        final Comparable<dynamic> bCompVal =
-            bVal! is Comparable ? bVal : ColModel.getRowValueString(b, sortedColumnKey, col);
+        final Comparable<dynamic> aCompVal = aVal! is Comparable
+            ? aVal
+            : ColModel.getRowValueString(a, sortedColumnKey, col);
+        final Comparable<dynamic> bCompVal = bVal! is Comparable
+            ? bVal
+            : ColModel.getRowValueString(b, sortedColumnKey, col);
         return sortedAscending ? aCompVal.compareTo(bCompVal) : bCompVal.compareTo(aCompVal);
       }),
     );
@@ -2647,10 +2685,10 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
             final List list = value is List
                 ? value
                 : value is ComparableList
-                    ? value.list
-                    : value is ListField
-                        ? value.objects
-                        : [];
+                ? value.list
+                : value is ListField
+                ? value.objects
+                : [];
             pass = false;
             for (final e in list) {
               pass = valueFilters[key]![e] ?? false;
@@ -2829,8 +2867,8 @@ extension Some<T> on List<T> {
     return every
         ? true
         : any
-            ? null
-            : false;
+        ? null
+        : false;
   }
 }
 
@@ -2842,6 +2880,6 @@ class FilterResults<T> {
     List<RowModel<T>>? filtered,
     List<RowModel<T>>? allFiltered,
     this.expandableRowsExist,
-  })  : filtered = filtered ?? [],
-        allFiltered = allFiltered ?? [];
+  }) : filtered = filtered ?? [],
+       allFiltered = allFiltered ?? [];
 }

@@ -47,15 +47,17 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
     // Update the tween using the provided visitor function.
-    _valueTween = visitor(
-      // The latest tween value. Can be `null`.
-      _valueTween,
-      // The color value toward which we are animating.
-      widget.value ?? 0.0,
-      // A function that takes a color value and returns a tween
-      // beginning at that value.
-      (dynamic value) => Tween<double>(begin: value as double?),
-    ) as Tween<double>?;
+    _valueTween =
+        visitor(
+              // The latest tween value. Can be `null`.
+              _valueTween,
+              // The color value toward which we are animating.
+              widget.value ?? 0.0,
+              // A function that takes a color value and returns a tween
+              // beginning at that value.
+              (dynamic value) => Tween<double>(begin: value as double?),
+            )
+            as Tween<double>?;
     // We could have more tweens than one by using the visitor
     // multiple times.
   }
@@ -99,8 +101,10 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
                   curve: Curves.easeOut,
                   repeat: true,
                   builder: (loopingAnimation, child) {
-                    Color backgroundColor =
-                        ColorTween(begin: colorTransparent, end: colorMild).evaluate(loopingAnimation)!;
+                    Color backgroundColor = ColorTween(
+                      begin: colorTransparent,
+                      end: colorMild,
+                    ).evaluate(loopingAnimation)!;
                     return Stack(
                       // fit: StackFit.expand,
                       children: [
@@ -208,13 +212,15 @@ class ErrorSign extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleWidget = this.titleWidget ??
+    final titleWidget =
+        this.titleWidget ??
         Text(
           title,
           style: Theme.of(context).textTheme.titleLarge,
           textAlign: TextAlign.center,
         );
-    final subtitleWidget = this.subtitleWidget ??
+    final subtitleWidget =
+        this.subtitleWidget ??
         (subtitle.isNullOrBlank
             ? null
             : Text(
@@ -225,21 +231,21 @@ class ErrorSign extends StatelessWidget {
     final retryWidget = retryButton == null && onRetry == null
         ? null
         : (retryButton ??
-            DialogButton.accept(
-              leading: const Icon(Icons.refresh),
-              onPressed: onRetry,
-              child: Text(FromZeroLocalizations.of(context).translate("retry")),
-            ));
+              DialogButton.accept(
+                leading: const Icon(Icons.refresh),
+                onPressed: onRetry,
+                child: Text(FromZeroLocalizations.of(context).translate("retry")),
+              ));
     final compact = this.compact ?? MediaQuery.sizeOf(context).height < 512;
     final iconWidget = icon == null
         ? null
         : IconTheme(
             data: Theme.of(context).iconTheme.copyWith(
-                  size: 128,
-                  color: !compact
-                      ? Theme.of(context).disabledColor
-                      : Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.1),
-                ),
+              size: 128,
+              color: !compact
+                  ? Theme.of(context).disabledColor
+                  : Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.1),
+            ),
             child: icon!,
           );
     Widget result;
@@ -309,8 +315,9 @@ class ErrorSign extends StatelessWidget {
     result = Padding(
       padding: const EdgeInsets.all(12.0),
       child: Align(
-        alignment:
-            context.findAncestorWidgetOfExactType<Scaffold>() == null ? Alignment.center : goldenRatioVerticalAlignment,
+        alignment: context.findAncestorWidgetOfExactType<Scaffold>() == null
+            ? Alignment.center
+            : goldenRatioVerticalAlignment,
         child: ScrollbarFromZero(
           controller: scrollController,
           child: SingleChildScrollView(
@@ -341,7 +348,7 @@ class FutureBuilderFromZero<T> extends StatefulWidget {
   final FutureLoadingBuilder loadingBuilder;
   final AnimatedSwitcherTransitionBuilder transitionBuilder;
   final bool
-      enableSkipFrame; // when transitioning from having data to not having it, delay the transition by 1 frame, to not show loading unnecessarily
+  enableSkipFrame; // when transitioning from having data to not having it, delay the transition by 1 frame, to not show loading unnecessarily
   final Duration transitionDuration;
   final Curve transitionInCurve;
   final Curve transitionOutCurve;
@@ -463,8 +470,10 @@ class FutureBuilderFromZeroState<T> extends State<FutureBuilderFromZero<T>> {
         if (state == 1) {
           updatePreviousData();
         }
-        int milliseconds = (DateTime.now().millisecondsSinceEpoch - initialTimestamp)
-            .clamp(0, widget.transitionDuration.inMilliseconds);
+        int milliseconds = (DateTime.now().millisecondsSinceEpoch - initialTimestamp).clamp(
+          0,
+          widget.transitionDuration.inMilliseconds,
+        );
         result = AsyncBuilderAnimationWrapper(
           transitionBuilder: (context, child, animation) => widget.transitionBuilder(child, animation),
           transitionDuration: Duration(milliseconds: milliseconds),

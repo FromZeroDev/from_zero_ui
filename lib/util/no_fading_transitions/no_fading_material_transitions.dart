@@ -10,8 +10,8 @@ class FadeUpwardsSlideTransition extends StatelessWidget {
     this.upwards = true,
     super.key,
   }) : _positionAnimation = routeAnimation.drive(
-          (movementTween ?? (upwards ? _bottomUpTween : _topDownTween)).chain(_fastOutSlowInTween),
-        );
+         (movementTween ?? (upwards ? _bottomUpTween : _topDownTween)).chain(_fastOutSlowInTween),
+       );
 
   // Fractional offset from 1/4 screen below the top to fully on screen.
   static final Tween<Offset> _bottomUpTween = Tween<Offset>(

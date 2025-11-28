@@ -7,7 +7,7 @@ class ComboField<T extends DAO> extends Field<T> {
   ContextFulFieldValueGetter<List<T>?, ComboField<T>>? possibleValuesGetter;
   ContextFulFieldValueGetter<Future<List<T>>?, ComboField<T>>? possibleValuesFutureGetter;
   ContextFulFieldValueGetter<AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>?, ComboField<T>>?
-      possibleValuesProviderGetter;
+  possibleValuesProviderGetter;
   bool? showSearchBox;
   ExtraWidgetBuilder<T>? extraWidget;
   FieldValueGetter<DAO?, ComboField<T>>? newObjectTemplateGetter;
@@ -154,7 +154,9 @@ class ComboField<T extends DAO> extends Field<T> {
   }) async {
     if (currentValidationId != dao.validationCallCount || !context.mounted) return false;
     await super.validate(
-      context, dao, currentValidationId, // ignore: use_build_context_synchronously
+      context,
+      dao,
+      currentValidationId, // ignore: use_build_context_synchronously
       validateIfNotEdited: validateIfNotEdited,
       validateIfHidden: validateIfHidden,
     );
@@ -325,8 +327,9 @@ class ComboField<T extends DAO> extends Field<T> {
       animation: this,
       builder: (context, child) {
         final enabled = this.enabled;
-        final visibleValidationErrors =
-            passedFirstEdit ? validationErrors : validationErrors.where((e) => e.isBeforeEditing);
+        final visibleValidationErrors = passedFirstEdit
+            ? validationErrors
+            : validationErrors.where((e) => e.isBeforeEditing);
         Widget result = ComboFromZero<T>(
           focusNode: focusNode,
           enabled: enabled,
@@ -347,7 +350,8 @@ class ComboField<T extends DAO> extends Field<T> {
           buttonChildBuilder: (context, title, hint, value, enabled, clearable, {showDropdownIcon = false}) {
             return Padding(
               padding: EdgeInsets.only(
-                  right: dense ? 0 : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40),
+                right: dense ? 0 : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40,
+              ),
               child: buttonContentBuilder(
                 context,
                 title,
@@ -409,23 +413,24 @@ class ComboField<T extends DAO> extends Field<T> {
           duration: const Duration(milliseconds: 300),
           color: dense && visibleValidationErrors.isNotEmpty
               ? ValidationMessage
-                  .severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!
-                  .withValues(alpha: 0.2)
+                    .severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!
+                    .withValues(alpha: 0.2)
               : backgroundColor?.call(context, this, dao),
           curve: Curves.easeOut,
           child: result,
         );
         result = TooltipFromZero(
-          message: (dense
-                  ? visibleValidationErrors
-                  : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
-              .fold('', (a, b) {
-            return a.toString().trim().isEmpty
-                ? b.toString()
-                : b.toString().trim().isEmpty
-                    ? a.toString()
-                    : '$a\n$b';
-          }),
+          message:
+              (dense
+                      ? visibleValidationErrors
+                      : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
+                  .fold('', (a, b) {
+                    return a.toString().trim().isEmpty
+                        ? b.toString()
+                        : b.toString().trim().isEmpty
+                        ? a.toString()
+                        : '$a\n$b';
+                  }),
           waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
           child: result,
         );
@@ -545,51 +550,41 @@ class ComboField<T extends DAO> extends Field<T> {
                         showHintOrTitleInsteadOfValue ? (hint ?? title ?? '') : value.toString(),
                         maxLines: 2,
                         style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                              height: 1,
-                              fontWeight: showHintOrTitleInsteadOfValue ? FontWeight.normal : null,
-                              // color: Theme.of(context).textTheme.dis,
-                            ),
+                          height: 1,
+                          fontWeight: showHintOrTitleInsteadOfValue ? FontWeight.normal : null,
+                          // color: Theme.of(context).textTheme.dis,
+                        ),
                       )
                     : value == null && hint == null && title != null
-                        ? Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              title,
-                              maxLines: 2,
-                              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                    fontWeight: FontWeight.w400,
-                                    height: 1.1,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge!
-                                        .color!
-                                        .withValues(alpha: enabled ? 1 : 0.75),
-                                  ),
-                            ),
-                          )
-                        : MaterialKeyValuePair(
-                            padding: 4,
-                            title: title,
-                            titleMaxLines: 1,
-                            titleStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                  height: 1,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .color!
-                                      .withValues(alpha: enabled ? 1 : 0.75),
-                                ),
-                            value: showHintOrTitleInsteadOfValue ? (hint ?? '') : value.toString(),
-                            valueMaxLines: 2,
-                            valueStyle: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  height: 1,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .color!
-                                      .withValues(alpha: enabled && !showHintInsteadOfValue ? 1 : 0.75),
-                                ),
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          title,
+                          maxLines: 2,
+                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            fontWeight: FontWeight.w400,
+                            height: 1.1,
+                            color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
                           ),
+                        ),
+                      )
+                    : MaterialKeyValuePair(
+                        padding: 4,
+                        title: title,
+                        titleMaxLines: 1,
+                        titleStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          height: 1,
+                          color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
+                        ),
+                        value: showHintOrTitleInsteadOfValue ? (hint ?? '') : value.toString(),
+                        valueMaxLines: 2,
+                        valueStyle: Theme.of(context).textTheme.titleMedium!.copyWith(
+                          height: 1,
+                          color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(
+                            alpha: enabled && !showHintInsteadOfValue ? 1 : 0.75,
+                          ),
+                        ),
+                      ),
                 const SizedBox(
                   height: 4,
                 ),

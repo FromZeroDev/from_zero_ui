@@ -3,12 +3,13 @@ import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-typedef ShowFilterPopupCallback = Future<bool> Function({
-  required BuildContext context,
-  required TableController controller,
-  required dynamic colKey,
-  GlobalKey? anchorKey,
-});
+typedef ShowFilterPopupCallback =
+    Future<bool> Function({
+      required BuildContext context,
+      required TableController controller,
+      required dynamic colKey,
+      GlobalKey? anchorKey,
+    });
 
 abstract class TableFromZeroFilterPopup {
   static Future<bool> showDefaultFilterPopup({
@@ -40,8 +41,9 @@ abstract class TableFromZeroFilterPopup {
         filterSearchFocusNode.requestFocus();
       });
     }
-    final ValueNotifier<Map<dynamic, List<dynamic>>?> availableFilters =
-        ValueNotifier(null); // controller.currentState.availableFilters
+    final ValueNotifier<Map<dynamic, List<dynamic>>?> availableFilters = ValueNotifier(
+      null,
+    ); // controller.currentState.availableFilters
     final relevantRows = controller.currentState!.getFilterResults(
       controller.currentState!.sorted,
       skipColKey: colKey, // skip filters on this column, filter out everything in other columns
@@ -95,9 +97,10 @@ abstract class TableFromZeroFilterPopup {
                               ),
                             ),
                             const SliverToBoxAdapter(
-                                child: SizedBox(
-                              height: 16,
-                            )),
+                              child: SizedBox(
+                                height: 16,
+                              ),
+                            ),
                             if (possibleConditionFilters.isNotEmpty)
                               SliverToBoxAdapter(
                                 child: Padding(
@@ -136,8 +139,8 @@ abstract class TableFromZeroFilterPopup {
                                                 Text(
                                                   FromZeroLocalizations.of(context).translate('add'),
                                                   style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                                        color: Theme.of(context).colorScheme.secondary,
-                                                      ),
+                                                    color: Theme.of(context).colorScheme.secondary,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -205,21 +208,27 @@ abstract class TableFromZeroFilterPopup {
                             ),
                             if (possibleConditionFilters.isNotEmpty)
                               SliverToBoxAdapter(
-                                  child: SizedBox(
-                                height: (newConditionFilters[colKey] ?? []).isEmpty ? 6 : 12,
-                              )),
+                                child: SizedBox(
+                                  height: (newConditionFilters[colKey] ?? []).isEmpty ? 6 : 12,
+                                ),
+                              ),
                             if (possibleConditionFilters.isNotEmpty)
                               const SliverToBoxAdapter(
-                                  child: Divider(
-                                height: 32,
-                              )),
+                                child: Divider(
+                                  height: 32,
+                                ),
+                              ),
                             TableFromZero(
                               tableController: filterTableController,
                               showHeaders: false,
                               emptyWidget: const SizedBox.shrink(),
                               initialSortedColumn: col?.possibleValues != null ? null : colKey,
                               rows: (col ?? SimpleColModel(name: '')).buildFilterPopupRowModels(
-                                  availableFilters[colKey] ?? [], newValueFilters, colKey, modified),
+                                availableFilters[colKey] ?? [],
+                                newValueFilters,
+                                colKey,
+                                modified,
+                              ),
                               // override style and text alignment
                               cellBuilder: (context, row, colKey, col) {
                                 var message = ColModel.getRowValueString(row, colKey, col);
@@ -348,8 +357,9 @@ abstract class TableFromZeroFilterPopup {
                                           ),
                                           Expanded(
                                             child: TextButton(
-                                              child:
-                                                  Text(FromZeroLocalizations.of(context).translate('clear_selection')),
+                                              child: Text(
+                                                FromZeroLocalizations.of(context).translate('clear_selection'),
+                                              ),
                                               onPressed: () {
                                                 modified.value = true;
                                                 filterPopupSetState(() {
@@ -458,16 +468,16 @@ abstract class TableFromZeroFilterPopup {
   }
 
   static List<ConditionFilter> getDefaultAvailableConditionFilters() => [
-        // FilterIsEmpty(),
-        // FilterTextExactly(),
-        FilterTextContains(),
-        FilterTextStartsWith(),
-        FilterTextEndsWith(),
-        FilterNumberEqualTo(),
-        FilterNumberGreaterThan(),
-        FilterNumberLessThan(),
-        // FilterDateExactDay(),
-        FilterDateAfter(),
-        FilterDateBefore(),
-      ];
+    // FilterIsEmpty(),
+    // FilterTextExactly(),
+    FilterTextContains(),
+    FilterTextStartsWith(),
+    FilterTextEndsWith(),
+    FilterNumberEqualTo(),
+    FilterNumberGreaterThan(),
+    FilterNumberLessThan(),
+    // FilterDateExactDay(),
+    FilterDateAfter(),
+    FilterDateBefore(),
+  ];
 }

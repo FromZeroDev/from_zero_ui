@@ -51,8 +51,8 @@ class ValueString<T> implements Comparable, ContainsValue<T> {
   int compareTo(other) => other is ValueString
       ? _compare(other.value)
       : other is T
-          ? _compare(other)
-          : 1;
+      ? _compare(other)
+      : 1;
 
   int _compare(T? other) {
     if (value == null) {
@@ -74,7 +74,7 @@ class ValueString<T> implements Comparable, ContainsValue<T> {
 
 class ValueStringNum<T extends num> extends ValueString<T> {
   ValueStringNum(T? value, NumberFormat formatter)
-      : super(value ?? (0.0 as T), value == null ? '' : formatter.format(value));
+    : super(value ?? (0.0 as T), value == null ? '' : formatter.format(value));
 }
 
 // TODO 2 this still takes memory for an empty string, it could be implemented better
@@ -118,8 +118,8 @@ class NumGroupComparingBySum implements ValueString<num> {
   int compareTo(other) => other is ValueString<num>
       ? _compare(other.value)
       : other is num
-          ? _compare(other)
-          : 1;
+      ? _compare(other)
+      : 1;
 
   @override
   int _compare(num? other) {

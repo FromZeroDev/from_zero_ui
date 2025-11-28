@@ -96,25 +96,28 @@ class PopupFromZeroState extends State<PopupFromZero> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQueryPadding = MediaQuery.viewPaddingOf(context) +
+    final mediaQueryPadding =
+        MediaQuery.viewPaddingOf(context) +
         MediaQuery.viewInsetsOf(
-            context); // viewPadding has the permanent padding (notch), viewInsets has the keyboard inset
+          context,
+        ); // viewPadding has the permanent padding (notch), viewInsets has the keyboard inset
     return LayoutBuilder(
       builder: (context, constraints) {
         final mqMaxWidth = constraints.maxWidth - mediaQueryPadding.horizontal;
         final mqMaxHeight = constraints.maxHeight - mediaQueryPadding.vertical;
-        final extraPadding = widget.padding ??
+        final extraPadding =
+            widget.padding ??
             EdgeInsets.symmetric(
               horizontal: mqMaxWidth > ScaffoldFromZero.screenSizeLarge
                   ? 24
                   : mqMaxWidth > ScaffoldFromZero.screenSizeMedium
-                      ? 16
-                      : 0,
+                  ? 16
+                  : 0,
               vertical: mqMaxHeight > ScaffoldFromZero.screenSizeLarge
                   ? 24
                   : mqMaxHeight > ScaffoldFromZero.screenSizeMedium
-                      ? 16
-                      : 0,
+                  ? 16
+                  : 0,
             );
         final padding = mediaQueryPadding + extraPadding;
         final maxWidth = constraints.maxWidth - padding.horizontal;
@@ -168,11 +171,13 @@ class PopupFromZeroState extends State<PopupFromZero> {
             double x;
             double y;
             if (referencePosition != null && referenceSize != null) {
-              x = referencePosition.dx +
+              x =
+                  referencePosition.dx +
                   referenceSize.width * ((widget.anchorAlignment.x + 1) / 2) -
                   popupWidth * ((widget.popupAlignment.x - 1) / -2) +
                   widget.offsetCorrection.dx;
-              y = referencePosition.dy +
+              y =
+                  referencePosition.dy +
                   referenceSize.height * ((widget.anchorAlignment.y + 1) / 2) -
                   childSize.height * ((widget.popupAlignment.y - 1) / -2) +
                   widget.offsetCorrection.dy;
@@ -184,32 +189,41 @@ class PopupFromZeroState extends State<PopupFromZero> {
               if (maxHeightWithPaddingTop - y < childSize.height) {
                 y = maxHeightWithPaddingTop - childSize.height;
               }
-              final overlappingWidth = Rectangle(referencePosition.dx, 0, referenceSize.width, 1)
-                      .intersection(Rectangle(x, 0, popupWidth, 1))
-                      ?.width
-                      .toDouble() ??
+              final overlappingWidth =
+                  Rectangle(
+                    referencePosition.dx,
+                    0,
+                    referenceSize.width,
+                    1,
+                  ).intersection(Rectangle(x, 0, popupWidth, 1))?.width.toDouble() ??
                   0;
-              final overlappingHeight = Rectangle(0, referencePosition.dy, 1, referenceSize.height)
-                      .intersection(Rectangle(0, y, 1, childSize.height))
-                      ?.height
-                      .toDouble() ??
+              final overlappingHeight =
+                  Rectangle(
+                    0,
+                    referencePosition.dy,
+                    1,
+                    referenceSize.height,
+                  ).intersection(Rectangle(0, y, 1, childSize.height))?.height.toDouble() ??
                   0;
               currentChildWidth = overlappingWidth + ((popupWidth - overlappingWidth) * animation.value);
               currentChildHeight = overlappingHeight + ((childSize.height - overlappingHeight) * animation.value);
-              final overlappingCorrectionX = (x <
-                          referencePosition
-                              .dx // add offsetCorrection only if not already accounted for in overlappingMeassure
-                      ? x - referencePosition.dx
-                      : x - (referencePosition.dx + referenceSize.width))
-                  .smartClamp(0, widget.offsetCorrection.dx);
-              final overlappingCorrectionY = (y <
-                          referencePosition
-                              .dy // add offsetCorrection only if not already accounted for in overlappingMeassure
-                      ? y - referencePosition.dy
-                      : y - (referencePosition.dy + referenceSize.height))
-                  .smartClamp(0, widget.offsetCorrection.dy);
+              final overlappingCorrectionX =
+                  (x <
+                              referencePosition
+                                  .dx // add offsetCorrection only if not already accounted for in overlappingMeassure
+                          ? x - referencePosition.dx
+                          : x - (referencePosition.dx + referenceSize.width))
+                      .smartClamp(0, widget.offsetCorrection.dx);
+              final overlappingCorrectionY =
+                  (y <
+                              referencePosition
+                                  .dy // add offsetCorrection only if not already accounted for in overlappingMeassure
+                          ? y - referencePosition.dy
+                          : y - (referencePosition.dy + referenceSize.height))
+                      .smartClamp(0, widget.offsetCorrection.dy);
               if (overlappingWidth >= referenceSize.width) {
-                x = referencePosition.dx -
+                x =
+                    referencePosition.dx -
                     ((currentChildWidth - referenceSize.width) * ((widget.popupAlignment.x - 1) / -2));
               } else if (referencePosition.dx < x) {
                 x = referencePosition.dx + referenceSize.width - overlappingWidth;
@@ -217,7 +231,8 @@ class PopupFromZeroState extends State<PopupFromZero> {
                 x = referencePosition.dx - ((currentChildWidth - overlappingWidth) * ((popupAlignment.x - 1) / -2));
               }
               if (overlappingHeight >= referenceSize.height) {
-                y = referencePosition.dy -
+                y =
+                    referencePosition.dy -
                     ((currentChildHeight - referenceSize.height) * ((popupAlignment.y - 1) / -2));
               } else if (referencePosition.dy < y) {
                 y = referencePosition.dy + referenceSize.height - overlappingHeight;

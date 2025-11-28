@@ -116,88 +116,88 @@ class ArrowPageIndicatorState extends State<ArrowPageIndicator> {
     required IconData iconData,
     required bool isNotVisible,
     required bool isLeft,
-  }) =>
-      Opacity(
-        opacity: isNotVisible ? 0.0 : 1.0,
-        child: Material(
-          color: Theme.of(context).canvasColor.withValues(alpha: 0.75),
-          shape: const CircleBorder(),
-          child: IconButton(
-            iconSize: widget.iconSize,
-            splashRadius: widget.iconSize * 0.6,
-            icon: icon ??
-                Icon(
-                  iconData,
-                  color: widget.iconColor,
-                  semanticLabel: isLeft ? widget.tooltipLeft : widget.tooltipRight,
-                ),
-            onPressed: isNotVisible
-                ? null
-                : () {
-                    widget.isJump
-                        ? widget.pageController.jumpToPage(isLeft ? _pageIndex - 1 : _pageIndex + 1)
-                        : isLeft
-                            ? widget.pageController.previousPage(
-                                duration: Duration(milliseconds: widget.duration),
-                                curve: widget.curve,
-                              )
-                            : widget.pageController.nextPage(
-                                duration: Duration(milliseconds: widget.duration),
-                                curve: widget.curve,
-                              );
-                  },
-          ),
-        ),
-      );
+  }) => Opacity(
+    opacity: isNotVisible ? 0.0 : 1.0,
+    child: Material(
+      color: Theme.of(context).canvasColor.withValues(alpha: 0.75),
+      shape: const CircleBorder(),
+      child: IconButton(
+        iconSize: widget.iconSize,
+        splashRadius: widget.iconSize * 0.6,
+        icon:
+            icon ??
+            Icon(
+              iconData,
+              color: widget.iconColor,
+              semanticLabel: isLeft ? widget.tooltipLeft : widget.tooltipRight,
+            ),
+        onPressed: isNotVisible
+            ? null
+            : () {
+                widget.isJump
+                    ? widget.pageController.jumpToPage(isLeft ? _pageIndex - 1 : _pageIndex + 1)
+                    : isLeft
+                    ? widget.pageController.previousPage(
+                        duration: Duration(milliseconds: widget.duration),
+                        curve: widget.curve,
+                      )
+                    : widget.pageController.nextPage(
+                        duration: Duration(milliseconds: widget.duration),
+                        curve: widget.curve,
+                      );
+              },
+      ),
+    ),
+  );
 
   Widget _buildLeftArrow() => _buildArrow(
-        icon: widget.leftIcon,
-        iconData: Icons.chevron_left,
-        isNotVisible: isFirstPage(),
-        isLeft: true,
-      );
+    icon: widget.leftIcon,
+    iconData: Icons.chevron_left,
+    isNotVisible: isFirstPage(),
+    isLeft: true,
+  );
 
   Widget _buildRightArrow() => _buildArrow(
-        icon: widget.rightIcon,
-        iconData: Icons.chevron_right,
-        isNotVisible: isLastPage(),
-        isLeft: false,
-      );
+    icon: widget.rightIcon,
+    iconData: Icons.chevron_right,
+    isNotVisible: isLastPage(),
+    isLeft: false,
+  );
 
   Widget _buildPageView() => ScrollConfiguration(
-        behavior: NoGlowBehaviour(),
-        child: widget.child,
-      );
+    behavior: NoGlowBehaviour(),
+    child: widget.child,
+  );
 
   Widget _buildBody() => widget.isInside ? _buildBodyWithStack() : _buildBodyWithRow();
 
   Widget _buildBodyWithStack() => Stack(
-        children: <Widget>[
-          _buildPageView(),
-          Positioned(
-            left: 0.0,
-            top: 0.0,
-            bottom: 0.0,
-            child: _buildLeftArrow(),
-          ),
-          Positioned(
-            right: 0.0,
-            top: 0.0,
-            bottom: 0.0,
-            child: _buildRightArrow(),
-          ),
-        ],
-      );
+    children: <Widget>[
+      _buildPageView(),
+      Positioned(
+        left: 0.0,
+        top: 0.0,
+        bottom: 0.0,
+        child: _buildLeftArrow(),
+      ),
+      Positioned(
+        right: 0.0,
+        top: 0.0,
+        bottom: 0.0,
+        child: _buildRightArrow(),
+      ),
+    ],
+  );
 
   Widget _buildBodyWithRow() => Row(
-        children: <Widget>[
-          _buildLeftArrow(),
-          Expanded(
-            child: _buildPageView(),
-          ),
-          _buildRightArrow(),
-        ],
-      );
+    children: <Widget>[
+      _buildLeftArrow(),
+      Expanded(
+        child: _buildPageView(),
+      ),
+      _buildRightArrow(),
+    ],
+  );
 
   bool isFirstPage() => _pageIndex == 0;
 

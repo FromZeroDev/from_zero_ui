@@ -58,26 +58,26 @@ class PageScaffoldState extends State<PageScaffold> {
                         ).show();
                       },
                     ),
-//                    SnackBarAction(
-//                      label: "Action",
-//                      onPressed: (){
-//                        SnackBarFromZero(
-//                          context: context,
-//                          type: SnackBarFromZero.info,
-//                          title: Text("Action Pressed"),
-//                        ).show(context);
-//                      },
-//                    ),
-//                    SnackBarAction(
-//                      label: "Action",
-//                      onPressed: (){
-//                        SnackBarFromZero(
-//                          context: context,
-//                          type: SnackBarFromZero.info,
-//                          title: Text("Action Pressed"),
-//                        ).show(context);
-//                      },
-//                    ),
+                    //                    SnackBarAction(
+                    //                      label: "Action",
+                    //                      onPressed: (){
+                    //                        SnackBarFromZero(
+                    //                          context: context,
+                    //                          type: SnackBarFromZero.info,
+                    //                          title: Text("Action Pressed"),
+                    //                        ).show(context);
+                    //                      },
+                    //                    ),
+                    //                    SnackBarAction(
+                    //                      label: "Action",
+                    //                      onPressed: (){
+                    //                        SnackBarFromZero(
+                    //                          context: context,
+                    //                          type: SnackBarFromZero.info,
+                    //                          title: Text("Action Pressed"),
+                    //                        ).show(context);
+                    //                      },
+                    //                    ),
                   ],
                 ).show();
               },
@@ -96,19 +96,20 @@ class PageScaffoldState extends State<PageScaffold> {
         ActionFromZero(
           title: "Search",
           icon: const Icon(Icons.search),
-          expandedBuilder: ({
-            required BuildContext context,
-            required String title,
-            Widget? icon,
-            ContextCallback? onTap,
-            String? disablingError,
-            Color? color,
-          }) {
-            return Container(
-              width: 256,
-              color: Colors.green,
-            );
-          },
+          expandedBuilder:
+              ({
+                required BuildContext context,
+                required String title,
+                Widget? icon,
+                ContextCallback? onTap,
+                String? disablingError,
+                Color? color,
+              }) {
+                return Container(
+                  width: 256,
+                  color: Colors.green,
+                );
+              },
         ),
       ],
     );

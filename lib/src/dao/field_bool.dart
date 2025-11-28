@@ -33,11 +33,11 @@ class BoolComparable implements Comparable<dynamic> {
     }
     return value == true
         ? otherValue == true
-            ? 0
-            : 1
+              ? 0
+              : 1
         : otherValue == true
-            ? -1
-            : 0;
+        ? -1
+        : 0;
   }
 }
 
@@ -121,26 +121,29 @@ class BoolField extends Field<BoolComparable> {
     super.viewWidgetBuilder = BoolField.defaultViewWidgetBuilder,
     super.onValueChanged,
     this.showViewCheckmark = BoolFieldShowViewCheckmark.always,
-  })  : showBothNeutralAndSpecificUiName = showBothNeutralAndSpecificUiName ??
-            (uiNameFalseGetter != null || uiNameTrueGetter != null
-                ? BoolFieldShowBothNeutralAndSpecificUiName.specificBelow
-                : BoolFieldShowBothNeutralAndSpecificUiName.no),
-        super(
-          dbValue: dbValue ?? value,
-          clearableGetter: falseFieldGetter,
-          maxWidth: maxWidth ??
-              (displayType == BoolFieldDisplayType.compactCheckBox
-                  ? 96
-                  : displayType == BoolFieldDisplayType.compactSwitch
-                      ? 96
-                      : 512),
-          minWidth: minWidth ??
-              (displayType == BoolFieldDisplayType.compactCheckBox
-                  ? 96
-                  : displayType == BoolFieldDisplayType.compactSwitch
-                      ? 96
-                      : 128),
-        );
+  }) : showBothNeutralAndSpecificUiName =
+           showBothNeutralAndSpecificUiName ??
+           (uiNameFalseGetter != null || uiNameTrueGetter != null
+               ? BoolFieldShowBothNeutralAndSpecificUiName.specificBelow
+               : BoolFieldShowBothNeutralAndSpecificUiName.no),
+       super(
+         dbValue: dbValue ?? value,
+         clearableGetter: falseFieldGetter,
+         maxWidth:
+             maxWidth ??
+             (displayType == BoolFieldDisplayType.compactCheckBox
+                 ? 96
+                 : displayType == BoolFieldDisplayType.compactSwitch
+                 ? 96
+                 : 512),
+         minWidth:
+             minWidth ??
+             (displayType == BoolFieldDisplayType.compactCheckBox
+                 ? 96
+                 : displayType == BoolFieldDisplayType.compactSwitch
+                 ? 96
+                 : 128),
+       );
 
   @override
   BoolField copyWith({
@@ -226,8 +229,7 @@ class BoolField extends Field<BoolComparable> {
     int currentValidationId,
     bool normalValidationResult, {
     BoolComparable? emptyValue,
-  }) async =>
-      false; // BoolField is never nullable
+  }) async => false; // BoolField is never nullable
 
   static Widget defaultViewWidgetBuilder(
     BuildContext context,
@@ -250,11 +252,11 @@ class BoolField extends Field<BoolComparable> {
     final theme = Theme.of(context);
     final valueName = value
         ? field.uiNameTrueGetter == null
-            ? null
-            : field.uiNameTrue
+              ? null
+              : field.uiNameTrue
         : field.uiNameFalseGetter == null
-            ? null
-            : field.uiNameFalse;
+        ? null
+        : field.uiNameFalse;
     Widget? icon;
     final activeColor = field.selectedColor?.call(context, field, field.dao) ?? Colors.green;
     if (field.displayType == BoolFieldDisplayType.checkBoxTile ||
@@ -390,14 +392,16 @@ class BoolField extends Field<BoolComparable> {
     bool useGlobalKeys = true,
   }) {
     final theme = Theme.of(context);
-    final isSizeNotHardRestricted = displayType == BoolFieldDisplayType.intrinsicHeightSwitchTile ||
+    final isSizeNotHardRestricted =
+        displayType == BoolFieldDisplayType.intrinsicHeightSwitchTile ||
         displayType == BoolFieldDisplayType.intrinsicHeightCheckBoxTile;
     final hackFocusTraversalPolicy = SingleFocusTraversal(focusNode);
     Widget result = AnimatedBuilder(
       animation: this,
       builder: (context, child) {
-        final visibleValidationErrors =
-            passedFirstEdit ? validationErrors : validationErrors.where((e) => e.isBeforeEditing);
+        final visibleValidationErrors = passedFirstEdit
+            ? validationErrors
+            : validationErrors.where((e) => e.isBeforeEditing);
         Widget result;
         switch (displayType) {
           case BoolFieldDisplayType.checkBoxTile:
@@ -422,15 +426,15 @@ class BoolField extends Field<BoolComparable> {
                     bottom: isSizeNotHardRestricted
                         ? 0
                         : dense
-                            ? 22
-                            : addCard
-                                ? 16
-                                : 12,
+                        ? 22
+                        : addCard
+                        ? 16
+                        : 12,
                   ),
                   tileColor: dense && visibleValidationErrors.isNotEmpty
                       ? ValidationMessage
-                          .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
-                          .withValues(alpha: 0.2)
+                            .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
+                            .withValues(alpha: 0.2)
                       : backgroundColor?.call(context, this, dao),
                   checkColor: selectedColor?.call(context, this, dao),
                   onChanged: !enabled
@@ -500,15 +504,15 @@ class BoolField extends Field<BoolComparable> {
                     bottom: isSizeNotHardRestricted
                         ? 0
                         : dense
-                            ? 22
-                            : addCard
-                                ? 16
-                                : 12,
+                        ? 22
+                        : addCard
+                        ? 16
+                        : 12,
                   ),
                   tileColor: dense && visibleValidationErrors.isNotEmpty
                       ? ValidationMessage
-                          .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
-                          .withValues(alpha: 0.2)
+                            .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
+                            .withValues(alpha: 0.2)
                       : backgroundColor?.call(context, this, dao),
                   activeColor: selectedColor?.call(context, this, dao),
                   activeTrackColor: selectedColor?.call(context, this, dao)?.withValues(alpha: 0.33),
@@ -567,8 +571,8 @@ class BoolField extends Field<BoolComparable> {
                   type: MaterialType.transparency,
                   color: dense && visibleValidationErrors.isNotEmpty
                       ? ValidationMessage
-                          .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
-                          .withValues(alpha: 0.2)
+                            .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
+                            .withValues(alpha: 0.2)
                       : backgroundColor?.call(context, this, dao),
                   child: InkWell(
                     onTap: !enabled
@@ -634,8 +638,8 @@ class BoolField extends Field<BoolComparable> {
                   elevation: 0,
                   color: dense && visibleValidationErrors.isNotEmpty
                       ? ValidationMessage
-                          .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
-                          .withValues(alpha: 0.2)
+                            .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
+                            .withValues(alpha: 0.2)
                       : backgroundColor?.call(context, this, dao),
                   child: InkWell(
                     focusNode: focusNode,
@@ -742,13 +746,15 @@ class BoolField extends Field<BoolComparable> {
             result = const Text('Unimplemented type'); // TODO 3 implement radio BoolField, maybe also radio ComboField
         }
         result = TooltipFromZero(
-          message:
-              validationErrors.where((e) => dense || e.severity == ValidationErrorSeverity.disabling).fold('', (a, b) {
+          message: validationErrors.where((e) => dense || e.severity == ValidationErrorSeverity.disabling).fold('', (
+            a,
+            b,
+          ) {
             return a.toString().trim().isEmpty
                 ? b.toString()
                 : b.toString().trim().isEmpty
-                    ? a.toString()
-                    : '$a\n$b';
+                ? a.toString()
+                : '$a\n$b';
           }),
           waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
           child: result,

@@ -125,13 +125,13 @@ class StringField extends Field<String> {
     super.actionsGetter,
     super.viewWidgetBuilder,
     super.onValueChanged,
-  })  : minLines = minLines ?? (type == StringFieldType.short ? null : 3),
-        maxLines = maxLines ?? (type == StringFieldType.short ? 1 : 999999999),
-        showObfuscationToggleButton = showObfuscationToggleButton ?? obfuscate,
-        super(
-          value: value ?? '',
-          dbValue: dbValue ?? value ?? '',
-        );
+  }) : minLines = minLines ?? (type == StringFieldType.short ? null : 3),
+       maxLines = maxLines ?? (type == StringFieldType.short ? 1 : 999999999),
+       showObfuscationToggleButton = showObfuscationToggleButton ?? obfuscate,
+       super(
+         value: value ?? '',
+         dbValue: dbValue ?? value ?? '',
+       );
 
   @override
   StringField copyWith({
@@ -299,8 +299,9 @@ class StringField extends Field<String> {
         animation: this,
         builder: (context, child) {
           final enabled = this.enabled;
-          final visibleValidationErrors =
-              passedFirstEdit ? validationErrors : validationErrors.where((e) => e.isBeforeEditing);
+          final visibleValidationErrors = passedFirstEdit
+              ? validationErrors
+              : validationErrors.where((e) => e.isBeforeEditing);
           final actions = buildActions(context, focusNode);
           final defaultActions = buildDefaultActions(context, focusNode: focusNode);
           var allActions = [
@@ -326,19 +327,22 @@ class StringField extends Field<String> {
                   animation: focusNode,
                   builder: (context, child) {
                     final backgroundColor = this.backgroundColor?.call(context, this, dao);
-                    final focusColor =
-                        Theme.of(context).focusColor.withValues(alpha: Theme.of(context).focusColor.opacity * 0.6);
+                    final focusColor = Theme.of(
+                      context,
+                    ).focusColor.withValues(alpha: Theme.of(context).focusColor.opacity * 0.6);
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
                       color: dense && visibleValidationErrors.isNotEmpty
-                          ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![
-                                  visibleValidationErrors.first.severity]!
-                              .withValues(alpha: 0.2)
+                          ? ValidationMessage
+                                .severityColors[Theme.of(
+                                  context,
+                                ).brightness.inverse]![visibleValidationErrors.first.severity]!
+                                .withValues(alpha: 0.2)
                           : focusNode.hasFocus
-                              ? backgroundColor != null
-                                  ? Color.alphaBlend(focusColor, backgroundColor)
-                                  : focusColor
-                              : focusColor.withValues(alpha: 0),
+                          ? backgroundColor != null
+                                ? Color.alphaBlend(focusColor, backgroundColor)
+                                : focusColor
+                          : focusColor.withValues(alpha: 0),
                       curve: Curves.easeOut,
                     );
                   },
@@ -354,12 +358,13 @@ class StringField extends Field<String> {
                   gestures: {
                     TransparentTapGestureRecognizer:
                         GestureRecognizerFactoryWithHandlers<TransparentTapGestureRecognizer>(
-                      () => TransparentTapGestureRecognizer(debugOwner: this),
-                      (TapGestureRecognizer instance) {
-                        instance // hack to fix textField breaking when window loses focus on desktop
-                            .onTapDown = (details) => controller.notifyListeners();
-                      },
-                    ),
+                          () => TransparentTapGestureRecognizer(debugOwner: this),
+                          (TapGestureRecognizer instance) {
+                            instance // hack to fix textField breaking when window loses focus on desktop
+                                .onTapDown = (details) =>
+                                controller.notifyListeners();
+                          },
+                        ),
                   },
                   child: Builder(
                     builder: (context) {
@@ -394,16 +399,17 @@ class StringField extends Field<String> {
             ],
           );
           result = TooltipFromZero(
-            message: (dense
-                    ? visibleValidationErrors
-                    : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
-                .fold('', (a, b) {
-              return a.toString().trim().isEmpty
-                  ? b.toString()
-                  : b.toString().trim().isEmpty
-                      ? a.toString()
-                      : '$a\n$b';
-            }),
+            message:
+                (dense
+                        ? visibleValidationErrors
+                        : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
+                    .fold('', (a, b) {
+                      return a.toString().trim().isEmpty
+                          ? b.toString()
+                          : b.toString().trim().isEmpty
+                          ? a.toString()
+                          : '$a\n$b';
+                    }),
             waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
             child: result,
           );
@@ -506,11 +512,12 @@ class StringField extends Field<String> {
       maxLines: minLines == null || minLines <= (maxLines ?? 0) ? maxLines : minLines,
       textInputAction: largeVertically ? null : TextInputAction.next,
       style: Theme.of(context).textTheme.titleMedium!.copyWith(
-            height: largeVertically ? 1.2 : 1.05,
-            color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
-            fontWeight: largeVertically ? FontWeight.w500 : FontWeight.w600,
-          ),
-      decoration: inputDecoration ??
+        height: largeVertically ? 1.2 : 1.05,
+        color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
+        fontWeight: largeVertically ? FontWeight.w500 : FontWeight.w600,
+      ),
+      decoration:
+          inputDecoration ??
           InputDecoration(
             hintText: hint,
             border: InputBorder.none,
@@ -520,8 +527,8 @@ class StringField extends Field<String> {
               height: dense
                   ? 0
                   : largeVertically
-                      ? 0.2
-                      : 0.6,
+                  ? 0.2
+                  : 0.6,
               color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
             ),
             label: largeVertically
@@ -530,13 +537,13 @@ class StringField extends Field<String> {
                       top: !dense && hint != null
                           ? 12
                           : largeVertically
-                              ? 0
-                              : 8,
+                          ? 0
+                          : 8,
                       bottom: !dense && hint != null
                           ? 12
                           : largeVertically
-                              ? 6
-                              : 0,
+                          ? 6
+                          : 0,
                     ),
                     child: Text(
                       uiName,
@@ -554,13 +561,13 @@ class StringField extends Field<String> {
                           top: !dense && hint != null
                               ? 12
                               : largeVertically
-                                  ? 0
-                                  : 8,
+                              ? 0
+                              : 8,
                           bottom: !dense && hint != null
                               ? 12
                               : largeVertically
-                                  ? 6
-                                  : 0,
+                              ? 6
+                              : 0,
                         ),
                         child: Text(
                           uiName,
@@ -573,12 +580,12 @@ class StringField extends Field<String> {
             floatingLabelBehavior: dense
                 ? FloatingLabelBehavior.never
                 : !enabled
-                    ? (value == null || value.isEmpty)
-                        ? FloatingLabelBehavior.never
-                        : FloatingLabelBehavior.always
-                    : hint != null
-                        ? FloatingLabelBehavior.always
-                        : FloatingLabelBehavior.auto,
+                ? (value == null || value.isEmpty)
+                      ? FloatingLabelBehavior.never
+                      : FloatingLabelBehavior.always
+                : hint != null
+                ? FloatingLabelBehavior.always
+                : FloatingLabelBehavior.auto,
             contentPadding: EdgeInsets.only(
               // left: dense ? textAlign==TextAlign.right ? 8 : 0 : 16, // TODO 1 test in next flutter version if there is an assert thrown here when left=0
               left: dense ? 0 : 16,
@@ -586,13 +593,13 @@ class StringField extends Field<String> {
               bottom: largeVertically
                   ? 16
                   : dense
-                      ? 10
-                      : 0,
+                  ? 10
+                  : 0,
               top: largeVertically
                   ? 16
                   : dense
-                      ? 8
-                      : 6,
+                  ? 8
+                  : 6,
             ),
           ),
       contextMenuBuilder: (context, editableTextState) {
@@ -615,7 +622,11 @@ class StringField extends Field<String> {
   }
 
   static void defaultOnKeyEvent(
-      KeyEvent value, TextEditingController controller, FocusNode focusNode, bool isSingleLine) {
+    KeyEvent value,
+    TextEditingController controller,
+    FocusNode focusNode,
+    bool isSingleLine,
+  ) {
     if (value is KeyDownEvent) {
       final selectionStart = controller.selection.start;
       if (selectionStart != controller.selection.end) {

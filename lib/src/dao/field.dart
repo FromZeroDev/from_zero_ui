@@ -1,19 +1,20 @@
 part of 'dao.dart';
 
-typedef FieldValidator<T extends Comparable> = FutureOr<ValidationError?> Function(
-    BuildContext context, DAO dao, Field<T> field);
+typedef FieldValidator<T extends Comparable> =
+    FutureOr<ValidationError?> Function(BuildContext context, DAO dao, Field<T> field);
 typedef FieldValueGetter<T, R extends Field> = T Function(R field, DAO dao);
 typedef ContextFulFieldValueGetter<T, R extends Field> = T Function(BuildContext context, R field, DAO dao);
 typedef OnFieldValueChanged<T> = void Function(DAO dao, Field field, T value, T previousValue);
-typedef ViewWidgetBuilder<T extends Comparable> = Widget Function(
-  BuildContext context,
-  Field<T> field, {
-  bool linkToInnerDAOs,
-  bool showViewButtons,
-  bool dense,
-  bool? hidden,
-  int autoSizeTextMaxLines,
-});
+typedef ViewWidgetBuilder<T extends Comparable> =
+    Widget Function(
+      BuildContext context,
+      Field<T> field, {
+      bool linkToInnerDAOs,
+      bool showViewButtons,
+      bool dense,
+      bool? hidden,
+      int autoSizeTextMaxLines,
+    });
 bool trueFieldGetter(_, __) => true;
 bool falseFieldGetter(_, __) => false;
 List defaultValidatorsGetter(_, __) => [];
@@ -35,9 +36,11 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
   bool get enabled => DAO.ignoreBlockingErrors
       ? true
       : validationErrors
-          .where((e) =>
-              e.severity == ValidationErrorSeverity.disabling || e.severity == ValidationErrorSeverity.invalidating)
-          .isEmpty;
+            .where(
+              (e) =>
+                  e.severity == ValidationErrorSeverity.disabling || e.severity == ValidationErrorSeverity.invalidating,
+            )
+            .isEmpty;
   FieldValueGetter<bool, Field> hiddenInTableGetter;
   bool get hiddenInTable => hiddenInTableGetter(this, dao);
   FieldValueGetter<bool, Field> hiddenInViewGetter;
@@ -158,15 +161,15 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
     this.actionsGetter,
     this.viewWidgetBuilder = Field.defaultViewWidgetBuilder,
     this.onValueChanged,
-  })  : _value = value,
-        dbValue = dbValue ?? value,
-        undoValues = undoValues ?? [],
-        redoValues = redoValues ?? [],
-        _fieldGlobalKey = fieldGlobalKey,
-        _focusNode = focusNode,
-        hiddenInTableGetter = hiddenInTableGetter ?? hiddenGetter ?? falseFieldGetter,
-        hiddenInViewGetter = hiddenInViewGetter ?? hiddenGetter ?? falseFieldGetter,
-        hiddenInFormGetter = hiddenInFormGetter ?? hiddenGetter ?? falseFieldGetter;
+  }) : _value = value,
+       dbValue = dbValue ?? value,
+       undoValues = undoValues ?? [],
+       redoValues = redoValues ?? [],
+       _fieldGlobalKey = fieldGlobalKey,
+       _focusNode = focusNode,
+       hiddenInTableGetter = hiddenInTableGetter ?? hiddenGetter ?? falseFieldGetter,
+       hiddenInViewGetter = hiddenInViewGetter ?? hiddenGetter ?? falseFieldGetter,
+       hiddenInFormGetter = hiddenInFormGetter ?? hiddenGetter ?? falseFieldGetter;
 
   Field<T> copyWith({
     FieldValueGetter<String, Field>? uiNameGetter,
@@ -238,10 +241,10 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
   @override
   int compareTo(other) => other is Field
       ? value == null || (value is String && (value! as String).isEmpty)
-          ? 1
-          : other.value == null
-              ? -1
-              : value!.compareTo(other.value)
+            ? 1
+            : other.value == null
+            ? -1
+            : value!.compareTo(other.value)
       : 1;
 
   void revertChanges() {
@@ -379,9 +382,13 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
         isRequired = emptyValidationErrors.where((e) => e.isBlocking).isNotEmpty;
       } catch (e, st) {
         isRequired = false;
-        log(LgLvl.error,
-            'Error while trying to evaluate if field is required: ${dao.classUiName} - ${dao.uiName}  --  $uiName',
-            e: e, st: st, type: FzLgType.dao);
+        log(
+          LgLvl.error,
+          'Error while trying to evaluate if field is required: ${dao.classUiName} - ${dao.uiName}  --  $uiName',
+          e: e,
+          st: st,
+          type: FzLgType.dao,
+        );
       }
     }
     this.isRequired = isRequired;
@@ -389,7 +396,11 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
   }
 
   static Future<List<ValidationError>> _getValidationErrors<T extends Comparable>(
-      BuildContext context, DAO dao, Field<T> field, int currentValidationId) async {
+    BuildContext context,
+    DAO dao,
+    Field<T> field,
+    int currentValidationId,
+  ) async {
     final List<FutureOr<ValidationError?>> futureErrors = [];
     for (final e in field.validators) {
       futureErrors.add(e(context, dao, field));
@@ -406,7 +417,8 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
       try {
         error = await e;
       } catch (e, st) {
-        final message = 'Error al ejecutar validación: '
+        final message =
+            'Error al ejecutar validación: '
             '${ApiProviderBuilder.getErrorTitle(context, e, st)}'
             '\n${ApiProviderBuilder.getErrorSubtitle(context, e, st)}';
         if (e is! DioException) {
@@ -547,8 +559,8 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
         message = field.value == null
             ? ''
             : dense
-                ? field.formatterDense.format(field.value!)
-                : field.formatter.format(field.value!);
+            ? field.formatterDense.format(field.value!)
+            : field.formatter.format(field.value!);
       } else {
         message = field.toString();
       }
@@ -565,8 +577,8 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
                   ? AutoSizeText(
                       message,
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            height: 1.1,
-                          ),
+                        height: 1.1,
+                      ),
                       textAlign: field.getColModel().alignment,
                       maxLines: autoSizeTextMaxLines,
                       softWrap: autoSizeTextMaxLines > 1,
@@ -578,9 +590,9 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
                         child: Text(
                           message,
                           style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                height: 1.1,
-                                fontSize: 15,
-                              ),
+                            height: 1.1,
+                            fontSize: 15,
+                          ),
                           textAlign: field.getColModel().alignment,
                           maxLines: autoSizeTextMaxLines,
                           softWrap: autoSizeTextMaxLines > 1,
@@ -594,17 +606,17 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
                         SelectableText(
                           message,
                           style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                                height: 1.1,
-                                wordSpacing: 0.4, // hack to fix soft-wrap bug with intrinsicHeight
-                              ),
+                            height: 1.1,
+                            wordSpacing: 0.4, // hack to fix soft-wrap bug with intrinsicHeight
+                          ),
                         ),
                         if (subtitle != null)
                           Text(
                             subtitle,
                             style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                  height: 1.1,
-                                  wordSpacing: 0.4, // hack to fix soft-wrap bug with intrinsicHeight
-                                ),
+                              height: 1.1,
+                              wordSpacing: 0.4, // hack to fix soft-wrap bug with intrinsicHeight
+                            ),
                           ),
                       ],
                     ),
@@ -699,15 +711,15 @@ class FieldGroup {
 
   /// only used when building FlexibleLayoutFromZero
   double get maxWidth => max(
-        fields.values.maxBy((e) => e.maxWidth)?.maxWidth ?? 0,
-        childGroups.maxBy((e) => e.maxWidth)?.maxWidth ?? 0,
-      );
+    fields.values.maxBy((e) => e.maxWidth)?.maxWidth ?? 0,
+    childGroups.maxBy((e) => e.maxWidth)?.maxWidth ?? 0,
+  );
 
   /// only used when building FlexibleLayoutFromZero
   double get minWidth => max(
-        fields.values.maxBy((e) => e.minWidth)?.minWidth ?? 0,
-        childGroups.maxBy((e) => e.minWidth)?.minWidth ?? 0,
-      );
+    fields.values.maxBy((e) => e.minWidth)?.minWidth ?? 0,
+    childGroups.maxBy((e) => e.minWidth)?.minWidth ?? 0,
+  );
 
   const FieldGroup({
     this.fields = const {},
@@ -741,37 +753,38 @@ class FieldGroup {
 class HiddenValueField<T> extends Field<BoolComparable> {
   T hiddenValue;
   HiddenValueField(this.hiddenValue)
-      : super(
-          uiNameGetter: (field, dao) => '',
-          hiddenGetter: (field, dao) => true,
-        );
+    : super(
+        uiNameGetter: (field, dao) => '',
+        hiddenGetter: (field, dao) => true,
+      );
   @override
-  Field<BoolComparable> copyWith(
-      {FieldValueGetter<String, Field<Comparable>>? uiNameGetter,
-      BoolComparable? value,
-      BoolComparable? dbValue,
-      FieldValueGetter<bool, Field<Comparable>>? clearableGetter,
-      double? maxWidth,
-      double? minWidth,
-      double? flex,
-      FieldValueGetter<String?, Field<Comparable>>? hintGetter,
-      FieldValueGetter<String?, Field<Comparable>>? tooltipGetter,
-      double? tableColumnWidth,
-      FieldValueGetter<bool, Field<Comparable>>? hiddenGetter,
-      FieldValueGetter<bool, Field<Comparable>>? hiddenInTableGetter,
-      FieldValueGetter<bool, Field<Comparable>>? hiddenInViewGetter,
-      FieldValueGetter<bool, Field<Comparable>>? hiddenInFormGetter,
-      FieldValueGetter<List<FieldValidator<BoolComparable>>, Field<Comparable>>? validatorsGetter,
-      bool? validateOnlyOnConfirm,
-      FieldValueGetter<SimpleColModel, Field<Comparable>>? colModelBuilder,
-      List<BoolComparable?>? undoValues,
-      List<BoolComparable?>? redoValues,
-      bool? invalidateNonEmptyValuesIfHiddenInForm,
-      BoolComparable? defaultValue,
-      ContextFulFieldValueGetter<Color?, Field<Comparable>>? backgroundColor,
-      ContextFulFieldValueGetter<List<ActionFromZero>, Field<Comparable>>? actionsGetter,
-      ViewWidgetBuilder<BoolComparable>? viewWidgetBuilder,
-      OnFieldValueChanged<BoolComparable>? onValueChanged}) {
+  Field<BoolComparable> copyWith({
+    FieldValueGetter<String, Field<Comparable>>? uiNameGetter,
+    BoolComparable? value,
+    BoolComparable? dbValue,
+    FieldValueGetter<bool, Field<Comparable>>? clearableGetter,
+    double? maxWidth,
+    double? minWidth,
+    double? flex,
+    FieldValueGetter<String?, Field<Comparable>>? hintGetter,
+    FieldValueGetter<String?, Field<Comparable>>? tooltipGetter,
+    double? tableColumnWidth,
+    FieldValueGetter<bool, Field<Comparable>>? hiddenGetter,
+    FieldValueGetter<bool, Field<Comparable>>? hiddenInTableGetter,
+    FieldValueGetter<bool, Field<Comparable>>? hiddenInViewGetter,
+    FieldValueGetter<bool, Field<Comparable>>? hiddenInFormGetter,
+    FieldValueGetter<List<FieldValidator<BoolComparable>>, Field<Comparable>>? validatorsGetter,
+    bool? validateOnlyOnConfirm,
+    FieldValueGetter<SimpleColModel, Field<Comparable>>? colModelBuilder,
+    List<BoolComparable?>? undoValues,
+    List<BoolComparable?>? redoValues,
+    bool? invalidateNonEmptyValuesIfHiddenInForm,
+    BoolComparable? defaultValue,
+    ContextFulFieldValueGetter<Color?, Field<Comparable>>? backgroundColor,
+    ContextFulFieldValueGetter<List<ActionFromZero>, Field<Comparable>>? actionsGetter,
+    ViewWidgetBuilder<BoolComparable>? viewWidgetBuilder,
+    OnFieldValueChanged<BoolComparable>? onValueChanged,
+  }) {
     return HiddenValueField(hiddenValue);
   }
 }

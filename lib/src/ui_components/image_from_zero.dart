@@ -59,13 +59,14 @@ class ImageFromZero extends StatefulWidget {
     this.fullscreenAsNewTabOnWeb = true,
     ImageSourceType? sourceType,
     super.key,
-  })  : fullscreenActions = fullscreenActions ?? actions,
-        sourceType = sourceType ??
-            (url.length >= 6 && url.substring(0, 6) == "assets"
-                ? ImageSourceType.assets
-                : url.length >= 4 && url.substring(0, 4) == "http"
-                    ? ImageSourceType.network
-                    : ImageSourceType.file);
+  }) : fullscreenActions = fullscreenActions ?? actions,
+       sourceType =
+           sourceType ??
+           (url.length >= 6 && url.substring(0, 6) == "assets"
+               ? ImageSourceType.assets
+               : url.length >= 4 && url.substring(0, 4) == "http"
+               ? ImageSourceType.network
+               : ImageSourceType.file);
 
   @override
   ImageFromZeroState createState() => ImageFromZeroState();
@@ -199,7 +200,7 @@ class ImageFromZeroState extends State<ImageFromZero> with TickerProviderStateMi
         kIsWeb
             ? null
             : (getFileCompilingWebAsNull(widget.url)!
-                as dynamic), // hack to prevent dart:io from blowing up on web, alternatively search for a package that does this cleanly
+                  as dynamic), // hack to prevent dart:io from blowing up on web, alternatively search for a package that does this cleanly
         fit: BoxFit.contain,
         enableSlideOutPage: true,
         loadStateChanged: _loadStateChanged,
@@ -302,7 +303,8 @@ class ImageFromZeroState extends State<ImageFromZero> with TickerProviderStateMi
                       return const SizedBox.shrink();
                     }
                     Widget actions = Column(
-                      children: widget.fullscreenType == FullscreenType.asAction ||
+                      children:
+                          widget.fullscreenType == FullscreenType.asAction ||
                               widget.fullscreenType == FullscreenType.onClickAndAsAction
                           ? [
                               buildFullScreenLink(
@@ -464,75 +466,77 @@ class HeroWidgetState extends State<HeroWidget> {
         return _rectTween;
       },
       // make hero better when slide out
-      flightShuttleBuilder: (
-        BuildContext flightContext,
-        Animation<double> animation,
-        HeroFlightDirection flightDirection,
-        BuildContext fromHeroContext,
-        BuildContext toHeroContext,
-      ) {
-        // make hero more smoothly
-        final Hero hero =
-            (flightDirection == HeroFlightDirection.pop ? fromHeroContext.widget : toHeroContext.widget) as Hero;
-        if (flightDirection == HeroFlightDirection.pop) {
-          final bool fixTransform = widget.slideType == SlideType.onlyImage &&
-              (widget.slidePagekey.currentState!.offset != Offset.zero ||
-                  widget.slidePagekey.currentState!.scale != 1.0);
+      flightShuttleBuilder:
+          (
+            BuildContext flightContext,
+            Animation<double> animation,
+            HeroFlightDirection flightDirection,
+            BuildContext fromHeroContext,
+            BuildContext toHeroContext,
+          ) {
+            // make hero more smoothly
+            final Hero hero =
+                (flightDirection == HeroFlightDirection.pop ? fromHeroContext.widget : toHeroContext.widget) as Hero;
+            if (flightDirection == HeroFlightDirection.pop) {
+              final bool fixTransform =
+                  widget.slideType == SlideType.onlyImage &&
+                  (widget.slidePagekey.currentState!.offset != Offset.zero ||
+                      widget.slidePagekey.currentState!.scale != 1.0);
 
-          final Widget toHeroWidget = (toHeroContext.widget as Hero).child;
-          return AnimatedBuilder(
-            animation: animation,
-            builder: (BuildContext buildContext, Widget? child) {
-              Widget animatedBuilderChild = hero.child;
+              final Widget toHeroWidget = (toHeroContext.widget as Hero).child;
+              return AnimatedBuilder(
+                animation: animation,
+                builder: (BuildContext buildContext, Widget? child) {
+                  Widget animatedBuilderChild = hero.child;
 
-              // make hero more smoothly
-              animatedBuilderChild = Stack(
-                clipBehavior: Clip.antiAlias,
-                alignment: Alignment.center,
-                children: <Widget>[
-                  Opacity(
-                    opacity: 1 - animation.value,
-                    child: UnconstrainedBox(
-                      child: SizedBox(
-                        width: _rectTween.begin!.width,
-                        height: _rectTween.begin!.height,
-                        child: toHeroWidget,
+                  // make hero more smoothly
+                  animatedBuilderChild = Stack(
+                    clipBehavior: Clip.antiAlias,
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      Opacity(
+                        opacity: 1 - animation.value,
+                        child: UnconstrainedBox(
+                          child: SizedBox(
+                            width: _rectTween.begin!.width,
+                            height: _rectTween.begin!.height,
+                            child: toHeroWidget,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Opacity(
-                    opacity: animation.value,
-                    child: animatedBuilderChild,
-                  ),
-                ],
+                      Opacity(
+                        opacity: animation.value,
+                        child: animatedBuilderChild,
+                      ),
+                    ],
+                  );
+
+                  // fix transform when slide out
+                  if (fixTransform) {
+                    final Tween<Offset> offsetTween = Tween<Offset>(
+                      begin: Offset.zero,
+                      end: widget.slidePagekey.currentState!.offset,
+                    );
+
+                    final Tween<double> scaleTween = Tween<double>(
+                      begin: 1.0,
+                      end: widget.slidePagekey.currentState!.scale,
+                    );
+                    animatedBuilderChild = Transform.translate(
+                      offset: offsetTween.evaluate(animation),
+                      child: Transform.scale(
+                        scale: scaleTween.evaluate(animation),
+                        child: animatedBuilderChild,
+                      ),
+                    );
+                  }
+
+                  return animatedBuilderChild;
+                },
               );
-
-              // fix transform when slide out
-              if (fixTransform) {
-                final Tween<Offset> offsetTween = Tween<Offset>(
-                  begin: Offset.zero,
-                  end: widget.slidePagekey.currentState!.offset,
-                );
-
-                final Tween<double> scaleTween = Tween<double>(
-                  begin: 1.0,
-                  end: widget.slidePagekey.currentState!.scale,
-                );
-                animatedBuilderChild = Transform.translate(
-                  offset: offsetTween.evaluate(animation),
-                  child: Transform.scale(
-                    scale: scaleTween.evaluate(animation),
-                    child: animatedBuilderChild,
-                  ),
-                );
-              }
-
-              return animatedBuilderChild;
-            },
-          );
-        }
-        return hero.child;
-      },
+            }
+            return hero.child;
+          },
       child: widget.child,
     );
   }

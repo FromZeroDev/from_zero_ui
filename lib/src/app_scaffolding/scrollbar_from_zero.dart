@@ -105,7 +105,8 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
 
     Widget child = widget.child;
     bool wantsAlwaysShown = Theme.of(context).scrollbarTheme.thumbVisibility?.resolve({}) ?? PlatformExtended.isDesktop;
-    bool supportsAlwaysShown = widget.controller != null &&
+    bool supportsAlwaysShown =
+        widget.controller != null &&
         (widget.controller!.hasClients || alwaysAttachedScrollController.lastPosition != null);
     if (widget.controller != null && wantsAlwaysShown && !supportsAlwaysShown) {
       // Listen until the controller has clients
@@ -116,11 +117,12 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
       if (widget.controller != null) {
         child = ScrollOpacityGradient(
           scrollController: alwaysAttachedScrollController,
-          direction: widget.opacityGradientDirection ??
+          direction:
+              widget.opacityGradientDirection ??
               (widget.controller!.hasClients
                   ? widget.controller!.position.axis == Axis.vertical
-                      ? OpacityGradient.vertical
-                      : OpacityGradient.horizontal
+                        ? OpacityGradient.vertical
+                        : OpacityGradient.horizontal
                   : OpacityGradient.vertical),
           maxSize: widget.opacityGradientSize,
           child: child,
@@ -236,10 +238,10 @@ class DummyScrollContext extends ScrollContext {
 
 class DummyScrollPosition extends ScrollPositionWithSingleContext {
   DummyScrollPosition(BuildContext context)
-      : super(
-          context: DummyScrollContext(context),
-          physics: const NeverScrollableScrollPhysics(),
-        );
+    : super(
+        context: DummyScrollContext(context),
+        physics: const NeverScrollableScrollPhysics(),
+      );
 }
 
 class AlwaysAttachedScrollController implements ScrollController {
@@ -270,8 +272,8 @@ class AlwaysAttachedScrollController implements ScrollController {
   Iterable<ScrollPosition> get positions => parent == null
       ? []
       : parent!.positions.isEmpty
-          ? []
-          : [parent!.positions.first];
+      ? []
+      : [parent!.positions.first];
 
   @override
   void addListener(VoidCallback listener) {

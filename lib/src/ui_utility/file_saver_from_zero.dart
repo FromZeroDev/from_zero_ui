@@ -51,8 +51,9 @@ Future<bool> saveFileFromZero({
   }
   _ongoingDownloads.add(hashCode);
   // avoid using the context over async gaps
-  final snackbarHostContext =
-      isHostContext ? context : context.findAncestorStateOfType<SnackBarHostFromZeroState>()!.context;
+  final snackbarHostContext = isHostContext
+      ? context
+      : context.findAncestorStateOfType<SnackBarHostFromZeroState>()!.context;
   final localizations = FromZeroLocalizations.of(snackbarHostContext);
 
   if (!await requestDefaultFilePermission()) {
@@ -139,7 +140,8 @@ Future<bool> saveFileFromZero({
                         return const Text('');
                       } else {
                         return Text(
-                            '${_percentFormatter.format(count / size)}   ( ${count.bytes()} / ${size.bytes()} )');
+                          '${_percentFormatter.format(count / size)}   ( ${count.bytes()} / ${size.bytes()} )',
+                        );
                       }
                     },
                   );
@@ -280,10 +282,10 @@ Future<bool> saveFileFromZero({
             SnackBarAction(
               label: 'COPIAR', // TODO 3 internationalize
               onPressed: () async {
-                await Process.run('cmd', [
-                  '/c',
-                  'echo.|clip'
-                ]); // clear windows clipboard, necessary because if a file is copied to clipboard, Pasteboard.writeFiles doesn't work
+                await Process.run(
+                  'cmd',
+                  ['/c', 'echo.|clip'],
+                ); // clear windows clipboard, necessary because if a file is copied to clipboard, Pasteboard.writeFiles doesn't work
                 await Pasteboard.writeFiles([file!.absolute.path]);
               },
             ),
@@ -305,7 +307,10 @@ Future<bool> saveFileFromZero({
         icon: downloadSuccess
             ? null
             : ApiProviderBuilder.getErrorIcon(
-                snackbarHostContext, error, stackTrace), // ignore: use_build_context_synchronously
+                snackbarHostContext,
+                error,
+                stackTrace,
+              ), // ignore: use_build_context_synchronously
         duration: null,
         title: Text(localizations.translate('download_fail')),
         message: Text(
@@ -429,9 +434,10 @@ Future<bool> requestDefaultFilePermission({
         type: lgType,
       );
       final result = androidInfo.version.sdkInt < 29
-          ? await Permission.storage.request() // deprecated on >=29 and always returns false
+          ? await Permission.storage
+                .request() // deprecated on >=29 and always returns false
           : await Permission.manageExternalStorage
-              .request(); // this permisison is excessive, but its all we can do, also we would need to add it to the manifest :))
+                .request(); // this permisison is excessive, but its all we can do, also we would need to add it to the manifest :))
       log(
         LgLvl.fine,
         'Request for file permission returned $result',

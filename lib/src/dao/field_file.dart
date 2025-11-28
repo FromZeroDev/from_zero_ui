@@ -23,8 +23,8 @@ class FileField extends StringField {
     return value.isNullOrEmpty
         ? null
         : pickDirectory
-            ? '$value${path.separator}'
-            : value?.split('/').last.split(r'\').last;
+        ? '$value${path.separator}'
+        : value?.split('/').last.split(r'\').last;
   }
 
   FileField({
@@ -63,8 +63,8 @@ class FileField extends StringField {
     this.allowTyping = false,
     this.initialDirectory,
   }) : super(
-          dbValue: dbValue ?? value,
-        );
+         dbValue: dbValue ?? value,
+       );
 
   @override
   FileField copyWith({
@@ -166,38 +166,39 @@ class FileField extends StringField {
       bool addedFilePicker = !enableDragAndDrop;
       return super
           .buildFieldEditorWidgets(
-        context,
-        addCard: addCard,
-        asSliver: asSliver,
-        expandToFillContainer: expandToFillContainer,
-        dense: dense,
-        focusNode: focusNode,
-        ignoreHidden: ignoreHidden,
-        mainScrollController: mainScrollController,
-      )
+            context,
+            addCard: addCard,
+            asSliver: asSliver,
+            expandToFillContainer: expandToFillContainer,
+            dense: dense,
+            focusNode: focusNode,
+            ignoreHidden: ignoreHidden,
+            mainScrollController: mainScrollController,
+          )
           .map((e) {
-        if (!addedFilePicker) {
-          addedFilePicker = true;
-          return FilePickerFromZero(
-            allowMultiple: false,
-            dialogTitle: hint ?? uiName,
-            fileType: fileType,
-            allowedExtensions: allowedExtensions,
-            enableDragAndDrop: enableDragAndDrop,
-            allowDragAndDropInWholeScreen: allowDragAndDropInWholeScreen,
-            onlyForDragAndDrop: true,
-            pickDirectory: pickDirectory,
-            initialDirectory: initialDirectory,
-            enabled: enabled,
-            onSelected: (value) {
-              userInteracted = true;
-              commitValue(value.first.absolute.path);
-            },
-            child: e,
-          );
-        }
-        return e;
-      }).toList();
+            if (!addedFilePicker) {
+              addedFilePicker = true;
+              return FilePickerFromZero(
+                allowMultiple: false,
+                dialogTitle: hint ?? uiName,
+                fileType: fileType,
+                allowedExtensions: allowedExtensions,
+                enableDragAndDrop: enableDragAndDrop,
+                allowDragAndDropInWholeScreen: allowDragAndDropInWholeScreen,
+                onlyForDragAndDrop: true,
+                pickDirectory: pickDirectory,
+                initialDirectory: initialDirectory,
+                enabled: enabled,
+                onSelected: (value) {
+                  userInteracted = true;
+                  commitValue(value.first.absolute.path);
+                },
+                child: e,
+              );
+            }
+            return e;
+          })
+          .toList();
     }
     focusNode ??= this.focusNode;
     Widget result;
@@ -269,8 +270,9 @@ class FileField extends StringField {
       child: AnimatedBuilder(
         animation: this,
         builder: (context, child) {
-          final visibleValidationErrors =
-              passedFirstEdit ? validationErrors : validationErrors.where((e) => e.isBeforeEditing);
+          final visibleValidationErrors = passedFirstEdit
+              ? validationErrors
+              : validationErrors.where((e) => e.isBeforeEditing);
           Widget result = Stack(
             children: [
               Material(
@@ -294,9 +296,10 @@ class FileField extends StringField {
                     builder: (context) {
                       return Padding(
                         padding: EdgeInsets.only(
-                            right: dense
-                                ? 0
-                                : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40),
+                          right: dense
+                              ? 0
+                              : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40,
+                        ),
                         child: ComboField.buttonContentBuilder(
                           context,
                           uiName,
@@ -321,16 +324,17 @@ class FileField extends StringField {
             ],
           );
           result = TooltipFromZero(
-            message: (dense
-                    ? visibleValidationErrors
-                    : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
-                .fold('', (a, b) {
-              return a.toString().trim().isEmpty
-                  ? b.toString()
-                  : b.toString().trim().isEmpty
-                      ? a.toString()
-                      : '$a\n$b';
-            }),
+            message:
+                (dense
+                        ? visibleValidationErrors
+                        : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
+                    .fold('', (a, b) {
+                      return a.toString().trim().isEmpty
+                          ? b.toString()
+                          : b.toString().trim().isEmpty
+                          ? a.toString()
+                          : '$a\n$b';
+                    }),
             waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
             child: result,
           );

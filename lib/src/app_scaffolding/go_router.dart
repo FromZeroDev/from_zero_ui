@@ -130,7 +130,8 @@ class GoRouteFromZero extends GoRoute {
       Animation<double> animation,
       Animation<double> secondaryAnimation,
       Widget child,
-    )? transitionBuilder,
+    )?
+    transitionBuilder,
     List<GoRouteFromZero> super.routes = const [],
     this.pageScaffoldId = 'main',
     this.pageScaffoldDepth = 0,
@@ -139,28 +140,30 @@ class GoRouteFromZero extends GoRoute {
     LocalKey Function(
       BuildContext context,
       GoRouterState state,
-    )? pageKeyGetter,
+    )?
+    pageKeyGetter,
     this.titleBuilder,
-  })  : assert(
-          (builder == null && transitionBuilder == null) || pageBuilder == null,
-          'If specifying pageBuilder; builder and transitionBuilder will be overriden, so they should be null',
-        ),
-        super(
-          name: name ?? path,
-          builder: null,
-          pageBuilder: pageBuilder ??
-              (context, state) {
-                return CustomTransitionPage<void>(
-                  key: state.pageKey,
-                  // key: (pageKeyGetter?.call(context, state)) ?? ValueKey(state.uri.toString()),
-                  child: OnlyOnActiveBuilder(
-                    builder: builder!,
-                    state: state,
-                  ),
-                  transitionsBuilder: transitionBuilder ?? (context, animation, secondaryAnimation, child) => child,
-                );
-              },
-        ) {
+  }) : assert(
+         (builder == null && transitionBuilder == null) || pageBuilder == null,
+         'If specifying pageBuilder; builder and transitionBuilder will be overriden, so they should be null',
+       ),
+       super(
+         name: name ?? path,
+         builder: null,
+         pageBuilder:
+             pageBuilder ??
+             (context, state) {
+               return CustomTransitionPage<void>(
+                 key: state.pageKey,
+                 // key: (pageKeyGetter?.call(context, state)) ?? ValueKey(state.uri.toString()),
+                 child: OnlyOnActiveBuilder(
+                   builder: builder!,
+                   state: state,
+                 ),
+                 transitionsBuilder: transitionBuilder ?? (context, animation, secondaryAnimation, child) => child,
+               );
+             },
+       ) {
     assert(
       this is GoRouteGroupFromZero || builder != null || pageBuilder != null,
       'One of builder or pageBuilder must be specified',
@@ -247,10 +250,14 @@ class GoRouteFromZero extends GoRoute {
     );
   }
 
-  Map<String, String> getPathParameters([Map<String, String> pathParameters = const {}]) =>
-      {...defaultPathParameters, ...pathParameters};
-  Map<String, String> getQueryParameters([Map<String, String> queryParameters = const {}]) =>
-      {...defaultQueryParameters, ...queryParameters};
+  Map<String, String> getPathParameters([Map<String, String> pathParameters = const {}]) => {
+    ...defaultPathParameters,
+    ...pathParameters,
+  };
+  Map<String, String> getQueryParameters([Map<String, String> queryParameters = const {}]) => {
+    ...defaultQueryParameters,
+    ...queryParameters,
+  };
   Object? getExtra([Object? extra]) {
     if ((extra == null || extra is Map) && defaultExtra is Map) {
       return {
@@ -334,9 +341,9 @@ class GoRouteGroupFromZero extends GoRouteFromZero {
     this.showInDrawerNavigation = true,
     this.showAsDropdown = true,
   }) : super(
-          path: 'null',
-          icon: icon ?? const SizedBox.shrink(),
-        );
+         path: 'null',
+         icon: icon ?? const SizedBox.shrink(),
+       );
 
   @override
   GoRouteGroupFromZero copyWith({

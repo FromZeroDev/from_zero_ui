@@ -39,8 +39,8 @@ class _ChildEntry {
   String toString() => 'Entry#${shortHash(this)}($widgetChild)';
 }
 
-typedef AnimatedSwitcherImageLayoutBuilder = Widget Function(
-    Widget? currentChild, List<Widget> previousChildren, Alignment alignment, Clip clipBehaviour);
+typedef AnimatedSwitcherImageLayoutBuilder =
+    Widget Function(Widget? currentChild, List<Widget> previousChildren, Alignment alignment, Clip clipBehaviour);
 
 class AnimatedSwitcherImage extends StatefulWidget {
   const AnimatedSwitcherImage({
@@ -91,7 +91,11 @@ class AnimatedSwitcherImage extends StatefulWidget {
   }
 
   static Widget defaultLayoutBuilder(
-      Widget? currentChild, List<Widget> previousChildren, Alignment alignment, Clip clipBehaviour) {
+    Widget? currentChild,
+    List<Widget> previousChildren,
+    Alignment alignment,
+    Clip clipBehaviour,
+  ) {
     return Stack(
       alignment: alignment,
       clipBehavior: clipBehaviour,
@@ -111,7 +115,11 @@ class AnimatedSwitcherImage extends StatefulWidget {
   }
 
   static Widget sliverLayoutBuilder(
-      Widget? currentChild, List<Widget> previousChildren, Alignment alignment, Clip clipBehaviour) {
+    Widget? currentChild,
+    List<Widget> previousChildren,
+    Alignment alignment,
+    Clip clipBehaviour,
+  ) {
     return SliverStack(
       positionedAlignment: alignment,
       children: <Widget>[
@@ -276,7 +284,8 @@ class _AnimatedSwitcherImageState extends State<AnimatedSwitcherImage> with Tick
       // print ('Setting image ${entry.hashCode}');
       await precacheImage(image, context);
       await Future<dynamic>.delayed(
-          const Duration(milliseconds: 1000)); // on success, let app breathe for a while before refreshing
+        const Duration(milliseconds: 1000),
+      ); // on success, let app breathe for a while before refreshing
       if (!mounted) return;
       entry.image = image;
     }

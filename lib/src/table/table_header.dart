@@ -94,8 +94,9 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
         try {
           filtered = widget.controller.filtered;
         } catch (_) {}
-        int selectedCount =
-            filtered == null ? 0 : filtered.where((e) => e.onCheckBoxSelected != null && e.selected == true).length;
+        int selectedCount = filtered == null
+            ? 0
+            : filtered.where((e) => e.onCheckBoxSelected != null && e.selected == true).length;
         Widget subtitle;
         if (selectedCount == 0) {
           if (filtered != null && widget.showElementCount) {
@@ -145,18 +146,19 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
         return Theme(
           data: Theme.of(context).copyWith(
             appBarTheme: Theme.of(context).appBarTheme.copyWith(
-                  color: widget.backgroundColor ??
-                      Material.of(context).color ??
-                      Theme.of(context).cardColor, // Colors.transparent
-                  iconTheme: Theme.of(context).iconTheme,
-                  actionsIconTheme: widget.defaultActionsColor == null
-                      ? Theme.of(context).iconTheme
-                      : Theme.of(context).iconTheme.copyWith(color: widget.defaultActionsColor),
-                  titleTextStyle: Theme.of(context).textTheme.titleMedium,
-                  toolbarTextStyle: widget.defaultActionsColor == null
-                      ? Theme.of(context).textTheme.titleMedium
-                      : Theme.of(context).textTheme.titleMedium!.copyWith(color: widget.defaultActionsColor),
-                ),
+              color:
+                  widget.backgroundColor ??
+                  Material.of(context).color ??
+                  Theme.of(context).cardColor, // Colors.transparent
+              iconTheme: Theme.of(context).iconTheme,
+              actionsIconTheme: widget.defaultActionsColor == null
+                  ? Theme.of(context).iconTheme
+                  : Theme.of(context).iconTheme.copyWith(color: widget.defaultActionsColor),
+              titleTextStyle: Theme.of(context).textTheme.titleMedium,
+              toolbarTextStyle: widget.defaultActionsColor == null
+                  ? Theme.of(context).textTheme.titleMedium
+                  : Theme.of(context).textTheme.titleMedium!.copyWith(color: widget.defaultActionsColor),
+            ),
           ),
           child: AppbarFromZero(
             titleSpacing: 0,
@@ -186,8 +188,8 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
                         if (widget.title != null)
                           DefaultTextStyle(
                             style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                                  fontSize: Theme.of(context).textTheme.titleLarge!.fontSize! * 0.85,
-                                ),
+                              fontSize: Theme.of(context).textTheme.titleLarge!.fontSize! * 0.85,
+                            ),
                             child: widget.title!,
                           ),
                         if (filtered != null) subtitle,
@@ -199,8 +201,9 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
             ),
             elevation: 0,
             actions: actions,
-            initialExpandedAction:
-                widget.addSearchAction && widget.searchActionExpandedByDefault ? actions.first : null,
+            initialExpandedAction: widget.addSearchAction && widget.searchActionExpandedByDefault
+                ? actions.first
+                : null,
             onExpanded: (_) {
               autofocusSearchOnNextBuild = true;
             },
@@ -217,68 +220,69 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
       icon: const Icon(Icons.search),
       breakpoints: {0: ActionState.expanded},
       centerExpanded: false,
-      expandedBuilder: ({
-        required BuildContext context,
-        required String title,
-        Widget? icon,
-        ContextCallback? onTap,
-        String? disablingError,
-        Color? color,
-      }) {
-        if (autofocusSearchOnNextBuild) {
-          autofocusSearchOnNextBuild = false;
-          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-            searchTextfieldFocusNode.requestFocus();
-          });
-        }
-        return Container(
-          width: 224,
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Stack(
-            children: [
-              TextFormField(
-                initialValue: searchQuery,
-                focusNode: searchTextfieldFocusNode,
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.only(
-                    left: 8,
-                    right: 8 + 28,
-                    bottom: 12,
+      expandedBuilder:
+          ({
+            required BuildContext context,
+            required String title,
+            Widget? icon,
+            ContextCallback? onTap,
+            String? disablingError,
+            Color? color,
+          }) {
+            if (autofocusSearchOnNextBuild) {
+              autofocusSearchOnNextBuild = false;
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                searchTextfieldFocusNode.requestFocus();
+              });
+            }
+            return Container(
+              width: 224,
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Stack(
+                children: [
+                  TextFormField(
+                    initialValue: searchQuery,
+                    focusNode: searchTextfieldFocusNode,
+                    decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.only(
+                        left: 8,
+                        right: 8 + 28,
+                        bottom: 12,
+                      ),
+                      labelText: "Buscar...",
+                    ),
+                    textAlignVertical: TextAlignVertical.center,
+                    textInputAction: TextInputAction.search,
+                    onChanged: (value) {
+                      searchQuery = value;
+                      widget.controller.filter();
+                    },
+                    onFieldSubmitted: (value) {
+                      final filtered = widget.controller.filtered;
+                      if (filtered.isNotEmpty) {
+                        submitSearch();
+                      }
+                    },
                   ),
-                  labelText: "Buscar...",
-                ),
-                textAlignVertical: TextAlignVertical.center,
-                textInputAction: TextInputAction.search,
-                onChanged: (value) {
-                  searchQuery = value;
-                  widget.controller.filter();
-                },
-                onFieldSubmitted: (value) {
-                  final filtered = widget.controller.filtered;
-                  if (filtered.isNotEmpty) {
-                    submitSearch();
-                  }
-                },
-              ),
-              Positioned.fill(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 1, right: 4),
-                    child: IconButton(
-                      icon: const Icon(Icons.search),
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? Theme.of(context).primaryColor
-                          : Colors.white,
-                      onPressed: submitSearch,
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 1, right: 4),
+                        child: IconButton(
+                          icon: const Icon(Icons.search),
+                          color: Theme.of(context).brightness == Brightness.light
+                              ? Theme.of(context).primaryColor
+                              : Colors.white,
+                          onPressed: submitSearch,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-        );
-      },
+            );
+          },
     );
   }
 

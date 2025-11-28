@@ -26,7 +26,8 @@ Future<T?> showModalFromZero<T>({
     useRootNavigator: useRootNavigator,
     routeSettings: routeSettings,
     filter: filter,
-    configuration: configuration ??
+    configuration:
+        configuration ??
         FromZeroModalConfiguration(
           showWindowBarOnDesktop: showWindowBarOnDesktop ?? useRootNavigator,
         ),
@@ -45,8 +46,8 @@ class FromZeroModalConfiguration extends FadeScaleTransitionConfiguration {
     super.reverseTransitionDuration = const Duration(milliseconds: 75),
     super.barrierLabel = 'Dismiss',
     this.showWindowBarOnDesktop = true,
-  })  : _myBarrierColor = barrierColor,
-        super(barrierColor: Colors.transparent);
+  }) : _myBarrierColor = barrierColor,
+       super(barrierColor: Colors.transparent);
   @override
   Widget transitionBuilder(
     BuildContext context,
@@ -77,11 +78,13 @@ class FromZeroModalConfiguration extends FadeScaleTransitionConfiguration {
           ]).animate(animation),
           child: FixedSlideTransition(
             // flutter's default SlideTransition causes an assertion when scrolling in a ListView.builder inside it
-            position: Tween<Offset>(
-              begin: const Offset(0.0, 128),
-              end: Offset.zero,
-            ).animate(
-                animation), // flutter's default SlideTransition causes an assertion when scrolling in a ListView.builder inside it
+            position:
+                Tween<Offset>(
+                  begin: const Offset(0.0, 128),
+                  end: Offset.zero,
+                ).animate(
+                  animation,
+                ), // flutter's default SlideTransition causes an assertion when scrolling in a ListView.builder inside it
             child: child,
           ),
         ),
@@ -200,14 +203,14 @@ class DialogFromZero extends StatefulWidget {
     this.alignment = goldenRatioVerticalAlignment,
     this.acceptCallback,
     super.key,
-  })  : assert(
-          appBar == null || (title == null && appBarActions == null),
-          'Setting appBar overrides title and appBarActions, no need to specify both',
-        ),
-        assert(
-          appBarActions == null || title != null,
-          'If setting appBarActions, a title must also be specified',
-        );
+  }) : assert(
+         appBar == null || (title == null && appBarActions == null),
+         'Setting appBar overrides title and appBarActions, no need to specify both',
+       ),
+       assert(
+         appBarActions == null || title != null,
+         'If setting appBarActions, a title must also be specified',
+       );
 
   @override
   State<DialogFromZero> createState() => _DialogFromZeroState();
@@ -494,8 +497,8 @@ class DialogButton extends StatelessWidget {
     this.style,
     this.tooltip,
     super.key,
-  })  : child = child, // ignore: prefer_initializing_formals
-        _dialogButtonType = DialogButtonType.other;
+  }) : child = child, // ignore: prefer_initializing_formals
+       _dialogButtonType = DialogButtonType.other;
 
   const DialogButton.cancel({
     this.child,
@@ -541,7 +544,8 @@ class DialogButton extends StatelessWidget {
     Widget result = TextButton(
       onPressed: onPressed,
       focusNode: focusNode,
-      style: style ??
+      style:
+          style ??
           TextButton.styleFrom(
             foregroundColor: color,
             padding: padding,

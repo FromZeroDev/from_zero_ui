@@ -14,26 +14,28 @@ class ZoomedFadeInFadeOutTransition extends StatelessWidget {
   Widget build(BuildContext context) {
     return DualTransitionBuilder(
       animation: animation,
-      forwardBuilder: (
-        BuildContext context,
-        Animation<double> animation,
-        Widget? child,
-      ) {
-        return ZoomedFadeInTransition(
-          animation: animation,
-          child: child!,
-        );
-      },
-      reverseBuilder: (
-        BuildContext context,
-        Animation<double> animation,
-        Widget? child,
-      ) {
-        return FadeOutTransition(
-          animation: animation,
-          child: child!,
-        );
-      },
+      forwardBuilder:
+          (
+            BuildContext context,
+            Animation<double> animation,
+            Widget? child,
+          ) {
+            return ZoomedFadeInTransition(
+              animation: animation,
+              child: child!,
+            );
+          },
+      reverseBuilder:
+          (
+            BuildContext context,
+            Animation<double> animation,
+            Widget? child,
+          ) {
+            return FadeOutTransition(
+              animation: animation,
+              child: child!,
+            );
+          },
       child: child,
     );
   }

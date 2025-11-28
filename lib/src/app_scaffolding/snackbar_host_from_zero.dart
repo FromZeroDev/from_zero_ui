@@ -77,7 +77,8 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
   Widget build(BuildContext context) {
     final controller = ref.watch(fromZeroSnackBarHostControllerProvider);
     SnackBarFromZero? currentSnackBar = controller._snackBarQueue.isEmpty ? null : controller._snackBarQueue.first;
-    bool isSameSnackBar = currentSnackBar?.key != null &&
+    bool isSameSnackBar =
+        currentSnackBar?.key != null &&
         lastShownSnackBar?.key != null &&
         currentSnackBar?.key == lastShownSnackBar?.key;
     if (currentSnackBar != null && !isSameSnackBar && currentSnackBar is APISnackBar) {

@@ -44,7 +44,8 @@ void Function(
   Map<String, Object>? data,
   int extraTraceLineOffset,
   FlutterErrorDetails? details,
-}) log = defaultLog;
+})
+log = defaultLog;
 
 void defaultLog(
   LgLvl level,
@@ -97,7 +98,8 @@ String? defaultLogGetMap(
   );
 
   if (e is DioException) {
-    msg += ' (${e.type})'
+    msg +=
+        ' (${e.type})'
         '\n  ${e.requestOptions.uri}'
         '${e.response == null ? '' : '  ${e.response!.statusCode} - ${_parseDioErrorResponse(e.response!.data)}'}';
 
@@ -136,7 +138,8 @@ String? defaultLogGetString(
   }
   if (e is DioException) {
     if (msg is String) {
-      msg += ' (${e.type})'
+      msg +=
+          ' (${e.type})'
           '\n  ${e.requestOptions.uri}'
           '${e.response == null ? '' : '  ${e.response!.statusCode} - ${_parseDioErrorResponse(e.response!.data)}'}';
     }
@@ -234,8 +237,11 @@ class FromZeroAppContentWrapper extends ConsumerStatefulWidget {
   static void exitApp(int code) {
     log(LgLvl.info, 'Exiting app with code: $code...', type: FzLgType.routing);
     if (!kIsWeb && Platform.isWindows) {
-      log(LgLvl.fine, 'Detected platform windows, releaseMode=$kReleaseMode, processName=$windowsProcessName',
-          type: FzLgType.routing);
+      log(
+        LgLvl.fine,
+        'Detected platform windows, releaseMode=$kReleaseMode, processName=$windowsProcessName',
+        type: FzLgType.routing,
+      );
       if (kReleaseMode && windowsProcessName != null) {
         log(LgLvl.fine, 'Running process: taskkill /IM "$windowsProcessName" /F', type: FzLgType.routing);
         // this ensures the process is completely killed and doesn't hang in older Windows versions
@@ -266,9 +272,9 @@ class FromZeroAppContentWrapper extends ConsumerStatefulWidget {
       final elems = line.split(',').map((elem) => elem.replaceAll('"', '')).toList();
       final name = elems[0];
       final pid = int.parse(elems[1]);
-//     final session = elems[2];
-//     final sessionNumber = int.parse(elems[3]);
-//     final memUsage = elems[4];
+      //     final session = elems[2];
+      //     final sessionNumber = int.parse(elems[3]);
+      //     final memUsage = elems[4];
       pids[name] = pid;
     }
     return pids;
@@ -507,18 +513,20 @@ class WindowBar extends StatelessWidget {
   Widget build(BuildContext context) {
     MediaQuery.sizeOf(context); // listen to resize, to difference maximized
     final theme = Theme.of(context);
-    final Color iconColor = iconTheme?.color ??
+    final Color iconColor =
+        iconTheme?.color ??
         theme.appBarTheme.iconTheme?.color ??
         theme.primaryIconTheme.color ??
         theme.iconTheme.color ??
         (theme.brightness == Brightness.light ? Colors.black : Colors.white);
     return Container(
-      height: height ??
+      height:
+          height ??
           (PlatformExtended.appWindow == null
               ? 32
               : appWindow.isMaximized
-                  ? appWindow.titleBarHeight * 0.66
-                  : appWindow.titleBarHeight),
+              ? appWindow.titleBarHeight * 0.66
+              : appWindow.titleBarHeight),
       color: backgroundColor,
       child: MoveWindowFromZero(
         child: Row(
@@ -628,16 +636,22 @@ class WindowBar extends StatelessWidget {
       final navigator = goRouter.routerDelegate.navigatorKey.currentState!;
       while (true) {
         final goRoute = goRouter.routerDelegate.currentConfiguration.last.route;
-        log(LgLvl.fine, 'Trying to pop ${goRouter.routerDelegate.currentConfiguration.last.matchedLocation}',
-            type: FzLgType.routing);
+        log(
+          LgLvl.fine,
+          'Trying to pop ${goRouter.routerDelegate.currentConfiguration.last.matchedLocation}',
+          type: FzLgType.routing,
+        );
         if (await navigator.maybePop()) {
           final previousGoRouteFromZero = goRoute is GoRouteFromZero ? goRoute : null;
           final newGoRoute = goRouter.routerDelegate.currentConfiguration.last.route;
           final newGoRouteFromZero = newGoRoute is GoRouteFromZero ? newGoRoute : null;
           if (newGoRoute == goRoute) {
             // if route refused to pop, or popped route was a modal, stop iteration
-            log(LgLvl.finer, 'Route refused to pop, or popped route was a modal, stopping iteration...',
-                type: FzLgType.routing);
+            log(
+              LgLvl.finer,
+              'Route refused to pop, or popped route was a modal, stopping iteration...',
+              type: FzLgType.routing,
+            );
             return;
           }
           if (previousGoRouteFromZero?.pageScaffoldId != newGoRouteFromZero?.pageScaffoldId) {
@@ -924,7 +938,8 @@ class CloseConfirmDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return DialogFromZero(
       title: Text(
-          "¿Seguro que quiere cerrar ${FromZeroAppContentWrapper.appNameForCloseConfirmation ?? 'la aplicación'}?"), // TODO 3 internationalize
+        "¿Seguro que quiere cerrar ${FromZeroAppContentWrapper.appNameForCloseConfirmation ?? 'la aplicación'}?",
+      ), // TODO 3 internationalize
       dialogActions: <Widget>[
         const DialogButton.cancel(),
         DialogButton(

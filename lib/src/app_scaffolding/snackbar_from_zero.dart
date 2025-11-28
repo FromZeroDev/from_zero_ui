@@ -141,8 +141,8 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
     }
     Color actionColor = type == null
         ? Theme.of(context).brightness == Brightness.light
-            ? Theme.of(context).primaryColor
-            : Theme.of(context).colorScheme.secondary
+              ? Theme.of(context).primaryColor
+              : Theme.of(context).colorScheme.secondary
         : SnackBarFromZero.colors[type];
     Widget result = Row(
       children: [
@@ -154,7 +154,8 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
           width: 8,
         ),
         Expanded(
-          child: widget.content ??
+          child:
+              widget.content ??
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,7 +293,8 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
         ],
       ),
     );
-    final fixed = widget.behaviour != SnackBarFromZero.behaviourFloating &&
+    final fixed =
+        widget.behaviour != SnackBarFromZero.behaviourFloating &&
         (widget.behaviour == SnackBarFromZero.behaviourFixed ||
             ref.watch(fromZeroScreenProvider.select((value) => value.isMobileLayout)));
     Color backgroundColor = type == null
@@ -341,9 +343,9 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerP
     );
     result = IconTheme(
       data: Theme.of(context).iconTheme.copyWith(
-            color: actionColor,
-            size: 32,
-          ),
+        color: actionColor,
+        size: 32,
+      ),
       child: result,
     );
     return result;

@@ -11,10 +11,11 @@ import 'package:value_layout_builder/value_layout_builder.dart';
 
 /// Signature used by [SliverStickyHeader.builder] to build the header
 /// when the sticky header state has changed.
-typedef SliverStickyHeaderWidgetBuilder = Widget Function(
-  BuildContext context,
-  SliverStickyHeaderState state,
-);
+typedef SliverStickyHeaderWidgetBuilder =
+    Widget Function(
+      BuildContext context,
+      SliverStickyHeaderState state,
+    );
 
 /// A
 class StickyHeaderController with ChangeNotifier {
@@ -63,8 +64,8 @@ class DefaultStickyHeaderController extends StatefulWidget {
   /// StickyHeaderController controller = DefaultStickyHeaderController.of(context);
   /// ```
   static StickyHeaderController? of(BuildContext context) {
-    final _StickyHeaderControllerScope? scope =
-        context.dependOnInheritedWidgetOfExactType<_StickyHeaderControllerScope>();
+    final _StickyHeaderControllerScope? scope = context
+        .dependOnInheritedWidgetOfExactType<_StickyHeaderControllerScope>();
     return scope?.controller;
   }
 
@@ -180,18 +181,18 @@ class SliverStickyHeader extends RenderObjectWidget {
     bool footer = false,
     Key? key,
   }) : this(
-          key: key,
-          header: ValueLayoutBuilder<SliverStickyHeaderState>(
-            builder: (context, constraints) => builder(context, constraints.value),
-          ),
-          sliver: sliver,
-          overlapsContent: overlapsContent,
-          sticky: sticky,
-          controller: controller,
-          scrollController: scrollController,
-          stickOffset: stickOffset,
-          footer: footer,
-        );
+         key: key,
+         header: ValueLayoutBuilder<SliverStickyHeaderState>(
+           builder: (context, constraints) => builder(context, constraints.value),
+         ),
+         sliver: sliver,
+         overlapsContent: overlapsContent,
+         sticky: sticky,
+         controller: controller,
+         scrollController: scrollController,
+         stickOffset: stickOffset,
+         footer: footer,
+       );
 
   /// The header to display before the sliver.
   final Widget? header;
@@ -326,12 +327,12 @@ class RenderSliverStickyHeader extends RenderSliver with RenderSliverHelpers {
     ScrollController? scrollController,
     double stickOffset = 0,
     bool footer = false,
-  })  : _overlapsContent = overlapsContent,
-        _sticky = sticky,
-        _scrollController = scrollController,
-        _stickOffset = stickOffset,
-        _footer = footer,
-        _controller = controller {
+  }) : _overlapsContent = overlapsContent,
+       _sticky = sticky,
+       _scrollController = scrollController,
+       _stickOffset = stickOffset,
+       _footer = footer,
+       _controller = controller {
     this.header = header as RenderBox?;
     this.child = child;
   }
@@ -469,12 +470,16 @@ class RenderSliverStickyHeader extends RenderSliver with RenderSliverHelpers {
         switch (constraints.axisDirection) {
           case AxisDirection.up:
           case AxisDirection.down:
-            headerParentData.paintOffset =
-                Offset(0, headerParentData.paintOffset.dy - (previousExternalStuckOffset ?? 0) + externalStuckOffset);
+            headerParentData.paintOffset = Offset(
+              0,
+              headerParentData.paintOffset.dy - (previousExternalStuckOffset ?? 0) + externalStuckOffset,
+            );
           case AxisDirection.left:
           case AxisDirection.right:
-            headerParentData.paintOffset =
-                Offset(headerParentData.paintOffset.dx - (previousExternalStuckOffset ?? 0) + externalStuckOffset, 0);
+            headerParentData.paintOffset = Offset(
+              headerParentData.paintOffset.dx - (previousExternalStuckOffset ?? 0) + externalStuckOffset,
+              0,
+            );
         }
         previousExternalStuckOffset = externalStuckOffset;
         markNeedsPaint();
@@ -631,7 +636,8 @@ class RenderSliverStickyHeader extends RenderSliver with RenderSliverHelpers {
       externalStuckOffset = sticky ? determineStuckOffsetFromExternalController() : 0;
       previousExternalStuckOffset = externalStuckOffset;
 
-      _isPinned = sticky &&
+      _isPinned =
+          sticky &&
           ((constraints.scrollOffset + constraints.overlap) > 0.0 ||
               externalStuckOffset > 0); // || constraints.remainingPaintExtent==constraints.viewportMainAxisExtent
 
@@ -731,11 +737,15 @@ class RenderSliverStickyHeader extends RenderSliver with RenderSliverHelpers {
       double stuckOffset;
       if (footer) {
         stuckOffset =
-            (-(offsetToReveal - scrollPosition.pixels + math.min(stickOffset, scrollPosition.maxScrollExtent)))
-                .clamp(-(fullScrollExtent - (_headerExtent ?? 0.0)), 0);
+            (-(offsetToReveal - scrollPosition.pixels + math.min(stickOffset, scrollPosition.maxScrollExtent))).clamp(
+              -(fullScrollExtent - (_headerExtent ?? 0.0)),
+              0,
+            );
       } else {
-        stuckOffset = (scrollPosition.pixels - offsetToReveal + stickOffset)
-            .clamp(0.0, fullScrollExtent - (_headerExtent ?? 0.0));
+        stuckOffset = (scrollPosition.pixels - offsetToReveal + stickOffset).clamp(
+          0.0,
+          fullScrollExtent - (_headerExtent ?? 0.0),
+        );
       }
       return stuckOffset;
       // } catch(e, st) {print(e); print(st); return 0; }

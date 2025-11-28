@@ -4,13 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:intl/intl.dart';
 
-abstract class ConditionFilter<T> {
+abstract class ConditionFilter {
   ConditionFilter({required this.extra});
   bool extra;
   String getUiName(BuildContext context);
   String getExtraUiName(BuildContext context);
   String getExtraUiTooltipFromZero(BuildContext context);
-  bool isAllowed(RowModel row, dynamic key, ColModel? col);
+  bool isAllowed(RowModel<dynamic> row, dynamic key, ColModel<dynamic>? col);
   late FocusNode focusNode = FocusNode();
   Widget buildFormWidget({
     required BuildContext context,
@@ -171,8 +171,8 @@ class FilterTextContains extends FilterText {
     bool inverse = false,
     super.query = '',
   }) : super(
-          extra: inverse,
-        );
+         extra: inverse,
+       );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_text_contains');
   @override
@@ -194,8 +194,8 @@ class FilterTextStartsWith extends FilterText {
     bool inverse = false,
     super.query = '',
   }) : super(
-          extra: inverse,
-        );
+         extra: inverse,
+       );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_text_begins');
   @override
@@ -217,8 +217,8 @@ class FilterTextEndsWith extends FilterText {
     bool inverse = false,
     super.query = '',
   }) : super(
-          extra: inverse,
-        );
+         extra: inverse,
+       );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_text_ends');
   @override
@@ -361,15 +361,14 @@ class FilterNumberEqualTo extends FilterNumber {
     bool inverse = false,
     super.query,
   }) : super(
-          extra: inverse,
-        );
+         extra: inverse,
+       );
   @override
   String getUiName(BuildContext context) => 'Número igual a'; //Number equal to // TODO 3 internationalize
   @override
   String getExtraUiName(BuildContext context) => 'Invertir'; //Reverse // TODO 3 internationalize
   @override
-  String getExtraUiTooltipFromZero(BuildContext context) =>
-      'Incluir valores distintos al valor especificado'; // TODO 3 internationalize
+  String getExtraUiTooltipFromZero(BuildContext context) => 'Incluir valores distintos al valor especificado'; // TODO 3 internationalize
   @override
   bool isAllowed(row, key, col) {
     if (query == null) return true;
@@ -386,8 +385,8 @@ class FilterNumberGreaterThan extends FilterNumber {
     bool inclusive = true,
     super.query,
   }) : super(
-          extra: inclusive,
-        );
+         extra: inclusive,
+       );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_number_greater');
   @override
@@ -411,8 +410,8 @@ class FilterNumberLessThan extends FilterNumber {
     bool inclusive = true,
     super.query,
   }) : super(
-          extra: inclusive,
-        );
+         extra: inclusive,
+       );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_number_less');
   @override
@@ -445,8 +444,8 @@ abstract class FilterDate extends ConditionFilter {
   FilterDate({
     required super.extra,
     required DateTime? query,
-  })  : _query = query,
-        _queryDate = query?.toDate();
+  }) : _query = query,
+       _queryDate = query?.toDate();
 
   @override
   Widget buildFormWidget({
@@ -600,8 +599,8 @@ class FilterDateAfter extends FilterDate {
     bool inclusive = true,
     super.query,
   }) : super(
-          extra: inclusive,
-        );
+         extra: inclusive,
+       );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_date_after');
   @override
@@ -629,8 +628,8 @@ class FilterDateBefore extends FilterDate {
     bool inclusive = true,
     super.query,
   }) : super(
-          extra: inclusive,
-        );
+         extra: inclusive,
+       );
   @override
   String getUiName(BuildContext context) => FromZeroLocalizations.of(context).translate('filter_date_before');
   @override

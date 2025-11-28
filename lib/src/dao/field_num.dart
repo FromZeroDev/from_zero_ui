@@ -104,8 +104,8 @@ class NumField extends Field<num> {
     return value == null
         ? ''
         : formatter == null
-            ? value.toString()
-            : formatter.format(value);
+        ? value.toString()
+        : formatter.format(value);
   }
 
   @override
@@ -271,8 +271,9 @@ class NumField extends Field<num> {
         animation: this,
         builder: (context, child) {
           final enabled = this.enabled;
-          final visibleValidationErrors =
-              passedFirstEdit ? validationErrors : validationErrors.where((e) => e.isBeforeEditing);
+          final visibleValidationErrors = passedFirstEdit
+              ? validationErrors
+              : validationErrors.where((e) => e.isBeforeEditing);
           final actions = buildActions(context, focusNode);
           final defaultActions = buildDefaultActions(context, focusNode: focusNode);
           var allActions = [
@@ -298,19 +299,22 @@ class NumField extends Field<num> {
                   animation: focusNode,
                   builder: (context, child) {
                     final backgroundColor = this.backgroundColor?.call(context, this, dao);
-                    final focusColor =
-                        Theme.of(context).focusColor.withValues(alpha: Theme.of(context).focusColor.opacity * 0.6);
+                    final focusColor = Theme.of(
+                      context,
+                    ).focusColor.withValues(alpha: Theme.of(context).focusColor.opacity * 0.6);
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
                       color: dense && visibleValidationErrors.isNotEmpty
-                          ? ValidationMessage.severityColors[Theme.of(context).brightness.inverse]![
-                                  visibleValidationErrors.first.severity]!
-                              .withValues(alpha: 0.2)
+                          ? ValidationMessage
+                                .severityColors[Theme.of(
+                                  context,
+                                ).brightness.inverse]![visibleValidationErrors.first.severity]!
+                                .withValues(alpha: 0.2)
                           : focusNode.hasFocus
-                              ? backgroundColor != null
-                                  ? Color.alphaBlend(focusColor, backgroundColor)
-                                  : focusColor
-                              : focusColor.withValues(alpha: 0),
+                          ? backgroundColor != null
+                                ? Color.alphaBlend(focusColor, backgroundColor)
+                                : focusColor
+                          : focusColor.withValues(alpha: 0),
                       curve: Curves.easeOut,
                     );
                   },
@@ -340,7 +344,8 @@ class NumField extends Field<num> {
                       keyboardType: TextInputType.number,
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
-                            RegExp('[0-9${digitsAfterComma == 0 ? '' : '.'}${allowNegative ? '-' : ''}]')),
+                          RegExp('[0-9${digitsAfterComma == 0 ? '' : '.'}${allowNegative ? '-' : ''}]'),
+                        ),
                       ],
                       actions: allActions,
                       onChanged: (v) {
@@ -403,16 +408,17 @@ class NumField extends Field<num> {
             ],
           );
           result = TooltipFromZero(
-            message: (dense
-                    ? visibleValidationErrors
-                    : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
-                .fold('', (a, b) {
-              return a.toString().trim().isEmpty
-                  ? b.toString()
-                  : b.toString().trim().isEmpty
-                      ? a.toString()
-                      : '$a\n$b';
-            }),
+            message:
+                (dense
+                        ? visibleValidationErrors
+                        : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
+                    .fold('', (a, b) {
+                      return a.toString().trim().isEmpty
+                          ? b.toString()
+                          : b.toString().trim().isEmpty
+                          ? a.toString()
+                          : '$a\n$b';
+                    }),
             waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
             child: result,
           );

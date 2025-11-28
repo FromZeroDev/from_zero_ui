@@ -57,8 +57,9 @@ class ResponsiveHorizontalInsets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final insets =
-        EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width < breakpoint ? smallPadding : bigPadding);
+    final insets = EdgeInsets.symmetric(
+      horizontal: MediaQuery.sizeOf(context).width < breakpoint ? smallPadding : bigPadding,
+    );
     if (asSliver) {
       return SliverPadding(
         padding: insets,
@@ -399,8 +400,8 @@ class OpacityGradient extends StatelessWidget {
     double? size,
     this.percentage,
     super.key,
-  })  : assert(size == null || percentage == null, "Can't set both a hard size and a percentage."),
-        size = size == null && percentage == null ? 16 : size;
+  }) : assert(size == null || percentage == null, "Can't set both a hard size and a percentage."),
+       size = size == null && percentage == null ? 16 : size;
 
   @override
   Widget build(BuildContext context) {
@@ -418,18 +419,18 @@ class OpacityGradient extends StatelessWidget {
           direction == bottom || direction == right
               ? 0
               : size == null
-                  ? percentage!
-                  : size! /
-                      (direction == top || direction == bottom || direction == vertical ? bounds.height : bounds.width),
+              ? percentage!
+              : size! /
+                    (direction == top || direction == bottom || direction == vertical ? bounds.height : bounds.width),
           direction == top || direction == left
               ? 1
               : size == null
-                  ? 1 - percentage!
-                  : 1 -
-                      size! /
-                          (direction == top || direction == bottom || direction == vertical
-                              ? bounds.height
-                              : bounds.width),
+              ? 1 - percentage!
+              : 1 -
+                    size! /
+                        (direction == top || direction == bottom || direction == vertical
+                            ? bounds.height
+                            : bounds.width),
           1,
         ],
         colors: const [Colors.transparent, Colors.black, Colors.black, Colors.transparent],
@@ -502,8 +503,10 @@ class ScrollOpacityGradientState extends State<ScrollOpacityGradient> {
         double newSize1, newSize2;
         try {
           newSize1 = widget.scrollController.position.pixels.clamp(0, widget.maxSize);
-          newSize2 = (widget.scrollController.position.maxScrollExtent - widget.scrollController.position.pixels)
-              .clamp(0, widget.maxSize);
+          newSize2 = (widget.scrollController.position.maxScrollExtent - widget.scrollController.position.pixels).clamp(
+            0,
+            widget.maxSize,
+          );
         } catch (e) {
           newSize1 = 0;
           newSize2 = 0;
@@ -604,8 +607,11 @@ class OverflowScrollState extends State<OverflowScroll> {
     try {
       Duration duration = (1000 * scrollController.position.maxScrollExtent / widget.autoscrollSpeed!).milliseconds;
       if (forward) {
-        await scrollController.animateTo(scrollController.position.maxScrollExtent,
-            duration: duration, curve: Curves.linear);
+        await scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: duration,
+          curve: Curves.linear,
+        );
       } else {
         await scrollController.animateTo(0, duration: duration, curve: Curves.linear);
       }
@@ -810,16 +816,21 @@ class ReturnToTopButtonState extends ConsumerState<ReturnToTopButton> {
                   child: FloatingActionButton(
                     heroTag: null,
                     backgroundColor: Theme.of(context).cardColor,
-                    onPressed: widget.onTap ??
+                    onPressed:
+                        widget.onTap ??
                         () {
                           if (widget.duration == null) {
                             widget.scrollController.jumpTo(0);
                           } else {
-                            widget.scrollController
-                                .animateTo(0, duration: widget.duration!, curve: Curves.easeOutCubic);
+                            widget.scrollController.animateTo(
+                              0,
+                              duration: widget.duration!,
+                              curve: Curves.easeOutCubic,
+                            );
                           }
                         },
-                    child: widget.icon ??
+                    child:
+                        widget.icon ??
                         Icon(
                           Icons.arrow_upward,
                           color: Theme.of(context).textTheme.bodyLarge!.color,
@@ -903,10 +914,10 @@ class TitleTextBackground extends StatelessWidget {
     this.child,
     this.backgroundColor,
     this.onTap,
-  })  : paddingTop = paddingTop ?? paddingVertical,
-        paddingBottom = paddingBottom ?? paddingVertical,
-        paddingLeft = paddingLeft ?? paddingHorizontal,
-        paddingRight = paddingRight ?? paddingHorizontal;
+  }) : paddingTop = paddingTop ?? paddingVertical,
+       paddingBottom = paddingBottom ?? paddingVertical,
+       paddingLeft = paddingLeft ?? paddingHorizontal,
+       paddingRight = paddingRight ?? paddingHorizontal;
 
   @override
   Widget build(BuildContext context) {
@@ -1138,7 +1149,8 @@ class FrameThrottleWidgetState extends State<FrameThrottleWidget> {
     }
     if (builtPlaceHolder) {
       return InitiallyAnimatedWidget(
-        builder: widget.transitionBuilder ??
+        builder:
+            widget.transitionBuilder ??
             (animation, child) {
               return FadeTransition(
                 opacity: animation,
@@ -1349,8 +1361,9 @@ class FlexibleLayoutFromZero extends StatelessWidget {
   }
 
   Widget buildInternal(BuildContext context, double relevantAxisSize) {
-    double minTotalSize =
-        children.sumBy((e) => e.minSize); // TODO 3 these calculations should probably be done in a render object
+    double minTotalSize = children.sumBy(
+      (e) => e.minSize,
+    ); // TODO 3 these calculations should probably be done in a render object
     Map<int, FlexibleLayoutItemFromZero> expandableItems = {};
     Map<int, double> itemSizes = {};
     for (int i = 0; i < children.length; i++) {
@@ -1452,17 +1465,19 @@ class FlexibleLayoutItemFromZero extends StatelessWidget {
   }
 }
 
-typedef TimedBuilder = Widget Function(
-  BuildContext context, {
-  required Duration elapsed,
-  required Duration remaining,
-});
-typedef TimedOverlayBuilder = Widget Function(
-  BuildContext context, {
-  required Duration elapsed,
-  required Duration remaining,
-  BorderRadiusGeometry? borderRadius,
-});
+typedef TimedBuilder =
+    Widget Function(
+      BuildContext context, {
+      required Duration elapsed,
+      required Duration remaining,
+    });
+typedef TimedOverlayBuilder =
+    Widget Function(
+      BuildContext context, {
+      required Duration elapsed,
+      required Duration remaining,
+      BorderRadiusGeometry? borderRadius,
+    });
 
 class TimedOverlay extends StatefulWidget {
   final Duration duration;
@@ -1657,7 +1672,8 @@ extension HexColor on Color {
   }
 
   /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-  String toHex({bool leadingHashSign = true, bool includeAlpha = true}) => '${leadingHashSign ? '#' : ''}'
+  String toHex({bool leadingHashSign = true, bool includeAlpha = true}) =>
+      '${leadingHashSign ? '#' : ''}'
       '${includeAlpha ? alpha.toRadixString(16).padLeft(2, '0') : ''}'
       '${red.toRadixString(16).padLeft(2, '0')}'
       '${green.toRadixString(16).padLeft(2, '0')}'
@@ -1679,16 +1695,8 @@ class SideClipper extends CustomClipper<Path> {
     this.clipTop = false,
     this.clipBottom = false,
   });
-  SideClipper.vertical()
-      : clipLeft = false,
-        clipRight = false,
-        clipTop = true,
-        clipBottom = true;
-  SideClipper.horizontal()
-      : clipLeft = true,
-        clipRight = true,
-        clipTop = false,
-        clipBottom = false;
+  SideClipper.vertical() : clipLeft = false, clipRight = false, clipTop = true, clipBottom = true;
+  SideClipper.horizontal() : clipLeft = true, clipRight = true, clipTop = false, clipBottom = false;
 
   @override
   Path getClip(Size size) {

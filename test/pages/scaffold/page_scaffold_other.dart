@@ -17,9 +17,10 @@ class PageScaffoldInnerState extends State<PageScaffoldOther> {
       title: const Text("Inner Page"),
       body: const Center(
         child: Card(
-            child: FlutterLogo(
-          size: 512,
-        )),
+          child: FlutterLogo(
+            size: 512,
+          ),
+        ),
       ),
       useCompactDrawerInsteadOfClose: false,
       drawerWidth: 512,

@@ -25,22 +25,24 @@ extension ActionStateExtension on ActionState {
 }
 
 typedef ContextCallback = void Function(BuildContext context);
-typedef ActionBuilder = Widget Function({
-  required BuildContext context,
-  required String title,
-  Widget? icon,
-  ContextCallback? onTap,
-  String? disablingError,
-  Color? color,
-});
-typedef OverflowActionBuilder = Widget Function({
-  required BuildContext context,
-  required String title,
-  Widget? icon,
-  ContextCallback? onTap,
-  String? disablingError,
-  bool forceIconSpace,
-});
+typedef ActionBuilder =
+    Widget Function({
+      required BuildContext context,
+      required String title,
+      Widget? icon,
+      ContextCallback? onTap,
+      String? disablingError,
+      Color? color,
+    });
+typedef OverflowActionBuilder =
+    Widget Function({
+      required BuildContext context,
+      required String title,
+      Widget? icon,
+      ContextCallback? onTap,
+      String? disablingError,
+      bool forceIconSpace,
+    });
 
 class ActionFromZero extends StatelessWidget {
   /// callback called when icon/button/overflowMenuItem is clicked
@@ -60,51 +62,52 @@ class ActionFromZero extends StatelessWidget {
   /// optional callbacks to customize the look of the widget in its different states
   final OverflowActionBuilder overflowBuilder;
   Widget buildOverflow(BuildContext context, {bool forceIconSpace = false}) => overflowBuilder(
-      context: context,
-      title: title,
-      icon: icon,
-      onTap: onTap,
-      disablingError: disablingError,
-      forceIconSpace: forceIconSpace);
+    context: context,
+    title: title,
+    icon: icon,
+    onTap: onTap,
+    disablingError: disablingError,
+    forceIconSpace: forceIconSpace,
+  );
 
   final ActionBuilder iconBuilder;
   Widget buildIcon(
     BuildContext context, {
     Color? color,
-  }) =>
-      iconBuilder(
-          context: context,
-          title: title,
-          icon: icon,
-          onTap: onTap,
-          disablingError: disablingError,
-          color: color ?? this.color);
+  }) => iconBuilder(
+    context: context,
+    title: title,
+    icon: icon,
+    onTap: onTap,
+    disablingError: disablingError,
+    color: color ?? this.color,
+  );
 
   final ActionBuilder buttonBuilder;
   Widget buildButton(
     BuildContext context, {
     Color? color,
-  }) =>
-      buttonBuilder(
-          context: context,
-          title: title,
-          icon: icon,
-          onTap: onTap,
-          disablingError: disablingError,
-          color: color ?? this.color);
+  }) => buttonBuilder(
+    context: context,
+    title: title,
+    icon: icon,
+    onTap: onTap,
+    disablingError: disablingError,
+    color: color ?? this.color,
+  );
 
   final ActionBuilder? expandedBuilder;
   Widget buildExpanded(
     BuildContext context, {
     Color? color,
-  }) =>
-      expandedBuilder!(
-          context: context,
-          title: title,
-          icon: icon,
-          onTap: onTap,
-          disablingError: disablingError,
-          color: color ?? this.color);
+  }) => expandedBuilder!(
+    context: context,
+    title: title,
+    icon: icon,
+    onTap: onTap,
+    disablingError: disablingError,
+    color: color ?? this.color,
+  );
   final bool centerExpanded;
 
   ActionFromZero({
@@ -120,11 +123,12 @@ class ActionFromZero extends StatelessWidget {
     this.expandedBuilder,
     this.centerExpanded = true,
     super.key,
-  }) : breakpoints = breakpoints ??
-            {
-              0: icon == null ? ActionState.overflow : ActionState.icon,
-              ScaffoldFromZero.screenSizeLarge: expandedBuilder == null ? ActionState.button : ActionState.expanded,
-            };
+  }) : breakpoints =
+           breakpoints ??
+           {
+             0: icon == null ? ActionState.overflow : ActionState.icon,
+             ScaffoldFromZero.screenSizeLarge: expandedBuilder == null ? ActionState.button : ActionState.expanded,
+           };
 
   ActionFromZero.divider({
     super.key,
@@ -132,18 +136,19 @@ class ActionFromZero extends StatelessWidget {
     this.overflowBuilder = dividerOverflowBuilder,
     this.iconBuilder = dividerIconBuilder,
     this.buttonBuilder = dividerIconBuilder,
-  })  : title = '',
-        icon = null,
-        color = null,
-        onTap = null,
-        expandedBuilder = null,
-        disablingError = null,
-        centerExpanded = true,
-        breakpoints = breakpoints ??
-            {
-              0: ActionState.overflow,
-              // ScaffoldFromZero.screenSizeLarge: ActionState.icon,
-            };
+  }) : title = '',
+       icon = null,
+       color = null,
+       onTap = null,
+       expandedBuilder = null,
+       disablingError = null,
+       centerExpanded = true,
+       breakpoints =
+           breakpoints ??
+           {
+             0: ActionState.overflow,
+             // ScaffoldFromZero.screenSizeLarge: ActionState.icon,
+           };
 
   static void Function(BuildContext context) nullOnTap = (context) {};
   ActionFromZero copyWith({
@@ -307,12 +312,12 @@ class ActionFromZero extends StatelessWidget {
               if (icon != null)
                 IconTheme(
                   data: Theme.of(context).iconTheme.copyWith(
-                        color: !enabled || onTap == null
-                            ? Theme.of(context).disabledColor
-                            : Theme.of(context).brightness == Brightness.light
-                                ? Colors.black45
-                                : Colors.grey.shade300,
-                      ),
+                    color: !enabled || onTap == null
+                        ? Theme.of(context).disabledColor
+                        : Theme.of(context).brightness == Brightness.light
+                        ? Colors.black45
+                        : Colors.grey.shade300,
+                  ),
                   child: icon,
                 ),
               if (icon == null && forceIconSpace)
@@ -392,30 +397,31 @@ class AnimatedActionFromZero extends StatelessWidget implements ActionFromZero {
   });
 
   @override
-  ActionFromZero copyWith(
-          {void Function(BuildContext context)? onTap,
-          String? title,
-          Widget? icon,
-          Color? color,
-          Map<double, ActionState>? breakpoints,
-          OverflowActionBuilder? overflowBuilder,
-          ActionBuilder? iconBuilder,
-          ActionBuilder? buttonBuilder,
-          ActionBuilder? expandedBuilder,
-          bool? centerExpanded,
-          String? disablingError}) =>
-      _action.copyWith(
-          onTap: onTap,
-          title: title,
-          icon: icon,
-          color: color,
-          breakpoints: breakpoints,
-          overflowBuilder: overflowBuilder,
-          iconBuilder: iconBuilder,
-          buttonBuilder: buttonBuilder,
-          expandedBuilder: expandedBuilder,
-          centerExpanded: centerExpanded,
-          disablingError: disablingError);
+  ActionFromZero copyWith({
+    void Function(BuildContext context)? onTap,
+    String? title,
+    Widget? icon,
+    Color? color,
+    Map<double, ActionState>? breakpoints,
+    OverflowActionBuilder? overflowBuilder,
+    ActionBuilder? iconBuilder,
+    ActionBuilder? buttonBuilder,
+    ActionBuilder? expandedBuilder,
+    bool? centerExpanded,
+    String? disablingError,
+  }) => _action.copyWith(
+    onTap: onTap,
+    title: title,
+    icon: icon,
+    color: color,
+    breakpoints: breakpoints,
+    overflowBuilder: overflowBuilder,
+    iconBuilder: iconBuilder,
+    buttonBuilder: buttonBuilder,
+    expandedBuilder: expandedBuilder,
+    centerExpanded: centerExpanded,
+    disablingError: disablingError,
+  );
 
   ActionFromZero? _cachedAction;
   ActionFromZero get _action {
@@ -621,7 +627,8 @@ class APIActionFromZero<T> extends ActionFromZero {
               title: title,
               icon: icon,
               onTap: null,
-              disablingError: '${ApiProviderBuilder.getErrorTitle(context, e, st)}'
+              disablingError:
+                  '${ApiProviderBuilder.getErrorTitle(context, e, st)}'
                   '\n${ApiProviderBuilder.getErrorSubtitle(context, e, st)}',
               color: color,
             );

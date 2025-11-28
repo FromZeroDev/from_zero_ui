@@ -53,19 +53,20 @@ class ThemeParametersFromZero extends ChangeNotifier {
   ThemeMode get themeMode => themes[selectedTheme] == null
       ? ThemeMode.system
       : themes[selectedTheme]!.brightness == Brightness.light
-          ? ThemeMode.light
-          : ThemeMode.dark;
+      ? ThemeMode.light
+      : ThemeMode.dark;
 
   ThemeData get defaultLightTheme => ThemeData();
   ThemeData get defaultDarkTheme => ThemeData.dark();
 
   /// override for custom choices
   List<Widget> get themeIcons => [
-        const Icon(MaterialCommunityIcons.theme_light_dark),
-        const Icon(Icons.wb_sunny),
-        const Icon(MaterialCommunityIcons.weather_night),
-      ];
-  List<String> Function(BuildContext context) get themeNames => (context) => [
+    const Icon(MaterialCommunityIcons.theme_light_dark),
+    const Icon(Icons.wb_sunny),
+    const Icon(MaterialCommunityIcons.weather_night),
+  ];
+  List<String> Function(BuildContext context) get themeNames =>
+      (context) => [
         FromZeroLocalizations.of(context).translate("default_theme"),
         FromZeroLocalizations.of(context).translate("light_theme"),
         FromZeroLocalizations.of(context).translate("dark_theme"),
@@ -81,11 +82,12 @@ class ThemeParametersFromZero extends ChangeNotifier {
   Locale? get appLocale => supportedLocales[selectedLocale];
 
   List<Locale?> get supportedLocales => [
-        null,
-        const Locale('en'),
-        const Locale('es'),
-      ];
-  List<String> Function(BuildContext context) get supportedLocaleTitles => (context) => [
+    null,
+    const Locale('en'),
+    const Locale('es'),
+  ];
+  List<String> Function(BuildContext context) get supportedLocaleTitles =>
+      (context) => [
         FromZeroLocalizations.of(context).translate("language_default"),
         "English",
         "Español",
@@ -410,27 +412,29 @@ class LoadingApp extends StatelessWidget {
         return Container(
           color: Colors.white,
           alignment: Alignment.center,
-//                child: Row(
-//                  mainAxisAlignment: MainAxisAlignment.center,
-//                  children: [
-//                    CircularProgressIndicator(
-//                      valueColor: ColorTween(begin: Theme.of(context).primaryColor, end: Theme.of(context).primaryColor).animate(kAlwaysDismissedAnimation),
-//                    ),
-//                    SizedBox(width: 16,),
-//                    Text(
-//                      "Procesando...",
-//                      style: Theme.of(context).textTheme.titleLarge,
-//                    ),
-//                  ],
-//                ),
+          //                child: Row(
+          //                  mainAxisAlignment: MainAxisAlignment.center,
+          //                  children: [
+          //                    CircularProgressIndicator(
+          //                      valueColor: ColorTween(begin: Theme.of(context).primaryColor, end: Theme.of(context).primaryColor).animate(kAlwaysDismissedAnimation),
+          //                    ),
+          //                    SizedBox(width: 16,),
+          //                    Text(
+          //                      "Procesando...",
+          //                      style: Theme.of(context).textTheme.titleLarge,
+          //                    ),
+          //                  ],
+          //                ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               LinearProgressIndicator(
-                valueColor: ColorTween(
-                  begin: Theme.of(context).primaryColor,
-                  end: Theme.of(context).primaryColor,
-                ).animate(kAlwaysDismissedAnimation) as Animation<Color>,
+                valueColor:
+                    ColorTween(
+                          begin: Theme.of(context).primaryColor,
+                          end: Theme.of(context).primaryColor,
+                        ).animate(kAlwaysDismissedAnimation)
+                        as Animation<Color>,
               ),
               Expanded(
                 child: Text(

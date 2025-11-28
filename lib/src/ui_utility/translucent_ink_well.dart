@@ -591,8 +591,13 @@ class _InkResponseTranslucentStateWidget extends StatefulWidget {
     ];
     properties.add(IterableProperty<String>('gestures', gestures, ifEmpty: '<none>'));
     properties.add(DiagnosticsProperty<MouseCursor>('mouseCursor', mouseCursor));
-    properties.add(DiagnosticsProperty<bool>('containedInkWellTranslucent', containedInkWellTranslucent,
-        level: DiagnosticLevel.fine));
+    properties.add(
+      DiagnosticsProperty<bool>(
+        'containedInkWellTranslucent',
+        containedInkWellTranslucent,
+        level: DiagnosticLevel.fine,
+      ),
+    );
     properties.add(
       DiagnosticsProperty<BoxShape>(
         'highlightShape',
@@ -845,8 +850,9 @@ class _InkResponseTranslucentState extends State<_InkResponseTranslucentStateWid
     final Offset position = referenceBox.globalToLocal(globalPosition);
     final Color color =
         widget.overlayColor?.resolve(statesController.value) ?? widget.splashColor ?? Theme.of(context).splashColor;
-    final RectCallback? rectCallback =
-        widget.containedInkWellTranslucent ? widget.getRectCallback!(referenceBox) : null;
+    final RectCallback? rectCallback = widget.containedInkWellTranslucent
+        ? widget.getRectCallback!(referenceBox)
+        : null;
     final BorderRadius? borderRadius = widget.borderRadius;
     final ShapeBorder? customBorder = widget.customBorder;
 
@@ -1290,8 +1296,8 @@ class InkWellTranslucent extends InkResponseTranslucent {
     super.autofocus,
     super.statesController,
   }) : super(
-          containedInkWellTranslucent: true,
-          highlightShape: BoxShape.rectangle,
-          enableFeedback: enableFeedback ?? true,
-        );
+         containedInkWellTranslucent: true,
+         highlightShape: BoxShape.rectangle,
+         enableFeedback: enableFeedback ?? true,
+       );
 }

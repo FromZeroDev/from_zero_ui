@@ -25,15 +25,15 @@ class SimpleShadowPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-//    canvas.drawPath(
-//      Path()
-//        ..addRect(Rect.fromPoints(Offset(-15, -15), Offset(size.width+15, size.height+15)))
-//        ..addOval(Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)))
-//        ..fillType = PathFillType.evenOdd,
-//      Paint()
-//        ..color = color.withValues(alpha: shadowOpacity)
-//        ..maskFilter = MaskFilter.blur(BlurStyle.normal, convertRadiusToSigma(3)),
-//    );
+    //    canvas.drawPath(
+    //      Path()
+    //        ..addRect(Rect.fromPoints(Offset(-15, -15), Offset(size.width+15, size.height+15)))
+    //        ..addOval(Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)))
+    //        ..fillType = PathFillType.evenOdd,
+    //      Paint()
+    //        ..color = color.withValues(alpha: shadowOpacity)
+    //        ..maskFilter = MaskFilter.blur(BlurStyle.normal, convertRadiusToSigma(3)),
+    //    );
 
     canvas.clipRect(
       Rect.fromPoints(
@@ -47,8 +47,9 @@ class SimpleShadowPainter extends CustomPainter {
         ),
       ),
     );
-    double spread =
-        direction == down || direction == up ? size.height * spreadPercentage : size.width * spreadPercentage;
+    double spread = direction == down || direction == up
+        ? size.height * spreadPercentage
+        : size.width * spreadPercentage;
     canvas.drawPath(
       Path()
         ..addRect(
@@ -69,15 +70,15 @@ class SimpleShadowPainter extends CustomPainter {
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, convertRadiusToSigma(spread)),
     );
 
-//    canvas.drawShadow(
-//      Path()
-//        ..addRect(Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)))
-////        ..addOval(Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)))
-//        ..fillType = PathFillType.evenOdd,
-//      color.withValues(alpha: shadowOpacity),
-//      elevation,
-//      true,
-//    );
+    //    canvas.drawShadow(
+    //      Path()
+    //        ..addRect(Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)))
+    ////        ..addOval(Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)))
+    //        ..fillType = PathFillType.evenOdd,
+    //      color.withValues(alpha: shadowOpacity),
+    //      elevation,
+    //      true,
+    //    );
   }
 
   static double convertRadiusToSigma(double radius) {

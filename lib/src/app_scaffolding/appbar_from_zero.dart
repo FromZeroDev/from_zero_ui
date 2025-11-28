@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
 class AppbarFromZero extends StatefulWidget {
-//  final Widget leading;
+  //  final Widget leading;
   final Widget title;
   final List<Widget> actions;
   final PreferredSizeWidget? bottom;
@@ -52,7 +52,7 @@ class AppbarFromZero extends StatefulWidget {
   final double actionPadding;
 
   AppbarFromZero({
-//    this.leading,
+    //    this.leading,
     this.title = const SizedBox.shrink(),
     List<Widget>? actions,
     this.useFlutterAppbar = true,
@@ -133,7 +133,11 @@ class AppbarFromZeroState extends State<AppbarFromZero> {
           return false;
         }
       },
-      child: widget.constraints != null || widget.actions.isEmpty // assumes LayoutBuilder is needed only for actions
+      child:
+          widget.constraints != null ||
+              widget
+                  .actions
+                  .isEmpty // assumes LayoutBuilder is needed only for actions
           ? _buildWithConstraints(context, widget.constraints)
           : LayoutBuilder(
               builder: _buildWithConstraints,
@@ -161,9 +165,10 @@ class AppbarFromZeroState extends State<AppbarFromZero> {
     final double titleBarHeight = !showWindowButtons
         ? 0
         : appWindow.isMaximized
-            ? appWindow.titleBarHeight * 0.66
-            : appWindow.titleBarHeight;
-    double? toolbarHeight = widget.toolbarHeight ??
+        ? appWindow.titleBarHeight * 0.66
+        : appWindow.titleBarHeight;
+    double? toolbarHeight =
+        widget.toolbarHeight ??
         (widget.useFlutterAppbar
             ? (AppBarTheme.of(context).toolbarHeight ?? 56) - 8 + (showWindowButtons ? titleBarHeight : 0)
             : null);
@@ -171,10 +176,10 @@ class AppbarFromZeroState extends State<AppbarFromZero> {
     final actionsColor = widget.backgroundColor == null
         ? null
         : widget.backgroundColor!.opacity < 0.3
-            ? Theme.of(context).textTheme.bodyLarge!.color
-            : ThemeData.estimateBrightnessForColor(widget.backgroundColor!) == Brightness.light
-                ? Colors.black
-                : Colors.white;
+        ? Theme.of(context).textTheme.bodyLarge!.color
+        : ThemeData.estimateBrightnessForColor(widget.backgroundColor!) == Brightness.light
+        ? Colors.black
+        : Colors.white;
     List<ActionFromZero> overflows = [];
     List<ActionFromZero> contextMenuActions = [];
     List<Widget> expanded = [];
@@ -395,9 +400,20 @@ class AppbarFromZeroState extends State<AppbarFromZero> {
         // title: titleContent,
         // actions: [actionsContent],
         // flexibleSpace: expandedContent,
-        title: Padding(padding: EdgeInsets.only(top: widget.topSafePadding), child: titleContent),
-        actions: [Padding(padding: EdgeInsets.only(top: widget.topSafePadding), child: actionsContent)],
-        flexibleSpace: Padding(padding: EdgeInsets.only(top: widget.topSafePadding), child: expandedContent),
+        title: Padding(
+          padding: EdgeInsets.only(top: widget.topSafePadding),
+          child: titleContent,
+        ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(top: widget.topSafePadding),
+            child: actionsContent,
+          ),
+        ],
+        flexibleSpace: Padding(
+          padding: EdgeInsets.only(top: widget.topSafePadding),
+          child: expandedContent,
+        ),
         automaticallyImplyLeading: false,
         bottom: widget.bottom,
         elevation: widget.elevation,

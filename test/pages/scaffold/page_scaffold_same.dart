@@ -17,9 +17,10 @@ class PageScaffoldInnerState extends State<PageScaffoldSame> {
       title: const Text("Inner Page"),
       body: const Center(
         child: Card(
-            child: FlutterLogo(
-          size: 512,
-        )),
+          child: FlutterLogo(
+            size: 512,
+          ),
+        ),
       ),
       drawerContentBuilder: (context, compact) => DrawerMenuFromZero(
         tabs: ResponsiveDrawerMenuItem.fromGoRoutes(routes: mainRoutes),

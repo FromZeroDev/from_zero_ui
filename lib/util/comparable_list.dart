@@ -32,7 +32,8 @@ class ComparableList<T extends Comparable> extends ComparableListBase<T> {
     bool deepCopy = false,
   }) {
     return ComparableList<T>(
-      list: list ??
+      list:
+          list ??
           (!deepCopy
               ? List.from(this.list)
               : this.list.map((dynamic e) {
