@@ -6,7 +6,7 @@ publish_to: 'none'
 version: 0.1.0
 
 environment:
-  sdk: "^3.5.0"
+  sdk: "^3.9.0"
 
 
 dependencies:
@@ -80,9 +80,10 @@ dependencies:
       url: https://github.com/ross96D/date
       ref: 6a1a8b7cdb09
   mlog:
+    version: ^1.0.1
     git:
       url: https://github.com/ross96D/mlog
-      ref: cfaa25769cc81583e0b3c538bcb3450dac2d6044
+      tag_pattern: "{{version}}"
 
 
 dev_dependencies:

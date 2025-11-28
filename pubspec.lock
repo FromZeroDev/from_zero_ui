@@ -518,11 +518,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: cfaa25769cc81583e0b3c538bcb3450dac2d6044
-      resolved-ref: cfaa25769cc81583e0b3c538bcb3450dac2d6044
+      resolved-ref: "8323a2e4cd5bd758fbc595885534cbbecc601fb8"
+      tag-pattern: "{{version}}"
       url: "https://github.com/ross96D/mlog"
     source: git
-    version: "1.0.0"
+    version: "1.0.1"
   multi_value_listenable_builder:
     dependency: "direct main"
     description:
