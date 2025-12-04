@@ -226,7 +226,7 @@ class DrawerMenuFromZero extends ConsumerStatefulWidget {
   DrawerMenuFromZero({
     required this.tabs,
     this.parentTabs,
-    @deprecated this.selected = -1,
+    this.selected = -1,
     this.compact = false,
     this.pushType = go,
     this.useGoRouter = true,
@@ -999,10 +999,10 @@ class DrawerMenuButtonFromZeroState extends State<DrawerMenuButtonFromZero> {
     final theme = Theme.of(context);
     final selectedColor = !widget.selected
         ? Colors.transparent
-        : Color.lerp((widget.selectedColor ?? theme.indicatorColor), theme.cardColor, 0.77);
+        : Color.lerp((widget.selectedColor ?? theme.tabBarTheme.indicatorColor), theme.cardColor, 0.77);
     final selectedTextColor = !widget.selected
         ? Colors.transparent
-        : widget.selectedColor ?? Color.lerp(theme.textTheme.bodyLarge!.color, theme.indicatorColor, 0.7)!;
+        : widget.selectedColor ?? Color.lerp(theme.textTheme.bodyLarge!.color, theme.tabBarTheme.indicatorColor, 0.7)!;
     final dense = widget.dense && !widget.selected;
     return Material(
       type: MaterialType.transparency,
