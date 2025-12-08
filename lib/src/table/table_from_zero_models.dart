@@ -119,6 +119,8 @@ abstract class RowModel<T> {
 
 ///The widget assumes columns will be constant, so bugs may happen when changing columns
 abstract class ColModel<T> {
+  const ColModel();
+
   String get name;
   String? get compactName;
   String? get tooltip;
@@ -423,48 +425,49 @@ class SimpleRowModel<T> extends RowModel<T> {
 
 class SimpleColModel<T> extends ColModel<T> {
   @override
-  String name;
+  final String name;
   @override
-  String? compactName;
+  final String? compactName;
   @override
-  String? tooltip;
+  final String? tooltip;
   @override
-  Color? backgroundColor;
+  final Color? backgroundColor;
   @override
-  TextStyle? textStyle;
+  final TextStyle? textStyle;
   @override
-  TextAlign? alignment;
+  final TextAlign? alignment;
   @override
-  int? flex;
+  final int? flex;
   @override
-  double? width;
+  final double? width;
   @override
-  ValueChanged<int>? onHeaderTap;
+  final ValueChanged<int>? onHeaderTap;
   @override
-  ValueChanged<int>? onHeaderDoubleTap;
+  final ValueChanged<int>? onHeaderDoubleTap;
   @override
-  ValueChanged<int>? onHeaderLongPress;
+  final ValueChanged<int>? onHeaderLongPress;
   @override
-  OnHeaderHoverCallback? onHeaderHover;
+  final OnHeaderHoverCallback? onHeaderHover;
   @override
-  bool? defaultSortAscending;
+  final bool? defaultSortAscending;
   @override
-  bool? sortEnabled;
+  final bool? sortEnabled;
   @override
-  bool? filterEnabled;
+  final bool? filterEnabled;
   @override
-  bool Function(RowModel<T> row)? rowCountSelector;
+  final bool Function(RowModel<T> row)? rowCountSelector;
   @override
-  ShowFilterPopupCallback? showFilterPopupCallback;
+  final ShowFilterPopupCallback? showFilterPopupCallback;
   @override
-  Iterable<dynamic>? possibleValues;
+  final Iterable<dynamic>? possibleValues;
   @override
-  Map<Object?, bool>? initialValueFilters;
+  final Map<Object?, bool>? initialValueFilters;
   @override
-  bool? initialValueFiltersExcludeAllElse;
+  final bool? initialValueFiltersExcludeAllElse;
   @override
-  bool initiallyHidden;
-  SimpleColModel({
+  final bool initiallyHidden;
+
+  const SimpleColModel({
     required this.name,
     this.compactName,
     this.tooltip,
@@ -537,10 +540,10 @@ class SimpleColModel<T> extends ColModel<T> {
 }
 
 class NumColModel<T> extends SimpleColModel<T> {
-  NumberFormat? formatter;
-  bool metadataShowSum;
-  bool metadataShowAverage;
-  NumColModel({
+  final NumberFormat? formatter;
+  final bool metadataShowSum;
+  final bool metadataShowAverage;
+  const NumColModel({
     required super.name,
     super.compactName,
     super.tooltip,

@@ -3526,13 +3526,15 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         propsShownOnTable[key] = value;
       }
     });
+    // TODO: 1 this is awful: it's inefficient and assumes usage of SimpleColModel
+    // just implement a param in TableFromzero for filterable and sortable that overrides all columns
     final columns = propsShownOnTable.map((key, value) {
-      final SimpleColModel result = value.getColModel();
+      SimpleColModel result = value.getColModel();
       if (listField.tableFilterable != null) {
-        result.filterEnabled = listField.tableFilterable;
+        result = result.copyWith(filterEnabled: listField.tableFilterable);
       }
       if (listField.tableSortable != null) {
-        result.sortEnabled = listField.tableSortable;
+        result = result.copyWith(sortEnabled: listField.tableSortable);
       }
       return MapEntry(key, result);
     });
