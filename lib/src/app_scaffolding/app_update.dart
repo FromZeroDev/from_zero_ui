@@ -7,12 +7,12 @@ import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_installer/flutter_app_installer.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:mlog/mlog.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:r_upgrade/r_upgrade.dart';
 
 class UpdateFromZero {
   int currentVersion;
@@ -267,8 +267,9 @@ class UpdateFromZero {
           if (await requestDefaultFilePermission(lgType: FzLgType.appUpdate)) {
             // this requires adding the following permission to manifest, which causes problems with google play upload
             // <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"></uses-permission>
-            RUpgrade.installByPath(downloadPath);
-            await Future<void>.delayed(const Duration(seconds: 1));
+            await FlutterAppInstaller().installApk(
+              filePath: downloadPath,
+            );
             // FromZeroAppContentWrapper.exitApp(0);
           } else {
             log(LgLvl.warning, 'Permission to install apk deinied on android...', type: FzLgType.appUpdate);

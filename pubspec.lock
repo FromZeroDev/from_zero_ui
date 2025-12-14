@@ -328,6 +328,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_app_installer:
+    dependency: "direct main"
+    description:
+      name: flutter_app_installer
+      sha256: "9672fc142a840b1cd86f621e4cc43a6beecb91d1469cf6bb00bbae7fe0b436fd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   flutter_font_icons:
     dependency: "direct main"
     description:
@@ -518,8 +526,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
+      ref: HEAD
       resolved-ref: "8323a2e4cd5bd758fbc595885534cbbecc601fb8"
-      tag-pattern: "{{version}}"
       url: "https://github.com/ross96D/mlog"
     source: git
     version: "1.0.1"
@@ -740,14 +748,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
-  r_upgrade:
-    dependency: "direct main"
-    description:
-      name: r_upgrade
-      sha256: "14337dd29cf67265ec86e1d518212cb6b6eafe9167fd366b050ccb1656461c55"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.2"
   rational:
     dependency: transitive
     description:

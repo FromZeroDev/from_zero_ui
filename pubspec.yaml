@@ -57,7 +57,7 @@ dependencies:
   bitsdojo_window: ^0.1.6 # ideally, we would do all window-related stuff with window_manager, and remove this dependency, but it's not worth the effort
   window_manager: ^0.4.3
   pasteboard: ^0.4.0
-  r_upgrade: ^0.4.2 # used to programatically install de apk file in Android
+  flutter_app_installer: ^1.0.1
 
   # * Specific Utility
   dio: ^5.8.0+1
