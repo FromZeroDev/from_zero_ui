@@ -10,7 +10,7 @@ import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:humanizer/humanizer.dart';
 import 'package:intl/intl.dart';
 import 'package:mlog/mlog.dart';
-import 'package:open_file_plus/open_file_plus.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
@@ -391,7 +391,7 @@ Future<bool> saveFileFromZero({
 
 Future<void> openFile(File file) async {
   if (Platform.isAndroid) {
-    await OpenFile.open(file.absolute.path);
+    await OpenFilex.open(file.absolute.path);
   } else {
     await launch(file.absolute.path);
   }
@@ -399,7 +399,7 @@ Future<void> openFile(File file) async {
 
 Future<void> openFolder(File file) async {
   if (Platform.isAndroid) {
-    await OpenFile.open(file.parent.absolute.path);
+    await OpenFilex.open(file.parent.absolute.path);
   } else if (Platform.isWindows) {
     await Process.run('explorer.exe /select,"${file.absolute.path.replaceAll('/', r'\')}"', []);
   } else {
