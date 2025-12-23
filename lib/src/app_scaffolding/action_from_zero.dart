@@ -690,7 +690,7 @@ class APIActionFromZero<T> extends ActionFromZero {
             );
           },
           errorBuilder: (context, error, stackTrace, onRetry) {
-            // TODO 1 this error will be completely buried
+            // TODO: 1 this error will be completely buried
             onTap = null;
             return ActionFromZero.defaultButtonBuilder(
               context: context,
@@ -758,7 +758,7 @@ class APIActionFromZero<T> extends ActionFromZero {
             );
           },
           errorBuilder: (context, error, stackTrace, onRetry) {
-            // TODO 1 this error will be completely buried
+            // TODO: 1 this error will be completely buried
             onTap = null;
             return ActionFromZero.defaultOverflowBuilder(
               context: context,

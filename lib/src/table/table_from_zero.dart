@@ -194,7 +194,7 @@ class TableFromZero<T> extends ConsumerStatefulWidget {
     mirror.currentColumnKeys = mirror.columnKeys!.where((e) {
       return relevantColumns!.containsKey(e) ? relevantColumns[e]! : mirror.currentColumnKeys!.contains(e);
     }).toList();
-    mirror.filter(); // TODO 2 PERFORMANCE do we need to re-filter?
+    mirror.filter(); // PERF: 2 do we need to re-filter?
   }
 
   static Map<dynamic, bool> _getRelevantColumns(TableController controller) {
@@ -593,7 +593,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
                 key,
                 _sanitizeValueForIsolate(
                   key,
-                  value, // TODO 2 performance, maybe allow to manually disable sanitization
+                  value, // PERF: 2, maybe allow to manually disable sanitization, when we're sure it's not needed
                   fieldAliases: fieldAliases[key]!,
                   daoAliases: daoAliases[key]!,
                 ),
@@ -920,7 +920,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
 
       // }  else {
       //
-      //   TODO 3 re-implement implicit animation with animated_list_plus
+      //   TODO: 3 re-implement implicit animation with animated_list_plus
       //   result = SliverImplicitlyAnimatedList<RowModel<T>>(
       //     items: allFiltered.isEmpty ? [] : allFiltered,
       //     areItemsTheSame: (a, b) => a==b,
@@ -2054,7 +2054,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
     List<ActionFromZero> colActions = [
       if (col?.sortEnabled ?? true)
         ActionFromZero(
-          title: 'Ordenar Ascendente', // TODO 3 internationalize
+          title: 'Ordenar Ascendente', // TODO: 3 internationalize
           icon: const Icon(MaterialCommunityIcons.sort_ascending),
           onTap: (context) {
             if (sortedColumn != colKey || !sortedAscending) {
@@ -2068,7 +2068,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
         ),
       if (col?.sortEnabled ?? true)
         ActionFromZero(
-          title: 'Ordenar Descendente', // TODO 3 internationalize
+          title: 'Ordenar Descendente', // TODO: 3 internationalize
           icon: const Icon(MaterialCommunityIcons.sort_descending),
           onTap: (context) {
             if (sortedColumn != colKey || sortedAscending) {
@@ -2082,7 +2082,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
         ),
       if (currentColumnKeys != null && widget.allowCustomization)
         ActionFromZero(
-          title: 'Esconder Columna', // TODO 3 internationalize
+          title: 'Esconder Columna', // TODO: 3 internationalize
           icon: const Icon(Icons.visibility_off),
           onTap: (context) {
             setState(() {
@@ -2320,7 +2320,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
       if (clearFiltersAction != null) clearFiltersAction,
       if (controller.currentColumnKeys != null && controller.columns != null)
         ActionFromZero(
-          title: 'Personalizar Tabla...', // TODO 3 internationalize
+          title: 'Personalizar Tabla...', // TODO: 3 internationalize
           icon: const Icon(Icons.settings),
           breakpoints: {0: ActionState.popup},
           onTap: (context) => controller.currentState!._showManageTablePopup(controller),
@@ -2347,7 +2347,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
   }) {
     final theme = Theme.of(context);
     return ActionFromZero(
-      title: 'Filtros...', // TODO 3 internationalize
+      title: 'Filtros...', // TODO: 3 internationalize
       icon: SelectableIcon(
         selected: controller.currentState?.filtersApplied[colKey] ?? false,
         icon: MaterialCommunityIcons.filter_outline,
@@ -2379,7 +2379,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
     if (skipConditions ||
         (controller.columns != null && controller.columns!.any((key, value) => (value.filterEnabled ?? true)))) {
       return ActionFromZero(
-        title: 'Limpiar todos los Filtros', // TODO 3 internationalize
+        title: 'Limpiar todos los Filtros', // TODO: 3 internationalize
         icon: const Icon(MaterialCommunityIcons.filter_remove),
         breakpoints: {0: ActionState.popup},
         onTap: !controller.currentState!.filtersApplied.any((k, v) => v)
@@ -2482,7 +2482,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
           }
         }
         if (updateHasExpandableRows) {
-          // if (forceChildrenAsSame) { // TODO 3 PERFORMANCE, deep iteration could be avoided since we know all children are the same, by _setAllChildrenHasExpandableRows on them reccursively and then trusting the parent when recalculating
+          // if (forceChildrenAsSame) { // PERF: 3, deep iteration could be avoided since we know all children are the same, by _setAllChildrenHasExpandableRows on them reccursively and then trusting the parent when recalculating
           // }
           int i = index;
           while (allFiltered[i].depth > 0) {

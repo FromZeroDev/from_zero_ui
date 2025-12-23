@@ -37,7 +37,7 @@ Future<bool> saveFileFromZero({
   bool? autoOpenOnFinish,
   bool showSnackBars = true,
   bool showDownloadSnackBar = true,
-  bool showResultSnackBar = true, // TODO 3 implement output pickers in not web (optional)
+  bool showResultSnackBar = true, // TODO: 3 implement output pickers in not web (optional)
   String? successTitle,
   String? successMessage,
   bool isHostContext = false,
@@ -280,7 +280,7 @@ Future<bool> saveFileFromZero({
             ),
           if (Platform.isWindows && multipleDownloads == null)
             SnackBarAction(
-              label: 'COPIAR', // TODO 3 internationalize
+              label: 'COPIAR', // TODO: 3 internationalize
               onPressed: () async {
                 await Process.run(
                   'cmd',

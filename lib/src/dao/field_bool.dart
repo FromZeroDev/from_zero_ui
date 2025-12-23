@@ -13,7 +13,7 @@ class BoolComparable implements Comparable<dynamic> {
   const BoolComparable(this.value);
 
   @override
-  String toString() => value ? 'SÍ' : 'NO'; // TODO 3 internationalize
+  String toString() => value ? 'SÍ' : 'NO'; // TODO: 3 internationalize
 
   @override
   bool operator ==(Object other) => other is BoolComparable && value == other.value;
@@ -743,7 +743,7 @@ class BoolField extends Field<BoolComparable> {
               showDropdownIcon: true,
             );
           case BoolFieldDisplayType.radio:
-            result = const Text('Unimplemented type'); // TODO 3 implement radio BoolField, maybe also radio ComboField
+            result = const Text('Unimplemented type'); // TODO: 3 implement radio BoolField, maybe also radio ComboField
         }
         result = TooltipFromZero(
           message: validationErrors.where((e) => dense || e.severity == ValidationErrorSeverity.disabling).fold('', (
@@ -759,7 +759,7 @@ class BoolField extends Field<BoolComparable> {
           waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
           child: result,
         );
-        // TODO 3 implement actions in FieldBool
+        // TODO: 3 implement actions in FieldBool
         if (addCard) {
           result = Card(
             clipBehavior: Clip.hardEdge,

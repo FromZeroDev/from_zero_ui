@@ -27,7 +27,7 @@ enum FileAutoOpenType {
 }
 
 class Export extends StatefulWidget {
-  //TODO 3 internationalize
+  //TODO: 3 internationalize
 
   static const List<String> defaultSizesUI = [
     "Carta",
@@ -42,7 +42,7 @@ class Export extends StatefulWidget {
     PdfPageFormat(PdfPageFormat.a4.height * 9 / 16, PdfPageFormat.a4.height),
   ];
 
-  // TODO 2 this is god awful. Completely refactor this class if we intend on using it again, or scrap it and decouple TableController excel export from it (which is the only use it has now)
+  // TODO: 2 this is god awful. Completely refactor this class if we intend on using it again, or scrap it and decouple TableController excel export from it (which is the only use it has now)
   int Function(int currentSize, bool portrait, double scale, String format)? childrenCount;
   final Widget Function(BuildContext context, int index, int currentSize, bool portrait, double scale, String format)?
   childBuilder;
@@ -830,7 +830,7 @@ class ExportState extends State<Export> {
                                 key: ValueKey(value),
                                 controller: textEditingControllers[value],
                                 decoration: InputDecoration(
-                                  labelText: "Título", // TODO 3 internationalize
+                                  labelText: "Título", // TODO: 3 internationalize
                                   labelStyle: TextStyle(
                                     color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75),
                                   ),
@@ -1159,7 +1159,7 @@ class _PageWrapper extends StatelessWidget {
                     key: globalKey,
                     child: MediaQuery(
                       data: mediaQuery.copyWith(
-                        disableAnimations: true, //TODO 3 this doesn't work for some reason
+                        disableAnimations: true, //TODO: 3 this doesn't work for some reason
                       ),
                       child: Theme(
                         data: themeData,

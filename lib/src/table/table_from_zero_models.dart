@@ -736,8 +736,8 @@ class BoolColModel<T> extends SimpleColModel<T> {
     super.filterEnabled,
     super.rowCountSelector,
     super.showFilterPopupCallback,
-    this.trueValue = 'SÍ', // TODO 3 internationalize
-    this.falseValue = 'NO', // TODO 3 internationalize
+    this.trueValue = 'SÍ', // TODO: 3 internationalize
+    this.falseValue = 'NO', // TODO: 3 internationalize
     super.defaultSortAscending = false,
     super.alignment = TextAlign.center,
     super.possibleValues,
@@ -997,7 +997,7 @@ class DateColModel<T> extends SimpleColModel<T> {
                 id: month,
                 values: {
                   colKey: ValueString(month, DateFormat("MMMM", "es").format(DateTime(year, month))),
-                }, // TODO 3 internationalize
+                }, // TODO: 3 internationalize
                 expanded: grouped[year]!.length == 1,
                 children: [
                   for (final date in grouped[year]![month]!)

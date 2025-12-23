@@ -77,7 +77,7 @@ class ValueStringNum<T extends num> extends ValueString<T> {
     : super(value ?? (0.0 as T), value == null ? '' : formatter.format(value));
 }
 
-// TODO 2 this still takes memory for an empty string, it could be implemented better
+// TODO: 2 this still takes memory for an empty string, it could be implemented better
 @deprecated
 class ValueStringLazy<T> extends ValueString<T> {
   String Function(T value) toStringFunction;

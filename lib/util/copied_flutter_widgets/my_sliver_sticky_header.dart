@@ -7,7 +7,7 @@ import 'package:value_layout_builder/value_layout_builder.dart';
 // this file is copied from flutter_sticky_header: ^0.6.5
 // ideally, we would always use sliver_tools and get rid of this
 
-// TODO 1 try to solve this with sliver_tools package and delete this hack
+// TODO: 1 try to solve this with sliver_tools package and delete this hack
 
 /// Signature used by [SliverStickyHeader.builder] to build the header
 /// when the sticky header state has changed.
@@ -649,8 +649,8 @@ class RenderSliverStickyHeader extends RenderSliver with RenderSliverHelpers {
       // second layout if scroll percentage changed and header is a
       // RenderStickyHeaderLayoutBuilder.
       if (header is RenderConstrainedLayoutBuilder<BoxValueConstraints<SliverStickyHeaderState>, RenderBox>) {
-        // TODO 2 the state headerScrollRatioClamped won't be correctly updated if the pin is due to external scrollController
-        // TODO 2 the state won't be correctly if footer==true
+        // TODO: 2 the state headerScrollRatioClamped won't be correctly updated if the pin is due to external scrollController
+        // TODO: 2 the state won't be correctly if footer==true
         double headerScrollRatioClamped = headerScrollRatio.clamp(0.0, 1.0);
 
         SliverStickyHeaderState state = SliverStickyHeaderState(headerScrollRatioClamped, _isPinned);
@@ -727,7 +727,7 @@ class RenderSliverStickyHeader extends RenderSliver with RenderSliverHelpers {
         temp = temp.parent!;
       } while (temp is! RenderAbstractViewport);
       var targetViewport = temp;
-      // TODO 2 this will only work if the external scrollable is the second wrapping the item, need to validate other cases, such as: the scrollController is the first scrollable (do nothing), the scrollController is third or more (continue iterating until finding it)
+      // TODO: 2 this will only work if the external scrollable is the second wrapping the item, need to validate other cases, such as: the scrollController is the first scrollable (do nothing), the scrollController is third or more (continue iterating until finding it)
 
       final offsetToReveal = targetViewport
           .getOffsetToReveal(previousViewport.parent!, footer ? 1 : 0)

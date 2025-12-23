@@ -11,7 +11,7 @@ class DateField extends Field<DateTime> {
   final DateTimePickerType type;
 
   static final defaultFormatter = DateFormat(DateFormat.YEAR_MONTH_DAY);
-  static final defaultDenseFormatter = DateFormat("dd/MM/yyyy"); // TODO 3 internationalize
+  static final defaultDenseFormatter = DateFormat("dd/MM/yyyy"); // TODO: 3 internationalize
   static final defaultTimeFormatter = DateFormat("H:mm");
   static final defaultFirstDate = DateTime(1900);
   static final defaultLastDate = DateTime(2200);

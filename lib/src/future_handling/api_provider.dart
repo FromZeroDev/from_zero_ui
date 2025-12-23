@@ -422,7 +422,7 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
   static String Function(BuildContext context, Object? error, StackTrace? stackTrace) getErrorTitle =
       defaultGetErrorTitle;
   static String defaultGetErrorTitle(BuildContext context, Object? error, StackTrace? stackTrace) {
-    // TODO 3 internationalize
+    // TODO: 3 internationalize
     if (error is DioException) {
       if (error.response != null) {
         if (error.response!.statusCode == 403) {
@@ -444,7 +444,7 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
   static String? Function(BuildContext context, Object? error, StackTrace? stackTrace) getErrorSubtitle =
       defaultGetErrorSubtitle;
   static String? defaultGetErrorSubtitle(BuildContext context, Object? error, StackTrace? stackTrace) {
-    // TODO 3 internationalize
+    // TODO: 3 internationalize
     if (error is DioException) {
       if (error.response != null) {
         if (error.response!.statusCode == 403) {
@@ -513,7 +513,7 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
   ]) {
     Widget result = DialogButton.cancel(
       leading: const Icon(Icons.info_outlined),
-      child: const Text('Detalles del Error'), // TODO 3 internationalize
+      child: const Text('Detalles del Error'), // TODO: 3 internationalize
       onPressed: () => showErrorDetailsDialog(context, error, stackTrace),
     );
     if (onRetry != null) {
@@ -544,7 +544,7 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
           content: SelectableText("$error\r\n\r\n$stackTrace}"),
           dialogActions: const [
             DialogButton.cancel(
-              child: Text('CERRAR'), // TODO 3 internationalize
+              child: Text('CERRAR'), // TODO: 3 internationalize
             ),
           ],
         );

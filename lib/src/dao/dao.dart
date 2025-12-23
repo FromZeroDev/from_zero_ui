@@ -35,7 +35,7 @@ enum DoubleColumnLayoutType {
 
 class DAO<ModelType> extends ChangeNotifier implements Comparable {
   static bool ignoreBlockingErrors = false; // VERY careful with this
-  covariant dynamic id; // TODO 3 id type should be declared as <>
+  covariant dynamic id; // TODO: 3 id type should be declared as <>
   late DAOValueGetter<String, ModelType> classUiNameGetter;
   String get classUiName => classUiNameGetter(this);
   DAOValueGetter<String, ModelType>? classUiNamePluralGetter;
@@ -555,7 +555,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                           height: 18,
                         ),
                         Text(
-                          'Validando Datos...', // TODO 3 internationalize
+                          'Validando Datos...', // TODO: 3 internationalize
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         Expanded(
@@ -607,7 +607,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                     ? true
                     : validation && validationErrors.firstOrNullWhere((e) => e.isBlocking) == null;
                 if (!showConfirmDialogWithBlockingErrors && !validation) {
-                  // TODO 3 implement a parameter for always allowing to save, even on error
+                  // TODO: 3 implement a parameter for always allowing to save, even on error
                   Navigator.of(context).pop(null);
                 }
                 if (!askForSaveConfirmation &&
@@ -629,7 +629,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                     validation
                         ? (saveConfirmationDialogTitle?.call(this) ??
                               FromZeroLocalizations.of(context).translate("confirm_save_title"))
-                        : 'Error de Validación', // TODO 3 internationalize
+                        : 'Error de Validación', // TODO: 3 internationalize
                   ),
                   content: AnimatedBuilder(
                     animation: this,
@@ -646,7 +646,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                                       ))
                                 : const Text(
                                     'Debe resolver los siguientes errores de validación:',
-                                  ), // TODO 3 internationalize
+                                  ), // TODO: 3 internationalize
                             SaveConfirmationValidationMessage(allErrors: validationErrors),
                           ],
                         ),
@@ -686,7 +686,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                             Widget result = DialogButton.accept(
                               tooltip: validation
                                   ? null
-                                  : 'No se puede guardar hasta resolver los errores de validación', // TODO 3 internationalize
+                                  : 'No se puede guardar hasta resolver los errores de validación', // TODO: 3 internationalize
                               onPressed: callback,
                               child: Text(
                                 (saveButtonTitle?.call(this).toUpperCase() ??
@@ -1026,7 +1026,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                 bool asPrimary = !widescreen || e.primary;
                 final name = doubleColumnLayoutType == DoubleColumnLayoutType.tabbed
                     ? e.name ?? 'Grupo $i'
-                    : 'Grupo 1'; // TODO 3 internationalize
+                    : 'Grupo 1'; // TODO: 3 internationalize
                 final scrollController = asPrimary ? primaryScrollController : ScrollController();
                 Widget groupWidget = buildGroupWidget(
                   context: context,
@@ -1159,7 +1159,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                                       appBar: Column(
                                         children: [
                                           if (secondaryFormWidgets.length > 1 ||
-                                              secondaryFormWidgets.keys.first != 'Grupo 1') // TODO 3 internationalize
+                                              secondaryFormWidgets.keys.first != 'Grupo 1') // TODO: 3 internationalize
                                             ExcludeFocus(
                                               child: ScrollbarFromZero(
                                                 controller: tabBarScrollController,
@@ -1178,7 +1178,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                                                         child: Builder(
                                                           builder: (context) {
                                                             return TabBar(
-                                                              // TODO 3 replace this with an actual widget: PageIndicatorFromzero. Allow to have an indicator + building children dinamically according to selected
+                                                              // TODO: 3 replace this with an actual widget: PageIndicatorFromzero. Allow to have an indicator + building children dinamically according to selected
                                                               isScrollable: false,
                                                               indicatorWeight: 3,
                                                               tabs: secondaryFormWidgets.keys.map((e) {

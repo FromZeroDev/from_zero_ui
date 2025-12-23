@@ -288,7 +288,7 @@ class AlwaysAttachedScrollController implements ScrollController {
   @override
   void attach(ScrollPosition position) {
     parent?.attach(position);
-    // TODO 1 on attach/detach, a ScrollMetricsNotification.empty should be dispatched to potentially notify the scrollbar that no positions are attached
+    // TODO: 1 on attach/detach, a ScrollMetricsNotification.empty should be dispatched to potentially notify the scrollbar that no positions are attached
   }
 
   @override
@@ -311,7 +311,7 @@ class AlwaysAttachedScrollController implements ScrollController {
   @override
   void detach(ScrollPosition position) {
     parent?.detach(position);
-    // TODO 1 on attach/detach, a ScrollMetricsNotification.empty should be dispatched to potentially notify the scrollbar that no positions are attached
+    // TODO: 1 on attach/detach, a ScrollMetricsNotification.empty should be dispatched to potentially notify the scrollbar that no positions are attached
   }
 
   @override

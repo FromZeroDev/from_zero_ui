@@ -12,7 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
-// TODO 2 break this up into individual files
+// TODO: 2 break this up into individual files
 
 class ResponsiveHorizontalInsetsSliver extends StatelessWidget {
   final Widget sliver;
@@ -1363,7 +1363,7 @@ class FlexibleLayoutFromZero extends StatelessWidget {
   Widget buildInternal(BuildContext context, double relevantAxisSize) {
     double minTotalSize = children.sumBy(
       (e) => e.minSize,
-    ); // TODO 3 these calculations should probably be done in a render object
+    ); // TODO: 3 these calculations should probably be done in a render object
     Map<int, FlexibleLayoutItemFromZero> expandableItems = {};
     Map<int, double> itemSizes = {};
     for (int i = 0; i < children.length; i++) {

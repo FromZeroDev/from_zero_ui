@@ -21,7 +21,7 @@ class StringField extends Field<String> {
   List<TextInputFormatter>? inputFormatters;
   bool obfuscate;
   bool trimOnSave;
-  bool showObfuscationToggleButton; // TODO 3 implement obfuscation toggle button
+  bool showObfuscationToggleButton; // TODO: 3 implement obfuscation toggle button
   Timer? valUpdateTimer;
 
   @override
@@ -587,7 +587,7 @@ class StringField extends Field<String> {
                 ? FloatingLabelBehavior.always
                 : FloatingLabelBehavior.auto,
             contentPadding: EdgeInsets.only(
-              // left: dense ? textAlign==TextAlign.right ? 8 : 0 : 16, // TODO 1 test in next flutter version if there is an assert thrown here when left=0
+              // left: dense ? textAlign==TextAlign.right ? 8 : 0 : 16, // TODO: 1 test in next flutter version if there is an assert thrown here when left=0
               left: dense ? 0 : 16,
               right: dense ? 0 : (16 + (context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40)),
               bottom: largeVertically

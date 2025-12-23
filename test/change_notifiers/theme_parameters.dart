@@ -24,7 +24,7 @@ class ThemeParameters extends ThemeParametersFromZero {
   List<ThemeData?> get themes => [
     null,
     ThemeData(
-      // TODO 3 make static const ThemeData definitions on settings, meant to be used with .copyWith
+      // TODO: 3 make static const ThemeData definitions on settings, meant to be used with .copyWith
       useMaterial3: true,
       canvasColor: Colors.grey.shade300,
       primaryColor: const Color.fromRGBO(0, 0, 100, 1),

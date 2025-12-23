@@ -378,7 +378,7 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
                 icon: Icon(
                   _isExpanded ? MaterialCommunityIcons.arrow_collapse_up : MaterialCommunityIcons.arrow_expand_down,
                 ),
-                title: _isExpanded ? 'Colapsar' : 'Expandir', // TODO 3 internationalize
+                title: _isExpanded ? 'Colapsar' : 'Expandir', // TODO: 3 internationalize
                 onTap: (context) {
                   setExpanded(!_isExpanded);
                 },
@@ -390,7 +390,7 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
                 icon: Icon(
                   expandChildren ? MaterialCommunityIcons.arrow_expand_down : MaterialCommunityIcons.arrow_collapse_up,
                 ),
-                title: expandChildren ? 'Expandir Descendientes' : 'Colapsar Descendientes', // TODO 3 internationalize
+                title: expandChildren ? 'Expandir Descendientes' : 'Colapsar Descendientes', // TODO: 3 internationalize
                 onTap: (context) {
                   bool expand = widget.childrenKeysForExpandCollapse!
                       .where((e) => !(e.currentState?.isExpanded ?? false))

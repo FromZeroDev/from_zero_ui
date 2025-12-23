@@ -52,7 +52,7 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
   static const List<double> sizes = [screenSizeSmall, screenSizeMedium, screenSizeLarge, screenSizeXLarge];
 
   final Duration drawerAnimationDuration = 300
-      .milliseconds; //TODO 3- allow customization of durations and curves of appbar and drawer animations (fix conflicts)
+      .milliseconds; //TODO: 3- allow customization of durations and curves of appbar and drawer animations (fix conflicts)
   final drawerAnimationCurve = Curves.easeOutCubic;
   final Duration appbarAnimationDuration = 300.milliseconds;
   final appbarAnimationCurve = Curves.easeOutCubic;
@@ -1435,9 +1435,9 @@ class AppbarChangeNotifier extends ChangeNotifier {
   final double safeAreaOffset;
   final double backgroundHeight;
   final AppbarType appbarType;
-  final double appbarScrollMultiplier = 0.5; //TODO 3 expose scroll appbar effect multipliers
+  final double appbarScrollMultiplier = 0.5; //TODO: 3 expose scroll appbar effect multipliers
   final double backgroundScrollMultiplier = 1.5;
-  final double unaffectedScrollLength; //TODO 3 expose this as well in Scaffold
+  final double unaffectedScrollLength; //TODO: 3 expose this as well in Scaffold
 
   AppbarChangeNotifier(
     this.appbarHeight,
@@ -1471,7 +1471,7 @@ class AppbarChangeNotifier extends ChangeNotifier {
   }
 
   double mainScrollPosition = 0;
-  int? lastScrollUpdateTime; //TODO 2 wait for the scroll gesture to end instead of the timer ? how
+  int? lastScrollUpdateTime; //TODO: 2 wait for the scroll gesture to end instead of the timer ? how
   void handleMainScrollerControllerCall(ScrollController scrollController) {
     if (appbarType == AppbarType.static) return;
     if (!scrollController.hasClients) return;

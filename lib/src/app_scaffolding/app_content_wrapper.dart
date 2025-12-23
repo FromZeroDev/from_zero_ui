@@ -939,7 +939,7 @@ class CloseConfirmDialog extends StatelessWidget {
     return DialogFromZero(
       title: Text(
         "¿Seguro que quiere cerrar ${FromZeroAppContentWrapper.appNameForCloseConfirmation ?? 'la aplicación'}?",
-      ), // TODO 3 internationalize
+      ), // TODO: 3 internationalize
       dialogActions: <Widget>[
         const DialogButton.cancel(),
         DialogButton(

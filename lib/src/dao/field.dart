@@ -643,7 +643,7 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
         AnimatedActionFromZero(
           animation: this,
           builder: () => ActionFromZero(
-            title: 'Deshacer', // TODO 3 internationalize
+            title: 'Deshacer', // TODO: 3 internationalize
             icon: const Icon(MaterialCommunityIcons.undo_variant),
             onTap: (context) {
               userInteracted = true;
@@ -658,7 +658,7 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
         AnimatedActionFromZero(
           animation: this,
           builder: () => ActionFromZero(
-            title: 'Rehacer', // TODO 3 internationalize
+            title: 'Rehacer', // TODO: 3 internationalize
             icon: const Icon(MaterialCommunityIcons.redo_variant),
             onTap: (context) {
               userInteracted = true;
@@ -673,7 +673,7 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
         AnimatedActionFromZero(
           animation: this,
           builder: () => ActionFromZero(
-            title: 'Limpiar', // TODO 3 internationalize
+            title: 'Limpiar', // TODO: 3 internationalize
             icon: const Icon(Icons.clear),
             onTap: (context) {
               userInteracted = true;

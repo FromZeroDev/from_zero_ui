@@ -120,7 +120,7 @@ abstract class TableFromZeroManagePopup {
                                                   return ActionFromZero(
                                                     title: visible
                                                         ? 'Ocultar Columna'
-                                                        : 'Mostrar Columna', // TODO 3 internationalize
+                                                        : 'Mostrar Columna', // TODO: 3 internationalize
                                                     icon: SelectableIcon(
                                                       selected: visible,
                                                       selectedIcon: Icons.visibility,

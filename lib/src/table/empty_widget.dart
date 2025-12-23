@@ -89,7 +89,7 @@ class TableEmptyWidget<T> extends StatelessWidget {
                               ),
                               Expanded(
                                 child: Text(
-                                  'Limpiar todos los Filtros', // TODO 3 internationalize
+                                  'Limpiar todos los Filtros', // TODO: 3 internationalize
                                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, height: 1.1),
                                 ),
                               ),

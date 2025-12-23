@@ -47,7 +47,7 @@ abstract class TableFromZeroFilterPopup {
     final relevantRows = controller.currentState!.getFilterResults(
       controller.currentState!.sorted,
       skipColKey: colKey, // skip filters on this column, filter out everything in other columns
-    ); // TODO 3 performance make getFilterResults async (either with an isolate or an artifitial throttle)
+    ); // PERF: 3 make getFilterResults async (either with an isolate or an artifitial throttle)
     TableFromZeroState.getAvailableFiltersForColumn(
       rowValues: relevantRows.allFiltered.map((e) => e.values),
       key: colKey,
@@ -55,7 +55,7 @@ abstract class TableFromZeroFilterPopup {
       // sort: true,
       sortAscending: col?.defaultSortAscending ?? true,
       possibleValues: col?.possibleValues,
-      // TODO 3 performance pass a state into that is unmounted when the filterView pops, so it can cancel calculations
+      // PERF: 3 pass a state into that is unmounted when the filterView pops, so it can cancel calculations
     ).then((result) {
       availableFilters.value = {
         colKey: result,
@@ -234,7 +234,7 @@ abstract class TableFromZeroFilterPopup {
                                 var message = ColModel.getRowValueString(row, colKey, col);
                                 var textStyle = const TextStyle(fontSize: 16);
                                 if (message.isBlank) {
-                                  message = '< vacío >'; // TODO 3 internacionalize
+                                  message = '< vacío >'; // TODO: 3 internacionalize
                                   textStyle = TextStyle(fontSize: 16, color: Theme.of(context).disabledColor);
                                 }
                                 const autoSizeTextMaxLines = 1;

@@ -108,7 +108,7 @@ class ThemeParametersFromZero extends ChangeNotifier {
     notifyListeners();
   }
 
-  //TODO 2 ??? implement UI scale
+  //TODO: 2 ??? implement UI scale
 }
 
 class FromZeroLocalizations {

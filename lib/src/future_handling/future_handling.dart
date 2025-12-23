@@ -493,7 +493,7 @@ class FutureBuilderFromZeroState<T> extends State<FutureBuilderFromZero<T>> {
   }
 }
 
-// TODO 3 move this to animations
+// TODO: 3 move this to animations
 class AnimatedContainerFromChildSize extends StatefulWidget {
   final Duration duration;
   final Curve curve;
@@ -612,7 +612,7 @@ class AnimatedContainerFromChildSizeState extends State<AnimatedContainerFromChi
           // if (previousSize != null){
           //   double previousHeight = max(previousSize!.height, constraints.minHeight);
           //   double previousWidth = max(previousSize!.width, constraints.minWidth);
-          //   durationMult = ((max((previousHeight-height).abs(), (previousWidth-width).abs()))/64).clamp(0.0, 1.0); TODO 3 make this work right when called multiple times in succesion by LayoutBuilder
+          //   durationMult = ((max((previousHeight-height).abs(), (previousWidth-width).abs()))/64).clamp(0.0, 1.0); TODO: 3 make this work right when called multiple times in succesion by LayoutBuilder
           // }
           int milliseconds = (DateTime.now().millisecondsSinceEpoch - initialTimestamp)
               .clamp(0, widget.duration.inMilliseconds * durationMult)

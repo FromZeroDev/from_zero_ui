@@ -102,7 +102,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   final bool? _showDefaultSnackBars;
   bool get showDefaultSnackBars => _showDefaultSnackBars ?? objectTemplate.canSave;
   ContextFulFieldValueGetter<List<RowAction<T>>, ListField<T, U>>?
-  extraRowActionsBuilder; //TODO 3 also allow global action builders
+  extraRowActionsBuilder; //TODO: 3 also allow global action builders
   bool showEditDialogOnAdd;
   bool showAddButtonAtEndOfTable;
   TableErrorWidgetBuilder<Widget, ListField<T, U>>? tableErrorWidget;
@@ -1336,7 +1336,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                   content: Text(
                     '${FromZeroLocalizations.of(context).translate('confirm_delete_desc')} ${elements.length} ${elements.length > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')}?',
                   ),
-                  // TODO 2 show more details about elements to be deleted
+                  // TODO: 2 show more details about elements to be deleted
                   dialogActions: [
                     const DialogButton.cancel(),
                     DialogButton(
@@ -1375,13 +1375,13 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   }
 
   static Future<void> maybeEditMultiple<T extends DAO>(BuildContext context, List<T> elements) async {
-    // TODO 3 test this well, rework it visually to be like maybeEdit
+    // TODO: 3 test this well, rework it visually to be like maybeEdit
 
     final T dao = elements.first.copyWith() as T;
     // change hints and clear all properties
     dao.beginUndoTransaction();
     dao.props.forEach((key, value) {
-      // TODO 3 should we remove validators / disable validation
+      // TODO: 3 should we remove validators / disable validation
       value.hintGetter = (_, __) => FromZeroLocalizations.of(context).translate('keep_value');
       value.dbValue = null;
       value.value = null;
@@ -1467,7 +1467,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                           slivers: dao.buildFormWidgets(
                             context,
                             showActionButtons: false,
-                          ), // TODO 3 why not use maybeEdit to show everything
+                          ), // TODO: 3 why not use maybeEdit to show everything
                         ),
                       ),
                     ),
@@ -1497,7 +1497,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                                               content: Text(
                                                 '${FromZeroLocalizations.of(context).translate('edit_multiple_confirm')} ${elements.length} ${elements.length > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')}?',
                                               ),
-                                              // TODO 3 show all details about each field about to change
+                                              // TODO: 3 show all details about each field about to change
                                               dialogActions: [
                                                 const DialogButton.cancel(),
                                                 DialogButton.accept(
@@ -1566,7 +1566,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
       return [result];
     }
     var displayType =
-        dense // TODO 2 maybe combo should also be allowed to build in dense if it has less than 2 elements
+        dense // TODO: 2 maybe combo should also be allowed to build in dense if it has less than 2 elements
         ? ListFieldDisplayType.popupButton
         : this.displayType;
 
@@ -1812,7 +1812,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                     ...buildWidgetsAsTable(
                       context,
                       addCard: false,
-                      asSliver: false, // TODO 3 performance build as slivers everything is supported in sliver form
+                      asSliver: false, // PERF: 3 build as slivers, everything is supported in sliver form
                       expandToFillContainer: false,
                       dense: false,
                       focusNode: FocusNode(),
@@ -1949,13 +1949,13 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                           controller: tabBarScrollController,
                           child: IntrinsicWidth(
                             child: TabBar(
-                              // TODO 3 replace this with an actual widget: PageIndicatorFromzero. Allow to have an indicator + building children dinamically according to selected
+                              // TODO: 3 replace this with an actual widget: PageIndicatorFromzero. Allow to have an indicator + building children dinamically according to selected
                               isScrollable: false,
                               indicatorWeight: 4,
                               tabs: objects.mapIndexed((i, e) {
                                 String name = e.toString();
                                 if (name.isBlank) {
-                                  name = 'Pág. ${i + 1}'; // TODO 3 internationalize
+                                  name = 'Pág. ${i + 1}'; // TODO: 3 internationalize
                                 }
                                 return ContextMenuFromZero(
                                   enabled: enabled,
@@ -2086,7 +2086,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                 final e = objects[page];
                 String name = e.toString();
                 if (name.isBlank) {
-                  name = 'Pág. ${page + 1}'; // TODO 3 internationalize
+                  name = 'Pág. ${page + 1}'; // TODO: 3 internationalize
                 }
                 Widget result = PageTransitionSwitcher(
                   duration: const Duration(milliseconds: 300),
@@ -2405,7 +2405,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
             AnimatedActionFromZero(
               animation: this,
               builder: () => ActionFromZero(
-                title: 'Limpiar', // TODO 3 internationalize
+                title: 'Limpiar', // TODO: 3 internationalize
                 icon: const Icon(Icons.clear),
                 onTap: (context) {
                   userInteracted = true;
@@ -3016,7 +3016,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
             );
           }
           if (allowAddNew) {
-            // TODO 3 figure out how to add this to sliver version
+            // TODO: 3 figure out how to add this to sliver version
             result = CallbackShortcuts(
               bindings: {
                 LogicalKeySet(LogicalKeyboardKey.shift, LogicalKeyboardKey.enter): () {
@@ -3383,7 +3383,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     objectTemplate ??= this.objectTemplate;
     final allowAddNew = this.allowAddNew;
     List<T> currentSelected = [];
-    // TODO 3 re-implement multiple edition, test well. Enabling this might break current uses of selection (when selecion is used for external purposes, like in PageSend EntidadContacto selection)
+    // TODO: 3 re-implement multiple edition, test well. Enabling this might break current uses of selection (when selecion is used for external purposes, like in PageSend EntidadContacto selection)
     // try {
     //   currentSelected = tableController.filtered.where((element) => selectedObjects.value[element]??selectionDefault).map((e) => e.id).toList();
     // } catch (_) {}
@@ -3463,7 +3463,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         AnimatedActionFromZero(
           animation: this,
           builder: () => ActionFromZero(
-            title: 'Deshacer', // TODO 3 internationalize
+            title: 'Deshacer', // TODO: 3 internationalize
             icon: const Icon(MaterialCommunityIcons.undo_variant),
             onTap: (context) {
               userInteracted = true;
@@ -3480,7 +3480,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         AnimatedActionFromZero(
           animation: this,
           builder: () => ActionFromZero(
-            title: 'Rehacer', // TODO 3 internationalize
+            title: 'Rehacer', // TODO: 3 internationalize
             icon: const Icon(MaterialCommunityIcons.redo_variant),
             onTap: (context) {
               userInteracted = true;
@@ -3499,7 +3499,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         ),
       if (availableObjectsPoolProvider != null)
         ActionFromZero(
-          title: 'Refrescar Datos', // TODO 3 internationalize
+          title: 'Refrescar Datos', // TODO: 3 internationalize
           icon: const Icon(
             Icons.refresh,
           ),

@@ -184,7 +184,7 @@ class ImageFromZeroState extends State<ImageFromZero> with TickerProviderStateMi
     if (widget.sourceType == ImageSourceType.assets) {
       // return Image.asset(widget.url);
       result = ExtendedImage.asset(
-        //TODO 3 why only this breaks on size change
+        //TODO: 3 why only this breaks on size change
         widget.url,
         fit: BoxFit.contain,
         enableSlideOutPage: true,

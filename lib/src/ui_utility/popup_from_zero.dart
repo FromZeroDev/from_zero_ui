@@ -17,7 +17,7 @@ Future<T?> showPopupFromZero<T>({
   Offset offsetCorrection = Offset.zero,
   Color? barrierColor,
   bool barrierDismissible = true,
-  // TODO 2 add an option to highlight the anchor (don't paint barrier over it), default true in ContextMenuFromZero
+  // TODO: 2 add an option to highlight the anchor (don't paint barrier over it), default true in ContextMenuFromZero
 }) async {
   return showDialog<T>(
     context: context,
@@ -81,7 +81,7 @@ class PopupFromZeroState extends State<PopupFromZero> {
   }
 
   void _checkChildSize(timeStamp) {
-    // TODO 1 performance hack to know when child changes size, since notifications don't work for some reason. Test the same method used in AnimatedFromChildSize, it could also work here
+    // PERF: 1 hack to know when child changes size, since notifications don't work for some reason. Test the same method used in AnimatedFromChildSize, it could also work here and make this faster
     if (!mounted) {
       return;
     }

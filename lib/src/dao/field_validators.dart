@@ -220,7 +220,7 @@ ValidationError? fieldValidatorListNotEmpty<T extends Comparable>(
           field: field,
           error:
               errorMessage ??
-              'At least one ${(field as ListField).objectTemplate.classUiName} required', // TODO 3 internationalize
+              'At least one ${(field as ListField).objectTemplate.classUiName} required', // TODO: 3 internationalize
           severity: severity,
         )
       : null;
@@ -592,7 +592,7 @@ class ValidationMessage extends StatelessWidget {
     if (checkForProxyAbove) {
       final proxy = context.findAncestorWidgetOfExactType<ValidationMessageProxy>();
       if (proxy != null) {
-        // TODO 2 maybe check that this specific field is in the proxy
+        // TODO: 2 maybe check that this specific field is in the proxy
         return const SizedBox.shrink();
       }
     }
