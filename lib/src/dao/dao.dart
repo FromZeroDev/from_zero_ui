@@ -754,15 +754,24 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     ModelType? model;
     if (onSaveAPI != null) {
       final stateNotifier = onSaveAPI!.call(contextForValidation ?? context, this);
-      final Completer completer = Completer();
+      final completer = Completer();
       final removeListener = stateNotifier.addListener((state) {
         state.mapOrNull(
           data: (data) {
+            model = data.value;
             completer.complete(data.value);
-            return model = data.value;
           },
           loading: (loading) => model = null,
-          error: (error) => model = null,
+          error: (error) {
+            final e = error.error;
+            log(LgLvl.warning, 'HEREEEEEEEEEEE: $e');
+            if (e is PartialSuccessError<ModelType>) {
+              model = e.result;
+              completer.complete(e.result);
+            } else {
+              model = null;
+            }
+          },
         );
       });
       final controller = APISnackBar(
@@ -775,10 +784,10 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       ).show();
       try {
         await Future.any([controller.closed, completer.future]);
-        success = model != null;
       } catch (e, st) {
         log(LgLvl.error, 'Error while saving $classUiName: $uiName', e: e, st: st, type: FzLgType.dao);
       }
+      success = model != null;
       removeListener();
     } else if (onSave == null) {
       success = true;

@@ -8,17 +8,20 @@ class SnackBarFromZero extends ConsumerStatefulWidget {
   static const success = 1;
   static const error = 2;
   static const loading = 3;
+  static const warning = 4;
   static final softColors = <Color>[
     Colors.blue.shade300,
     Colors.green.shade300,
     Colors.red.shade300,
     Colors.blue.shade300,
+    Colors.orange.shade300,
   ];
   static final colors = <Color>[
     Colors.blue.shade500,
     Colors.green.shade500,
     Colors.red.shade500,
     Colors.blue.shade500,
+    Colors.orange.shade500,
   ];
   static final icons = [
     const Icon(Icons.info_outline),
@@ -31,6 +34,7 @@ class SnackBarFromZero extends ConsumerStatefulWidget {
         valueColor: AlwaysStoppedAnimation(Colors.blue.shade500),
       ),
     ),
+    const Icon(Icons.warning),
   ];
   static const behaviourFixed = 10;
   static const behaviourFloating = 11;

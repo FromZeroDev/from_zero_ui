@@ -284,19 +284,28 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
   }
 
   Widget resultBuilder(BuildContext context, Object? error, StackTrace? stackTrace) {
-    final type = error == null ? SnackBarFromZero.success : SnackBarFromZero.error;
+    var type = error == null ? SnackBarFromZero.success : SnackBarFromZero.error;
     final actionColor = SnackBarFromZero.colors[type];
     final splashColor = Theme.of(context).colorScheme.secondary;
-    bool showRetry = true, showErrorDetails = false;
+    bool showRetry, showErrorDetails;
     Widget? icon;
     String? title, message;
     if (error == null) {
       showRetry = false;
+      showErrorDetails = false;
       title = widget.successTitle;
       message = widget.successMessage;
     } else {
       if (error is String) {
         title = error;
+        showRetry = false;
+        showErrorDetails = false;
+      } else if (error is PartialSuccessError) {
+        type = error.snackbarTypeOverride;
+        title = error.titleOverride;
+        message = error.messageOverride;
+        showRetry = false;
+        showErrorDetails = false;
       } else {
         final isRetryable = ApiProviderBuilder.isErrorRetryable(error, stackTrace);
         showRetry = !kReleaseMode || isRetryable;

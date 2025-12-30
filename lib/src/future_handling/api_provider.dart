@@ -416,6 +416,9 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
       }
       return const Icon(MaterialCommunityIcons.wifi_off);
     }
+    if (error is PartialSuccessError) {
+      return Icon(Icons.warning);
+    }
     return const Icon(Icons.report_problem_outlined);
   }
 
@@ -437,6 +440,9 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
         return 'Error Interno del Servidor';
       }
       return FromZeroLocalizations.of(context).translate("error_connection");
+    }
+    if (error is PartialSuccessError) {
+      return error.titleOverride;
     }
     return "Error Inesperado";
   }
@@ -460,6 +466,9 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
       }
       return FromZeroLocalizations.of(context).translate("error_connection_details");
     }
+    if (error is PartialSuccessError) {
+      return error.messageOverride;
+    }
     return "Por favor, notifique a su administrador de sistema";
   }
 
@@ -480,6 +489,9 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
       }
       return true;
     }
+    if (error is PartialSuccessError) {
+      return false;
+    }
     return false;
   }
 
@@ -499,6 +511,9 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
         return false;
       }
       return true;
+    }
+    if (error is PartialSuccessError) {
+      return false;
     }
     return true;
   }
@@ -832,4 +847,17 @@ class SliverApiStateBuilder<T> extends ApiStateBuilder<T> {
   }) : super(
          applyAnimatedContainerFromChildSize: false,
        );
+}
+
+class PartialSuccessError<T> {
+  final T? result;
+  final int snackbarTypeOverride;
+  final String titleOverride;
+  final String messageOverride;
+  const PartialSuccessError({
+    required this.result,
+    this.snackbarTypeOverride = SnackBarFromZero.warning,
+    this.titleOverride = 'Éxito Parcial',
+    this.messageOverride = '',
+  });
 }
