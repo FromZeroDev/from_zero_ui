@@ -764,7 +764,6 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
           loading: (loading) => model = null,
           error: (error) {
             final e = error.error;
-            log(LgLvl.warning, 'HEREEEEEEEEEEE: $e');
             if (e is PartialSuccessError<ModelType>) {
               model = e.result;
               completer.complete(e.result);
