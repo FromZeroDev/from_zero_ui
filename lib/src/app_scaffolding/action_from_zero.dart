@@ -346,7 +346,9 @@ class ActionFromZero extends StatelessWidget {
           ),
         );
         result = TextButton(
-          onPressed: (!enabled || onTap == null) ? null : () => onTap.call(originalContext),
+          onPressed: (!enabled || onTap == null)
+              ? null
+              : () => onTap.call(originalContext.mounted ? originalContext : context),
           style: TextButton.styleFrom(
             foregroundColor: !enabled || onTap == null
                 ? Theme.of(context).disabledColor
