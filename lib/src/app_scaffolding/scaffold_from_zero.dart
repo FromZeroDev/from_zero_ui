@@ -1129,10 +1129,11 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                       (Theme.of(context).textTheme.bodyLarge!.color!);
                   final iconButtonTransparentColor = iconButtonColor.withValues(alpha: 0.05);
                   final iconButtonSemiTransparentColor = iconButtonColor.withValues(alpha: 0.1);
+                  final showBackButton = canPop && (PlatformExtended.isMobile ? !isMobileLayout : true);
                   return Stack(
                     fit: StackFit.expand,
                     children: [
-                      if (!isMobileLayout && canPop)
+                      if (showBackButton)
                         Positioned(
                           left: 8,
                           top: 0,
@@ -1154,7 +1155,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                         ),
                       if (widget.drawerTitle != null)
                         Positioned(
-                          left: !isMobileLayout && canPop ? 56 : 16,
+                          left: showBackButton ? 56 : 16,
                           right: widget.centerDrawerTitle ? 8 : null,
                           top: 0,
                           bottom: 0,
