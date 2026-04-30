@@ -526,7 +526,8 @@ class _LifecycleHookState extends State<_LifecycleHook> {
 typedef ApiActionCallback<T, R> = R Function(BuildContext context, List<T> data);
 
 class APIActionFromZero<T> extends ActionFromZero {
-  final List<ValueNotifier> dependedNotifiers;
+  @override
+  final List<ValueListenable> dependedNotifiers;
   final List<ApiProvider<T>> Function(List<dynamic> values) providersBuilder;
   final ApiActionCallback<T, void>? onTapApi;
   final ApiActionCallback<T, String?>? disablingErrorBuilder;
