@@ -338,13 +338,13 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
               ),
             ),
           ),
-        // if (widget.enabled && widget.inkWellEnabled)
-        //   Positioned.fill(
-        //     child: InkWellTranslucent(
-        //       onTap: _handleTap,
-        //       borderRadius: widget.borderRadius,
-        //     ),
-        //   ),
+        if (widget.enabled && widget.inkWellEnabled)
+          Positioned.fill(
+            child: InkWellTranslucent(
+              onTap: _handleTap,
+              borderRadius: widget.borderRadius,
+            ),
+          ),
       ],
     );
     // if (widget.contextMenuActions.isNotEmpty || widget.addExpandCollapseContextMenuAction) { // always add this, so child tree isn't rebuilt on compact/decompact drawer
