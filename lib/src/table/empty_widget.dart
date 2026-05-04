@@ -65,9 +65,11 @@ class TableEmptyWidget<T> extends StatelessWidget {
           ),
           ErrorSign(
             title: title ?? FromZeroLocalizations.of(context).translate('no_data'),
-            subtitle: state != null && (filtersApplied || state.widget.rows.isNotEmpty)
-                ? FromZeroLocalizations.of(context).translate('no_data_filters')
-                : FromZeroLocalizations.of(context).translate('no_data_desc'),
+            subtitle:
+                subtitle ??
+                (state != null && (filtersApplied || state.widget.rows.isNotEmpty)
+                    ? FromZeroLocalizations.of(context).translate('no_data_filters')
+                    : FromZeroLocalizations.of(context).translate('no_data_desc')),
             retryButton:
                 retryButton ??
                 (tableController == null || (state != null && !filtersApplied)

@@ -3,11 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/util/copied_flutter_widgets/my_ensure_visible_when_focused.dart';
 
+typedef FilteredValuesGetter<T, R extends Field> =
+    T Function(String value)? Function(BuildContext context, R field, DAO dao);
+
 class ComboField<T extends DAO> extends Field<T> {
   ContextFulFieldValueGetter<List<T>?, ComboField<T>>? possibleValuesGetter;
   ContextFulFieldValueGetter<Future<List<T>>?, ComboField<T>>? possibleValuesFutureGetter;
   ContextFulFieldValueGetter<AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>?, ComboField<T>>?
   possibleValuesProviderGetter;
+  FilteredValuesGetter<List<T>, ComboField<T>>? filteredValuesGetter;
+  FilteredValuesGetter<Future<List<T>>, ComboField<T>>? filteredValuesFutureGetter;
+  FilteredValuesGetter<AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>, ComboField<T>>?
+  filteredValuesProviderGetter;
   bool? showSearchBox;
   ExtraWidgetBuilder<T>? extraWidget;
   FieldValueGetter<DAO?, ComboField<T>>? newObjectTemplateGetter;
@@ -18,6 +25,8 @@ class ComboField<T extends DAO> extends Field<T> {
   bool invalidateValuesNotInPossibleValues;
   bool showNullInSelection;
   bool showHintAsNullInSelection;
+  Duration debounce;
+  int minChars;
 
   ComboField({
     required super.uiNameGetter,
@@ -32,6 +41,9 @@ class ComboField<T extends DAO> extends Field<T> {
     this.possibleValuesGetter,
     this.possibleValuesFutureGetter,
     this.possibleValuesProviderGetter,
+    this.filteredValuesGetter,
+    this.filteredValuesFutureGetter,
+    this.filteredValuesProviderGetter,
     this.sort = true,
     this.showSearchBox,
     this.showViewActionOnDAOs = true,
@@ -59,7 +71,34 @@ class ComboField<T extends DAO> extends Field<T> {
     super.onValueChanged,
     this.showNullInSelection = false,
     this.showHintAsNullInSelection = true,
-  });
+    Duration? debounce,
+    int? minChars,
+  }) : debounce =
+           debounce ??
+           (possibleValuesGetter != null ||
+                   possibleValuesFutureGetter != null ||
+                   possibleValuesProviderGetter != null ||
+                   filteredValuesGetter != null
+               ? Duration.zero
+               : const Duration(milliseconds: 300)),
+       minChars =
+           minChars ??
+           (possibleValuesGetter != null ||
+                   possibleValuesFutureGetter != null ||
+                   possibleValuesProviderGetter != null ||
+                   filteredValuesGetter != null
+               ? 0
+               : 3),
+       assert(
+         1 ==
+             ((possibleValuesGetter == null ? 0 : 1) +
+                 (possibleValuesFutureGetter == null ? 0 : 1) +
+                 (possibleValuesProviderGetter == null ? 0 : 1) +
+                 (filteredValuesGetter == null ? 0 : 1) +
+                 (filteredValuesFutureGetter == null ? 0 : 1) +
+                 (filteredValuesProviderGetter == null ? 0 : 1)),
+         'You must set one and only one way of getting values.',
+       );
 
   @override
   ComboField<T> copyWith({
@@ -73,6 +112,10 @@ class ComboField<T extends DAO> extends Field<T> {
     ContextFulFieldValueGetter<List<T>?, ComboField<T>>? possibleValuesGetter,
     ContextFulFieldValueGetter<Future<List<T>>?, ComboField<T>>? possibleValuesFutureGetter,
     ContextFulFieldValueGetter<ApiProvider<List<T>>?, ComboField<T>>? possibleValuesProviderGetter,
+    FilteredValuesGetter<List<T>, ComboField<T>>? filteredValuesGetter,
+    FilteredValuesGetter<Future<List<T>>, ComboField<T>>? filteredValuesFutureGetter,
+    FilteredValuesGetter<AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>, ComboField<T>>?
+    filteredValuesProviderGetter,
     FieldValueGetter<String?, Field>? hintGetter,
     FieldValueGetter<String?, Field>? tooltipGetter,
     bool? sort,
@@ -101,6 +144,8 @@ class ComboField<T extends DAO> extends Field<T> {
     OnFieldValueChanged<T?>? onValueChanged,
     bool? showNullInSelection,
     bool? showHintAsNullInSelection,
+    Duration? debounce,
+    int? minChars,
   }) {
     return ComboField<T>(
       uiNameGetter: uiNameGetter ?? this.uiNameGetter,
@@ -113,6 +158,9 @@ class ComboField<T extends DAO> extends Field<T> {
       possibleValuesGetter: possibleValuesGetter ?? this.possibleValuesGetter,
       possibleValuesFutureGetter: possibleValuesFutureGetter ?? this.possibleValuesFutureGetter,
       possibleValuesProviderGetter: possibleValuesProviderGetter ?? this.possibleValuesProviderGetter,
+      filteredValuesGetter: filteredValuesGetter ?? this.filteredValuesGetter,
+      filteredValuesFutureGetter: filteredValuesFutureGetter ?? this.filteredValuesFutureGetter,
+      filteredValuesProviderGetter: filteredValuesProviderGetter ?? this.filteredValuesProviderGetter,
       hintGetter: hintGetter ?? this.hintGetter,
       tooltipGetter: tooltipGetter ?? this.tooltipGetter,
       sort: sort ?? this.sort,
@@ -141,6 +189,8 @@ class ComboField<T extends DAO> extends Field<T> {
       onValueChanged: onValueChanged ?? this.onValueChanged,
       showNullInSelection: showNullInSelection ?? this.showNullInSelection,
       showHintAsNullInSelection: showHintAsNullInSelection ?? this.showHintAsNullInSelection,
+      debounce: debounce ?? this.debounce,
+      minChars: minChars ?? this.minChars,
     );
   }
 
@@ -153,47 +203,61 @@ class ComboField<T extends DAO> extends Field<T> {
     bool validateIfHidden = false,
   }) async {
     if (currentValidationId != dao.validationCallCount || !context.mounted) return false;
-    await super.validate(
+    final superResult = super.validate(
       context,
       dao,
       currentValidationId, // ignore: use_build_context_synchronously
       validateIfNotEdited: validateIfNotEdited,
       validateIfHidden: validateIfHidden,
     );
-    if (currentValidationId != dao.validationCallCount || !context.mounted) return false;
-    final List<T> possibleValues;
-    final provider = possibleValuesProviderGetter?.call(context, this, dao); // ignore: use_build_context_synchronously
-    if (provider != null) {
-      possibleValues = await (context as WidgetRef).watch(provider.notifier).future;
-    } else {
-      final future = possibleValuesFutureGetter?.call(context, this, dao); // ignore: use_build_context_synchronously
-      if (future != null) {
-        possibleValues = await future;
-      } else {
-        possibleValues = possibleValuesGetter!.call(context, this, dao)!; // ignore: use_build_context_synchronously
+
+    if (invalidateValuesNotInPossibleValues &&
+        value != null &&
+        (possibleValuesGetter != null || possibleValuesProviderGetter != null || possibleValuesFutureGetter != null)) {
+      List<T>? possibleValues;
+      if (possibleValuesGetter != null) {
+        possibleValues = possibleValuesGetter!(context, this, dao);
+      }
+      if (possibleValues == null && possibleValuesProviderGetter != null) {
+        // ignore: use_build_context_synchronously
+        final provider = possibleValuesProviderGetter!.call(context, this, dao);
+        if (provider != null) {
+          possibleValues = await (context as WidgetRef).watch(provider.notifier).future;
+          if (currentValidationId != dao.validationCallCount || !context.mounted) return false;
+        }
+      }
+      if (possibleValues == null && possibleValuesFutureGetter != null) {
+        // ignore: use_build_context_synchronously
+        final future = possibleValuesFutureGetter?.call(context, this, dao);
+        if (future != null) {
+          possibleValues = await future;
+          if (currentValidationId != dao.validationCallCount || !context.mounted) return false;
+        }
+      }
+      if (possibleValues != null && !possibleValues.contains(value)) {
+        // ignore: use_build_context_synchronously
+        final error = '$uiName: ${FromZeroLocalizations.of(context).translate("validation_combo_not_possible")}';
+        if (value == dbValue) {
+          validationErrors.add(
+            ValidationError(
+              field: this,
+              error: error,
+            ),
+          );
+        } else {
+          validationErrors.add(
+            InvalidatingError<T>(
+              field: this,
+              error: error,
+              defaultValue: null,
+            ),
+          );
+        }
       }
     }
+
+    await superResult;
     if (currentValidationId != dao.validationCallCount || !context.mounted) return false;
-    if (invalidateValuesNotInPossibleValues && value != null && !possibleValues.contains(value)) {
-      // ignore: use_build_context_synchronously
-      final error = '$uiName: ${FromZeroLocalizations.of(context).translate("validation_combo_not_possible")}';
-      if (value == dbValue) {
-        validationErrors.add(
-          ValidationError(
-            field: this,
-            error: error,
-          ),
-        );
-      } else {
-        validationErrors.add(
-          InvalidatingError<T>(
-            field: this,
-            error: error,
-            defaultValue: null,
-          ),
-        );
-      }
-    }
     validationErrors.sort((a, b) => a.severity.weight.compareTo(b.severity.weight));
     return validationErrors.where((e) => e.isBlocking).isEmpty;
   }
@@ -342,6 +406,9 @@ class ComboField<T extends DAO> extends Field<T> {
           possibleValues: possibleValuesGetter?.call(context, this, dao),
           possibleValuesFuture: possibleValuesFutureGetter?.call(context, this, dao),
           possibleValuesProvider: provider,
+          filteredValues: filteredValuesGetter?.call(context, this, dao),
+          filteredValuesFuture: filteredValuesFutureGetter?.call(context, this, dao),
+          filteredValuesProvider: filteredValuesProviderGetter?.call(context, this, dao),
           sort: sort,
           showSearchBox: showSearchBox,
           onSelected: (v) => _onSelected(v, focusNode),
@@ -367,7 +434,10 @@ class ComboField<T extends DAO> extends Field<T> {
           extraWidget: extraWidget ?? this.extraWidget,
           showViewActionOnDAOs: showViewActionOnDAOs,
           showDropdownIcon: showDropdownIcon,
+          debounce: debounce,
+          minChars: minChars,
         );
+        // TODO: 3 implement the loading sign for possibleValuesFuture as well
         if (provider != null) {
           result = Stack(
             children: [
