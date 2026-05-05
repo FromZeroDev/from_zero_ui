@@ -279,6 +279,13 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
             child: widget.titleBuilder?.call(context, _isExpanded) ?? widget.title,
           ),
         ),
+        if (widget.enabled && widget.inkWellEnabled)
+          Positioned.fill(
+            child: InkWellTranslucent(
+              onTap: _handleTap,
+              borderRadius: widget.borderRadius,
+            ),
+          ),
         if (widget.trailing is! SizedBox && widget.children.isNotEmpty)
           Positioned(
             top: 0,
@@ -336,13 +343,6 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
                   width: 2,
                 ),
               ),
-            ),
-          ),
-        if (widget.enabled && widget.inkWellEnabled)
-          Positioned.fill(
-            child: InkWellTranslucent(
-              onTap: _handleTap,
-              borderRadius: widget.borderRadius,
             ),
           ),
       ],
