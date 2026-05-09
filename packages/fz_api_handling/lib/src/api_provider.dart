@@ -11,6 +11,7 @@ import 'package:fz_snackbar/fz_snackbar.dart';
 import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_animations/fz_animations.dart';
 import 'package:fz_log/fz_log.dart';
+import 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
 
 typedef ApiProvider<T> = AutoDisposeStateNotifierProvider<ApiState<T>, AsyncValue<T>>;
 typedef ApiProviderFamily<T, P> = AutoDisposeStateNotifierProviderFamily<ApiState<T>, AsyncValue<T>, P>;

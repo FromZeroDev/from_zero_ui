@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_scaffold/src/app_content_wrapper.dart';
 import 'package:fz_actions/fz_actions.dart';
 import 'package:fz_appbar/fz_appbar.dart';
-import 'package:fz_copy_tooltip/fz_copy_tooltip.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_simple_shadow/fz_simple_shadow.dart';
 import 'package:fz_platform/fz_platform.dart';

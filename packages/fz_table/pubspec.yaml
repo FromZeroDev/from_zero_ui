@@ -29,8 +29,8 @@ dependencies:
     path: ../fz_copy_ensure_visible
   fz_copy_sticky_header:
     path: ../fz_copy_sticky_header
-  fz_copy_tooltip:
-    path: ../fz_copy_tooltip
+  fz_tooltip:
+    path: ../fz_tooltip
   fz_dao:
     path: ../fz_dao
   fz_export:

@@ -348,6 +348,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_animated_switcher_image:
+    dependency: "direct overridden"
+    description:
+      path: "../fz_animated_switcher_image"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_animations:
     dependency: "direct main"
     description:
@@ -467,10 +474,24 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_log:
+    dependency: transitive
+    description:
+      path: "../fz_log"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_logo:
     dependency: transitive
     description:
       path: "../fz_logo"
+      relative: true
+    source: path
+    version: "0.1.0"
+  fz_notification_relayer:
+    dependency: transitive
+    description:
+      path: "../fz_notification_relayer"
       relative: true
     source: path
     version: "0.1.0"
@@ -513,6 +534,13 @@ packages:
     dependency: "direct main"
     description:
       path: "../fz_scrollbar"
+      relative: true
+    source: path
+    version: "0.1.0"
+  fz_selectable_icon:
+    dependency: transitive
+    description:
+      path: "../fz_selectable_icon"
       relative: true
     source: path
     version: "0.1.0"

@@ -4,7 +4,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:fz_copy_tooltip/fz_copy_tooltip.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_ui_utility/fz_ui_utility.dart';
 import 'package:fz_api_handling/fz_api_handling.dart';

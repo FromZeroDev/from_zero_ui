@@ -1,4 +1,4 @@
-name: fz_copy_tooltip
+name: fz_tooltip
 description: Material tooltip widget (copied and customized from Flutter).
 publish_to: 'none'
 version: 0.1.0

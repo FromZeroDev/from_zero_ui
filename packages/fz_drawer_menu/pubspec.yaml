@@ -13,8 +13,8 @@ dependencies:
 
   fz_actions:
     path: ../fz_actions
-  fz_copy_tooltip:
-    path: ../fz_copy_tooltip
+  fz_tooltip:
+    path: ../fz_tooltip
   fz_expansion_tile:
     path: ../fz_expansion_tile
   fz_popup:

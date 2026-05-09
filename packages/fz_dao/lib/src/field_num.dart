@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fz_dao/fz_dao.dart';
 import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_copy_tooltip/fz_copy_tooltip.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_snackbar/fz_snackbar.dart';
 import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_dialog/fz_dialog.dart';

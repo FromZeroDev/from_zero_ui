@@ -411,13 +411,6 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
-  fz_copy_tooltip:
-    dependency: "direct main"
-    description:
-      path: "../fz_copy_tooltip"
-      relative: true
-    source: path
-    version: "0.1.0"
   fz_dao:
     dependency: transitive
     description:
@@ -474,10 +467,24 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_log:
+    dependency: transitive
+    description:
+      path: "../fz_log"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_logo:
     dependency: "direct main"
     description:
       path: "../fz_logo"
+      relative: true
+    source: path
+    version: "0.1.0"
+  fz_notification_relayer:
+    dependency: transitive
+    description:
+      path: "../fz_notification_relayer"
       relative: true
     source: path
     version: "0.1.0"
@@ -523,6 +530,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_selectable_icon:
+    dependency: transitive
+    description:
+      path: "../fz_selectable_icon"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_simple_shadow:
     dependency: "direct main"
     description:
@@ -548,6 +562,13 @@ packages:
     dependency: transitive
     description:
       path: "../fz_theme"
+      relative: true
+    source: path
+    version: "0.1.0"
+  fz_tooltip:
+    dependency: "direct main"
+    description:
+      path: "../fz_tooltip"
       relative: true
     source: path
     version: "0.1.0"

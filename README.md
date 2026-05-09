@@ -50,7 +50,7 @@ This is the root compatibility package — importing `from_zero_ui` gives you ev
 | [fz_log](packages/fz_log/) | Configurable logging with log-level filtering |
 | [fz_value_string](packages/fz_value_string/) | Value wrappers, keyboard shortcuts, utilities |
 | [fz_comparable_list](packages/fz_comparable_list/) | Deduplicating comparable list |
-| [fz_copy_tooltip](packages/fz_copy_tooltip/) | Rich customizable tooltip widget |
+| [fz_tooltip](packages/fz_tooltip/) | Rich customizable tooltip widget |
 | [fz_scrollbar](packages/fz_scrollbar/) | Custom thin scrollbar |
 | [fz_opacity_gradient](packages/fz_opacity_gradient/) | Scroll-fade gradient masks |
 | [fz_ui_utility](packages/fz_ui_utility/) | Misc widgets: responsive insets, icon backgrounds, overflow scrolls |
@@ -60,6 +60,7 @@ This is the root compatibility package — importing `from_zero_ui` gives you ev
 | Package | Description |
 |---------|-------------|
 | [fz_animations](packages/fz_animations/) | Custom transition animations |
+| [fz_animated_switcher_image](packages/fz_animated_switcher_image/) | AnimatedSwitcher with snapshot-based child transitions |
 | [fz_simple_shadow](packages/fz_simple_shadow/) | CustomPainter-based shadow |
 | [fz_selectable_icon](packages/fz_selectable_icon/) | Selectable icon with highlight state |
 | [fz_logo](packages/fz_logo/) | FromZero brand logo |
@@ -107,3 +108,109 @@ dependencies:
   fz_table:
     path: packages/fz_table
 ```
+
+## Changes planned
+### New Packages
+### Package Separations
+### Package Deletion / Merging
+- fz_copy_sticky_header should be deleted in favor of using sliver_tools. This requires code changes in the packages that use it and a lot of testing.
+- Consider merging some of the packages that are only depended on by one package into that package. Especially for those that aren't meant for direct consumption.
+
+## Dependency Graph
+
+### No dependencies (leaf packages)
+
+```
+fz_animated_switcher_image  fz_animations         fz_gesture_relayer
+fz_notification_relayer     fz_copy_ensure_visible  fz_copy_page_indicator
+fz_copy_sticky_header       fz_copy_time_picker     fz_file_picker
+fz_hack_focus_traversal     fz_localizations        fz_log
+fz_logo                     fz_number_format        fz_opacity_gradient
+fz_platform                 fz_selectable_icon      fz_simple_shadow
+fz_translucent_ink_well     fz_value_string         fz_web_compile_file
+fz_web_initial_config       fz_web_platform_impl
+```
+
+### Dependency tree (topological, deepest first)
+
+```
+fz_value_string
+ └── fz_comparable_list
+
+fz_platform
+ ├── fz_tooltip
+ │    ├── fz_dialog
+ │    ├── fz_appbar
+ │    ├── fz_date_picker
+ │    ├── fz_combo
+ │    └── ...
+ ├── fz_scrollbar
+ /* and almost everything else */
+
+fz_localizations
+ ├── fz_theme
+ │    ├── fz_ui_scale
+ │    └── fz_scaffold
+ ├── fz_dao
+ │    └── fz_table
+ │         └── fz_export
+ └── (used by nearly every widget package)
+
+fz_log
+ ├── fz_scaffold
+ ├── fz_api_handling
+ ├── fz_dao
+ ├── fz_file_saver
+ ├── fz_app_update
+ ├── fz_image
+ └── fz_table
+
+fz_scaffold
+ ├── fz_router
+ ├── fz_snackbar
+ ├── fz_appbar
+ ├── fz_dialog
+ ├── fz_drawer_menu
+ ├── fz_popup
+ ├── fz_actions
+ ├── fz_app_update
+ ├── fz_theme
+ ├── fz_export
+ ├── fz_dao
+ ├── fz_table
+ └── fz_ui_utility
+
+fz_dao ←→ fz_table (mutual dependency)
+```
+
+### Full dependency listing
+
+| Package | Depends on |
+|---------|-----------|
+| fz_actions | fz_api_handling, fz_tooltip, fz_future_handling, fz_scaffold |
+| fz_api_handling | fz_animated_switcher_image, fz_animations, fz_dialog, fz_future_handling, fz_localizations, fz_log, fz_snackbar |
+| fz_appbar | fz_actions, fz_platform, fz_popup, fz_scaffold |
+| fz_app_update | fz_dialog, fz_file_saver, fz_localizations, fz_log, fz_platform, fz_scaffold |
+| fz_combo | fz_api_handling, fz_tooltip, fz_dao, fz_future_handling, fz_localizations, fz_popup, fz_scrollbar, fz_table, fz_ui_utility |
+| fz_comparable_list | fz_value_string |
+| fz_tooltip | fz_platform, fz_scrollbar |
+| fz_dao | fz_actions, fz_animations, fz_api_handling, fz_appbar, fz_combo, fz_comparable_list, fz_copy_ensure_visible, fz_tooltip, fz_date_picker, fz_dialog, fz_file_picker, fz_future_handling, fz_hack_focus_traversal, fz_localizations, fz_log, fz_platform, fz_popup, fz_scaffold, fz_scrollbar, fz_selectable_icon, fz_snackbar, fz_table, fz_translucent_ink_well, fz_ui_utility, fz_value_string |
+| fz_date_picker | fz_copy_time_picker, fz_tooltip, fz_localizations, fz_popup, fz_ui_utility |
+| fz_dialog | fz_animations, fz_appbar, fz_tooltip, fz_future_handling, fz_localizations, fz_platform, fz_scaffold, fz_scrollbar, fz_ui_utility |
+| fz_drawer_menu | fz_actions, fz_tooltip, fz_expansion_tile, fz_popup, fz_router, fz_scaffold, fz_scrollbar, fz_ui_utility |
+| fz_expansion_tile | fz_actions, fz_copy_ensure_visible, fz_drawer_menu, fz_future_handling, fz_translucent_ink_well, fz_ui_utility |
+| fz_export | fz_copy_page_indicator, fz_dao, fz_dialog, fz_file_saver, fz_platform, fz_scaffold, fz_table, fz_theme, fz_ui_utility, fz_value_string |
+| fz_file_saver | fz_api_handling, fz_localizations, fz_log, fz_platform, fz_snackbar |
+| fz_future_handling | fz_animated_switcher_image, fz_animations, fz_dialog, fz_export, fz_localizations, fz_opacity_gradient, fz_scrollbar, fz_ui_utility |
+| fz_image | fz_api_handling, fz_tooltip, fz_future_handling, fz_localizations, fz_log, fz_ui_utility, fz_web_compile_file |
+| fz_popup | fz_actions, fz_platform, fz_scaffold, fz_scrollbar, fz_snackbar |
+| fz_router | fz_scaffold |
+| fz_scaffold | fz_actions, fz_animations, fz_appbar, fz_tooltip, fz_dialog, fz_localizations, fz_log, fz_platform, fz_router, fz_scrollbar, fz_simple_shadow, fz_snackbar, fz_theme, fz_ui_utility |
+| fz_scrollbar | fz_platform, fz_opacity_gradient |
+| fz_snackbar | fz_api_handling, fz_tooltip, fz_dialog, fz_future_handling, fz_localizations, fz_scaffold |
+| fz_table | fz_actions, fz_animations, fz_api_handling, fz_appbar, fz_comparable_list, fz_copy_ensure_visible, fz_copy_sticky_header, fz_tooltip, fz_dao, fz_date_picker, fz_dialog, fz_export, fz_future_handling, fz_localizations, fz_log, fz_notification_relayer, fz_platform, fz_popup, fz_router, fz_scaffold, fz_scrollbar, fz_selectable_icon, fz_simple_shadow, fz_ui_utility, fz_value_string |
+| fz_theme | fz_app_update, fz_combo, fz_tooltip, fz_localizations, fz_scaffold, fz_ui_utility |
+| fz_ui_scale | fz_theme |
+| fz_ui_utility | fz_animations, fz_tooltip, fz_dialog, fz_future_handling, fz_localizations, fz_logo, fz_scaffold, fz_scrollbar, fz_simple_shadow, fz_translucent_ink_well, fz_value_string |
+
+Packages not listed have zero internal `fz_*` dependencies.

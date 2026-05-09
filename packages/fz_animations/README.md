@@ -1,21 +1,42 @@
 # fz_animations
 
-Custom animation widgets used across FromZero UI, including:
+Custom transition animations used across FromZero UI.
 
-- `FadeUpwardsSlideTransition` — slides up while fading in
-- `FadeUpwardsFadeTransition` — fades upwards
-- `FixedSlideTransition` — a slide transition that doesn't move below 0
-- `AnimatedSwitcherImage` — animated image switcher (fades between images)
-- `HeroesFromZero` — tweaked hero animations
-- Custom `SharedAxisTransition` and `FadeThroughTransition` variants without fading
+## Widgets
+
+| Widget | Description |
+|--------|-------------|
+| `FadeUpwardsSlideTransition` | Slide-up part of `FadeUpwardsPageTransitionsBuilder` (no fade) |
+| `FadeUpwardsFadeTransition` | Fade-in part of `FadeUpwardsPageTransitionsBuilder` (no slide) |
+| `FixedSlideTransition` | Slide transition that clamps at 0 instead of going negative |
+| `ZoomedFadeInFadeOutTransition` | Fades in with a slight zoom while fading out the previous child |
+| `ZoomedFadeInTransition` | Entrance transition with slight zoom + opacity |
+| `FadeOutTransition` | Exit transition that fades out |
+| `FadeThroughPageTransitionsBuilder` | `FadeThroughTransition` without the fade — shows solid pages |
+| `SharedAxisPageTransitionsBuilder` | `SharedAxisTransition` without the fade — solid shared-axis slides |
+| `HeroesFromZero` | Utility for fading hero flights via `fadeThroughFlightShuttleBuilder` |
 
 ## Usage
 
 ```dart
 import 'package:fz_animations/fz_animations.dart';
 
+// Slide transition (no fade)
 FadeUpwardsSlideTransition(
   animation: animation,
-  child: YourWidget(),
+  child: MyPage(),
+)
+
+// Zoomed fade in + fade out
+ZoomedFadeInFadeOutTransition(
+  animation: animation,
+  child: MyPage(),
+)
+
+// Hero fade-through shuttle
+Hero(
+  tag: 'my-tag',
+  flightShuttleBuilder: HeroesFromZero.fadeThroughFlightShuttleBuilder,
+  child: MyWidget(),
 )
 ```

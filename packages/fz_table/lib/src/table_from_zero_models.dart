@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:fz_table/fz_table.dart';
 import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_copy_tooltip/fz_copy_tooltip.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_dao/fz_dao.dart';
 import 'package:fz_value_string/fz_value_string.dart';
 import 'package:fz_comparable_list/fz_comparable_list.dart';

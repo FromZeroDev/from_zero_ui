@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_copy_tooltip/fz_copy_tooltip.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';

@@ -1,3 +1,4 @@
+export 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
 export 'package:fz_log/fz_log.dart';
 export 'package:fz_actions/fz_actions.dart';
 export 'package:fz_animations/fz_animations.dart';
@@ -10,7 +11,7 @@ export 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 export 'package:fz_copy_page_indicator/fz_copy_page_indicator.dart';
 export 'package:fz_copy_sticky_header/fz_copy_sticky_header.dart';
 export 'package:fz_copy_time_picker/fz_copy_time_picker.dart';
-export 'package:fz_copy_tooltip/fz_copy_tooltip.dart';
+export 'package:fz_tooltip/fz_tooltip.dart';
 export 'package:fz_dao/fz_dao.dart';
 export 'package:fz_date_picker/fz_date_picker.dart';
 export 'package:fz_dialog/fz_dialog.dart';

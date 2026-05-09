@@ -13,7 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_platform/fz_platform.dart';
 import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_copy_tooltip/fz_copy_tooltip.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_simple_shadow/fz_simple_shadow.dart';
 import 'package:fz_dialog/fz_dialog.dart';

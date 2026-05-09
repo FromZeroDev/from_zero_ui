@@ -1,6 +1,6 @@
 # fz_dao
 
-A Data Access Objects system with built-in CRUD, form fields, validation, and table integration. Combined with `fz_table`, this is the most powerful subsystem in FromZero UI.
+A Data Access Objects (this is an AWFUL name, it should be called Forms or something) system with built-in CRUD, form fields, validation, and table integration. Combined with `fz_table`, this is the most powerful subsystem in FromZero UI.
 
 ## Core concepts
 
@@ -58,9 +58,7 @@ class ContainerDAO extends LazyDAO<ContainerFull> {
 }
 ```
 
-Saving:
-
+Show form dialog:
 ```dart
-final dao = MyDAO(null);
-final saved = await dao.save(context);
+ContainerDAO(null).edit();
 ```

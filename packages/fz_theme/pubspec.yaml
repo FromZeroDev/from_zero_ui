@@ -17,8 +17,8 @@ dependencies:
     path: ../fz_app_update
   fz_combo:
     path: ../fz_combo
-  fz_copy_tooltip:
-    path: ../fz_copy_tooltip
+  fz_tooltip:
+    path: ../fz_tooltip
   fz_scaffold:
     path: ../fz_scaffold
   fz_ui_utility:

@@ -28,3 +28,5 @@ dependencies:
 dependency_overrides:
   intl: ^0.20.2
   archive: ^4.0.7
+  fz_animated_switcher_image:
+    path: ../fz_animated_switcher_image

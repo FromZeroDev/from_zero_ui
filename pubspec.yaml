@@ -13,6 +13,8 @@ dependencies:
 
   fz_actions:
     path: packages/fz_actions
+  fz_animated_switcher_image:
+    path: packages/fz_animated_switcher_image
   fz_animations:
     path: packages/fz_animations
   fz_api_handling:
@@ -33,8 +35,8 @@ dependencies:
     path: packages/fz_copy_sticky_header
   fz_copy_time_picker:
     path: packages/fz_copy_time_picker
-  fz_copy_tooltip:
-    path: packages/fz_copy_tooltip
+  fz_tooltip:
+    path: packages/fz_tooltip
   fz_dao:
     path: packages/fz_dao
   fz_date_picker:

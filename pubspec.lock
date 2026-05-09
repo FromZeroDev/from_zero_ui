@@ -377,6 +377,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_animated_switcher_image:
+    dependency: "direct main"
+    description:
+      path: "packages/fz_animated_switcher_image"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_animations:
     dependency: "direct main"
     description:
@@ -444,13 +451,6 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/fz_copy_time_picker"
-      relative: true
-    source: path
-    version: "0.1.0"
-  fz_copy_tooltip:
-    dependency: "direct main"
-    description:
-      path: "packages/fz_copy_tooltip"
       relative: true
     source: path
     version: "0.1.0"
@@ -647,6 +647,13 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/fz_theme"
+      relative: true
+    source: path
+    version: "0.1.0"
+  fz_tooltip:
+    dependency: "direct main"
+    description:
+      path: "packages/fz_tooltip"
       relative: true
     source: path
     version: "0.1.0"

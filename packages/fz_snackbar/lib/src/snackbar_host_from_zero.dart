@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_copy_tooltip/fz_copy_tooltip.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_snackbar/src/api_snackbar.dart';
 import 'package:fz_snackbar/src/snackbar_from_zero.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';

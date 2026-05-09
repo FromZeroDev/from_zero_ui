@@ -12,8 +12,8 @@ dependencies:
 
   fz_copy_time_picker:
     path: ../fz_copy_time_picker
-  fz_copy_tooltip:
-    path: ../fz_copy_tooltip
+  fz_tooltip:
+    path: ../fz_tooltip
   fz_localizations:
     path: ../fz_localizations
   fz_popup:

@@ -11,8 +11,8 @@ dependencies:
 
   fz_api_handling:
     path: ../fz_api_handling
-  fz_copy_tooltip:
-    path: ../fz_copy_tooltip
+  fz_tooltip:
+    path: ../fz_tooltip
   fz_dialog:
     path: ../fz_dialog
   fz_localizations:

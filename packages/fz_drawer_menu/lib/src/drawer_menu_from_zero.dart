@@ -7,7 +7,7 @@ import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_expansion_tile/fz_expansion_tile.dart';
 import 'package:fz_popup/fz_popup.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
-import 'package:fz_copy_tooltip/fz_copy_tooltip.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_ui_utility/fz_ui_utility.dart';
 import 'package:go_router/go_router.dart';
 

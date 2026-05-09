@@ -12,6 +12,7 @@ import 'package:fz_export/fz_export.dart';
 import 'package:fz_animations/fz_animations.dart';
 import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_future_handling/src/async_value_builder.dart';
+import 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
 
 class LoadingSign extends ImplicitlyAnimatedWidget {
   final double? value;

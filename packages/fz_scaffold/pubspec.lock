@@ -411,13 +411,6 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
-  fz_copy_tooltip:
-    dependency: "direct main"
-    description:
-      path: "../fz_copy_tooltip"
-      relative: true
-    source: path
-    version: "0.1.0"
   fz_dao:
     dependency: transitive
     description:
@@ -562,6 +555,13 @@ packages:
     dependency: "direct main"
     description:
       path: "../fz_theme"
+      relative: true
+    source: path
+    version: "0.1.0"
+  fz_tooltip:
+    dependency: "direct main"
+    description:
+      path: "../fz_tooltip"
       relative: true
     source: path
     version: "0.1.0"

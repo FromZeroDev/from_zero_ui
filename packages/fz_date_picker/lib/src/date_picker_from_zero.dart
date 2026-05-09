@@ -2,7 +2,7 @@ import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:fz_ui_utility/fz_ui_utility.dart';
 import 'package:fz_popup/fz_popup.dart';
-import 'package:fz_copy_tooltip/fz_copy_tooltip.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_copy_time_picker/fz_copy_time_picker.dart'
     as time_picker_dialog_from_zero;

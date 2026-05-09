@@ -1,6 +1,10 @@
 # fz_copy_time_picker
 
-A time picker dialog copied and customized from Flutter's Material time picker, used by `DatePickerFromZero`.
+> **Primarily for internal use** by `fz_date_picker` — use `DatePickerFromZero` to get both date and time in one widget.
+
+A time picker dialog copied and customized from Flutter's Material time picker.
+
+**Difference from Flutter's built-in**: customized styling and integrated with `DatePickerFromZero` for unified date+time picking.
 
 ## Usage
 
