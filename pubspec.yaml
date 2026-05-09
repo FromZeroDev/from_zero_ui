@@ -1,13 +1,9 @@
 name: from_zero_ui
-description: UI generalizations and utility classes for working with flutter.
-
+description: UI generalizations and utility classes for working with flutter. Root compatibility package that re-exports all sub-packages.
 publish_to: 'none'
-
 version: 0.1.0
-
 environment:
   sdk: "^3.9.0"
-
 
 dependencies:
   flutter:
@@ -15,86 +11,107 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # * Language Extensions
-  intl: ^0.20.2
-  dartx: ^1.2.0
-  collection: ^1.19.1
-  email_validator: ^3.0.0
-  cancelable_compute: ^2.1.1
-
-  # * State Management
-  go_router: 10.0.0 # it will be a lot of work to update this because our routing solution is tightly coupled to it
-  flutter_riverpod: 2.0.0-dev.9 # can't update until cacheTime is re-added, lots of potential bugs to be fixed with this update, when updating, also try https://pub.dev/packages/riverpod_lint
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
-
-  # * Widgets / UI
-  auto_size_text: ^3.0.0
-  page_view_indicators: ^2.0.0
-#  implicitly_animated_reorderable_list: ^0.4.2 # discontinued and unused for now, use animated_list_plus if needed again
-  flutter_font_icons : ^2.2.5
-  animations: ^2.0.11
-  extended_image: ^8.1.0  # it might be a lot of work to update this because our routing solution is tightly coupled to it
-  google_fonts: ^6.2.1 # used in from_zero_logo
-  sliver_tools: ^0.2.12
-  value_layout_builder: ^0.5.0 # required by my_sliver_sticky_header. If everything is migrated to use sliver_tools, this can be removed
-  humanizer: ^2.2.0
-#  keframe: ^3.0.0 # unused for now, but very interesting package...
-  preload_page_view: ^0.2.0
-  multi_value_listenable_builder: ^0.0.2
-
-  # * Plugins
-  url_launcher: 6.3.1
-  path_provider: ^2.1.0
-  platform_detect: ^2.0.7
-  device_info_plus: ^11.4.0
-  permission_handler: ^12.0.0+1  # if build window throws error, check https://github.com/Baseflow/flutter-permission-handler/issues/819#issuecomment-1673271795
-  open_filex: ^4.7.0
-  file_picker: ^10.1.9
-  desktop_drop: ^0.4.1 # to support all platforms, try https://pub.dev/packages/super_drag_and_drop
-  universal_html: ^2.2.3 # used for file_saver_from_zero download on web
-  enough_convert: ^1.6.0 # used for reading window events on windows # ! replace with native converters if ever available on windows and web
-  bitsdojo_window: ^0.1.6 # ideally, we would do all window-related stuff with window_manager, and remove this dependency, but it's not worth the effort
-  window_manager: ^0.4.3
-  pasteboard: ^0.4.0
-  flutter_app_installer: ^1.0.1
-
-  # * Specific Utility
-  dio: ^5.8.0+1
-  dio_smart_retry: ^7.0.1
-  sanitize_filename: ^1.0.5
-  archive: ^4.0.7 # used to unzip the update on Windows
-  excel: # ^4.0.2
-#    path: ../excel/
-    git:
-      url: https://github.com/Wishmater/excel
-      ref: 6b1afaf4d33a5314ac33cecdfa9399f54dbf2481
-  pdf: # 3.10.5
-    git:
-      url: https://github.com/Wishmater/dart_pdf
-      ref: 206d0671ac2a99b577f815353bf7ccb3873dca7f
-      path: pdf
-  date:
-#    path: ../date/
-    git:
-      url: https://github.com/ross96D/date
-      ref: 6a1a8b7cdb09
-  mlog:
-    version: ^1.0.1
-    git:
-      url: https://github.com/ross96D/mlog
-      tag_pattern: "{{version}}"
-
+  fz_actions:
+    path: packages/fz_actions
+  fz_animations:
+    path: packages/fz_animations
+  fz_api_handling:
+    path: packages/fz_api_handling
+  fz_app_update:
+    path: packages/fz_app_update
+  fz_appbar:
+    path: packages/fz_appbar
+  fz_combo:
+    path: packages/fz_combo
+  fz_comparable_list:
+    path: packages/fz_comparable_list
+  fz_copy_ensure_visible:
+    path: packages/fz_copy_ensure_visible
+  fz_copy_page_indicator:
+    path: packages/fz_copy_page_indicator
+  fz_copy_sticky_header:
+    path: packages/fz_copy_sticky_header
+  fz_copy_time_picker:
+    path: packages/fz_copy_time_picker
+  fz_copy_tooltip:
+    path: packages/fz_copy_tooltip
+  fz_dao:
+    path: packages/fz_dao
+  fz_date_picker:
+    path: packages/fz_date_picker
+  fz_dialog:
+    path: packages/fz_dialog
+  fz_drawer_menu:
+    path: packages/fz_drawer_menu
+  fz_expansion_tile:
+    path: packages/fz_expansion_tile
+  fz_export:
+    path: packages/fz_export
+  fz_file_picker:
+    path: packages/fz_file_picker
+  fz_log:
+    path: packages/fz_log
+  fz_file_saver:
+    path: packages/fz_file_saver
+  fz_future_handling:
+    path: packages/fz_future_handling
+  fz_gesture_relayer:
+    path: packages/fz_gesture_relayer
+  fz_hack_focus_traversal:
+    path: packages/fz_hack_focus_traversal
+  fz_image:
+    path: packages/fz_image
+  fz_localizations:
+    path: packages/fz_localizations
+  fz_logo:
+    path: packages/fz_logo
+  fz_notification_relayer:
+    path: packages/fz_notification_relayer
+  fz_number_format:
+    path: packages/fz_number_format
+  fz_opacity_gradient:
+    path: packages/fz_opacity_gradient
+  fz_platform:
+    path: packages/fz_platform
+  fz_popup:
+    path: packages/fz_popup
+  fz_router:
+    path: packages/fz_router
+  fz_scaffold:
+    path: packages/fz_scaffold
+  fz_scrollbar:
+    path: packages/fz_scrollbar
+  fz_selectable_icon:
+    path: packages/fz_selectable_icon
+  fz_simple_shadow:
+    path: packages/fz_simple_shadow
+  fz_snackbar:
+    path: packages/fz_snackbar
+  fz_table:
+    path: packages/fz_table
+  fz_theme:
+    path: packages/fz_theme
+  fz_translucent_ink_well:
+    path: packages/fz_translucent_ink_well
+  fz_ui_scale:
+    path: packages/fz_ui_scale
+  fz_ui_utility:
+    path: packages/fz_ui_utility
+  fz_value_string:
+    path: packages/fz_value_string
+  fz_web_compile_file:
+    path: packages/fz_web_compile_file
+  fz_web_initial_config:
+    path: packages/fz_web_initial_config
+  fz_web_platform_impl:
+    path: packages/fz_web_platform_impl
 
 dev_dependencies:
   flutter_lints: ^5.0.0
 
-
 dependency_overrides:
-  intl: ^0.20.2    # apparently packages before 1.0 break on every minor version, which makes it pretty much unusable
-  archive: ^4.0.7  # old excel fork forces 3.3.7 which has security issues, we should if features implemented by us are already available in excel package and migrate
-#  win32: ^5.0.6    # force older plugins (bitsdojo_window 0.1.5) to use a newer version, required by other plugins (file_picker>=5.3.2)
-
+  intl: ^0.20.2
+  archive: ^4.0.7
 
 flutter:
   uses-material-design: true

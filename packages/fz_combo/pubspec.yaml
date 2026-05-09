@@ -1,0 +1,33 @@
+name: fz_combo
+description: Combo (dropdown/combobox) widget for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: 2.0.0-dev.9
+
+  fz_api_handling:
+    path: ../fz_api_handling
+  fz_copy_tooltip:
+    path: ../fz_copy_tooltip
+  fz_dao:
+    path: ../fz_dao
+  fz_future_handling:
+    path: ../fz_future_handling
+  fz_localizations:
+    path: ../fz_localizations
+  fz_popup:
+    path: ../fz_popup
+  fz_scrollbar:
+    path: ../fz_scrollbar
+  fz_table:
+    path: ../fz_table
+  fz_ui_utility:
+    path: ../fz_ui_utility
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

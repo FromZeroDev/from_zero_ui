@@ -1,0 +1,14 @@
+name: fz_copy_page_indicator
+description: Arrow page indicator widget (copied from Flutter).
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  page_view_indicators: ^2.0.0
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

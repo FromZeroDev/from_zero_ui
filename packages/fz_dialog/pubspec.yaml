@@ -1,0 +1,36 @@
+name: fz_dialog
+description: Modal dialog system for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  animations: ^2.0.11
+  bitsdojo_window: ^0.1.6
+  dartx: ^1.2.0
+  multi_value_listenable_builder: ^0.0.2
+
+  fz_animations:
+    path: ../fz_animations
+  fz_appbar:
+    path: ../fz_appbar
+  fz_copy_tooltip:
+    path: ../fz_copy_tooltip
+  fz_future_handling:
+    path: ../fz_future_handling
+  fz_localizations:
+    path: ../fz_localizations
+  fz_platform:
+    path: ../fz_platform
+  fz_scaffold:
+    path: ../fz_scaffold
+  fz_scrollbar:
+    path: ../fz_scrollbar
+  fz_ui_utility:
+    path: ../fz_ui_utility
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

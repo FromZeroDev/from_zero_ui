@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:from_zero_ui/src/app_scaffolding/settings.dart';
+import 'package:from_zero_ui/from_zero_ui.dart';
 
 class ThemeParameters extends ThemeParametersFromZero {
   @override

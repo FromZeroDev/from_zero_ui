@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:from_zero_ui/util/web_initial_config/web_initial_config.dart';
+import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'change_notifiers/theme_parameters.dart';
 import 'router.dart';

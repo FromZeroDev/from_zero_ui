@@ -1,0 +1,17 @@
+name: fz_scrollbar
+description: Custom scrollbar with scroll controller for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  fz_platform:
+    path: ../fz_platform
+  fz_opacity_gradient:
+    path: ../fz_opacity_gradient
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

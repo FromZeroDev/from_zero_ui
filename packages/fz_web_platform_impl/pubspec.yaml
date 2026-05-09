@@ -1,0 +1,14 @@
+name: fz_web_platform_impl
+description: Web platform implementation utility for Flutter.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  platform_detect: ^2.0.7
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

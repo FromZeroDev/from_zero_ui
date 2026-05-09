@@ -1,0 +1,16 @@
+name: fz_comparable_list
+description: Comparable list utilities for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  collection: ^1.18.0
+  fz_value_string:
+    path: ../fz_value_string
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

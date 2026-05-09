@@ -1,0 +1,50 @@
+name: fz_scaffold
+description: Main scaffold and app content wrapper for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: 2.0.0-dev.9
+  bitsdojo_window: ^0.1.6
+  dartx: ^1.2.0
+  dio: ^5.8.0+1
+  go_router: 10.0.0
+  hive: ^2.2.3
+  window_manager: ^0.4.3
+
+  fz_actions:
+    path: ../fz_actions
+  fz_animations:
+    path: ../fz_animations
+  fz_appbar:
+    path: ../fz_appbar
+  fz_copy_tooltip:
+    path: ../fz_copy_tooltip
+  fz_dialog:
+    path: ../fz_dialog
+  fz_localizations:
+    path: ../fz_localizations
+  fz_platform:
+    path: ../fz_platform
+  fz_router:
+    path: ../fz_router
+  fz_scrollbar:
+    path: ../fz_scrollbar
+  fz_simple_shadow:
+    path: ../fz_simple_shadow
+  fz_snackbar:
+    path: ../fz_snackbar
+  fz_theme:
+    path: ../fz_theme
+  fz_ui_utility:
+    path: ../fz_ui_utility
+
+
+  fz_log:
+    path: ../fz_log
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

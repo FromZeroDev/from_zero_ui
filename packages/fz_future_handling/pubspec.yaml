@@ -1,0 +1,30 @@
+name: fz_future_handling
+description: Future handling widgets and utilities for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: 2.0.0-dev.9
+  dartx: ^1.2.0
+
+  fz_animations:
+    path: ../fz_animations
+  fz_dialog:
+    path: ../fz_dialog
+  fz_export:
+    path: ../fz_export
+  fz_localizations:
+    path: ../fz_localizations
+  fz_opacity_gradient:
+    path: ../fz_opacity_gradient
+  fz_scrollbar:
+    path: ../fz_scrollbar
+  fz_ui_utility:
+    path: ../fz_ui_utility
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

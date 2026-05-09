@@ -1,0 +1,16 @@
+name: fz_platform
+description: Platform utilities for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  bitsdojo_window: ^0.1.6
+  bitsdojo_window_platform_interface: ^0.1.2
+  path_provider: ^2.1.0
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

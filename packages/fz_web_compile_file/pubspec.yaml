@@ -1,0 +1,13 @@
+name: fz_web_compile_file
+description: Web compile file utility for Flutter.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

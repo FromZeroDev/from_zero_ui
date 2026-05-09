@@ -1,0 +1,18 @@
+name: fz_router
+description: GoRouter extensions for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: 2.0.0-dev.9
+  go_router: 10.0.0
+
+  fz_scaffold:
+    path: ../fz_scaffold
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

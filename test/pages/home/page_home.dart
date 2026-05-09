@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:from_zero_ui/src/ui_utility/from_zero_logo.dart';
+import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../router.dart';

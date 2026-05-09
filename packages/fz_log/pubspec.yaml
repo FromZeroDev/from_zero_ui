@@ -1,0 +1,19 @@
+name: fz_log
+description: Logging utilities for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.8.0+1
+  mlog:
+    version: ^1.0.1
+    git:
+      url: https://github.com/ross96D/mlog
+      tag_pattern: "{{version}}"
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

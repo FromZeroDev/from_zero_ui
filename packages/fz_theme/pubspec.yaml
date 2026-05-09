@@ -1,0 +1,31 @@
+name: fz_theme
+description: Theme system for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: 2.0.0-dev.9
+  flutter_font_icons: ^2.2.5
+  bitsdojo_window: ^0.1.6
+  hive_flutter: ^1.1.0
+  intl: ^0.20.2
+
+  fz_app_update:
+    path: ../fz_app_update
+  fz_combo:
+    path: ../fz_combo
+  fz_copy_tooltip:
+    path: ../fz_copy_tooltip
+  fz_scaffold:
+    path: ../fz_scaffold
+  fz_ui_utility:
+    path: ../fz_ui_utility
+
+  fz_localizations:
+    path: ../fz_localizations
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

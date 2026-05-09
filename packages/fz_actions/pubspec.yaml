@@ -1,0 +1,23 @@
+name: fz_actions
+description: Action system for FromZero UI (toolbar actions, context menus, API actions).
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  multi_value_listenable_builder: ^0.0.2
+
+  fz_api_handling:
+    path: ../fz_api_handling
+  fz_copy_tooltip:
+    path: ../fz_copy_tooltip
+  fz_future_handling:
+    path: ../fz_future_handling
+  fz_scaffold:
+    path: ../fz_scaffold
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

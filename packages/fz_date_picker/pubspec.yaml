@@ -1,0 +1,26 @@
+name: fz_date_picker
+description: Date picker widget for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  dartx: ^1.2.0
+  intl: ^0.20.2
+
+  fz_copy_time_picker:
+    path: ../fz_copy_time_picker
+  fz_copy_tooltip:
+    path: ../fz_copy_tooltip
+  fz_localizations:
+    path: ../fz_localizations
+  fz_popup:
+    path: ../fz_popup
+  fz_ui_utility:
+    path: ../fz_ui_utility
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

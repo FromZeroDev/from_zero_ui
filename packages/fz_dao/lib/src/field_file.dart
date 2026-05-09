@@ -1,0 +1,466 @@
+import 'dart:io';
+
+import 'package:dartx/dartx.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fz_dao/fz_dao.dart';
+import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_copy_tooltip/fz_copy_tooltip.dart';
+import 'package:fz_snackbar/fz_snackbar.dart';
+import 'package:fz_api_handling/fz_api_handling.dart';
+import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_combo/fz_combo.dart';
+import 'package:fz_value_string/fz_value_string.dart';
+import 'package:fz_future_handling/fz_future_handling.dart';
+import 'package:fz_file_picker/fz_file_picker.dart';
+import 'package:fz_comparable_list/fz_comparable_list.dart';
+import 'package:fz_ui_utility/fz_ui_utility.dart';
+import 'package:fz_animations/fz_animations.dart';
+import 'package:fz_platform/fz_platform.dart';
+import 'package:fz_file_picker/fz_file_picker.dart';
+import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
+import 'package:path/path.dart' as path;
+import 'package:fz_actions/fz_actions.dart';
+import 'package:fz_scaffold/fz_scaffold.dart';
+import 'package:fz_scrollbar/fz_scrollbar.dart';
+import 'package:fz_appbar/fz_appbar.dart';
+import 'package:fz_table/fz_table.dart';
+import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
+import 'package:fz_selectable_icon/fz_selectable_icon.dart';
+import 'package:fz_log/fz_log.dart';
+import 'package:fz_date_picker/fz_date_picker.dart';
+
+class FileField extends StringField {
+  final FileType fileType;
+  final List<String>? allowedExtensions;
+  final bool enableDragAndDrop;
+  final bool allowDragAndDropInWholeScreen;
+  final bool pickDirectory;
+  final bool allowTyping;
+  final String? initialDirectory;
+
+  File? get file => value.isNullOrEmpty ? null : File(value!);
+  String? get filename {
+    return value.isNullOrEmpty
+        ? null
+        : pickDirectory
+        ? '$value${path.separator}'
+        : value?.split('/').last.split(r'\').last;
+  }
+
+  FileField({
+    required super.uiNameGetter,
+    super.value,
+    String? dbValue,
+    super.clearableGetter,
+    super.maxWidth,
+    super.minWidth,
+    super.flex,
+    super.hintGetter,
+    super.tooltipGetter,
+    super.tableColumnWidth,
+    super.hiddenGetter,
+    super.hiddenInTableGetter,
+    super.hiddenInViewGetter,
+    super.hiddenInFormGetter,
+    super.validatorsGetter,
+    super.validateOnlyOnConfirm,
+    super.colModelBuilder,
+    super.undoValues,
+    super.redoValues,
+    super.fieldGlobalKey,
+    super.focusNode,
+    super.invalidateNonEmptyValuesIfHiddenInForm,
+    super.defaultValue = '',
+    super.backgroundColor,
+    super.actionsGetter,
+    super.viewWidgetBuilder,
+    super.onValueChanged,
+    this.fileType = FileType.any,
+    this.allowedExtensions,
+    this.enableDragAndDrop = true,
+    this.allowDragAndDropInWholeScreen = false,
+    this.pickDirectory = false,
+    this.allowTyping = false,
+    this.initialDirectory,
+  }) : super(
+         dbValue: dbValue ?? value,
+       );
+
+  @override
+  FileField copyWith({
+    FieldValueGetter<String, Field>? uiNameGetter,
+    String? value,
+    String? dbValue,
+    FieldValueGetter<String?, Field>? hintGetter,
+    FieldValueGetter<String?, Field>? tooltipGetter,
+    FieldValueGetter<bool, Field>? clearableGetter,
+    double? maxWidth,
+    double? minWidth,
+    double? flex,
+    double? tableColumnWidth,
+    FieldValueGetter<bool, Field>? hiddenGetter,
+    FieldValueGetter<bool, Field>? hiddenInTableGetter,
+    FieldValueGetter<bool, Field>? hiddenInViewGetter,
+    FieldValueGetter<bool, Field>? hiddenInFormGetter,
+    FieldValueGetter<List<FieldValidator<String>>, Field>? validatorsGetter,
+    bool? validateOnlyOnConfirm,
+    FieldValueGetter<SimpleColModel, Field>? colModelBuilder,
+    List<String?>? undoValues,
+    List<String?>? redoValues,
+    bool? invalidateNonEmptyValuesIfHiddenInForm,
+    String? defaultValue,
+    ContextFulFieldValueGetter<Color?, Field>? backgroundColor,
+    ContextFulFieldValueGetter<List<ActionFromZero>, Field>? actionsGetter,
+    ViewWidgetBuilder<String>? viewWidgetBuilder,
+    OnFieldValueChanged<String?>? onValueChanged,
+    FileType? fileType,
+    List<String>? allowedExtensions,
+    bool? enableDragAndDrop,
+    bool? allowDragAndDropInWholeScreen,
+    bool? pickDirectory,
+    bool? allowTyping,
+    String? initialDirectory,
+    // StringField fields
+    bool? obfuscate,
+    bool? showObfuscationToggleButton,
+    bool? trimOnSave,
+    StringFieldType? type,
+    int? minLines,
+    int? maxLines,
+    InputDecoration? inputDecoration,
+    List<TextInputFormatter>? inputFormatters,
+  }) {
+    return FileField(
+      uiNameGetter: uiNameGetter ?? this.uiNameGetter,
+      value: value ?? this.value,
+      dbValue: dbValue ?? this.dbValue,
+      clearableGetter: clearableGetter ?? this.clearableGetter,
+      maxWidth: maxWidth ?? this.maxWidth,
+      minWidth: minWidth ?? this.minWidth,
+      flex: flex ?? this.flex,
+      hintGetter: hintGetter ?? this.hintGetter,
+      tooltipGetter: tooltipGetter ?? this.tooltipGetter,
+      tableColumnWidth: tableColumnWidth ?? this.tableColumnWidth,
+      hiddenInTableGetter: hiddenInTableGetter ?? hiddenGetter ?? this.hiddenInTableGetter,
+      hiddenInViewGetter: hiddenInViewGetter ?? hiddenGetter ?? this.hiddenInViewGetter,
+      hiddenInFormGetter: hiddenInFormGetter ?? hiddenGetter ?? this.hiddenInFormGetter,
+      validatorsGetter: validatorsGetter ?? this.validatorsGetter,
+      validateOnlyOnConfirm: validateOnlyOnConfirm ?? this.validateOnlyOnConfirm,
+      colModelBuilder: colModelBuilder ?? this.colModelBuilder,
+      undoValues: undoValues ?? List.from(this.undoValues),
+      redoValues: redoValues ?? List.from(this.redoValues),
+      invalidateNonEmptyValuesIfHiddenInForm:
+          invalidateNonEmptyValuesIfHiddenInForm ?? this.invalidateNonEmptyValuesIfHiddenInForm,
+      defaultValue: defaultValue ?? this.defaultValue,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      actionsGetter: actionsGetter ?? this.actionsGetter,
+      viewWidgetBuilder: viewWidgetBuilder ?? this.viewWidgetBuilder,
+      onValueChanged: onValueChanged ?? this.onValueChanged,
+      fileType: fileType ?? this.fileType,
+      allowedExtensions: allowedExtensions ?? this.allowedExtensions,
+      enableDragAndDrop: enableDragAndDrop ?? this.enableDragAndDrop,
+      allowDragAndDropInWholeScreen: allowDragAndDropInWholeScreen ?? this.allowDragAndDropInWholeScreen,
+      pickDirectory: pickDirectory ?? this.pickDirectory,
+      allowTyping: allowTyping ?? this.allowTyping,
+      initialDirectory: initialDirectory ?? this.initialDirectory,
+      // StringField fields
+      // obfuscate: obfuscate ?? this.obfuscate,
+      // showObfuscationToggleButton: showObfuscationToggleButton ?? this.showObfuscationToggleButton,
+      // trimOnSave: trimOnSave ?? this.trimOnSave,
+    );
+  }
+
+  @override
+  List<Widget> buildFieldEditorWidgets(
+    BuildContext context, {
+    bool addCard = false,
+    bool asSliver = true,
+    bool expandToFillContainer = true,
+    bool dense = false,
+    bool ignoreHidden = false,
+    FocusNode? focusNode,
+    ScrollController? mainScrollController,
+    bool useGlobalKeys = true,
+  }) {
+    if (allowTyping) {
+      bool addedFilePicker = !enableDragAndDrop;
+      return super
+          .buildFieldEditorWidgets(
+            context,
+            addCard: addCard,
+            asSliver: asSliver,
+            expandToFillContainer: expandToFillContainer,
+            dense: dense,
+            focusNode: focusNode,
+            ignoreHidden: ignoreHidden,
+            mainScrollController: mainScrollController,
+          )
+          .map((e) {
+            if (!addedFilePicker) {
+              addedFilePicker = true;
+              return FilePickerFromZero(
+                allowMultiple: false,
+                dialogTitle: hint ?? uiName,
+                fileType: fileType,
+                allowedExtensions: allowedExtensions,
+                enableDragAndDrop: enableDragAndDrop,
+                allowDragAndDropInWholeScreen: allowDragAndDropInWholeScreen,
+                onlyForDragAndDrop: true,
+                pickDirectory: pickDirectory,
+                initialDirectory: initialDirectory,
+                enabled: enabled,
+                onSelected: (value) {
+                  userInteracted = true;
+                  commitValue(value.first.absolute.path);
+                },
+                child: e,
+              );
+            }
+            return e;
+          })
+          .toList();
+    }
+    focusNode ??= this.focusNode;
+    Widget result;
+    if (hiddenInForm && !ignoreHidden) {
+      result = const SizedBox.shrink();
+      if (asSliver) {
+        result = SliverToBoxAdapter(
+          child: result,
+        );
+      }
+      return [result];
+    }
+    if (expandToFillContainer) {
+      result = LayoutBuilder(
+        builder: (context, constraints) {
+          return _buildFieldEditorWidget(
+            context,
+            addCard: addCard,
+            asSliver: asSliver,
+            expandToFillContainer: expandToFillContainer,
+            largeHorizontally: constraints.maxWidth >= ScaffoldFromZero.screenSizeMedium,
+            focusNode: focusNode!,
+            dense: dense,
+            constraints: constraints,
+            useGlobalKeys: useGlobalKeys,
+          );
+        },
+      );
+    } else {
+      result = _buildFieldEditorWidget(
+        context,
+        addCard: addCard,
+        asSliver: asSliver,
+        expandToFillContainer: expandToFillContainer,
+        focusNode: focusNode,
+        dense: dense,
+        useGlobalKeys: useGlobalKeys,
+      );
+    }
+    if (asSliver) {
+      result = SliverToBoxAdapter(
+        child: result,
+      );
+    }
+    return [result];
+  }
+
+  Widget _buildFieldEditorWidget(
+    BuildContext context, {
+    required FocusNode focusNode,
+    bool addCard = false,
+    bool asSliver = true,
+    bool expandToFillContainer = true,
+    bool largeHorizontally = false,
+    bool dense = false,
+    BoxConstraints? constraints,
+    bool useGlobalKeys = true,
+  }) {
+    String? initialDirectory;
+    if (this.initialDirectory != null) {
+      initialDirectory = this.initialDirectory;
+    } else if (value.isNotNullOrEmpty) {
+      try {
+        initialDirectory = File(value!).parent.path;
+      } catch (_) {}
+    }
+    Widget result = NotificationListener(
+      onNotification: (notification) => true,
+      child: AnimatedBuilder(
+        animation: this,
+        builder: (context, child) {
+          final visibleValidationErrors = passedFirstEdit
+              ? validationErrors
+              : validationErrors.where((e) => e.isBeforeEditing);
+          Widget result = Stack(
+            children: [
+              Material(
+                color: enabled ? Colors.transparent : Theme.of(context).canvasColor,
+                child: FilePickerFromZero(
+                  allowMultiple: false,
+                  dialogTitle: hint ?? uiName,
+                  fileType: fileType,
+                  allowedExtensions: allowedExtensions,
+                  enableDragAndDrop: enableDragAndDrop,
+                  allowDragAndDropInWholeScreen: allowDragAndDropInWholeScreen,
+                  pickDirectory: pickDirectory,
+                  focusNode: focusNode,
+                  initialDirectory: initialDirectory,
+                  enabled: enabled,
+                  onSelected: (value) {
+                    userInteracted = true;
+                    commitValue(value.first.absolute.path);
+                  },
+                  child: Builder(
+                    builder: (context) {
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          right: dense
+                              ? 0
+                              : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40,
+                        ),
+                        child: ComboField.buttonContentBuilder(
+                          context,
+                          uiName,
+                          hint,
+                          filename,
+                          enabled,
+                          false,
+                          dense: dense,
+                          showDropdownIcon: false,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              // if (!enabled)
+              //   Positioned.fill(
+              //     child: MouseRegion(
+              //       cursor: SystemMouseCursors.forbidden,
+              //     ),
+              //   ),
+            ],
+          );
+          result = TooltipFromZero(
+            message:
+                (dense
+                        ? visibleValidationErrors
+                        : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
+                    .fold('', (a, b) {
+                      return a.toString().trim().isEmpty
+                          ? b.toString()
+                          : b.toString().trim().isEmpty
+                          ? a.toString()
+                          : '$a\n$b';
+                    }),
+            waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
+            child: result,
+          );
+          if (!dense) {
+            final actions = buildActions(context, focusNode);
+            final defaultActions = buildDefaultActions(context);
+            var allActions = [
+              ...actions,
+              if (actions.isNotEmpty && defaultActions.isNotEmpty)
+                ActionFromZero.divider(breakpoints: {0: ActionState.popup}),
+              ...defaultActions,
+            ];
+            if (!enabled) {
+              allActions = allActions
+                  .map(
+                    (e) => e.copyWith(
+                      disablingError: '',
+                    ),
+                  )
+                  .toList();
+            }
+            result = AppbarFromZero(
+              contextMenuEnabled: enabled,
+              onShowContextMenu: () => focusNode.requestFocus(),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              useFlutterAppbar: false,
+              extendTitleBehindActions: true,
+              toolbarHeight: 56,
+              paddingRight: 6,
+              actionPadding: 0,
+              skipTraversalForActions: true,
+              constraints: const BoxConstraints(),
+              actions: allActions,
+              title: SizedBox(height: 56, child: result),
+            );
+          }
+          result = ValidationRequiredOverlay(
+            isRequired: isRequired,
+            isEmpty: enabled && value == null,
+            errors: validationErrors,
+            dense: dense,
+            child: result,
+          );
+          return result;
+        },
+      ),
+    );
+    if (addCard) {
+      result = Card(
+        clipBehavior: Clip.hardEdge,
+        child: result,
+      );
+    }
+    return EnsureVisibleWhenFocused(
+      focusNode: focusNode,
+      child: Padding(
+        key: useGlobalKeys ? fieldGlobalKey : null,
+        padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
+        child: SizedBox(
+          width: maxWidth,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 64,
+                child: result,
+              ),
+              if (!dense)
+                ValidationMessage(
+                  errors: validationErrors,
+                  passedFirstEdit: passedFirstEdit,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  List<ActionFromZero> buildDefaultActions(BuildContext context, {FocusNode? focusNode}) {
+    return [
+      if (allowTyping)
+        ActionFromZero(
+          icon: const Icon(Icons.file_open),
+          title: 'Load from File', // TODO: 3 internationalize
+          breakpoints: {0: ActionState.icon},
+          onTap: (context) async {
+            final result = await pickFileFromZero(
+              dialogTitle: hint ?? uiName,
+              fileType: fileType,
+              allowedExtensions: allowedExtensions,
+              pickDirectory: pickDirectory,
+              initialDirectory: initialDirectory,
+            );
+            if (result != null && result.isNotEmpty) {
+              userInteracted = true;
+              commitValue(result.first.absolute.path);
+            }
+          },
+        ),
+      ...super.buildDefaultActions(context, focusNode: focusNode),
+    ];
+  }
+}

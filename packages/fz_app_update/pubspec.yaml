@@ -1,0 +1,36 @@
+name: fz_app_update
+description: App update handling for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  animations: ^2.0.11
+  archive: ^4.0.7
+  bitsdojo_window: ^0.1.6
+  dio: ^5.8.0+1
+  dio_smart_retry: ^7.0.1
+  intl: ^0.20.2
+  path: ^1.8.0
+  path_provider: ^2.1.0
+  flutter_app_installer: ^1.0.1
+
+  fz_dialog:
+    path: ../fz_dialog
+  fz_file_saver:
+    path: ../fz_file_saver
+  fz_localizations:
+    path: ../fz_localizations
+  fz_platform:
+    path: ../fz_platform
+  fz_scaffold:
+    path: ../fz_scaffold
+
+
+  fz_log:
+    path: ../fz_log
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7

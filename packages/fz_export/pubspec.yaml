@@ -1,0 +1,53 @@
+name: fz_export
+description: PDF/PNG/Excel export system for FromZero UI.
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: "^3.9.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_font_icons: ^2.2.5
+  animations: ^2.0.11
+  dartx: ^1.2.0
+  date:
+    git:
+      url: https://github.com/ross96D/date
+      ref: 6a1a8b7cdb09
+  excel:
+    git:
+      url: https://github.com/Wishmater/excel
+      ref: 6b1afaf4d33a5314ac33cecdfa9399f54dbf2481
+  intl: ^0.20.2
+  page_view_indicators: ^2.0.0
+  path: ^1.8.0
+  pdf:
+    git:
+      url: https://github.com/Wishmater/dart_pdf
+      ref: 206d0671ac2a99b577f815353bf7ccb3873dca7f
+      path: pdf
+
+  fz_copy_page_indicator:
+    path: ../fz_copy_page_indicator
+  fz_dao:
+    path: ../fz_dao
+  fz_dialog:
+    path: ../fz_dialog
+  fz_file_saver:
+    path: ../fz_file_saver
+  fz_platform:
+    path: ../fz_platform
+  fz_scaffold:
+    path: ../fz_scaffold
+  fz_table:
+    path: ../fz_table
+  fz_theme:
+    path: ../fz_theme
+  fz_ui_utility:
+    path: ../fz_ui_utility
+  fz_value_string:
+    path: ../fz_value_string
+
+dependency_overrides:
+  intl: ^0.20.2
+  archive: ^4.0.7
