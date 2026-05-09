@@ -21,3 +21,6 @@ ResponsiveHorizontalInsets(
   child: YourWidget(),
 )
 ```
+
+
+> **Requires** `FromZeroAppContentWrapper` at the app root for `fromZeroScreenProvider` and related providers. See [fz_scaffold](../fz_scaffold/#fromzeroappcontentwrapper----the-app-root) for setup.

@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:intl/number_symbols.dart';
 
 class ExtendedNumberFormat extends MyNumberFormat {
+  // TODO: 2 does it make sense to declare these statically here ??
   static final emptyNumberFormatter = ExtendedNumberFormat(null);
   static final doubleDecimalNumberFormatter = ExtendedNumberFormat("###,###,###,###,##0.00");
   static final tripleDecimalNumberFormatter = ExtendedNumberFormat("###,###,###,###,##0.000");

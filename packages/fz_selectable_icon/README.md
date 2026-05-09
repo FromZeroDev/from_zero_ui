@@ -1,6 +1,6 @@
 # fz_selectable_icon
 
-An icon widget with a border/background that highlights on tap, useful for toolbar-like icon buttons.
+An icon widget with a border/background that highlights when `selected=true`, useful for icons that indicate a toggleable state (acting kinda like a switch).
 
 ## Usage
 

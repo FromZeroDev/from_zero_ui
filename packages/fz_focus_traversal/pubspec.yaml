@@ -1,4 +1,4 @@
-name: fz_hack_focus_traversal
+name: fz_focus_traversal
 description: Focus traversal hack utility for Flutter.
 publish_to: 'none'
 version: 0.1.0

@@ -453,17 +453,17 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_focus_traversal:
+    dependency: "direct main"
+    description:
+      path: "../fz_focus_traversal"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_future_handling:
     dependency: "direct main"
     description:
       path: "../fz_future_handling"
-      relative: true
-    source: path
-    version: "0.1.0"
-  fz_hack_focus_traversal:
-    dependency: "direct main"
-    description:
-      path: "../fz_hack_focus_traversal"
       relative: true
     source: path
     version: "0.1.0"

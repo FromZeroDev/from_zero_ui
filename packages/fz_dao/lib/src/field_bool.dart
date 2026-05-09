@@ -17,7 +17,7 @@ import 'package:fz_ui_utility/fz_ui_utility.dart';
 import 'package:fz_animations/fz_animations.dart';
 import 'package:fz_platform/fz_platform.dart';
 import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
-import 'package:fz_hack_focus_traversal/fz_hack_focus_traversal.dart';
+import 'package:fz_focus_traversal/fz_focus_traversal.dart';
 import 'package:fz_actions/fz_actions.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';

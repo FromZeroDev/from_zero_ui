@@ -10,20 +10,20 @@ This is the root compatibility package — importing `from_zero_ui` gives you ev
 
 | Package | Description |
 |---------|-------------|
-| [fz_scaffold](packages/fz_scaffold/) | App content wrapper, screen size management, responsive breakpoints, drawer, window controls |
-| [fz_theme](packages/fz_theme/) | Theme system (light/dark), theme switcher, locale switcher, Hive-backed persistence |
+| [fz_scaffold](packages/fz_scaffold/) | App wrapper, screen sizes, responsive sidebar↔bottom nav, desktop window controls |
+| [fz_theme](packages/fz_theme/) | Theme system (light/dark), theme/locale switcher, Hive persistence |
 | [fz_router](packages/fz_router/) | GoRouter extensions with drawer integration and route grouping |
 | [fz_appbar](packages/fz_appbar/) | App bar widget with window dragging, drawer toggle, action overflow |
 | [fz_drawer_menu](packages/fz_drawer_menu/) | Responsive navigation drawer (sidebar on desktop, bottom nav on mobile) |
-| [fz_localizations](packages/fz_localizations/) | i18n support with JSON translation files |
+| [fz_localizations](packages/fz_localizations/) | i18n JSON translations (en/es out of the box) |
 
 ### Data & Tables
 
 | Package | Description |
 |---------|-------------|
 | [fz_dao](packages/fz_dao/) | Data Access Objects: CRUD, form fields, validation |
-| [fz_table](packages/fz_table/) | Highly customizable data table with sorting, filtering, selection |
-| [fz_export](packages/fz_export/) | Table export to PDF, PNG, Excel |
+| [fz_table](packages/fz_table/) | Customizable data table: sorting, multi-type filtering, column management, isolate computation |
+| [fz_export](packages/fz_export/) | Auto-export or dialog-choose: PDF, PNG, Excel from tables |
 | [fz_api_handling](packages/fz_api_handling/) | Riverpod-based API state management with Dio |
 | [fz_future_handling](packages/fz_future_handling/) | Async UI widgets (loading, error, data states) |
 
@@ -31,28 +31,27 @@ This is the root compatibility package — importing `from_zero_ui` gives you ev
 
 | Package | Description |
 |---------|-------------|
-| [fz_combo](packages/fz_combo/) | Combo box / dropdown with search and multi-select |
-| [fz_popup](packages/fz_popup/) | Popup menu and context menu widgets |
-| [fz_dialog](packages/fz_dialog/) | Modal dialog system with desktop title bar support |
-| [fz_snackbar](packages/fz_snackbar/) | Snackbar system with API binding and block-UI mode |
-| [fz_date_picker](packages/fz_date_picker/) | Date picker with optional time selection |
+| [fz_combo](packages/fz_combo/) | Combo box / dropdown: search, multi-select, table integration |
+| [fz_popup](packages/fz_popup/) | Anchor-aware popup + right-click context menu with action inheritance |
+| [fz_dialog](packages/fz_dialog/) | Modal dialog with custom transitions, desktop title bar, button system |
+| [fz_snackbar](packages/fz_snackbar/) | Queue-based snackbars: typed status, API-bound auto-dismiss, block-UI |
+| [fz_date_picker](packages/fz_date_picker/) | Inline widget or dialog: date + time, DAO field integration |
 | [fz_file_picker](packages/fz_file_picker/) | File picker with drag-and-drop support |
-| [fz_image](packages/fz_image/) | Image widget with fullscreen zoom |
-| [fz_actions](packages/fz_actions/) | Action system for toolbar buttons and context menus |
-| [fz_expansion_tile](packages/fz_expansion_tile/) | Material expansion tile (customized) |
-| [fz_ui_scale](packages/fz_ui_scale/) | UI scale/zoom slider |
+| [fz_image](packages/fz_image/) | Image with fullscreen pinch-zoom, hero transitions, retryable loading |
+| [fz_actions](packages/fz_actions/) | Action system with responsive breakpoints — appbar, table, context menu |
+| [fz_ui_scale](packages/fz_ui_scale/) | Whole-UI proportional scaling (not just text), Hive-persisted |
 
 ### Utilities
 
 | Package | Description |
 |---------|-------------|
-| [fz_platform](packages/fz_platform/) | Platform detection (web-safe), desktop window support |
-| [fz_log](packages/fz_log/) | Configurable logging with log-level filtering |
-| [fz_value_string](packages/fz_value_string/) | Value wrappers, keyboard shortcuts, utilities |
-| [fz_comparable_list](packages/fz_comparable_list/) | Deduplicating comparable list |
-| [fz_tooltip](packages/fz_tooltip/) | Rich customizable tooltip widget |
-| [fz_scrollbar](packages/fz_scrollbar/) | Custom thin scrollbar |
-| [fz_opacity_gradient](packages/fz_opacity_gradient/) | Scroll-fade gradient masks |
+| [fz_platform](packages/fz_platform/) | Web-safe platform detection (isMobile/isDesktop/etc.), download dirs, desktop window |
+| [fz_log](packages/fz_log/) | Configurable log() with type-tagged log levels (FzLgType) |
+| [fz_value_string](packages/fz_value_string/) | Decouples sort/comparison value from display string for tables & combos |
+| [fz_comparable_list](packages/fz_comparable_list/) | Deep-equality list wrappers for Riverpod provider family arguments |
+| [fz_tooltip](packages/fz_tooltip/) | Desktop-aware tooltip with scrollable content, platform-sensitive timing |
+| [fz_scrollbar](packages/fz_scrollbar/) | Scrollbar with edge-case fixes: always-visible on desktop, attach/detach notifications |
+| [fz_opacity_gradient](packages/fz_opacity_gradient/) | Static and scroll-aware content-edge fade masks |
 | [fz_ui_utility](packages/fz_ui_utility/) | Misc widgets: responsive insets, icon backgrounds, overflow scrolls |
 
 ### Leaf / Tiny
@@ -67,22 +66,22 @@ This is the root compatibility package — importing `from_zero_ui` gives you ev
 | [fz_number_format](packages/fz_number_format/) | Extended number formatting |
 | [fz_gesture_relayer](packages/fz_gesture_relayer/) | Gesture event relay between widget subtrees |
 | [fz_notification_relayer](packages/fz_notification_relayer/) | Scroll notification re-broadcasting |
-| [fz_translucent_ink_well](packages/fz_translucent_ink_well/) | Translucent-splash InkWell |
-| [fz_hack_focus_traversal](packages/fz_hack_focus_traversal/) | Focus traversal hack |
-| [fz_copy_ensure_visible](packages/fz_copy_ensure_visible/) | Ensure focused widget visibility |
-| [fz_copy_page_indicator](packages/fz_copy_page_indicator/) | Arrow page indicator |
-| [fz_copy_sticky_header](packages/fz_copy_sticky_header/) | Sliver sticky header |
-| [fz_copy_time_picker](packages/fz_copy_time_picker/) | Time picker dialog |
+| [fz_translucent_ink_well](packages/fz_translucent_ink_well/) | InkWell with translucent hitbox — doesn't block widgets behind it |
+| [fz_focus_traversal](packages/fz_focus_traversal/) | Makes FocusTraversalGroup target a single node (jumps between form fields) |
+| [fz_copy_ensure_visible](packages/fz_copy_ensure_visible/) | Ensure-visible-when-focused (internally by DAO fields, expansion tiles) |
+| [fz_copy_page_indicator](packages/fz_copy_page_indicator/) | Arrow page indicator (internally by export) |
+| [fz_copy_sticky_header](packages/fz_copy_sticky_header/) | Sliver sticky header (internally by table) |
+| [fz_copy_time_picker](packages/fz_copy_time_picker/) | Time picker dialog (internally by date picker) |
 
 ### Web & File
 
 | Package | Description |
 |---------|-------------|
-| [fz_web_compile_file](packages/fz_web_compile_file/) | Platform-conditional file creation for web |
-| [fz_web_initial_config](packages/fz_web_initial_config/) | Platform-conditional initial config for web |
-| [fz_web_platform_impl](packages/fz_web_platform_impl/) | Platform-conditional web implementations |
-| [fz_file_saver](packages/fz_file_saver/) | File saving with native dialogs |
-| [fz_app_update](packages/fz_app_update/) | App update checking and installation |
+| [fz_web_compile_file](packages/fz_web_compile_file/) | Platform-conditional file creation (web uses Blob, native uses File) |
+| [fz_web_initial_config](packages/fz_web_initial_config/) | Sets PathUrlStrategy on web (clean URLs without #) |
+| [fz_web_platform_impl](packages/fz_web_platform_impl/) | Bridges platform_detect (operatingSystem on web, stub on native) |
+| [fz_file_saver](packages/fz_file_saver/) | Cross-platform file saving: progress snackbar, auto-open, batch downloads |
+| [fz_app_update](packages/fz_app_update/) | Check + download + install updates (Windows MSI, Android APK) |
 
 ## Quick start
 
@@ -115,6 +114,8 @@ dependencies:
 ### Package Deletion / Merging
 - fz_copy_sticky_header should be deleted in favor of using sliver_tools. This requires code changes in the packages that use it and a lot of testing.
 - Consider merging some of the packages that are only depended on by one package into that package. Especially for those that aren't meant for direct consumption.
+- fz_log should be deleted and just use mlog once mlog provides proper customization support: Formatter, Outputs, etc.
+- fz_web_compile_file we don't really use web anymore and also there are libs that solve this.
 
 ## Dependency Graph
 
@@ -124,7 +125,7 @@ dependencies:
 fz_animated_switcher_image  fz_animations         fz_gesture_relayer
 fz_notification_relayer     fz_copy_ensure_visible  fz_copy_page_indicator
 fz_copy_sticky_header       fz_copy_time_picker     fz_file_picker
-fz_hack_focus_traversal     fz_localizations        fz_log
+fz_focus_traversal          fz_localizations        fz_log
 fz_logo                     fz_number_format        fz_opacity_gradient
 fz_platform                 fz_selectable_icon      fz_simple_shadow
 fz_translucent_ink_well     fz_value_string         fz_web_compile_file
@@ -194,7 +195,7 @@ fz_dao ←→ fz_table (mutual dependency)
 | fz_combo | fz_api_handling, fz_tooltip, fz_dao, fz_future_handling, fz_localizations, fz_popup, fz_scrollbar, fz_table, fz_ui_utility |
 | fz_comparable_list | fz_value_string |
 | fz_tooltip | fz_platform, fz_scrollbar |
-| fz_dao | fz_actions, fz_animations, fz_api_handling, fz_appbar, fz_combo, fz_comparable_list, fz_copy_ensure_visible, fz_tooltip, fz_date_picker, fz_dialog, fz_file_picker, fz_future_handling, fz_hack_focus_traversal, fz_localizations, fz_log, fz_platform, fz_popup, fz_scaffold, fz_scrollbar, fz_selectable_icon, fz_snackbar, fz_table, fz_translucent_ink_well, fz_ui_utility, fz_value_string |
+| fz_dao | fz_actions, fz_animations, fz_api_handling, fz_appbar, fz_combo, fz_comparable_list, fz_copy_ensure_visible, fz_tooltip, fz_date_picker, fz_dialog, fz_file_picker, fz_focus_traversal, fz_future_handling, fz_localizations, fz_log, fz_platform, fz_popup, fz_scaffold, fz_scrollbar, fz_selectable_icon, fz_snackbar, fz_table, fz_translucent_ink_well, fz_ui_utility, fz_value_string |
 | fz_date_picker | fz_copy_time_picker, fz_tooltip, fz_localizations, fz_popup, fz_ui_utility |
 | fz_dialog | fz_animations, fz_appbar, fz_tooltip, fz_future_handling, fz_localizations, fz_platform, fz_scaffold, fz_scrollbar, fz_ui_utility |
 | fz_drawer_menu | fz_actions, fz_tooltip, fz_expansion_tile, fz_popup, fz_router, fz_scaffold, fz_scrollbar, fz_ui_utility |

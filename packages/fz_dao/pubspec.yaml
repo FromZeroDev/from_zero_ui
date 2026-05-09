@@ -37,8 +37,8 @@ dependencies:
     path: ../fz_file_picker
   fz_future_handling:
     path: ../fz_future_handling
-  fz_hack_focus_traversal:
-    path: ../fz_hack_focus_traversal
+  fz_focus_traversal:
+    path: ../fz_focus_traversal
   fz_localizations:
     path: ../fz_localizations
   fz_platform:

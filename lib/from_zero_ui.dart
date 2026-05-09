@@ -22,7 +22,7 @@ export 'package:fz_file_picker/fz_file_picker.dart';
 export 'package:fz_file_saver/fz_file_saver.dart';
 export 'package:fz_future_handling/fz_future_handling.dart';
 export 'package:fz_gesture_relayer/fz_gesture_relayer.dart';
-export 'package:fz_hack_focus_traversal/fz_hack_focus_traversal.dart';
+export 'package:fz_focus_traversal/fz_focus_traversal.dart';
 export 'package:fz_image/fz_image.dart';
 export 'package:fz_localizations/fz_localizations.dart';
 export 'package:fz_logo/fz_logo.dart';

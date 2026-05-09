@@ -510,6 +510,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_focus_traversal:
+    dependency: "direct main"
+    description:
+      path: "packages/fz_focus_traversal"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_future_handling:
     dependency: "direct main"
     description:
@@ -521,13 +528,6 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/fz_gesture_relayer"
-      relative: true
-    source: path
-    version: "0.1.0"
-  fz_hack_focus_traversal:
-    dependency: "direct main"
-    description:
-      path: "packages/fz_hack_focus_traversal"
       relative: true
     source: path
     version: "0.1.0"

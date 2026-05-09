@@ -47,3 +47,6 @@ defaultDarkTheme → opaqueDarkTheme → darkTheme → ThemeData
 ```
 
 Each tier overrides specific properties, so you can extend any level.
+
+
+> **Requires** `FromZeroAppContentWrapper` at the app root for `fromZeroScreenProvider` and related providers. See [fz_scaffold](../fz_scaffold/#fromzeroappcontentwrapper----the-app-root) for setup.

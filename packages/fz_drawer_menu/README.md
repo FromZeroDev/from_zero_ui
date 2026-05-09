@@ -96,3 +96,6 @@ Items navigate via go_router by default. Set `pushType` for custom behavior:
 - `DrawerMenuFromZero.go` — default, router navigation
 - `DrawerMenuFromZero.push` — pushes a new route
 - `DrawerMenuFromZero.replace` — replaces current route
+
+
+> **Requires** `FromZeroAppContentWrapper` at the app root for `fromZeroScreenProvider` and related providers. See [fz_scaffold](../fz_scaffold/#fromzeroappcontentwrapper----the-app-root) for setup.

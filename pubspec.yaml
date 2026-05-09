@@ -59,8 +59,8 @@ dependencies:
     path: packages/fz_future_handling
   fz_gesture_relayer:
     path: packages/fz_gesture_relayer
-  fz_hack_focus_traversal:
-    path: packages/fz_hack_focus_traversal
+  fz_focus_traversal:
+    path: packages/fz_focus_traversal
   fz_image:
     path: packages/fz_image
   fz_localizations:
