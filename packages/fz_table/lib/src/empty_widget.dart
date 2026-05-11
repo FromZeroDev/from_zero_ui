@@ -33,17 +33,14 @@ class TableEmptyWidget<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = tableController?.currentState;
     List<ActionFromZero> actions = this.actions ?? [];
-    if (tableController != null &&
-        (tableController!.currentState?.widget.allowCustomization ?? false)) {
+    if (tableController != null && (tableController!.currentState?.widget.allowCustomization ?? false)) {
       actions = TableFromZeroState.addManageActions(
         context,
         actions: actions,
         controller: tableController!,
       );
     }
-    final exportPathForExcel =
-        this.exportPathForExcel ??
-        tableController?.currentState?.widget.exportPathForExcel;
+    final exportPathForExcel = this.exportPathForExcel ?? tableController?.currentState?.widget.exportPathForExcel;
     if (tableController != null && exportPathForExcel != null) {
       actions = TableFromZeroState.addExportExcelAction(
         context,
@@ -52,9 +49,7 @@ class TableEmptyWidget<T> extends StatelessWidget {
         exportPathForExcel: exportPathForExcel,
       );
     }
-    final filtersApplied =
-        state != null &&
-        state.filtersApplied.values.firstOrNullWhere((e) => e == true) != null;
+    final filtersApplied = state != null && state.filtersApplied.values.firstOrNullWhere((e) => e == true) != null;
     return ContextMenuFromZero(
       actions: actions.whereType<ActionFromZero>().toList(),
       onShowMenu: onShowMenu,
@@ -75,12 +70,10 @@ class TableEmptyWidget<T> extends StatelessWidget {
             ),
           ),
           ErrorSign(
-            title:
-                title ?? FromZeroLocalizations.of(context).translate('no_data'),
+            title: title ?? FromZeroLocalizations.of(context).translate('no_data'),
             subtitle:
                 subtitle ??
-                (state != null &&
-                        (filtersApplied || state.widget.rows.isNotEmpty)
+                (state != null && (filtersApplied || state.widget.rows.isNotEmpty)
                     ? FromZeroLocalizations.of(
                         context,
                       ).translate('no_data_filters')

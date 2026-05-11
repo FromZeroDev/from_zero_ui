@@ -20,6 +20,8 @@ import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_log/fz_log.dart';
+import 'package:fz_opacity_gradient/fz_opacity_gradient.dart';
+import 'package:fz_platform/fz_platform.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_snackbar/fz_snackbar.dart';

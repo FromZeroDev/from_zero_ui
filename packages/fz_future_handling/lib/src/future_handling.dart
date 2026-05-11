@@ -11,7 +11,7 @@ import 'package:fz_future_handling/src/async_value_builder.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_opacity_gradient/fz_opacity_gradient.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart' hide OpacityGradient, ScrollOpacityGradient;
+import 'package:fz_ui_utility/fz_ui_utility.dart';
 
 class LoadingSign extends ImplicitlyAnimatedWidget {
   final double? value;

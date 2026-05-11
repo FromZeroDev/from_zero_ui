@@ -511,7 +511,7 @@ packages:
     source: path
     version: "0.1.0"
   fz_opacity_gradient:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../fz_opacity_gradient"
       relative: true

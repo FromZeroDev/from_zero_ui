@@ -2,49 +2,44 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cancelable_compute/cancelable_compute.dart'
-    as cancelable_compute;
+import 'package:cancelable_compute/cancelable_compute.dart' as cancelable_compute;
 import 'package:dartx/dartx.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_table/fz_table.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_dao/fz_dao.dart';
-import 'package:fz_value_string/fz_value_string.dart';
+import 'package:fz_actions/fz_actions.dart';
+import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_comparable_list/fz_comparable_list.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
-import 'package:fz_popup/fz_popup.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
-import 'package:fz_simple_shadow/fz_simple_shadow.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_export/fz_export.dart';
-import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_table/src/manage_popup.dart';
 import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 import 'package:fz_copy_sticky_header/fz_copy_sticky_header.dart';
-import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_selectable_icon/fz_selectable_icon.dart';
-import 'package:fz_appbar/fz_appbar.dart';
-import 'package:fz_notification_relayer/fz_notification_relayer.dart';
-import 'package:fz_router/fz_router.dart';
-import 'package:fz_log/fz_log.dart';
-import 'package:intl/intl.dart';
-import 'package:fz_router/fz_router.dart';
-import 'package:fz_log/fz_log.dart';
-import 'package:sliver_tools/sliver_tools.dart';
+import 'package:fz_dao/fz_dao.dart';
 import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_export/fz_export.dart';
+import 'package:fz_future_handling/fz_future_handling.dart';
+import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_log/fz_log.dart';
+import 'package:fz_notification_relayer/fz_notification_relayer.dart';
+import 'package:fz_opacity_gradient/fz_opacity_gradient.dart';
+import 'package:fz_popup/fz_popup.dart';
+import 'package:fz_router/fz_router.dart';
+import 'package:fz_scrollbar/fz_scrollbar.dart';
+import 'package:fz_selectable_icon/fz_selectable_icon.dart';
+import 'package:fz_simple_shadow/fz_simple_shadow.dart';
+import 'package:fz_table/fz_table.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
+import 'package:fz_ui_utility/fz_ui_utility.dart';
+import 'package:fz_value_string/fz_value_string.dart';
+import 'package:intl/intl.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
-typedef OnRowHoverCallback = void Function(RowModel row, bool selected);
-typedef OnCheckBoxSelectedCallback =
-    bool? Function(RowModel row, bool? selected);
+// ignore: avoid_positional_boolean_parameters
+typedef OnRowHoverCallback = void Function(RowModel<dynamic> row, bool selected);
+// ignore: avoid_positional_boolean_parameters
+typedef OnCheckBoxSelectedCallback = bool? Function(RowModel<dynamic> row, bool? selected);
+// ignore: avoid_positional_boolean_parameters
 typedef OnHeaderHoverCallback = void Function(dynamic key, bool selected);
-typedef OnCellTapCallback = ValueChanged<RowModel>? Function(dynamic key);
+typedef OnCellTapCallback = ValueChanged<RowModel<dynamic>>? Function(dynamic key);
 typedef OnCellHoverCallback = OnRowHoverCallback? Function(dynamic key);
 typedef WidthGetter = double Function(List<dynamic> currentColumnKeys);
 typedef CellBuilder<T> =
@@ -52,7 +47,7 @@ typedef CellBuilder<T> =
       BuildContext context,
       RowModel<T> row,
       dynamic colKey,
-      ColModel? col,
+      ColModel<dynamic>? col,
     );
 
 class TableFromZero<T> extends ConsumerStatefulWidget {
@@ -79,6 +74,7 @@ class TableFromZero<T> extends ConsumerStatefulWidget {
   final dynamic initialSortedColumn;
   final bool sortNullOnTop;
   final Widget? emptyWidget;
+  // ignore: avoid_positional_boolean_parameters
   final bool? Function(bool? value, List<RowModel<T>> filtered)? onAllSelected;
   final Widget? horizontalDivider;
   final Widget? verticalDivider;
@@ -174,26 +170,24 @@ class TableFromZero<T> extends ConsumerStatefulWidget {
   @override
   TableFromZeroState<T> createState() => TableFromZeroState<T>();
 
-  static final syncProvider =
-      StateProvider.family<List<TableController>, String>((ref, syncId) => []);
+  static final syncProvider = StateProvider.family<List<TableController<dynamic>>, String>((ref, syncId) => []);
 
   static void addControllerToSync(
     WidgetRef ref,
-    TableController controller,
+    TableController<dynamic> controller,
     String syncId, {
-    StateController<List<TableController>>? notifier,
+    StateController<List<TableController<dynamic>>>? notifier,
   }) {
     notifier ??= ref.read(syncProvider.call(syncId).notifier);
     notifier!.state = [...notifier.state, controller];
-    if (notifier.state.length > 1)
-      syncControllersSpecific(notifier.state.first, controller);
+    if (notifier.state.length > 1) syncControllersSpecific(notifier.state.first, controller);
   }
 
   static void removeControllerFromSync(
     WidgetRef ref,
-    TableController controller,
+    TableController<dynamic> controller,
     String syncId, {
-    StateController<List<TableController>>? notifier,
+    StateController<List<TableController<dynamic>>>? notifier,
   }) {
     notifier ??= ref.read(syncProvider.call(syncId).notifier);
     notifier!.state = notifier.state.where((e) => e != controller).toList();
@@ -202,7 +196,7 @@ class TableFromZero<T> extends ConsumerStatefulWidget {
   static void syncControllers(
     WidgetRef ref,
     String syncId, {
-    TableController? original,
+    TableController<dynamic>? original,
   }) {
     final controllers = ref.read(syncProvider.call(syncId));
     if (controllers.isNotEmpty) {
@@ -221,20 +215,18 @@ class TableFromZero<T> extends ConsumerStatefulWidget {
 
   // for now, only column visibility is synced, but this could be used to sync other properties in the future
   static void syncControllersSpecific(
-    TableController original,
-    TableController mirror, {
+    TableController<dynamic> original,
+    TableController<dynamic> mirror, {
     Map<dynamic, bool>? relevantColumns,
   }) {
     relevantColumns ??= _getRelevantColumns(original);
     mirror.currentColumnKeys = mirror.columnKeys!.where((e) {
-      return relevantColumns!.containsKey(e)
-          ? relevantColumns[e]!
-          : mirror.currentColumnKeys!.contains(e);
+      return relevantColumns!.containsKey(e) ? relevantColumns[e]! : mirror.currentColumnKeys!.contains(e);
     }).toList();
     mirror.filter(); // PERF: 2 do we need to re-filter?
   }
 
-  static Map<dynamic, bool> _getRelevantColumns(TableController controller) {
+  static Map<dynamic, bool> _getRelevantColumns(TableController<dynamic> controller) {
     final currentColumnKeys = controller.currentColumnKeys ?? [];
     final columnKeys = controller.columnKeys ?? [];
     return {for (final e in columnKeys) e: currentColumnKeys.contains(e)};
@@ -250,14 +242,11 @@ class TrackingScrollControllerFomZero extends TrackingScrollController {
       positions.isNotEmpty,
       'ScrollController not attached to any scroll views.',
     );
-    return positions.length > mainIndex
-        ? positions.elementAt(mainIndex)
-        : positions.last;
+    return positions.length > mainIndex ? positions.elementAt(mainIndex) : positions.last;
   }
 }
 
-class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
-    with TickerProviderStateMixin {
+class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerProviderStateMixin {
   late bool showFiltersLoading = widget.waitForFirstFilterToRender;
   static const double _checkmarkWidth = 40;
   static const double _dropdownButtonWidth = 28;
@@ -279,8 +268,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   final Map<RowModel<T>, Animation<double>> nestedRowEntranceAnimations = {};
 
   List<dynamic>? _columnKeys;
-  List<dynamic>? get columnKeys =>
-      widget.tableController?.columnKeys ?? _columnKeys;
+  List<dynamic>? get columnKeys => widget.tableController?.columnKeys ?? _columnKeys;
   set columnKeys(List<dynamic>? value) {
     if (widget.tableController == null) {
       _columnKeys = value;
@@ -290,8 +278,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   }
 
   List<dynamic>? _currentColumnKeys;
-  List<dynamic>? get currentColumnKeys =>
-      widget.tableController?.currentColumnKeys ?? _currentColumnKeys;
+  List<dynamic>? get currentColumnKeys => widget.tableController?.currentColumnKeys ?? _currentColumnKeys;
   set currentColumnKeys(List<dynamic>? value) {
     if (widget.tableController == null) {
       _currentColumnKeys = value;
@@ -312,8 +299,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   }
 
   Map<dynamic, Map<Object?, bool>> _valueFilters = {};
-  Map<dynamic, Map<Object?, bool>> get valueFilters =>
-      widget.tableController?.valueFilters ?? _valueFilters;
+  Map<dynamic, Map<Object?, bool>> get valueFilters => widget.tableController?.valueFilters ?? _valueFilters;
   set valueFilters(Map<dynamic, Map<Object?, bool>> value) {
     if (widget.tableController == null) {
       _valueFilters = value;
@@ -323,8 +309,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   }
 
   Map<dynamic, bool> _valueFiltersApplied = {};
-  Map<dynamic, bool> get valueFiltersApplied =>
-      widget.tableController?.valueFiltersApplied ?? _valueFiltersApplied;
+  Map<dynamic, bool> get valueFiltersApplied => widget.tableController?.valueFiltersApplied ?? _valueFiltersApplied;
   set valueFiltersApplied(Map<dynamic, bool> value) {
     if (widget.tableController == null) {
       _valueFiltersApplied = value;
@@ -334,8 +319,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   }
 
   Map<dynamic, bool> _filtersApplied = {};
-  Map<dynamic, bool> get filtersApplied =>
-      widget.tableController?.filtersApplied ?? _filtersApplied;
+  Map<dynamic, bool> get filtersApplied => widget.tableController?.filtersApplied ?? _filtersApplied;
   set filtersApplied(Map<dynamic, bool> value) {
     if (widget.tableController == null) {
       _filtersApplied = value;
@@ -350,9 +334,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   Map<dynamic, GlobalKey> filterGlobalKeys = {};
 
   dynamic _sortedColumn;
-  dynamic get sortedColumn => widget.tableController == null
-      ? _sortedColumn
-      : widget.tableController!.sortedColumn;
+  dynamic get sortedColumn => widget.tableController == null ? _sortedColumn : widget.tableController!.sortedColumn;
   set sortedColumn(dynamic value) {
     if (widget.tableController == null) {
       _sortedColumn = value;
@@ -362,9 +344,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   }
 
   bool _sortedAscending = true;
-  bool get sortedAscending => widget.tableController == null
-      ? _sortedAscending
-      : widget.tableController!.sortedAscending;
+  bool get sortedAscending =>
+      widget.tableController == null ? _sortedAscending : widget.tableController!.sortedAscending;
   set sortedAscending(bool value) {
     if (widget.tableController == null) {
       _sortedAscending = value;
@@ -373,9 +354,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     }
   }
 
-  final TrackingScrollControllerFomZero sharedController =
-      TrackingScrollControllerFomZero();
-  RowModel? headerRowModel;
+  final TrackingScrollControllerFomZero sharedController = TrackingScrollControllerFomZero();
+  RowModel<dynamic>? headerRowModel;
 
   TableFromZeroState();
 
@@ -387,9 +367,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     if (widget.tableController?.currentState == this) {
       widget.tableController!.currentState = null;
     }
-    if (widget.tableController != null &&
-        widget.syncId != null &&
-        _syncNotifier != null) {
+    if (widget.tableController != null && widget.syncId != null && _syncNotifier != null) {
       TableFromZero.removeControllerFromSync(
         ref,
         widget.tableController!,
@@ -423,8 +401,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       }
     });
     sortedColumn ??= widget.initialSortedColumn;
-    sortedAscending =
-        widget.columns?[sortedColumn]?.defaultSortAscending ?? true;
+    sortedAscending = widget.columns?[sortedColumn]?.defaultSortAscending ?? true;
     init(notifyListeners: false, isFirstInit: true);
     if (widget.tableController != null && widget.syncId != null) {
       _syncNotifier = ref.read(
@@ -439,18 +416,16 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     }
   }
 
-  StateController<List<TableController>>? _syncNotifier;
+  StateController<List<TableController<dynamic>>>? _syncNotifier;
   @override
   void didUpdateWidget(TableFromZero<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (isStateInvalidated) {
       init(notifyListeners: false);
-    } else if (widget.headerRowModel != null ||
-        widget.headerWidgetAddon != null) {
+    } else if (widget.headerRowModel != null || widget.headerWidgetAddon != null) {
       initHeaderRowModel();
     }
-    if (widget.tableController != oldWidget.tableController ||
-        widget.syncId != oldWidget.syncId) {
+    if (widget.tableController != oldWidget.tableController || widget.syncId != oldWidget.syncId) {
       if (oldWidget.tableController != null && oldWidget.syncId != null) {
         TableFromZero.removeControllerFromSync(
           ref,
@@ -506,8 +481,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         final e = newKeys[i];
         if (!columnKeys!.contains(e)) {
           columnKeys!.insert(min(i, columnKeys!.length), e);
-          if (!widget.columns![e]!.initiallyHidden &&
-              !currentColumnKeys!.contains(e)) {
+          if (!widget.columns![e]!.initiallyHidden && !currentColumnKeys!.contains(e)) {
             currentColumnKeys!.insert(min(i, currentColumnKeys!.length), e);
           }
         }
@@ -520,8 +494,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     _showCheckmarks = false;
     _showDropdowns = false;
     final allRows = sorted.map((e) => e.allRows).flatten();
-    _enableSkipFrameWidgetForRows =
-        widget.enableSkipFrameWidgetForRows ?? allRows.length > 50;
+    _enableSkipFrameWidgetForRows = widget.enableSkipFrameWidgetForRows ?? allRows.length > 50;
     for (final e in allRows) {
       if (_showCheckmarks && _showDropdowns) {
         break;
@@ -529,9 +502,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       _showCheckmarks = _showCheckmarks || e.onCheckBoxSelected != null;
       _showDropdowns = _showDropdowns || e.isExpandable;
     }
-    _leadingControlsWidth =
-        (_showCheckmarks ? _checkmarkWidth : 0) +
-        (_showDropdowns ? _dropdownButtonWidth : 0);
+    _leadingControlsWidth = (_showCheckmarks ? _checkmarkWidth : 0) + (_showDropdowns ? _dropdownButtonWidth : 0);
     if (widget.tableController != null) {
       widget.tableController!.currentState = this;
     }
@@ -552,9 +523,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       valueFilters = {};
       if (widget.columns != null) {
         for (final e in widget.columns!.keys) {
-          final colFilters =
-              widget.tableController?.initialValueFilters?[e] ??
-              widget.columns?[e]?.initialValueFilters;
+          final colFilters = widget.tableController?.initialValueFilters?[e] ?? widget.columns?[e]?.initialValueFilters;
           if (colFilters != null) filtersAltered = true;
           valueFilters[e] = colFilters ?? {};
         }
@@ -564,9 +533,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       for (final e in widget.columns?.keys ?? []) {
         if (!valueFilters.containsKey(e)) {
           valueFilters[e] =
-              widget.tableController?.initialValueFilters?[e] ??
-              widget.columns?[e]?.initialValueFilters ??
-              {};
+              widget.tableController?.initialValueFilters?[e] ?? widget.columns?[e]?.initialValueFilters ?? {};
           filtersAltered = true;
         }
       }
@@ -576,14 +543,10 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     if (widget.columns != null) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         initFilters(
-          widget.rows
-              .map((e) => e.allRows)
-              .flatten()
-              .toList(), // passing sorted would count only visible rows
+          widget.rows.map((e) => e.allRows).flatten().toList(), // passing sorted would count only visible rows
           filterAfter: filtersAltered,
         ).then((value) {
-          showFiltersLoading =
-              false; // this assumes we now only want to show filters loading before first render
+          showFiltersLoading = false; // this assumes we now only want to show filters loading before first render
           if (mounted && filtersAltered) {
             setState(() {});
           }
@@ -598,21 +561,16 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       if (widget.headerRowModel is SimpleRowModel) {
         headerRowModel = (widget.headerRowModel! as SimpleRowModel).copyWith(
           onCheckBoxSelected: widget.headerRowModel!.onCheckBoxSelected,
-          values:
-              widget.columns == null ||
-                  widget.columns!.length == widget.headerRowModel!.values.length
+          values: widget.columns == null || widget.columns!.length == widget.headerRowModel!.values.length
               ? widget.headerRowModel!.values
               : widget.columns!.map((key, value) => MapEntry(key, value.name)),
           rowAddon: widget.headerRowModel?.rowAddon ?? widget.headerWidgetAddon,
           rowAddonIsAboveRow: widget.headerRowModel?.rowAddonIsAboveRow ?? true,
           rowAddonIsCoveredByBackground:
-              widget.headerRowModel?.rowAddonIsCoveredByBackground ??
-              widget.headerWidgetAddon == null,
+              widget.headerRowModel?.rowAddonIsCoveredByBackground ?? widget.headerWidgetAddon == null,
           rowAddonIsCoveredByScrollable:
-              widget.headerRowModel?.rowAddonIsCoveredByScrollable ??
-              widget.headerWidgetAddon == null,
-          rowAddonIsCoveredByGestureDetector:
-              widget.headerRowModel?.rowAddonIsCoveredByGestureDetector ?? true,
+              widget.headerRowModel?.rowAddonIsCoveredByScrollable ?? widget.headerWidgetAddon == null,
+          rowAddonIsCoveredByGestureDetector: widget.headerRowModel?.rowAddonIsCoveredByGestureDetector ?? true,
           rowAddonIsSticky: widget.headerRowModel?.rowAddonIsSticky ?? false,
         );
       } else {
@@ -621,9 +579,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     } else {
       headerRowModel = SimpleRowModel(
         id: "header_row",
-        values:
-            widget.columns?.map((key, value) => MapEntry(key, value.name)) ??
-            {},
+        values: widget.columns?.map((key, value) => MapEntry(key, value.name)) ?? {},
         selected: true,
         height: widget.rows.isEmpty ? 36 : widget.rows.first.height,
         rowAddon: widget.headerWidgetAddon,
@@ -636,10 +592,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     }
   }
 
-  cancelable_compute.ComputeOperation<Map<dynamic, List<dynamic>>>?
-  availableFiltersIsolateController;
-  cancelable_compute.ComputeOperation<Map<dynamic, Map<Object?, bool>>?>?
-  validInitialFiltersIsolateController;
+  cancelable_compute.ComputeOperation<Map<dynamic, List<dynamic>>>? availableFiltersIsolateController;
+  cancelable_compute.ComputeOperation<Map<dynamic, Map<Object?, bool>>?>? validInitialFiltersIsolateController;
   Future<void> initFilters(
     List<RowModel<T>> rows, {
     bool? filterAfter,
@@ -649,9 +603,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     validInitialFiltersIsolateController?.cancel();
     Map<dynamic, List<dynamic>> computedAvailableFilters;
     Map<dynamic, Map<Object?, bool>>? computedValidInitialFilters;
-    if (computeFiltersInIsolate ??
-        widget.computeFiltersInIsolate ??
-        rows.length > 200) {
+    if (computeFiltersInIsolate ?? widget.computeFiltersInIsolate ?? rows.length > 200) {
       try {
         final Map<dynamic, Map<dynamic, Field>> fieldAliases = {
           for (final key in widget.columns!.keys) key: {},
@@ -685,16 +637,13 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
             fieldAliases.isEmpty && daoAliases.isEmpty,
           ],
         );
-        final computationResult =
-            await availableFiltersIsolateController!.value;
+        final computationResult = await availableFiltersIsolateController!.value;
         if (computationResult == null) return; // cancelled
         computedAvailableFilters = computationResult.map((key, value) {
           if (fieldAliases.isEmpty && daoAliases.isEmpty) {
             return MapEntry(key, value);
           } else {
-            final result = value
-                .map((e) => fieldAliases[key]![e] ?? daoAliases[key]![e] ?? e)
-                .toList();
+            final result = value.map((e) => fieldAliases[key]![e] ?? daoAliases[key]![e] ?? e).toList();
             final sorted = result.sortedWith(
               (a, b) => defaultComparator(
                 a,
@@ -706,15 +655,13 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
           }
         });
         if (valueFiltersApplied.values.where((e) => e == true).isNotEmpty) {
-          validInitialFiltersIsolateController = cancelable_compute
-              .compute(_getValidInitialFilters, [
-                valueFilters,
-                computedAvailableFilters,
-                _getColPossibleValues(),
-                _getColInitialValueFiltersExcludeAllElse(),
-              ]);
-          computedValidInitialFilters =
-              await validInitialFiltersIsolateController!.value;
+          validInitialFiltersIsolateController = cancelable_compute.compute(_getValidInitialFilters, [
+            valueFilters,
+            computedAvailableFilters,
+            _getColPossibleValues(),
+            _getColInitialValueFiltersExcludeAllElse(),
+          ]);
+          computedValidInitialFilters = await validInitialFiltersIsolateController!.value;
         }
       } catch (e, st) {
         log(
@@ -756,8 +703,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     if (mounted) {
       availableFilters.value = computedAvailableFilters;
       if (filterAfter ?? (computedValidInitialFilters != null)) {
-        if (computedValidInitialFilters != null)
-          valueFilters = computedValidInitialFilters;
+        if (computedValidInitialFilters != null) valueFilters = computedValidInitialFilters;
         _updateFiltersApplied();
         filter();
       }
@@ -768,7 +714,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     dynamic key,
     dynamic value, {
     required Map<dynamic, Field> fieldAliases,
-    required Map<dynamic, DAO> daoAliases,
+    required Map<dynamic, DAO<dynamic>> daoAliases,
   }) {
     if (value is List) {
       return value
@@ -857,8 +803,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     // bool sort = true,
     bool sortAscending = true,
     Iterable<dynamic>? possibleValues,
-    ValueNotifier<int>?
-    operationCounter, // if null artifitial throttle is disabled
+    ValueNotifier<int>? operationCounter, // if null artifitial throttle is disabled
     State? state, // for cancelling if unmounted
   }) async {
     final artifitialThrottle = operationCounter != null;
@@ -868,9 +813,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       final available = <dynamic>{};
       for (final row in rowValues) {
         final element = row[key];
-        if (element is List ||
-            element is ComparableList ||
-            element is ListField) {
+        if (element is List || element is ComparableList || element is ListField) {
           final list = element is List
               ? element
               : element is ComparableList
@@ -925,8 +868,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   Map<dynamic, Iterable<dynamic>?> _getColPossibleValues() {
     if (widget.columns == null) return {};
     return {
-      for (final e in widget.columns!.keys)
-        e: widget.columns![e]!.possibleValues,
+      for (final e in widget.columns!.keys) e: widget.columns![e]!.possibleValues,
     };
   }
 
@@ -956,8 +898,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       });
       final possibleValues = colPossibleValues[col];
       if (possibleValues != null) {
-        final initialValueFiltersExcludeAllElse =
-            colInitialValueFiltersExcludeAllElse[col] ?? false;
+        final initialValueFiltersExcludeAllElse = colInitialValueFiltersExcludeAllElse[col] ?? false;
         for (final e in possibleValues) {
           if (!filters.containsKey(e)) {
             filters[e] = !initialValueFiltersExcludeAllElse;
@@ -975,15 +916,11 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
     int childCount = allFiltered.length.coerceIn(1);
-    final showHeaders =
-        widget.showHeaders &&
-        (allFiltered.isNotEmpty || filtersApplied.values.any((e) => e));
-    final minWidth =
-        widget.ignoreWidthGettersIfEmpty && allFiltered.isEmpty && !showHeaders
+    final showHeaders = widget.showHeaders && (allFiltered.isNotEmpty || filtersApplied.values.any((e) => e));
+    final minWidth = widget.ignoreWidthGettersIfEmpty && allFiltered.isEmpty && !showHeaders
         ? null
         : widget.minWidthGetter?.call(currentColumnKeys ?? []);
-    final maxWidth =
-        widget.ignoreWidthGettersIfEmpty && allFiltered.isEmpty && !showHeaders
+    final maxWidth = widget.ignoreWidthGettersIfEmpty && allFiltered.isEmpty && !showHeaders
         ? 640.0
         : widget.maxWidthGetter?.call(currentColumnKeys ?? []);
     Widget result;
@@ -1057,8 +994,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
 
     Widget? header = showHeaders
         ? headerRowModel != null
-              ? headerRowModel!.values.isEmpty &&
-                        headerRowModel!.rowAddon != null
+              ? headerRowModel!.values.isEmpty && headerRowModel!.rowAddon != null
                     ? LayoutBuilder(
                         builder: (context, constraints) {
                           return _wrapRowAddon(
@@ -1173,7 +1109,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
 
   Widget _getRow(
     BuildContext context,
-    RowModel? row,
+    RowModel<dynamic>? row,
     int index,
     double? minWidth,
   ) {
@@ -1184,7 +1120,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         child:
             widget.emptyWidget ??
             TableEmptyWidget(
-              tableController: widget.tableController ?? TableController()
+              tableController: widget.tableController ?? TableController<dynamic>()
                 ..currentState = this
                 ..valueFilters = valueFilters
                 ..conditionFilters = conditionFilters,
@@ -1244,7 +1180,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
 
   Widget _defaultRowBuilder(
     BuildContext context,
-    RowModel row,
+    RowModel<dynamic> row,
     int index,
     double? minWidth,
   ) {
@@ -1259,8 +1195,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     }
     flexibleMinWidth = flexibleMinWidth.coerceAtLeast(0);
     int cols =
-        (((currentColumnKeys ?? row.values.keys).length) +
-                (_showLeadingControls ? 1 : 0)) *
+        (((currentColumnKeys ?? row.values.keys).length) + (_showLeadingControls ? 1 : 0)) *
             (widget.verticalDivider == null ? 1 : 2) +
         (widget.verticalDivider == null ? 0 : 1);
 
@@ -1269,12 +1204,10 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         : widget.rowDisabledValidator?.call(row as RowModel<T>);
     final String? tooltip = row == headerRowModel
         ? null
-        : rowDisabledReason ??
-              widget.rowTooltipGetter?.call(row as RowModel<T>);
+        : rowDisabledReason ?? widget.rowTooltipGetter?.call(row as RowModel<T>);
     Widget builder(BuildContext context, BoxConstraints? constraints) {
       final Map<Widget, ActionState> rowActionStates = {
-        for (final e in widget.rowActions)
-          e: e.getStateForMaxWidth(constraints?.maxWidth ?? double.infinity),
+        for (final e in widget.rowActions) e: e.getStateForMaxWidth(constraints?.maxWidth ?? double.infinity),
       };
       List<ActionFromZero> rowActions = row == headerRowModel
           ? []
@@ -1315,12 +1248,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
             title: row.hasExpandableRows! ? 'Colapsar fila' : 'Expandir fila',
             breakpoints: {0: ActionState.popup},
             onTap: (context) {
-              for (
-                int i = index;
-                i < allFiltered.length &&
-                    (i == index || allFiltered[i].depth > row.depth);
-                i++
-              ) {
+              for (int i = index; i < allFiltered.length && (i == index || allFiltered[i].depth > row.depth); i++) {
                 toggleRowExpanded(
                   allFiltered[i],
                   i,
@@ -1344,9 +1272,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
                   ? MaterialCommunityIcons.arrow_collapse_up
                   : MaterialCommunityIcons.arrow_expand_down,
             ),
-            title: _expandableRowsExist!
-                ? 'Colapsar todas las filas'
-                : 'Expandir todas las filas',
+            title: _expandableRowsExist! ? 'Colapsar todas las filas' : 'Expandir todas las filas',
             breakpoints: {0: ActionState.popup},
             onTap: (context) {
               for (int i = 0; i < allFiltered.length; i++) {
@@ -1387,18 +1313,12 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
           context,
           actions: rowActions,
           exportPathForExcel: widget.exportPathForExcel!,
-          tableController:
-              widget.tableController ??
-              (TableController()..currentState = this),
+          tableController: widget.tableController ?? (TableController()..currentState = this),
         );
       }
       // This assumes standard icon size, custom action iconBuilders will probably break the table,
       // this is very prone to breaking, but there is no other efficient way of doing it
-      final actionsWidth =
-          widget.rowActions
-              .where((e) => rowActionStates[e]!.shownOnPrimaryToolbar)
-              .length *
-          48.0;
+      final actionsWidth = widget.rowActions.where((e) => rowActionStates[e]!.shownOnPrimaryToolbar).length * 48.0;
       Widget decorationBuilder(BuildContext context, int j) {
         bool addSizing = true;
         if (widget.verticalDivider != null) {
@@ -1430,9 +1350,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         if (result == null && col?.flex == 0) {
           return const SizedBox.shrink();
         }
+        // ignore: use_decorated_box // decoration is nullable, so it can't be passed to a DecoratedBox, and this ensures result!=null
         result = Container(
-          // ignore: use_decorated_box
-          // decoration is nullable, so it can't be passed to a DecoratedBox, and this ensures result!=null
           decoration: _getDecoration(
             row,
             index,
@@ -1445,9 +1364,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
           if (col?.width != null) {
             result = SizedBox(width: col!.width, child: result);
           } else {
-            if (constraints != null &&
-                minWidth != null &&
-                constraints.maxWidth < minWidth) {
+            if (constraints != null && minWidth != null && constraints.maxWidth < minWidth) {
               return SizedBox(
                 width: flexibleMinWidth * (_getFlex(colKey) / maxFlex),
                 child: result,
@@ -1499,9 +1416,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
                             maxHeight: double.infinity,
                             maxWidth: double.infinity,
                             child: SelectableIcon(
-                              selected:
-                                  row.expanded ||
-                                  row.isFilteredInBecauseOfChildren,
+                              selected: row.expanded || row.isFilteredInBecauseOfChildren,
                               icon: Icons.expand_less,
                               selectedColor: row.isFilteredInBecauseOfChildren
                                   ? theme.disabledColor
@@ -1513,10 +1428,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
                         ),
                       ),
                     if (row == headerRowModel
-                        ? row.onCheckBoxSelected != null ||
-                              widget.onAllSelected != null
-                        : row.onCheckBoxSelected != null ||
-                              (row.children.isNotEmpty && _showCheckmarks))
+                        ? row.onCheckBoxSelected != null || widget.onAllSelected != null
+                        : row.onCheckBoxSelected != null || (row.children.isNotEmpty && _showCheckmarks))
                       SizedBox(
                         width: _checkmarkWidth,
                         child: StatefulBuilder(
@@ -1528,10 +1441,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
                                   : row.onCheckBoxSelected != null
                                   ? row.selected
                                   : row.allChildren.some((e) => e.selected),
-                              onChanged:
-                                  (row == headerRowModel
-                                      ? allFiltered.isEmpty
-                                      : rowDisabledReason != null)
+                              onChanged: (row == headerRowModel ? allFiltered.isEmpty : rowDisabledReason != null)
                                   ? null
                                   : (value) {
                                       value = value ?? false;
@@ -1568,8 +1478,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
                                           }
                                         } else {
                                           bool result = false;
-                                          for (final e
-                                              in row.allFilteredChildren) {
+                                          for (final e in row.allFilteredChildren) {
                                             if (e.onCheckBoxSelected != null) {
                                               final evaluation =
                                                   e.onCheckBoxSelected!(
@@ -1604,8 +1513,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
           return const SizedBox.shrink();
         }
         Widget result = Container(
-          height: row
-              .height, // widget.enableFixedHeightForListRows ? row.height : null,
+          height: row.height, // widget.enableFixedHeightForListRows ? row.height : null,
           alignment: Alignment.center,
           padding: row == headerRowModel
               ? null
@@ -1648,30 +1556,18 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
           result = Material(
             type: MaterialType.transparency,
             child: InkWell(
-              onTap:
-                  widget.enabled &&
-                      row.onCellTap != null &&
-                      row.onCellTap!(colKey) != null
+              onTap: widget.enabled && row.onCellTap != null && row.onCellTap!(colKey) != null
                   ? () {
                       row.onCellTap!(colKey)!.call(row);
                     }
                   : null,
-              onDoubleTap:
-                  widget.enabled &&
-                      row.onCellDoubleTap != null &&
-                      row.onCellDoubleTap!(colKey) != null
+              onDoubleTap: widget.enabled && row.onCellDoubleTap != null && row.onCellDoubleTap!(colKey) != null
                   ? () => row.onCellDoubleTap!(colKey)!.call(row)
                   : null,
-              onLongPress:
-                  widget.enabled &&
-                      row.onCellLongPress != null &&
-                      row.onCellLongPress!(colKey) != null
+              onLongPress: widget.enabled && row.onCellLongPress != null && row.onCellLongPress!(colKey) != null
                   ? () => row.onCellLongPress!(colKey)!.call(row)
                   : null,
-              onHover:
-                  widget.enabled &&
-                      row.onCellHover != null &&
-                      row.onCellHover!(colKey) != null
+              onHover: widget.enabled && row.onCellHover != null && row.onCellHover!(colKey) != null
                   ? (value) => row.onCellHover!(colKey)!.call(row, value)
                   : null,
               child: result,
@@ -1681,9 +1577,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         if (col?.width != null) {
           return SizedBox(width: col!.width, child: result);
         } else {
-          if (constraints != null &&
-              minWidth != null &&
-              constraints.maxWidth < minWidth) {
+          if (constraints != null && minWidth != null && constraints.maxWidth < minWidth) {
             return SizedBox(
               width: (flexibleMinWidth * (_getFlex(colKey) / maxFlex)),
               child: result,
@@ -1696,12 +1590,9 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
 
       Widget background;
       Widget result;
-      if (constraints != null &&
-          minWidth != null &&
-          constraints.maxWidth < minWidth) {
+      if (constraints != null && minWidth != null && constraints.maxWidth < minWidth) {
         background = NotificationListener(
-          onNotification: (n) =>
-              n is ScrollNotification || n is ScrollMetricsNotification,
+          onNotification: (n) => n is ScrollNotification || n is ScrollMetricsNotification,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             controller: sharedController,
@@ -1734,8 +1625,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
               child: Row(
                 children: [
                   SizedBox(width: widget.tableHorizontalPadding),
-                  for (int index = 0; index < cols; index++)
-                    cellBuilder(context, index),
+                  for (int index = 0; index < cols; index++) cellBuilder(context, index),
                   SizedBox(width: widget.tableHorizontalPadding),
                 ],
               ),
@@ -1745,18 +1635,14 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         result = ScrollOpacityGradient(
           scrollController: sharedController,
           direction: OpacityGradient.horizontal,
-          child:
-              (widget.columns != null && widget.showHeaders
-                  ? row == headerRowModel
-                  : index == 0)
+          child: (widget.columns != null && widget.showHeaders ? row == headerRowModel : index == 0)
               ? NotificationRelayListener(
                   controller: notificationRelayController,
                   consumeRelayedNotifications: true,
                   child: result,
                 )
               : NotificationListener(
-                  onNotification: (n) =>
-                      n is ScrollNotification || n is ScrollMetricsNotification,
+                  onNotification: (n) => n is ScrollNotification || n is ScrollMetricsNotification,
                   child: result,
                 ),
         );
@@ -1782,8 +1668,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
           );
         }
       }
-      if (row != headerRowModel &&
-          !(row.rowAddonIsCoveredByGestureDetector ?? false)) {
+      if (row != headerRowModel && !(row.rowAddonIsCoveredByGestureDetector ?? false)) {
         result = _buildRowGestureDetector(
           context: context,
           row: row as RowModel<T>,
@@ -1828,8 +1713,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         Widget addon;
         if (row.expanded || !row.rowAddonIsExpandable) {
           addon = _wrapRowAddon(row, constraints, minWidth)!;
-          if (row.rowAddonIsExpandable &&
-              rowAddonEntranceAnimations[row] != null) {
+          if (row.rowAddonIsExpandable && rowAddonEntranceAnimations[row] != null) {
             addon = _buildEntranceAnimation(
               child: addon,
               row: row,
@@ -1872,8 +1756,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
           );
         }
       }
-      if (row != headerRowModel &&
-          (row.rowAddonIsCoveredByGestureDetector ?? false)) {
+      if (row != headerRowModel && (row.rowAddonIsCoveredByGestureDetector ?? false)) {
         result = _buildRowGestureDetector(
           context: context,
           row: row as RowModel<T>,
@@ -1888,13 +1771,9 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         children: [
           Positioned.fill(
             child: Align(
-              alignment: (row.rowAddonIsAboveRow ?? false)
-                  ? Alignment.bottomCenter
-                  : Alignment.topCenter,
+              alignment: (row.rowAddonIsAboveRow ?? false) ? Alignment.bottomCenter : Alignment.topCenter,
               child: SizedBox(
-                height: (row.rowAddonIsCoveredByBackground ?? true)
-                    ? double.infinity
-                    : row.height,
+                height: (row.rowAddonIsCoveredByBackground ?? true) ? double.infinity : row.height,
                 child: Stack(
                   children: [
                     Container(
@@ -1922,9 +1801,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
           onShowMenu: () => row.focusNode.requestFocus(),
           actions: rowActions
               .where(
-                (e) =>
-                    (rowActionStates[e] ?? ActionState.popup) !=
-                    ActionState.none,
+                (e) => (rowActionStates[e] ?? ActionState.popup) != ActionState.none,
               )
               .toList()
               .cast(),
@@ -1974,10 +1851,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     String? tooltip,
   }) {
     Widget result = child;
-    if (enabled &&
-        (row.onRowTap != null ||
-            row.onCheckBoxSelected != null ||
-            row.isExpandable)) {
+    if (enabled && (row.onRowTap != null || row.onCheckBoxSelected != null || row.isExpandable)) {
       result = InkWell(
         onTap: !widget.enabled
             ? null
@@ -1985,8 +1859,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
             ? () => row.onRowTap!(row)
             : row.onCheckBoxSelected != null
             ? () {
-                if (row.onCheckBoxSelected!(row, !(row.selected ?? false)) ??
-                    false) {
+                if (row.onCheckBoxSelected!(row, !(row.selected ?? false)) ?? false) {
                   setState(() {});
                 }
               }
@@ -1995,15 +1868,9 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
                 toggleRowExpanded(row, index);
               }
             : null,
-        onDoubleTap: widget.enabled && row.onRowDoubleTap != null
-            ? () => row.onRowDoubleTap!(row)
-            : null,
-        onLongPress: widget.enabled && row.onRowLongPress != null
-            ? () => row.onRowLongPress!(row)
-            : null,
-        onHover: widget.enabled && row.onRowHover != null
-            ? (value) => row.onRowHover!(row, value)
-            : null,
+        onDoubleTap: widget.enabled && row.onRowDoubleTap != null ? () => row.onRowDoubleTap!(row) : null,
+        onLongPress: widget.enabled && row.onRowLongPress != null ? () => row.onRowLongPress!(row) : null,
+        onHover: widget.enabled && row.onRowHover != null ? (value) => row.onRowHover!(row, value) : null,
         child: child,
       );
     }
@@ -2026,7 +1893,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
 
   Widget _buildEntranceAnimation({
     required Widget child,
-    required RowModel row,
+    required RowModel<dynamic> row,
     required Animation<double> animation,
   }) {
     return AnimatedBuilder(
@@ -2047,7 +1914,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   }
 
   Widget? _wrapRowAddon(
-    RowModel row,
+    RowModel<dynamic> row,
     BoxConstraints? constraints,
     double? minWidth,
   ) {
@@ -2057,8 +1924,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         minWidth != null &&
         constraints.maxWidth < minWidth) {
       return NotificationListener(
-        onNotification: (n) =>
-            n is ScrollNotification || n is ScrollMetricsNotification,
+        onNotification: (n) => n is ScrollNotification || n is ScrollMetricsNotification,
         child: SingleChildScrollView(
           controller: sharedController,
           scrollDirection: Axis.horizontal,
@@ -2071,7 +1937,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
 
   Widget defaultHeaderCellBuilder(
     BuildContext context,
-    RowModel row,
+    RowModel<dynamic> row,
     dynamic colKey, {
     int autoSizeTextMaxLines = 1,
   }) {
@@ -2101,16 +1967,13 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
 
   Widget _defaultHeaderCellBuilder(
     BuildContext context,
-    RowModel row,
+    RowModel<dynamic> row,
     dynamic colKey, {
     required Map<dynamic, List<dynamic>>? availableFilters,
     int autoSizeTextMaxLines = 1,
   }) {
     final col = widget.columns?[colKey];
-    final compactName =
-        col?.compactName ??
-        col?.name ??
-        ColModel.getRowValueString(row, colKey, col);
+    final compactName = col?.compactName ?? col?.name ?? ColModel.getRowValueString(row, colKey, col);
     final name = col?.name ?? ColModel.getRowValueString(row, colKey, col);
     final tooltip = col?.tooltip;
     bool export = context.findAncestorWidgetOfExactType<Export>() != null;
@@ -2137,12 +2000,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
             duration: const Duration(milliseconds: 250),
             curve: Curves.easeOut,
             padding: EdgeInsets.only(
-              left:
-                  widget.cellPadding.left +
-                  (!export && sortedColumn == colKey ? 15 : 4),
-              right:
-                  widget.cellPadding.right +
-                  (!export && (col?.filterEnabled ?? true) ? 10 : 4),
+              left: widget.cellPadding.left + (!export && sortedColumn == colKey ? 15 : 4),
+              right: widget.cellPadding.right + (!export && (col?.filterEnabled ?? true) ? 10 : 4),
               top: widget.cellPadding.top,
               bottom: widget.cellPadding.bottom,
             ),
@@ -2165,9 +2024,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
                         style: textStyle.copyWith(fontSize: 15),
                         maxLines: autoSizeTextMaxLines,
                         softWrap: autoSizeTextMaxLines > 1,
-                        overflow: autoSizeTextMaxLines > 1
-                            ? TextOverflow.clip
-                            : TextOverflow.fade,
+                        overflow: autoSizeTextMaxLines > 1 ? TextOverflow.clip : TextOverflow.fade,
                       ),
                     ),
             ),
@@ -2231,12 +2088,9 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
                             icon: MaterialCommunityIcons.filter_outline,
                             selectedIcon: MaterialCommunityIcons.filter,
                             selectedColor: theme.colorScheme.secondary,
-                            unselectedColor: theme.textTheme.bodyLarge!.color!
-                                .withValues(
-                                  alpha: theme.brightness == Brightness.light
-                                      ? 0.7
-                                      : 0.8,
-                                ),
+                            unselectedColor: theme.textTheme.bodyLarge!.color!.withValues(
+                              alpha: theme.brightness == Brightness.light ? 0.7 : 0.8,
+                            ),
                             unselectedOffset: 0,
                             selectedOffset: 0,
                           ),
@@ -2263,9 +2117,11 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         focusNode: headerFocusNodes[colKey]!,
         child: InkWell(
           focusNode: headerFocusNodes[colKey],
+          // ignore: use_if_null_to_convert_nulls_to_bools
           onTap: col?.onHeaderTap != null || col?.sortEnabled == true
               ? () {
                   headerFocusNodes[colKey]!.requestFocus();
+                  // ignore: use_if_null_to_convert_nulls_to_bools
                   if (col?.sortEnabled == true) {
                     if (sortedColumn == colKey) {
                       setState(() {
@@ -2353,8 +2209,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         context,
         actions: colActions,
         exportPathForExcel: widget.exportPathForExcel!,
-        tableController:
-            widget.tableController ?? (TableController()..currentState = this),
+        tableController: widget.tableController ?? (TableController()..currentState = this),
       );
     }
     result = ContextMenuFromZero(
@@ -2371,9 +2226,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     GlobalKey? anchorKey,
   }) async {
     final col = widget.columns?[colKey];
-    final callback =
-        col?.showFilterPopupCallback ??
-        TableFromZeroFilterPopup.showDefaultFilterPopup;
+    final callback = col?.showFilterPopupCallback ?? TableFromZeroFilterPopup.showDefaultFilterPopup;
     bool modified = await callback(
       context: context,
       controller: widget.tableController ?? TableController()
@@ -2387,6 +2240,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       _updateFiltersApplied();
       if (updateStateIfModified) {
         setState(() {
+          // ignore: invalid_use_of_protected_member
           widget.tableController?.notifyListeners();
           filter();
         });
@@ -2395,7 +2249,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     return modified;
   }
 
-  Future<void> _showManageTablePopup(TableController controller) async {
+  Future<void> _showManageTablePopup(TableController<dynamic> controller) async {
     if (currentColumnKeys != null && widget.columns != null) {
       final result = await TableFromZeroManagePopup.showDefaultManagePopup(
         context: context,
@@ -2403,6 +2257,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       );
       if ((result.modified || result.filtersModified) && mounted) {
         setState(() {
+          // ignore: invalid_use_of_protected_member
           widget.tableController?.notifyListeners();
           if (result.filtersModified) {
             _updateFiltersApplied();
@@ -2424,7 +2279,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     BuildContext context,
     RowModel<T> row,
     dynamic colKey,
-    ColModel? col,
+    ColModel<dynamic>? col,
     TextStyle? style,
     TextAlign alignment, {
     int autoSizeTextMaxLines = 1,
@@ -2447,9 +2302,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
           textAlign: alignment,
           maxLines: autoSizeTextMaxLines,
           softWrap: autoSizeTextMaxLines > 1,
-          overflow: autoSizeTextMaxLines > 1
-              ? TextOverflow.clip
-              : TextOverflow.fade,
+          overflow: autoSizeTextMaxLines > 1 ? TextOverflow.clip : TextOverflow.fade,
         ),
       ),
     );
@@ -2457,7 +2310,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   }
 
   BoxDecoration? _getDecoration(
-    RowModel row,
+    RowModel<dynamic> row,
     int index,
     dynamic colKey,
     bool isDisabled,
@@ -2474,9 +2327,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
             colKey,
             isHeader,
           );
-      if (backgroundColor.opacity < 1 &&
-          widget.alternateRowBackgroundBrightness) {
-        backgroundColor = backgroundColor.opacity == 0
+      if (backgroundColor.a < 1 && widget.alternateRowBackgroundBrightness) {
+        backgroundColor = backgroundColor.a == 0
             ? _getMaterialColor()
             : Color.alphaBlend(backgroundColor, _getMaterialColor());
       }
@@ -2493,24 +2345,19 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         backgroundColor.withValues(alpha: 0.66),
         Theme.of(context).disabledColor,
       );
-      if (backgroundColor.opacity < 1) {
+      if (backgroundColor.a < 1) {
         backgroundColor = Color.alphaBlend(
           backgroundColor,
           _getMaterialColor(),
         );
       }
     }
-    return backgroundColor == null
-        ? null
-        : BoxDecoration(color: backgroundColor);
+    return backgroundColor == null ? null : BoxDecoration(color: backgroundColor);
   }
 
-  Color _getMaterialColor() =>
-      widget.backgroundColor ??
-      Material.of(context).color ??
-      Theme.of(context).cardColor;
+  Color _getMaterialColor() => widget.backgroundColor ?? Material.of(context).color ?? Theme.of(context).cardColor;
   // Color _getBrightnessColor() => Theme.of(context).brightness==Brightness.light ? Colors.white : Color.fromRGBO(0, 0, 0, 1);
-  Color? _getBackgroundColor(RowModel row, dynamic colKey, bool isHeader) {
+  Color? _getBackgroundColor(RowModel<dynamic> row, dynamic colKey, bool isHeader) {
     Color? backgroundColor;
     if (isHeader) {
       backgroundColor = widget.columns?[colKey]?.backgroundColor;
@@ -2524,7 +2371,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
 
   bool _shouldApplyDarkerBackground(
     Color? current,
-    RowModel row,
+    RowModel<dynamic> row,
     int index,
     dynamic colKey,
     bool isHeader,
@@ -2554,15 +2401,16 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     }
   }
 
-  static TextAlign getAlignment(dynamic colKey, ColModel? col) {
+  static TextAlign getAlignment(dynamic colKey, ColModel<dynamic>? col) {
     return col?.alignment ?? TextAlign.left;
   }
 
   static TextStyle? getStyle(
     BuildContext context,
-    RowModel row,
+    RowModel<dynamic> row,
     dynamic colKey,
-    ColModel? col,
+    ColModel<dynamic>? col,
+    // ignore: avoid_positional_boolean_parameters
     bool rowStyleTakesPriorityOverColumn,
     bool isDisabled,
   ) {
@@ -2591,17 +2439,15 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   static List<ActionFromZero> addManageActions(
     BuildContext context, {
     required List<ActionFromZero> actions,
-    required TableController controller,
+    required TableController<dynamic> controller,
     Map<dynamic, List<dynamic>>? availableFilters,
     dynamic colKey,
-    ColModel? col,
+    ColModel<dynamic>? col,
     bool showFiltersLoading = false,
   }) {
     final clearFiltersAction = getClearAllFiltersAction(controller: controller);
     final manageActions = [
-      if (colKey != null &&
-          (col?.filterEnabled ?? true) &&
-          (!showFiltersLoading || availableFilters != null))
+      if (colKey != null && (col?.filterEnabled ?? true) && (!showFiltersLoading || availableFilters != null))
         getOpenFilterPopupAction(
           context,
           controller: controller,
@@ -2614,22 +2460,20 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
           title: 'Personalizar Tabla...', // TODO: 3 internationalize
           icon: const Icon(Icons.settings),
           breakpoints: {0: ActionState.popup},
-          onTap: (context) =>
-              controller.currentState!._showManageTablePopup(controller),
+          onTap: (context) => controller.currentState!._showManageTablePopup(controller),
         ),
     ];
     return [
       ...actions,
-      if (actions.isNotEmpty && manageActions.isNotEmpty)
-        ActionFromZero.divider(breakpoints: {0: ActionState.popup}),
+      if (actions.isNotEmpty && manageActions.isNotEmpty) ActionFromZero.divider(breakpoints: {0: ActionState.popup}),
       ...manageActions,
     ];
   }
 
   static ActionFromZero getOpenFilterPopupAction(
     BuildContext context, {
-    required TableController controller,
-    ColModel? col,
+    required TableController<dynamic> controller,
+    ColModel<dynamic>? col,
     dynamic colKey,
     GlobalKey? globalKey,
     ValueChanged<bool>? onPopupResult,
@@ -2642,9 +2486,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         selected: controller.currentState?.filtersApplied[colKey] ?? false,
         icon: MaterialCommunityIcons.filter_outline,
         selectedIcon: MaterialCommunityIcons.filter,
-        selectedColor: theme.brightness == Brightness.light
-            ? theme.primaryColor
-            : theme.colorScheme.secondary,
+        selectedColor: theme.brightness == Brightness.light ? theme.primaryColor : theme.colorScheme.secondary,
         unselectedColor: theme.textTheme.bodyLarge!.color,
         unselectedOffset: 0,
         selectedOffset: 0,
@@ -2663,7 +2505,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   }
 
   static ActionFromZero? getClearAllFiltersAction({
-    required TableController controller,
+    required TableController<dynamic> controller,
     bool skipConditions = false,
     bool updateStateIfModified = true,
     VoidCallback? onDidTap,
@@ -2708,13 +2550,12 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
   static List<ActionFromZero> addExportExcelAction(
     BuildContext context, {
     required List<ActionFromZero> actions,
-    required TableController tableController,
+    required TableController<dynamic> tableController,
     required FutureOr<String> exportPathForExcel,
   }) {
     return [
       ...actions,
-      if (actions.isNotEmpty)
-        ActionFromZero.divider(breakpoints: {0: ActionState.popup}),
+      if (actions.isNotEmpty) ActionFromZero.divider(breakpoints: {0: ActionState.popup}),
       ActionFromZero(
         title: 'Exportar Excel',
         icon: const Icon(MaterialCommunityIcons.file_excel),
@@ -2725,12 +2566,11 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
             final route = GoRouteFromZero.of(context);
             routeTitle = route.title ?? route.path;
           } catch (_) {}
-          showModalFromZero(
+          showModalFromZero<void>(
             context: appbarContext,
             builder: (context) => Export.excelOnly(
               scaffoldContext: appbarContext,
-              title:
-                  "${DateFormat("yyyy-MM-dd hh.mm.ss aaa").format(DateTime.now())} - $routeTitle",
+              title: "${DateFormat("yyyy-MM-dd hh.mm.ss aaa").format(DateTime.now())} - $routeTitle",
               path: exportPathForExcel,
               excelSheets: () => {routeTitle: tableController},
             ),
@@ -2748,9 +2588,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     bool updateHasExpandableRows = true,
   }) {
     expanded ??= !row.expanded;
-    if (row.isExpandable &&
-        expanded != row.expanded &&
-        !row.isFilteredInBecauseOfChildren) {
+    if (row.isExpandable && expanded != row.expanded && !row.isFilteredInBecauseOfChildren) {
       setState(() {
         if (expanded!) {
           row.expanded = true;
@@ -2863,19 +2701,22 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     List<RowModel<T>> list, {
     bool sortedAscending = true,
     Object? sortedColumnKey,
-    ColModel? col,
+    ColModel<dynamic>? col,
     bool sortNullOnTop = true,
   }) {
     if (list.isEmpty) return;
     mergeSort<RowModel<T>>(
       list.cast<RowModel<T>>(),
       compare: ((RowModel<T> a, RowModel<T> b) {
-        if ((a.alwaysOnTop != null || b.alwaysOnTop != null) &&
-            a.alwaysOnTop != b.alwaysOnTop) {
-          if (a.alwaysOnTop == true || b.alwaysOnTop == false)
-            return -1; // ignore: use_if_null_to_convert_nulls_to_bools
-          if (a.alwaysOnTop == false || b.alwaysOnTop == true)
-            return 1; // ignore: use_if_null_to_convert_nulls_to_bools
+        if ((a.alwaysOnTop != null || b.alwaysOnTop != null) && a.alwaysOnTop != b.alwaysOnTop) {
+          // ignore: use_if_null_to_convert_nulls_to_bools
+          if (a.alwaysOnTop == true || b.alwaysOnTop == false) {
+            return -1;
+          }
+          // ignore: use_if_null_to_convert_nulls_to_bools
+          if (a.alwaysOnTop == false || b.alwaysOnTop == true) {
+            return 1;
+          }
         }
         if (sortedColumnKey == null) {
           return 0;
@@ -2903,9 +2744,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
         final Comparable<dynamic> bCompVal = bVal! is Comparable
             ? bVal
             : ColModel.getRowValueString(b, sortedColumnKey, col);
-        return sortedAscending
-            ? aCompVal.compareTo(bCompVal)
-            : bCompVal.compareTo(aCompVal);
+        return sortedAscending ? aCompVal.compareTo(bCompVal) : bCompVal.compareTo(aCompVal);
       }),
     );
     for (final e in list) {
@@ -2925,6 +2764,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     allFiltered = result.allFiltered;
     _expandableRowsExist = result.expandableRowsExist;
     if (mounted && notifyListeners) {
+      // ignore: invalid_use_of_protected_member
       widget.tableController?.notifyListeners();
     }
   }
@@ -2933,11 +2773,11 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     List<RowModel<T>> rows, {
     dynamic skipColKey,
   }) {
-    List<RowModel<T>> filtered = rows
-        .where((e) => _passesFilters(e, skipColKey: skipColKey))
-        .toList();
-    for (final e in (widget.tableController?.extraFilters ?? [])) {
-      filtered = e(filtered);
+    List<RowModel<T>> filtered = rows.where((e) => _passesFilters(e, skipColKey: skipColKey)).toList();
+    if (widget.tableController != null) {
+      for (final e in widget.tableController!.extraFilters) {
+        filtered = e(filtered);
+      }
     }
     if (widget.onFilter != null) {
       filtered = widget.onFilter!(filtered);
@@ -2947,20 +2787,17 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       bool? hasExpandableRows = _setAllChildrenAsFiltered(e);
       result.allFiltered.addAll(e.visibleRows);
       if (hasExpandableRows != null) {
-        result.expandableRowsExist =
-            (result.expandableRowsExist ?? true) && hasExpandableRows;
+        result.expandableRowsExist = (result.expandableRowsExist ?? true) && hasExpandableRows;
       }
     }
-    final filteredSet = Set.from(result.filtered);
+    final filteredSet = Set<RowModel<T>>.from(result.filtered);
     for (final e in rows) {
       if (e.children.isNotEmpty && !filteredSet.contains(e)) {
         final subResult = getFilterResults(e.children);
         e.filteredChildren = subResult.filtered;
         e.hasExpandableRows = subResult.expandableRowsExist;
         if (subResult.expandableRowsExist != null) {
-          result.expandableRowsExist =
-              (result.expandableRowsExist ?? true) &&
-              subResult.expandableRowsExist!;
+          result.expandableRowsExist = (result.expandableRowsExist ?? true) && subResult.expandableRowsExist!;
         }
         if (subResult.filtered.isNotEmpty) {
           e.isFilteredInBecauseOfChildren = true;
@@ -2982,11 +2819,11 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
       if (key != skipColKey) {
         // final col = widget.columns?[key];
         if (valueFiltersApplied[key] ?? false) {
-          final value = row
-              .values[key]; // availableFilters are calculated with row[key], so it needs to be the same here
+          final value =
+              row.values[key]; // availableFilters are calculated with row[key], so it needs to be the same here
           // final value = ColModel.getRowValue(row, key, col);
           if (value is List || value is ComparableList || value is ListField) {
-            final List list = value is List
+            final List<dynamic> list = value is List
                 ? value
                 : value is ComparableList
                 ? value.list
@@ -3025,8 +2862,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     bool? hasExpandableRows = row.isExpandable ? row.expanded : null;
     for (final e in row.children) {
       final childHasExpandableRows = _setAllChildrenAsFiltered(e);
-      hasExpandableRows =
-          hasExpandableRows! && (childHasExpandableRows ?? true);
+      hasExpandableRows = hasExpandableRows! && (childHasExpandableRows ?? true);
     }
     row.hasExpandableRows = hasExpandableRows;
     row.isFilteredInBecauseOfChildren = false;
@@ -3036,14 +2872,11 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
 
   void _updateFiltersApplied() {
     valueFiltersApplied = {
-      for (final key in widget.columns?.keys ?? [])
-        key: _isValueFilterApplied(key),
+      for (final key in widget.columns?.keys ?? []) key: _isValueFilterApplied(key),
     };
     filtersApplied = {
       for (final key in widget.columns?.keys ?? [])
-        key:
-            (valueFiltersApplied[key] ?? false) ||
-            (conditionFilters[key] ?? []).isNotEmpty,
+        key: (valueFiltersApplied[key] ?? false) || (conditionFilters[key] ?? []).isNotEmpty,
     };
   }
 
@@ -3061,6 +2894,7 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>>
     return false;
   }
 
+  // ignore: avoid_positional_boolean_parameters
   static int defaultComparator(dynamic a, dynamic b, bool sortAscending) {
     int result;
     if (a == null || b == null) {
@@ -3121,33 +2955,31 @@ class TableController<T> extends ChangeNotifier {
     Map<dynamic, Map<Object?, bool>>? valueFilters,
     Map<dynamic, bool>? columnVisibilities,
     bool? sortedAscending,
-    int? sortedColumnIndex,
+    dynamic sortedColumn,
     TableFromZeroState<T>? currentState,
   }) {
     return TableController<T>()
       ..extraFilters = extraFilters ?? this.extraFilters
-      ..initialConditionFilters =
-          initialConditionFilters ?? this.initialConditionFilters
+      ..initialConditionFilters = initialConditionFilters ?? this.initialConditionFilters
       ..conditionFilters = conditionFilters ?? this.conditionFilters
       ..initialValueFilters = initialValueFilters ?? this.initialValueFilters
-      ..initialValueFiltersExcludeAllElse =
-          initialValueFiltersExcludeAllElse ??
-          this.initialValueFiltersExcludeAllElse
+      ..initialValueFiltersExcludeAllElse = initialValueFiltersExcludeAllElse ?? this.initialValueFiltersExcludeAllElse
       ..valueFilters = valueFilters ?? this.valueFilters
       ..sortedAscending = sortedAscending ?? this.sortedAscending
-      ..sortedColumn = sortedColumnIndex ?? this.sortedColumn
+      ..sortedColumn = sortedColumn ?? this.sortedColumn
       ..currentState = currentState ?? this.currentState;
   }
 
   bool get mounted => currentState != null;
   List<RowModel<T>> get filtered => currentState!.filtered;
   List<RowModel<T>> get allFiltered => currentState!.allFiltered;
-  Map<dynamic, ColModel>? get columns => currentState?.widget.columns;
+  Map<dynamic, ColModel<dynamic>>? get columns => currentState?.widget.columns;
 
   /// Call this if the rows change, to re-initialize rows
   void reInit() => currentState?.isStateInvalidated = true;
   void sort() {
     if (currentState?.mounted ?? false) {
+      // ignore: invalid_use_of_protected_member
       currentState!.setState(() {
         currentState!.sort();
       });
@@ -3156,6 +2988,7 @@ class TableController<T> extends ChangeNotifier {
 
   void filter() {
     if (currentState?.mounted ?? false) {
+      // ignore: invalid_use_of_protected_member
       currentState!.setState(() {
         currentState!.filter();
       });

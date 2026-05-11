@@ -21,7 +21,7 @@ Future<void> initHive([String? subdir]) async {
     await Hive.initFlutter(subdir);
   }
   if (kIsWeb) {
-    await Hive.openBox("settings");
+    await Hive.openBox<dynamic>("settings");
   } else {
     File file = File('update_temp_args.txt');
     if (file.existsSync()) {
@@ -41,7 +41,7 @@ Future<void> initHive([String? subdir]) async {
         lines[1].replaceAll('%20', ' '),
       );
     } else {
-      await Hive.openBox("settings");
+      await Hive.openBox<dynamic>("settings");
     }
   }
 }
@@ -76,9 +76,9 @@ class ThemeParametersFromZero extends ChangeNotifier {
       ];
   List<ThemeData?> get themes => [null, defaultLightTheme, defaultDarkTheme];
 
-  int get selectedTheme => Hive.box("settings").get("theme", defaultValue: 0);
+  int get selectedTheme => Hive.box<dynamic>("settings").get("theme", defaultValue: 0);
   set selectedTheme(int value) {
-    Hive.box("settings").put("theme", value);
+    Hive.box<dynamic>("settings").put("theme", value);
     notifyListeners();
   }
 
@@ -105,15 +105,14 @@ class ThemeParametersFromZero extends ChangeNotifier {
       )
       .toList();
 
-  int get selectedLocale => Hive.box("settings").get("locale", defaultValue: 0);
+  int get selectedLocale => Hive.box<dynamic>("settings").get("locale", defaultValue: 0);
   set selectedLocale(int value) {
-    Hive.box("settings").put("locale", value);
+    Hive.box<dynamic>("settings").put("locale", value);
     notifyListeners();
   }
 
   //TODO: 2 ??? implement UI scale
 }
-
 
 class ThemeSwitcher extends StatelessWidget {
   final ThemeParametersFromZero themeParameters;
@@ -135,39 +134,49 @@ class ThemeSwitcher extends StatelessWidget {
         }
         return true;
       },
-      buttonChildBuilder: (context, title, hint, value, enabled, clearable, {showDropdownIcon = false}) {
-        return IconTheme(
-          data: Theme.of(context).iconTheme,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(
-                  width: 6,
+      buttonChildBuilder:
+          (
+            context, {
+            required title,
+            required hint,
+            required value,
+            required enabled,
+            required clearable,
+            showDropdownIcon = false,
+            dense = false,
+          }) {
+            return IconTheme(
+              data: Theme.of(context).iconTheme,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    themeParameters.themeIcons[themeParameters.selectedTheme],
+                    const SizedBox(
+                      width: 12,
+                    ),
+                    Expanded(
+                      child: MaterialKeyValuePair(
+                        title: title,
+                        value: themeParameters.themeNames(context)[themeParameters.selectedTheme],
+                        valueStyle: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 4,
+                    ),
+                    // Icon(Icons.arrow_drop_down, color: Theme.of(context).textTheme.bodyLarge!.color,),
+                    // const SizedBox(width: 4,),
+                  ],
                 ),
-                themeParameters.themeIcons[themeParameters.selectedTheme],
-                const SizedBox(
-                  width: 12,
-                ),
-                Expanded(
-                  child: MaterialKeyValuePair(
-                    title: title,
-                    value: themeParameters.themeNames(context)[themeParameters.selectedTheme],
-                    valueStyle: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                const SizedBox(
-                  width: 4,
-                ),
-                // Icon(Icons.arrow_drop_down, color: Theme.of(context).textTheme.bodyLarge!.color,),
-                // const SizedBox(width: 4,),
-              ],
-            ),
-          ),
-        );
-      },
+              ),
+            );
+          },
       popupWidgetBuilder: (value) {
         return Row(
           mainAxisSize: MainAxisSize.min,
@@ -208,12 +217,13 @@ class _UiScalePickerState extends ConsumerState<UiScalePicker> {
   @override
   void initState() {
     super.initState();
-    value = Hive.box('settings').get('ui_scale');
+    value = Hive.box<dynamic>('settings').get('ui_scale');
   }
 
   @override
   Widget build(BuildContext context) {
-    final defaultValue = MediaQuery.textScaleFactorOf(context).clamp(1.0, 1.5);
+    // ignore: deprecated_member_use // this is fucking retarded, if they ever remove this maybe we have to do textScaler.scale(kDefFontSize); and get an approximated factor from there??
+    final defaultValue = MediaQuery.textScalerOf(context).textScaleFactor.clamp(1.0, 1.5);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,6 +285,7 @@ class _UiScalePickerState extends ConsumerState<UiScalePicker> {
                       ),
                     ),
                     Slider(
+                      // ignore: deprecated_member_use // this is fucking retarded, if they ever remove this maybe we have to do textScaler.scale(kDefFontSize); and get an approximated factor from there??
                       value: value ?? MediaQuery.textScaleFactorOf(context).clamp(1, 1.5),
                       min: 1,
                       max: 1.5,
@@ -305,7 +316,7 @@ class _UiScalePickerState extends ConsumerState<UiScalePicker> {
   }
 
   void commitValue() {
-    Hive.box('settings').put('ui_scale', value);
+    Hive.box<dynamic>('settings').put('ui_scale', value);
     ref.read(fromZeroScreenProvider).scale = value;
   }
 }

@@ -21,6 +21,8 @@ dependencies:
     path: ../fz_scaffold
   fz_future_handling:
     path: ../fz_future_handling
+  fz_opacity_gradient:
+    path: ../fz_opacity_gradient
 
 dependency_overrides:
   intl: ^0.20.2

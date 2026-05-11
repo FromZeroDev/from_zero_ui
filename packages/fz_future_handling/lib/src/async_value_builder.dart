@@ -5,11 +5,9 @@ import 'package:fz_future_handling/src/future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 
 typedef DataBuilder<T> = Widget Function(BuildContext context, T data);
-typedef DataMultiBuilder<T> =
-    Widget Function(BuildContext context, List<T> data);
+typedef DataMultiBuilder<T> = Widget Function(BuildContext context, List<T> data);
 typedef LoadingBuilder = Widget Function(BuildContext context);
-typedef ErrorBuilder =
-    Widget Function(BuildContext context, Object error, StackTrace? stackTrace);
+typedef ErrorBuilder = Widget Function(BuildContext context, Object error, StackTrace? stackTrace);
 typedef FutureTransitionBuilder =
     Widget Function(
       BuildContext context,
@@ -225,9 +223,7 @@ class AsyncValueMultiBuilder<T> extends StatelessWidget {
       stateString = 'Error-${error.hashCode}';
       result = errorBuilder(context, error!, stackTrace);
     } else if (data.length == asyncValues.length) {
-      stateString = asyncValues.isEmpty
-          ? 'empty'
-          : 'Data-${Object.hashAll(asyncValues)}';
+      stateString = asyncValues.isEmpty ? 'empty' : 'Data-${Object.hashAll(asyncValues)}';
       result = dataBuilder(context, data);
     } else {
       stateString = 'loading';
@@ -366,9 +362,7 @@ class AsyncBuilderAnimationWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final notifyResize = applyAnimatedContainerFromChildSize
-        ? ChangeNotifier()
-        : null;
+    final notifyResize = applyAnimatedContainerFromChildSize ? ChangeNotifier() : null;
     Widget result = child;
     if (loadingState != null) {
       result = KeyedSubtree(
@@ -376,15 +370,13 @@ class AsyncBuilderAnimationWrapper extends StatelessWidget {
         child: result,
       );
     }
-    if (animatedSwitcherType != AnimatedSwitcherType.none &&
-        transitionDuration != Duration.zero) {
+    if (animatedSwitcherType != AnimatedSwitcherType.none && transitionDuration != Duration.zero) {
       if (animatedSwitcherType == AnimatedSwitcherType.normal) {
         result = AnimatedSwitcher(
           duration: transitionDuration,
           switchInCurve: transitionInCurve,
           switchOutCurve: transitionOutCurve,
-          transitionBuilder: (child, animation) =>
-              transitionBuilder(context, child, animation),
+          transitionBuilder: (child, animation) => transitionBuilder(context, child, animation),
           layoutBuilder: (currentChild, previousChildren) {
             return layoutBuilder(
               currentChild,
@@ -400,15 +392,12 @@ class AsyncBuilderAnimationWrapper extends StatelessWidget {
           duration: transitionDuration,
           switchInCurve: transitionInCurve,
           switchOutCurve: transitionOutCurve,
-          transitionBuilder: (child, animation) =>
-              transitionBuilder(context, child, animation),
+          transitionBuilder: (child, animation) => transitionBuilder(context, child, animation),
           layoutBuilder: layoutBuilder,
           alignment: alignment ?? Alignment.center,
           clipBehaviour: clipBehaviour ?? Clip.hardEdge,
-          takeImages:
-              animatedSwitcherType != AnimatedSwitcherType.imageNoOutgoing,
-          rebuildOutgoingChildrenIfNoImageReady:
-              animatedSwitcherType == AnimatedSwitcherType.imageWithRebuild,
+          takeImages: animatedSwitcherType != AnimatedSwitcherType.imageNoOutgoing,
+          rebuildOutgoingChildrenIfNoImageReady: animatedSwitcherType == AnimatedSwitcherType.imageWithRebuild,
           child: result,
         );
       }

@@ -40,8 +40,7 @@ class APISnackBar<T> extends SnackBarFromZero {
     state.whenOrNull(
       error: (error, stackTrace) {
         bool blockUI =
-            blockUIType == APISnackBarBlockUIType.always ||
-            blockUIType == APISnackBarBlockUIType.whileLoadingOrError;
+            blockUIType == APISnackBarBlockUIType.always || blockUIType == APISnackBarBlockUIType.whileLoadingOrError;
         if (blockUI != this.blockUI.value) {
           this.blockUI.value = blockUI;
         }
@@ -65,8 +64,7 @@ class APISnackBar<T> extends SnackBarFromZero {
   }
 }
 
-class APISnackBarState<T> extends ConsumerState<APISnackBar<T>>
-    with TickerProviderStateMixin {
+class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProviderStateMixin {
   AnimationController? animationController;
 
   @override
@@ -272,9 +270,7 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>>
     Object? error,
     StackTrace? stackTrace,
   ) {
-    var type = error == null
-        ? SnackBarFromZero.success
-        : SnackBarFromZero.error;
+    var type = error == null ? SnackBarFromZero.success : SnackBarFromZero.error;
     final actionColor = SnackBarFromZero.colors[type];
     final splashColor = Theme.of(context).colorScheme.secondary;
     bool showRetry, showErrorDetails;
@@ -303,9 +299,7 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>>
         );
         showRetry = !kReleaseMode || isRetryable;
         showErrorDetails =
-            !kReleaseMode ||
-            (!isRetryable &&
-                ApiProviderBuilder.shouldShowErrorDetails(error, stackTrace));
+            !kReleaseMode || (!isRetryable && ApiProviderBuilder.shouldShowErrorDetails(error, stackTrace));
         icon = ApiProviderBuilder.getErrorIcon(context, error, stackTrace);
         title = ApiProviderBuilder.getErrorTitle(context, error, stackTrace);
         message = ApiProviderBuilder.getErrorSubtitle(
@@ -450,8 +444,7 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>>
           ),
         ),
         if (showAcceptInsteadOfClose) const SizedBox(width: 16),
-        if (!showAcceptInsteadOfClose &&
-            (error == null || (widget.cancelable ?? true)))
+        if (!showAcceptInsteadOfClose && (error == null || (widget.cancelable ?? true)))
           SizedBox(
             width: 42,
             height: double.infinity,
@@ -549,9 +542,7 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>>
       },
     );
     result = Container(
-      width: fixed
-          ? double.infinity
-          : (widget.width ?? (512 + (hasActions ? 128 : 0))),
+      width: fixed ? double.infinity : (widget.width ?? (512 + (hasActions ? 128 : 0))),
       padding: EdgeInsets.only(bottom: fixed ? 0 : 48),
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 64),

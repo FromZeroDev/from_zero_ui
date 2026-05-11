@@ -116,6 +116,7 @@ class _StickyHeaderControllerScope extends InheritedWidget {
 class SliverStickyHeaderState {
   const SliverStickyHeaderState(
     this.scrollPercentage,
+    // ignore: avoid_positional_boolean_parameters // this is copied from flutter :))
     this.isPinned,
   );
 

@@ -16,6 +16,7 @@ import 'package:fz_copy_page_indicator/fz_copy_page_indicator.dart' as my_arrow_
 import 'package:fz_dao/fz_dao.dart';
 import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_file_saver/fz_file_saver.dart';
+import 'package:fz_platform/fz_platform.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_table/fz_table.dart';
 import 'package:fz_theme/fz_theme.dart';
@@ -50,13 +51,16 @@ class Export extends StatefulWidget {
   ];
 
   // TODO: 2 this is god awful. Completely refactor this class if we intend on using it again, or scrap it and decouple TableController excel export from it (which is the only use it has now)
-  int Function(int currentSize, bool portrait, double scale, String format)? childrenCount;
+  // ignore: avoid_positional_boolean_parameters
+  final int Function(int currentSize, bool portrait, double scale, String format)? childrenCount;
+  // ignore: avoid_positional_boolean_parameters
   final Widget Function(BuildContext context, int index, int currentSize, bool portrait, double scale, String format)?
   childBuilder;
   final Widget Function(
     BuildContext context,
     int index,
     int currentSize,
+    // ignore: avoid_positional_boolean_parameters
     bool portrait,
     double scale,
     String format,
@@ -130,7 +134,8 @@ class Export extends StatefulWidget {
            //            shape: Border.all(style: BorderStyle.none),
          ),
        ),
-       childBuilder = null;
+       childBuilder = null,
+       childrenCount = null;
 
   Export.dummy({
     required this.dummyChild,
@@ -204,6 +209,9 @@ class ExportState extends State<Export> {
     if (widget.excelSheets?.call() != null) 'Excel',
   ];
 
+  // ignore: avoid_positional_boolean_parameters
+  late int Function(int currentSize, bool portrait, double scale, String format)? childrenCount = widget.childrenCount;
+
   // int get currentSize => Hive.box("settings").get("export_size", defaultValue: 0);
   // set currentSize(int value) => Hive.box("settings").put("export_size", value);
   // int get format => Hive.box("settings").get("export_format", defaultValue: 0);
@@ -237,7 +245,7 @@ class ExportState extends State<Export> {
   void initState() {
     super.initState();
     if (widget.scrollableChildBuilder != null) {
-      widget.childrenCount = ((currentSize, bool portrait, double scale, String format) {
+      childrenCount = ((currentSize, bool portrait, double scale, String format) {
         if (first) {
           first = false;
           WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
@@ -345,7 +353,7 @@ class ExportState extends State<Export> {
       i++;
       doneExports++;
       if (i <
-          widget.childrenCount!(
+          childrenCount!(
             currentSize,
             portrait,
             scale,
@@ -363,7 +371,6 @@ class ExportState extends State<Export> {
     if (format == 'PDF') {
       var format = Export.defaultFormats[currentSize];
       if (!portrait) format = PdfPageFormat(format.height, format.width);
-      if (!mounted) return;
       Uint8List pngBytes = await _getImageBytes(size, await _getImage(size, boundaryKeys[i]));
       if (!mounted) return;
       pdf.addPage(
@@ -376,25 +383,26 @@ class ExportState extends State<Export> {
         ),
       );
       if (i ==
-          widget.childrenCount!(
+          childrenCount!(
                 currentSize,
                 portrait,
                 scale,
                 this.format,
               ) -
               1) {
+        final path = await widget.path;
         if (!mounted) return;
+        // don't await, so the window closes before snackbar
         saveFileFromZero(
-          // don't await, so the window closes before snackbar
           context: context,
           name: '${widget.title}.pdf',
-          pathAppend: await widget.path,
+          pathAppend: path,
           data: pdf.save,
         );
       }
     } else if (format == 'PNG') {
       final title =
-          '${widget.title}${widget.childrenCount!(
+          '${widget.title}${childrenCount!(
                     currentSize,
                     portrait,
                     scale,
@@ -403,9 +411,10 @@ class ExportState extends State<Export> {
       final path = await widget.path;
       if (!mounted) return;
       final pngBytes = _getImageBytes(size, await _getImage(size, boundaryKeys[i]));
+      if (!mounted) return;
       if (i == 0) {
+        // don't await, so the window closes before snackbar, might have issues with multiple files
         saveFileFromZero(
-          // don't await, so the window closes before snackbar, might have issues with multiple files
           context: context,
           name: title,
           pathAppend: path,
@@ -418,7 +427,6 @@ class ExportState extends State<Export> {
         if (!mounted) return;
         await imgFile.writeAsBytes(bytes);
       }
-      if (!mounted) return;
     }
   }
 
@@ -486,7 +494,7 @@ class ExportState extends State<Export> {
               if (i == -1) {
                 backgroundColor = col?.backgroundColor;
                 if (backgroundColor != null) {
-                  backgroundColor = backgroundColor.withValues(alpha: backgroundColor.opacity * 0.5);
+                  backgroundColor = backgroundColor.withValues(alpha: backgroundColor.a * 0.5);
                 }
               } else {
                 if (value.currentState!.widget.rowStyleTakesPriorityOverColumn) {
@@ -597,16 +605,17 @@ class ExportState extends State<Export> {
       }*/
     });
     excel.delete('Sheet1');
+    final path = await widget.path;
     if (!mounted) return;
     saveFileFromZero(
       // don't await, so the window closes before snackbar
       context: context,
       name: '${widget.title}.xlsx',
-      pathAppend: await widget.path,
+      pathAppend: path,
       data: () async => excel.encode()!,
     );
     doneExports =
-        widget.childrenCount?.call(
+        childrenCount?.call(
           currentSize,
           portrait,
           scale,
@@ -619,7 +628,7 @@ class ExportState extends State<Export> {
   Widget build(BuildContext context) {
     if (widget.dummyChild != null) return widget.dummyChild!;
     while (textEditingControllers.length <
-        (widget.childrenCount?.call(
+        (childrenCount?.call(
               currentSize,
               portrait,
               scale,
@@ -635,7 +644,7 @@ class ExportState extends State<Export> {
       );
     }
     while (boundaryKeys.length <
-        (widget.childrenCount?.call(
+        (childrenCount?.call(
               currentSize,
               portrait,
               scale,
@@ -657,7 +666,8 @@ class ExportState extends State<Export> {
     }
     export = () async {
       if (await requestDefaultFilePermission()) {
-        showModalFromZero(
+        if (!context.mounted) return;
+        showModalFromZero<void>(
           context: context,
           configuration: const FadeScaleTransitionConfiguration(
             barrierDismissible: false,
@@ -701,16 +711,17 @@ class ExportState extends State<Export> {
         do {
           await Future<dynamic>.delayed(500.milliseconds);
         } while (doneExports <
-            (widget.childrenCount?.call(
+            (childrenCount?.call(
                   currentSize,
                   portrait,
                   scale,
                   format,
                 ) ??
                 1));
-        if (mounted) {
-          Navigator.of(context).pop();
+        if (!context.mounted) {
+          return; // already popped, probably
         }
+        Navigator.of(context).pop();
       }
     };
     return ResponsiveInsetsDialog(
@@ -748,7 +759,7 @@ class ExportState extends State<Export> {
                               key: pageViewKey,
                               controller: controller,
                               itemCount:
-                                  widget.childrenCount?.call(
+                                  childrenCount?.call(
                                     currentSize,
                                     portrait,
                                     scale,
@@ -770,7 +781,7 @@ class ExportState extends State<Export> {
                                 pageController: controller,
                                 currentPageNotifier: currentPageNotifier,
                                 itemCount:
-                                    widget.childrenCount?.call(
+                                    childrenCount?.call(
                                       currentSize,
                                       portrait,
                                       scale,
@@ -788,7 +799,7 @@ class ExportState extends State<Export> {
                       //                        "Vista Previa", //(Página ${controller.page}/${pages.length})
                       //                        style: Theme.of(context).textTheme.bodySmall.copyWith(color: Colors.black),
                       //                      ),
-                      if ((widget.childrenCount?.call(
+                      if ((childrenCount?.call(
                                 currentSize,
                                 portrait,
                                 scale,
@@ -798,7 +809,7 @@ class ExportState extends State<Export> {
                           1)
                         CirclePageIndicator(
                           itemCount:
-                              widget.childrenCount?.call(
+                              childrenCount?.call(
                                 currentSize,
                                 portrait,
                                 scale,
@@ -1043,15 +1054,15 @@ class ExportState extends State<Export> {
                           ),
                           color: Colors.blue,
                           onPressed: () async {
-                            showModalFromZero(
+                            showModalFromZero<void>(
                               context: context,
                               builder: (context) {
                                 int index = currentPageNotifier.value;
-                                return RawKeyboardListener(
+                                return KeyboardListener(
                                   focusNode: FocusNode(),
                                   autofocus: true,
-                                  onKey: (value) {
-                                    if (PlatformExtended.isWindows && value.logicalKey != LogicalKeyboardKey.escape) {
+                                  onKeyEvent: (event) {
+                                    if (PlatformExtended.isWindows && event.logicalKey != LogicalKeyboardKey.escape) {
                                       Navigator.of(context).pop();
                                     }
                                   },

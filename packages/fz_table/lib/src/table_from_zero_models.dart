@@ -59,7 +59,7 @@ class RowAction<T> extends ActionFromZero {
 abstract class RowModel<T> {
   T get id;
   Key? get rowKey => null;
-  Map get values;
+  Map<dynamic, dynamic> get values;
   Color? get backgroundColor => null;
   TextStyle? get textStyle => null;
   double? get height => 36;
@@ -154,14 +154,14 @@ abstract class ColModel<T> {
   bool? get initialValueFiltersExcludeAllElse;
   bool get initiallyHidden;
 
-  Object? getValue(RowModel row, dynamic key) {
+  Object? getValue(RowModel<dynamic> row, dynamic key) {
     return row.values[key];
   }
 
-  String getValueString(RowModel row, dynamic key) {
+  String getValueString(RowModel<dynamic> row, dynamic key) {
     final value = getValue(row, key);
     if (value is List || value is ComparableList) {
-      final List list = value is List
+      final List<dynamic> list = value is List
           ? value
           : value is ComparableList
           ? value.list
@@ -228,6 +228,7 @@ abstract class ColModel<T> {
     }
   }
 
+  // ignore: avoid_positional_boolean_parameters
   Widget? buildSortedIcon(BuildContext context, bool ascending) => null;
   List<ConditionFilter> getAvailableConditionFilters() => [
     // FilterIsEmpty(),
@@ -243,17 +244,17 @@ abstract class ColModel<T> {
     // FilterDateBefore(),
   ];
 
-  static Object? getRowValue(RowModel row, dynamic key, ColModel? col) {
+  static Object? getRowValue(RowModel<dynamic> row, dynamic key, ColModel<dynamic>? col) {
     return col?.getValue(row, key) ?? row.values[key];
   }
 
-  static String getRowValueString(RowModel row, dynamic key, ColModel? col) {
+  static String getRowValueString(RowModel<dynamic> row, dynamic key, ColModel<dynamic>? col) {
     if (col != null) {
       return col.getValueString(row, key);
     }
     final value = getRowValue(row, key, col);
     if (value is List || value is ComparableList) {
-      final List list = value is List
+      final List<dynamic> list = value is List
           ? value
           : value is ComparableList
           ? value.list
@@ -264,7 +265,7 @@ abstract class ColModel<T> {
     }
   }
 
-  List<RowModel> buildFilterPopupRowModels(
+  List<RowModel<dynamic>> buildFilterPopupRowModels(
     List<dynamic> availableFilters,
     Map<dynamic, Map<Object?, bool>> valueFilters,
     dynamic colKey,
@@ -292,7 +293,7 @@ class SimpleRowModel<T> extends RowModel<T> {
   @override
   Key? rowKey;
   @override
-  Map values;
+  Map<dynamic, dynamic> values;
   @override
   Color? backgroundColor;
   @override
@@ -369,7 +370,7 @@ class SimpleRowModel<T> extends RowModel<T> {
   SimpleRowModel<T> copyWith({
     T? id,
     Key? rowKey,
-    Map? values,
+    Map<dynamic, dynamic>? values,
     Color? backgroundColor,
     TextStyle? textStyle,
     double? height,
@@ -629,10 +630,10 @@ class NumColModel<T> extends SimpleColModel<T> {
   }
 
   @override
-  String getValueString(RowModel row, dynamic key) {
+  String getValueString(RowModel<dynamic> row, dynamic key) {
     final value = getValue(row, key);
     if (value is List || value is ComparableList) {
-      final List list = value is List
+      final List<dynamic> list = value is List
           ? value
           : value is ComparableList
           ? value.list
@@ -682,7 +683,7 @@ class NumColModel<T> extends SimpleColModel<T> {
     return '';
   }
 
-  num _sumList(Iterable list) {
+  num _sumList(Iterable<dynamic> list) {
     return list.sumBy((value) {
       if (value is num) {
         return value;
@@ -803,7 +804,7 @@ class BoolColModel<T> extends SimpleColModel<T> {
   }
 
   @override
-  String getValueString(RowModel row, dynamic key) {
+  String getValueString(RowModel<dynamic> row, dynamic key) {
     final value = getValue(row, key);
     if (value is bool) {
       return value ? trueValue : falseValue;
@@ -911,10 +912,10 @@ class DateColModel<T> extends SimpleColModel<T> {
     List<RowModel<T>>? reFiltered,
   }) => '';
   @override
-  String getValueString(RowModel row, dynamic key) {
+  String getValueString(RowModel<dynamic> row, dynamic key) {
     final value = getValue(row, key);
     if (value is List || value is ComparableList) {
-      final List list = value is List
+      final List<dynamic> list = value is List
           ? value
           : value is ComparableList
           ? value.list
@@ -947,7 +948,7 @@ class DateColModel<T> extends SimpleColModel<T> {
     FilterDateBefore(),
   ];
   @override
-  List<RowModel> buildFilterPopupRowModels(
+  List<RowModel<dynamic>> buildFilterPopupRowModels(
     List<dynamic> availableFilters,
     Map<dynamic, Map<Object?, bool>> valueFilters,
     dynamic colKey,
@@ -972,7 +973,7 @@ class DateColModel<T> extends SimpleColModel<T> {
         other.add(e);
       }
     }
-    final List<RowModel> result = [];
+    final List<RowModel<dynamic>> result = [];
     for (final e in other) {
       result.add(
         SimpleRowModel(

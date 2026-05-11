@@ -2,8 +2,10 @@ name: fz_localizations
 description: FromZero localizations (i18n) for Flutter apps.
 publish_to: 'none'
 version: 0.1.0
+
 environment:
   sdk: "^3.9.0"
+
 dependencies:
   flutter:
     sdk: flutter
@@ -15,3 +17,7 @@ dependency_overrides:
 
 dev_dependencies:
   flutter_lints: ^5.0.0
+
+flutter:
+  assets:
+    - assets/i18n/

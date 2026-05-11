@@ -8,6 +8,7 @@ import 'package:fz_actions/fz_actions.dart';
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 import 'package:fz_dao/fz_dao.dart';
+import 'package:fz_opacity_gradient/fz_opacity_gradient.dart';
 import 'package:fz_popup/fz_popup.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_table/fz_table.dart';

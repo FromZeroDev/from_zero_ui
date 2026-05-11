@@ -356,6 +356,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_animated_switcher_image:
+    dependency: transitive
+    description:
+      path: "../fz_animated_switcher_image"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_animations:
     dependency: "direct main"
     description:
@@ -419,10 +426,24 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_copy_time_picker:
+    dependency: transitive
+    description:
+      path: "../fz_copy_time_picker"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_dao:
     dependency: transitive
     description:
       path: "../fz_dao"
+      relative: true
+    source: path
+    version: "0.1.0"
+  fz_date_picker:
+    dependency: transitive
+    description:
+      path: "../fz_date_picker"
       relative: true
     source: path
     version: "0.1.0"
@@ -497,7 +518,7 @@ packages:
     source: path
     version: "0.1.0"
   fz_opacity_gradient:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../fz_opacity_gradient"
       relative: true

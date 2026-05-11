@@ -7,10 +7,9 @@ import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_snackbar/src/api_snackbar.dart';
 import 'package:fz_snackbar/src/snackbar_from_zero.dart';
 
-var fromZeroSnackBarHostControllerProvider =
-    ChangeNotifierProvider<SnackBarHostControllerFromZero>((ref) {
-      return SnackBarHostControllerFromZero();
-    });
+var fromZeroSnackBarHostControllerProvider = ChangeNotifierProvider<SnackBarHostControllerFromZero>((ref) {
+  return SnackBarHostControllerFromZero();
+});
 
 class SnackBarControllerFromZero {
   SnackBarControllerFromZero({required this.host, required this.snackBar});
@@ -72,16 +71,13 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
   @override
   Widget build(BuildContext context) {
     final controller = ref.watch(fromZeroSnackBarHostControllerProvider);
-    SnackBarFromZero? currentSnackBar = controller._snackBarQueue.isEmpty
-        ? null
-        : controller._snackBarQueue.first;
+    SnackBarFromZero? currentSnackBar = controller._snackBarQueue.isEmpty ? null : controller._snackBarQueue.first;
     bool isSameSnackBar =
         currentSnackBar?.key != null &&
         lastShownSnackBar?.key != null &&
         currentSnackBar?.key == lastShownSnackBar?.key;
-    if (currentSnackBar != null &&
-        !isSameSnackBar &&
-        currentSnackBar is APISnackBar) {
+    if (currentSnackBar != null && !isSameSnackBar && currentSnackBar is APISnackBar) {
+      // ignore: invalid_use_of_protected_member
       currentSnackBar.updateBlockUI(currentSnackBar.stateNotifier.state);
     }
     final viewPadding = MediaQuery.viewPaddingOf(context);
@@ -105,9 +101,7 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 250),
                             curve: Curves.ease,
-                            color: blockUI
-                                ? Colors.black54
-                                : Colors.black.withValues(alpha: 0),
+                            color: blockUI ? Colors.black54 : Colors.black.withValues(alpha: 0),
                           ),
                         );
                       },
@@ -117,9 +111,7 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
               ),
             ),
             AnimatedContainerFromChildSize(
-              child:
-                  controller._snackBarQueue.isEmpty ||
-                      !controller._snackBarQueue.first.pushScreen
+              child: controller._snackBarQueue.isEmpty || !controller._snackBarQueue.first.pushScreen
                   ? const SizedBox.shrink()
                   : Container(
                       key: ValueKey(controller._snackBarQueue.first.hashCode),
@@ -162,9 +154,7 @@ class SnackBarHostFromZeroState extends ConsumerState<SnackBarHostFromZero> {
                 );
               }
             },
-            child:
-                controller._snackBarQueue.isEmpty ||
-                    controller._snackBarQueue.first.pushScreen
+            child: controller._snackBarQueue.isEmpty || controller._snackBarQueue.first.pushScreen
                 ? const SizedBox.shrink()
                 : Container(
                     key: ValueKey(controller._snackBarQueue.first.hashCode),

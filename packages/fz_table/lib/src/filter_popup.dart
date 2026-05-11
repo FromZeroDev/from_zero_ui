@@ -9,12 +9,11 @@ import 'package:fz_popup/fz_popup.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_table/fz_table.dart';
 import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
 
 typedef ShowFilterPopupCallback =
     Future<bool> Function({
       required BuildContext context,
-      required TableController controller,
+      required TableController<dynamic> controller,
       required dynamic colKey,
       GlobalKey? anchorKey,
     });
@@ -22,25 +21,21 @@ typedef ShowFilterPopupCallback =
 abstract class TableFromZeroFilterPopup {
   static Future<bool> showDefaultFilterPopup({
     required BuildContext context,
-    required TableController controller,
+    required TableController<dynamic> controller,
     required dynamic colKey,
     GlobalKey? anchorKey,
   }) async {
-    final ColModel? col = controller.currentState!.widget.columns?[colKey];
-    final Map<dynamic, List<ConditionFilter>> conditionFilters =
-        controller.conditionFilters!;
-    final Map<dynamic, Map<Object?, bool>> valueFilters =
-        controller.valueFilters!;
+    final ColModel<dynamic>? col = controller.currentState!.widget.columns?[colKey];
+    final Map<dynamic, List<ConditionFilter>> conditionFilters = controller.conditionFilters!;
+    final Map<dynamic, Map<Object?, bool>> valueFilters = controller.valueFilters!;
     final newConditionFilters = {
-      for (final e in conditionFilters.keys)
-        e: List<ConditionFilter>.from(conditionFilters[e]!),
+      for (final e in conditionFilters.keys) e: List<ConditionFilter>.from(conditionFilters[e]!),
     };
     final newValueFilters = {
-      for (final e in valueFilters.keys)
-        e: Map<Object?, bool>.from(valueFilters[e]!),
+      for (final e in valueFilters.keys) e: Map<Object?, bool>.from(valueFilters[e]!),
     };
     ScrollController filtersScrollController = ScrollController();
-    TableController filterTableController = TableController(
+    TableController<dynamic> filterTableController = TableController(
       initialValueFilters: {
         colKey: {},
       }, // make sure to disregard initialValueFilters in the original column
@@ -48,20 +43,19 @@ abstract class TableFromZeroFilterPopup {
     );
     final modified = ValueNotifier(false);
     List<ConditionFilter> possibleConditionFilters =
-        col?.getAvailableConditionFilters() ??
-        getDefaultAvailableConditionFilters();
+        col?.getAvailableConditionFilters() ?? getDefaultAvailableConditionFilters();
     final filterSearchFocusNode = FocusNode();
     if (PlatformExtended.isDesktop) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         filterSearchFocusNode.requestFocus();
       });
     }
-    final ValueNotifier<Map<dynamic, List<dynamic>>?> availableFilters =
-        ValueNotifier(null); // controller.currentState.availableFilters
+    final ValueNotifier<Map<dynamic, List<dynamic>>?> availableFilters = ValueNotifier(
+      null,
+    ); // controller.currentState.availableFilters
     final relevantRows = controller.currentState!.getFilterResults(
       controller.currentState!.sorted,
-      skipColKey:
-          colKey, // skip filters on this column, filter out everything in other columns
+      skipColKey: colKey, // skip filters on this column, filter out everything in other columns
     ); // PERF: 3 make getFilterResults async (either with an isolate or an artifitial throttle)
     TableFromZeroState.getAvailableFiltersForColumn(
       rowValues: relevantRows.allFiltered.map((e) => e.values),
@@ -74,7 +68,7 @@ abstract class TableFromZeroFilterPopup {
     ).then((result) {
       availableFilters.value = {colKey: result};
     });
-    final confirm = await showPopupFromZero(
+    final confirm = await showPopupFromZero<bool>(
       context: context,
       anchorKey: anchorKey,
       builder: (context) {
@@ -123,8 +117,7 @@ abstract class TableFromZeroFilterPopup {
                                     horizontal: 8,
                                   ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.only(left: 4),
@@ -162,14 +155,11 @@ abstract class TableFromZeroFilterPopup {
                                                   FromZeroLocalizations.of(
                                                     context,
                                                   ).translate('add'),
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium!
-                                                      .copyWith(
-                                                        color: Theme.of(
-                                                          context,
-                                                        ).colorScheme.secondary,
-                                                      ),
+                                                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).colorScheme.secondary,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -189,22 +179,18 @@ abstract class TableFromZeroFilterPopup {
                                           onSelected: (value) {
                                             filterPopupSetState(() {
                                               modified.value = true;
-                                              if (newConditionFilters[colKey] ==
-                                                  null) {
-                                                newConditionFilters[colKey] =
-                                                    [];
+                                              if (newConditionFilters[colKey] == null) {
+                                                newConditionFilters[colKey] = [];
                                               }
                                               newConditionFilters[colKey]!.add(
                                                 value,
                                               );
                                             });
-                                            WidgetsBinding.instance
-                                                .addPostFrameCallback((
-                                                  timeStamp,
-                                                ) {
-                                                  value.focusNode
-                                                      .requestFocus();
-                                                });
+                                            WidgetsBinding.instance.addPostFrameCallback((
+                                              timeStamp,
+                                            ) {
+                                              value.focusNode.requestFocus();
+                                            });
                                           },
                                         ),
                                       ),
@@ -212,8 +198,7 @@ abstract class TableFromZeroFilterPopup {
                                   ),
                                 ),
                               ),
-                            if (possibleConditionFilters.isNotEmpty &&
-                                (newConditionFilters[colKey] ?? []).isEmpty)
+                            if (possibleConditionFilters.isNotEmpty && (newConditionFilters[colKey] ?? []).isEmpty)
                               SliverToBoxAdapter(
                                 child: Padding(
                                   padding: const EdgeInsets.only(
@@ -260,11 +245,7 @@ abstract class TableFromZeroFilterPopup {
                             if (possibleConditionFilters.isNotEmpty)
                               SliverToBoxAdapter(
                                 child: SizedBox(
-                                  height:
-                                      (newConditionFilters[colKey] ?? [])
-                                          .isEmpty
-                                      ? 6
-                                      : 12,
+                                  height: (newConditionFilters[colKey] ?? []).isEmpty ? 6 : 12,
                                 ),
                               ),
                             if (possibleConditionFilters.isNotEmpty)
@@ -275,16 +256,13 @@ abstract class TableFromZeroFilterPopup {
                               tableController: filterTableController,
                               showHeaders: false,
                               emptyWidget: const SizedBox.shrink(),
-                              initialSortedColumn: col?.possibleValues != null
-                                  ? null
-                                  : colKey,
-                              rows: (col ?? SimpleColModel(name: ''))
-                                  .buildFilterPopupRowModels(
-                                    availableFilters[colKey] ?? [],
-                                    newValueFilters,
-                                    colKey,
-                                    modified,
-                                  ),
+                              initialSortedColumn: col?.possibleValues != null ? null : colKey,
+                              rows: (col ?? SimpleColModel(name: '')).buildFilterPopupRowModels(
+                                availableFilters[colKey] ?? [],
+                                newValueFilters,
+                                colKey,
+                                modified,
+                              ),
                               // override style and text alignment
                               cellBuilder: (context, row, colKey, col) {
                                 var message = ColModel.getRowValueString(
@@ -294,8 +272,7 @@ abstract class TableFromZeroFilterPopup {
                                 );
                                 var textStyle = const TextStyle(fontSize: 16);
                                 if (message.isBlank) {
-                                  message =
-                                      '< vacío >'; // TODO: 3 internacionalize
+                                  message = '< vacío >'; // TODO: 3 internacionalize
                                   textStyle = TextStyle(
                                     fontSize: 16,
                                     color: Theme.of(context).disabledColor,
@@ -318,9 +295,7 @@ abstract class TableFromZeroFilterPopup {
                                       textAlign: TextAlign.left,
                                       maxLines: autoSizeTextMaxLines,
                                       softWrap: autoSizeTextMaxLines > 1,
-                                      overflow: autoSizeTextMaxLines > 1
-                                          ? TextOverflow.clip
-                                          : TextOverflow.fade,
+                                      overflow: autoSizeTextMaxLines > 1 ? TextOverflow.clip : TextOverflow.fade,
                                     ),
                                   ),
                                 );
@@ -344,13 +319,9 @@ abstract class TableFromZeroFilterPopup {
                                         onChanged: (v) {
                                           filterTableController.extraFilters = [
                                             (rows) {
-                                              List<RowModel> starts = [];
-                                              List<RowModel> contains = [];
-                                              final q = v
-                                                  .replaceAll('.', '')
-                                                  .replaceAll(',', '')
-                                                  .trim()
-                                                  .toUpperCase();
+                                              List<RowModel<dynamic>> starts = [];
+                                              List<RowModel<dynamic>> contains = [];
+                                              final q = v.replaceAll('.', '').replaceAll(',', '').trim().toUpperCase();
                                               if (q.isEmpty) {
                                                 return rows;
                                               } else {
@@ -362,19 +333,14 @@ abstract class TableFromZeroFilterPopup {
                                                       col,
                                                     ),
                                                   ];
-                                                  for (
-                                                    int i = 0;
-                                                    i < values.length;
-                                                    i++
-                                                  ) {
+                                                  for (int i = 0; i < values.length; i++) {
                                                     values[i] = values[i]
                                                         .replaceAll('.', '')
                                                         .replaceAll(',', '')
                                                         .trim()
                                                         .toUpperCase();
                                                   }
-                                                  bool doesContain = false,
-                                                      doesStart = false;
+                                                  bool doesContain = false, doesStart = false;
                                                   for (final value in values) {
                                                     if (value.contains(q)) {
                                                       doesContain = true;
@@ -419,11 +385,8 @@ abstract class TableFromZeroFilterPopup {
                                       ),
                                     ),
                                     const SizedBox(height: 6),
-                                    if (filterTableController.currentState ==
-                                            null ||
-                                        filterTableController
-                                            .filtered
-                                            .isNotEmpty)
+                                    if (filterTableController.currentState == null ||
+                                        filterTableController.filtered.isNotEmpty)
                                       Row(
                                         children: [
                                           Expanded(
@@ -436,22 +399,14 @@ abstract class TableFromZeroFilterPopup {
                                               onPressed: () {
                                                 modified.value = true;
                                                 filterPopupSetState(() {
-                                                  for (final initialRow
-                                                      in filterTableController
-                                                          .filtered) {
+                                                  for (final initialRow in filterTableController.filtered) {
                                                     for (final row in [
                                                       initialRow,
-                                                      ...initialRow
-                                                          .allFilteredChildren,
+                                                      ...initialRow.allFilteredChildren,
                                                     ]) {
-                                                      if (row.onCheckBoxSelected !=
-                                                          null) {
-                                                        newValueFilters[colKey]![row
-                                                                .id] =
-                                                            true;
-                                                        (row as SimpleRowModel)
-                                                                .selected =
-                                                            true;
+                                                      if (row.onCheckBoxSelected != null) {
+                                                        newValueFilters[colKey]![row.id] = true;
+                                                        (row as SimpleRowModel).selected = true;
                                                       }
                                                     }
                                                   }
@@ -469,22 +424,14 @@ abstract class TableFromZeroFilterPopup {
                                               onPressed: () {
                                                 modified.value = true;
                                                 filterPopupSetState(() {
-                                                  for (final initialRow
-                                                      in filterTableController
-                                                          .filtered) {
+                                                  for (final initialRow in filterTableController.filtered) {
                                                     for (final row in [
                                                       initialRow,
-                                                      ...initialRow
-                                                          .allFilteredChildren,
+                                                      ...initialRow.allFilteredChildren,
                                                     ]) {
-                                                      if (row.onCheckBoxSelected !=
-                                                          null) {
-                                                        newValueFilters[colKey]![row
-                                                                .id] =
-                                                            false;
-                                                        (row as SimpleRowModel)
-                                                                .selected =
-                                                            false;
+                                                      if (row.onCheckBoxSelected != null) {
+                                                        newValueFilters[colKey]![row.id] = false;
+                                                        (row as SimpleRowModel).selected = false;
                                                       }
                                                     }
                                                   }

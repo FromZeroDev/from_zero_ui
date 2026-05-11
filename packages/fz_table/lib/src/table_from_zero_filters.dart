@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fz_date_picker/fz_date_picker.dart';
 import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_platform/fz_platform.dart';
 import 'package:fz_table/fz_table.dart';
 import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_ui_utility/fz_ui_utility.dart';

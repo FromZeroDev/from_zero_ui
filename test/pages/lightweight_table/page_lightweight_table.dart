@@ -14,9 +14,9 @@ class PageLightweightTableState extends State<PageLightweightTable> {
   late Widget col1;
   late Widget col2;
   late Widget col3;
-  late TableFromZero table1;
-  late TableFromZero table2;
-  late TableFromZero table3;
+  late TableFromZero<dynamic> table1;
+  late TableFromZero<dynamic> table2;
+  late TableFromZero<dynamic> table3;
   final ScrollController scrollController = ScrollController();
   final ScrollController tableScrollController = ScrollController();
   final ScrollController customScrollController = ScrollController();
@@ -133,7 +133,7 @@ class PageLightweightTableState extends State<PageLightweightTable> {
           }).toList(),
       columns: ["Col 1", "Col 2", "Col 3", "Col 4", "Col 5"]
           .map((e) {
-            return SimpleColModel(
+            return SimpleColModel<dynamic>(
               name: e,
             );
           })
@@ -206,7 +206,7 @@ class PageLightweightTableState extends State<PageLightweightTable> {
       alternateRowBackgroundBrightness: true,
       columns: ["Col 1", "Col 2", "Col 3", "Col 4", "Col 5"]
           .map(
-            (e) => SimpleColModel(
+            (e) => SimpleColModel<dynamic>(
               name: e,
               filterEnabled: true,
               width: e == "Col 1" ? 128 : null,

@@ -1,7 +1,8 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:go_router/go_router.dart';
 
@@ -16,7 +17,7 @@ class PageHome extends StatefulWidget {
 
 class PageHomeState extends State<PageHome> {
   ScrollController controller = ScrollController();
-  late DAO testDao;
+  late DAO<dynamic> testDao;
 
   @override
   void initState() {

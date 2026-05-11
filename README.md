@@ -116,6 +116,7 @@ dependencies:
 - Consider merging some of the packages that are only depended on by one package into that package. Especially for those that aren't meant for direct consumption.
 - fz_log should be deleted and just use mlog once mlog provides proper customization support: Formatter, Outputs, etc.
 - fz_web_compile_file we don't really use web anymore and also there are libs that solve this.
+- fz_copy_time_picker can be fused into fz_date_picker (the only one that uses it).
 
 ## Dependency Graph
 

@@ -19,7 +19,7 @@ import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sanitize_filename/sanitize_filename.dart';
 import 'package:universal_html/html.dart' as html;
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 final _percentFormatter = NumberFormat.decimalPercentPattern(decimalDigits: 1);
 
@@ -112,10 +112,10 @@ Future<bool> saveFileFromZero({
         ],
       );
     }
-    // we're trusting that the parent SnackbarHost won't be disposed while waiting. SnackbarHost should live at the root of the widget tree for as long as the app lives.
-    // ignore: use_build_context_synchronously
     downloadSnackBarController = SnackBarFromZero(
       key: snackBarKey ?? ValueKey(data.hashCode),
+      // we're trusting that the parent SnackbarHost won't be disposed while waiting. SnackbarHost should live at the root of the widget tree for as long as the app lives.
+      // ignore: use_build_context_synchronously
       context: snackbarHostContext,
       type: type,
       progressIndicator: progressIndicator,
@@ -266,10 +266,10 @@ Future<bool> saveFileFromZero({
     if (success &&
         uiPath != null &&
         (multipleDownloads == null || multipleDownloadsCurrentIndex == multipleDownloads.lastIndex)) {
-      // we're trusting that the parent SnackbarHost won't be disposed while waiting. SnackbarHost should live at the root of the widget tree for as long as the app lives.
-      // ignore: use_build_context_synchronously
       await SnackBarFromZero(
         key: snackBarKey ?? ValueKey(data.hashCode),
+        // we're trusting that the parent SnackbarHost won't be disposed while waiting. SnackbarHost should live at the root of the widget tree for as long as the app lives.
+        // ignore: use_build_context_synchronously
         context: snackbarHostContext,
         type: SnackBarFromZero.success,
         duration: const Duration(seconds: 8),
@@ -302,25 +302,27 @@ Future<bool> saveFileFromZero({
       // we're trusting that the parent SnackbarHost won't be disposed while waiting. SnackbarHost should live at the root of the widget tree for as long as the app lives.
       // ignore: use_build_context_synchronously
       final errorSubtitle = ApiProviderBuilder.getErrorSubtitle(snackbarHostContext, error, stackTrace);
-      // ignore: use_build_context_synchronously
       await SnackBarFromZero(
         key: snackBarKey ?? ValueKey(data.hashCode),
+        // ignore: use_build_context_synchronously
         context: snackbarHostContext,
         type: SnackBarFromZero.error,
         icon: downloadSuccess
             ? null
             : ApiProviderBuilder.getErrorIcon(
+                // ignore: use_build_context_synchronously
                 snackbarHostContext,
                 error,
                 stackTrace,
-              ), // ignore: use_build_context_synchronously
+              ),
         duration: null,
         title: Text(localizations.translate('download_fail')),
         message: Text(
           downloadSuccess
               ? localizations.translate('error_file')
+              // ignore: use_build_context_synchronously
               : ('${ApiProviderBuilder.getErrorTitle(snackbarHostContext, error, stackTrace)}${errorSubtitle == null ? '' : '\n$errorSubtitle'}'),
-        ), // ignore: use_build_context_synchronously
+        ),
         actions: [
           if (onRetry != null)
             SnackBarAction(
@@ -336,10 +338,10 @@ Future<bool> saveFileFromZero({
 
   _ongoingDownloads.remove(hashCode);
   if (retry) {
-    // we're trusting that the parent SnackbarHost won't be disposed while waiting.
-    // SnackbarHost should live at the root of the widget tree for as long as the app lives.
-    // ignore: use_build_context_synchronously
     success = await saveFileFromZero(
+      // we're trusting that the parent SnackbarHost won't be disposed while waiting.
+      // SnackbarHost should live at the root of the widget tree for as long as the app lives.
+      // ignore: use_build_context_synchronously
       context: snackbarHostContext,
       data: onRetry!,
       pathAppend: pathAppend,
@@ -363,10 +365,10 @@ Future<bool> saveFileFromZero({
   }
   if (success && multipleDownloads != null && multipleDownloadsCurrentIndex < multipleDownloads.lastIndex) {
     multipleDownloadsCurrentIndex++;
-    // we're trusting that the parent SnackbarHost won't be disposed while waiting.
-    // SnackbarHost should live at the root of the widget tree for as long as the app lives.
-    // ignore: use_build_context_synchronously
     success = await saveFileFromZero(
+      // we're trusting that the parent SnackbarHost won't be disposed while waiting.
+      // SnackbarHost should live at the root of the widget tree for as long as the app lives.
+      // ignore: use_build_context_synchronously
       context: snackbarHostContext,
       data: multipleDownloads[multipleDownloadsCurrentIndex],
       pathAppend: pathAppend,
@@ -396,7 +398,7 @@ Future<void> openFile(File file) async {
   if (Platform.isAndroid) {
     await OpenFilex.open(file.absolute.path);
   } else {
-    await launch(file.absolute.path);
+    await launchUrlString(file.absolute.path);
   }
 }
 
@@ -406,7 +408,7 @@ Future<void> openFolder(File file) async {
   } else if (Platform.isWindows) {
     await Process.run('explorer.exe /select,"${file.absolute.path.replaceAll('/', r'\')}"', []);
   } else {
-    await launch(file.parent.absolute.path);
+    await launchUrlString(file.parent.absolute.path);
   }
 }
 

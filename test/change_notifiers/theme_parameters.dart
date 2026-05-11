@@ -1,6 +1,7 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
-import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
 class ThemeParameters extends ThemeParametersFromZero {
@@ -39,6 +40,7 @@ class ThemeParameters extends ThemeParametersFromZero {
       highlightColor: Colors.transparent,
       splashColor: Colors.blue.withValues(alpha: 0.1),
       appBarTheme: const AppBarTheme(
+        // ignore: deprecated_member_use
         color: Colors.white,
         titleTextStyle: TextStyle(
           color: Colors.black,
@@ -90,6 +92,7 @@ class ThemeParameters extends ThemeParametersFromZero {
       ),
       visualDensity: VisualDensity.compact,
       appBarTheme: const AppBarTheme(
+        // ignore: deprecated_member_use
         color: Colors.white,
         titleTextStyle: TextStyle(
           color: Colors.black,

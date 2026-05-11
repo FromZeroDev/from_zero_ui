@@ -23,9 +23,9 @@ dependencies:
     path: ../fz_scaffold
   fz_ui_utility:
     path: ../fz_ui_utility
-
   fz_localizations:
     path: ../fz_localizations
+
 dependency_overrides:
   intl: ^0.20.2
   archive: ^4.0.7

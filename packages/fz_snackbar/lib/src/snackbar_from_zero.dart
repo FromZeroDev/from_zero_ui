@@ -96,9 +96,7 @@ class SnackBarFromZero extends ConsumerStatefulWidget {
       }
     } catch (_) {}
     context ??= this.context;
-    final hostContext = isHostContext
-        ? context
-        : context.findAncestorStateOfType<SnackBarHostFromZeroState>()!.context;
+    final hostContext = isHostContext ? context : context.findAncestorStateOfType<SnackBarHostFromZeroState>()!.context;
     final host = (hostContext as WidgetRef).read(
       fromZeroSnackBarHostControllerProvider,
     );
@@ -114,8 +112,7 @@ class SnackBarFromZero extends ConsumerStatefulWidget {
   }
 }
 
-class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero>
-    with TickerProviderStateMixin {
+class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero> with TickerProviderStateMixin {
   AnimationController? animationController;
 
   @override
@@ -156,8 +153,7 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero>
     Widget result = Row(
       children: [
         const SizedBox(width: 10),
-        if (widget.icon != null || type != null)
-          widget.icon ?? SnackBarFromZero.icons[type!],
+        if (widget.icon != null || type != null) widget.icon ?? SnackBarFromZero.icons[type!],
         const SizedBox(width: 8),
         Expanded(
           child:
@@ -265,9 +261,7 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero>
       if (animationController == null) {
         progressIndicator = LinearProgressIndicator(
           valueColor: AlwaysStoppedAnimation(actionColor),
-          backgroundColor: type == null
-              ? null
-              : SnackBarFromZero.softColors[type],
+          backgroundColor: type == null ? null : SnackBarFromZero.softColors[type],
         );
       } else {
         progressIndicator = AnimatedBuilder(
@@ -276,9 +270,7 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero>
             return LinearProgressIndicator(
               value: 1 - animationController!.value,
               valueColor: AlwaysStoppedAnimation(actionColor),
-              backgroundColor: type == null
-                  ? null
-                  : SnackBarFromZero.softColors[type],
+              backgroundColor: type == null ? null : SnackBarFromZero.softColors[type],
             );
           },
         );
@@ -330,10 +322,7 @@ class SnackBarFromZeroState extends ConsumerState<SnackBarFromZero>
       );
     }
     result = Container(
-      width: fixed
-          ? double.infinity
-          : (widget.width ??
-                (512 + ((widget.actions?.length ?? 0) == 0 ? 0 : 128))),
+      width: fixed ? double.infinity : (widget.width ?? (512 + ((widget.actions?.length ?? 0) == 0 ? 0 : 128))),
       padding: EdgeInsets.only(bottom: fixed ? 0 : 48),
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 64),

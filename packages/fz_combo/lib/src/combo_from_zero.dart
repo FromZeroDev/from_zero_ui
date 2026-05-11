@@ -139,13 +139,14 @@ class ComboFromZero<T> extends StatefulWidget {
   @override
   ComboFromZeroState<T> createState() => ComboFromZeroState<T>();
 
+  // TODO: 2 this should probably be a statless widget
   static Widget defaultButtonChildBuilder(
-    BuildContext context,
-    String? title,
-    String? hint,
-    dynamic value,
-    bool enabled,
-    bool clearable, {
+    BuildContext context, {
+    required String? title,
+    required String? hint,
+    required dynamic value,
+    required bool enabled,
+    required bool clearable,
     bool showDropdownIcon = true,
   }) {
     final theme = Theme.of(context);
@@ -270,11 +271,11 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
     if (widget.buttonChildBuilder == null) {
       result = ComboFromZero.defaultButtonChildBuilder(
         context,
-        widget.title,
-        widget.hint,
-        widget.value,
-        widget.enabled,
-        widget.clearable,
+        title: widget.title,
+        hint: widget.hint,
+        value: widget.value,
+        enabled: widget.enabled,
+        clearable: widget.clearable,
         showDropdownIcon: widget.showDropdownIcon,
       );
     } else {
@@ -314,11 +315,11 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
     if (widget.buttonChildBuilder == null) {
       result = ComboFromZero.defaultButtonChildBuilder(
         context,
-        widget.title,
-        widget.hint,
-        widget.value,
-        widget.enabled,
-        widget.clearable,
+        title: widget.title,
+        hint: widget.hint,
+        value: widget.value,
+        enabled: widget.enabled,
+        clearable: widget.clearable,
         showDropdownIcon: widget.showDropdownIcon,
       );
     } else {

@@ -7,8 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_animations/fz_animations.dart'
-    as no_fading_shared_axis_transition;
+import 'package:fz_animations/fz_animations.dart' as no_fading_shared_axis_transition;
 import 'package:fz_animations/fz_animations.dart';
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_dialog/fz_dialog.dart';
@@ -20,8 +19,8 @@ import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_simple_shadow/fz_simple_shadow.dart';
 import 'package:fz_tooltip/fz_tooltip.dart';
 
-typedef DrawerContentBuilder =
-    Widget Function(BuildContext context, bool compact);
+// ignore: avoid_positional_boolean_parameters
+typedef DrawerContentBuilder = Widget Function(BuildContext context, bool compact);
 
 typedef ScaffoldFromZeroTransitionBuilder =
     Widget Function({
@@ -84,8 +83,7 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
   final TransitionBuilder? drawerBackground;
   final bool useCompactDrawerInsteadOfClose;
   final WidgetBuilder? bottomNavigationBarBuilder;
-  final double
-  bottomNavigationBarBreakpoint; // onlyShown when screen is smaller than this breakpoint
+  final double bottomNavigationBarBreakpoint; // onlyShown when screen is smaller than this breakpoint
   final bool constraintBodyOnXLargeScreens;
   final bool centerTitle;
   final double drawerPaddingTop;
@@ -147,34 +145,19 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
        drawerWidth = drawerWidth ?? (drawerContentBuilder == null ? 0 : 304),
        collapsibleBackgroundHeight =
            collapsibleBackgroundLength ??
-           (appbarType == AppbarType.static || appbarHeight == null
-               ? -1
-               : appbarHeight * 4),
+           (appbarType == AppbarType.static || appbarHeight == null ? -1 : appbarHeight * 4),
        scrollbarType =
-           scrollbarType ??
-           (appbarType == AppbarType.static
-               ? ScrollBarType.belowAppbar
-               : ScrollBarType.overAppbar),
-       bodyFloatsBelowAppbar =
-           bodyFloatsBelowAppbar ?? appbarType == AppbarType.quickReturn,
-       compactDrawerWidth =
-           drawerContentBuilder == null || !useCompactDrawerInsteadOfClose
-           ? 0
-           : 56,
+           scrollbarType ?? (appbarType == AppbarType.static ? ScrollBarType.belowAppbar : ScrollBarType.overAppbar),
+       bodyFloatsBelowAppbar = bodyFloatsBelowAppbar ?? appbarType == AppbarType.quickReturn,
+       compactDrawerWidth = drawerContentBuilder == null || !useCompactDrawerInsteadOfClose ? 0 : 56,
        appbarHeight =
            appbarHeight ??
            (appbarType == AppbarType.none
                ? 0
-               : (48 +
-                     (PlatformExtended.appWindow?.titleBarHeight ??
-                         8))), //useCompactDrawerInsteadOfClose ? 56 : 0
-       titleTransitionBuilder =
-           titleTransitionBuilder ?? defaultTitleTransitionBuilder,
-       drawerContentTransitionBuilder =
-           drawerContentTransitionBuilder ??
-           defaultDrawerContentTransitionBuilder,
-       bodyTransitionBuilder =
-           bodyTransitionBuilder ?? defaultBodyTransitionBuilder;
+               : (48 + (PlatformExtended.appWindow?.titleBarHeight ?? 8))), //useCompactDrawerInsteadOfClose ? 56 : 0
+       titleTransitionBuilder = titleTransitionBuilder ?? defaultTitleTransitionBuilder,
+       drawerContentTransitionBuilder = drawerContentTransitionBuilder ?? defaultDrawerContentTransitionBuilder,
+       bodyTransitionBuilder = bodyTransitionBuilder ?? defaultBodyTransitionBuilder;
 
   @override
   ScaffoldFromZeroState createState() => ScaffoldFromZeroState();
@@ -197,24 +180,18 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
               left: Tween<double>(begin: 64.0, end: 0.0).evaluate(
                 CurvedAnimation(
                   curve: Curves.easeInQuad,
-                  parent: scaffoldChangeNotifier.titleAnimation
-                      ? animation
-                      : kAlwaysCompleteAnimation,
+                  parent: scaffoldChangeNotifier.titleAnimation ? animation : kAlwaysCompleteAnimation,
                 ),
               ),
               child: FadeTransition(
                 opacity: CurvedAnimation(
                   curve: Curves.easeOutCubic,
-                  parent: scaffoldChangeNotifier.titleAnimation
-                      ? animation
-                      : kAlwaysCompleteAnimation,
+                  parent: scaffoldChangeNotifier.titleAnimation ? animation : kAlwaysCompleteAnimation,
                 ),
                 child: ScaleTransition(
                   scale: CurvedAnimation(
                     curve: Curves.easeOutCubic,
-                    parent: scaffoldChangeNotifier.titleAnimation
-                        ? animation
-                        : kAlwaysCompleteAnimation,
+                    parent: scaffoldChangeNotifier.titleAnimation ? animation : kAlwaysCompleteAnimation,
                   ),
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -274,9 +251,7 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
                     ).animate(secondaryAnimation)
                   : kAlwaysCompleteAnimation,
               child: FadeUpwardsSlideTransition(
-                routeAnimation: scaffoldChangeNotifier.sharedAnim
-                    ? animation
-                    : kAlwaysCompleteAnimation,
+                routeAnimation: scaffoldChangeNotifier.sharedAnim ? animation : kAlwaysCompleteAnimation,
                 child: child!,
               ),
             );
@@ -306,29 +281,22 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
             if (scaffoldChangeNotifier.sharedAnim) {
               var sharedSecondaryAnimation = secondaryAnimation;
               var sharedAnimation = animation;
-              if (secondaryAnimation.status == AnimationStatus.reverse ||
-                  animation.status == AnimationStatus.reverse) {
+              if (secondaryAnimation.status == AnimationStatus.reverse || animation.status == AnimationStatus.reverse) {
                 sharedSecondaryAnimation = ReverseAnimation(animation);
                 sharedAnimation = ReverseAnimation(secondaryAnimation);
               }
               return no_fading_shared_axis_transition.SharedAxisTransition(
-                animation:
-                    scaffoldChangeNotifier.animationType ==
-                        ScaffoldTypeAnimation.outer
+                animation: scaffoldChangeNotifier.animationType == ScaffoldTypeAnimation.outer
                     ? ReverseAnimation(sharedSecondaryAnimation)
                     : sharedAnimation,
-                secondaryAnimation:
-                    scaffoldChangeNotifier.animationType ==
-                        ScaffoldTypeAnimation.outer
+                secondaryAnimation: scaffoldChangeNotifier.animationType == ScaffoldTypeAnimation.outer
                     ? ReverseAnimation(sharedAnimation).isCompleted
                           ? kAlwaysDismissedAnimation
                           : ReverseAnimation(sharedAnimation)
                     : sharedSecondaryAnimation.isCompleted
                     ? kAlwaysDismissedAnimation
                     : sharedSecondaryAnimation,
-                transitionType: no_fading_shared_axis_transition
-                    .SharedAxisTransitionType
-                    .scaled,
+                transitionType: no_fading_shared_axis_transition.SharedAxisTransitionType.scaled,
                 fillColor: Colors.transparent,
                 child: child!,
               );
@@ -383,8 +351,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
     widget.mainScrollController?.addListener(_handleScroll);
     if (route != null && widget.rememberDrawerScrollOffset) {
       if (_changeNotifier.drawerContentScrollOffsets[pageScaffoldId] == null) {
-        _changeNotifier.drawerContentScrollOffsets[pageScaffoldId] =
-            ValueNotifier(0);
+        _changeNotifier.drawerContentScrollOffsets[pageScaffoldId] = ValueNotifier(0);
       }
       _changeNotifier.drawerContentScrollOffsets[pageScaffoldId]?.addListener(
         _onDrawerScrollOffsetChanged,
@@ -396,8 +363,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
     bool beforeBlockNotify = _changeNotifier.blockNotify;
     _changeNotifier.blockNotify = true;
     _changeNotifier.expandedDrawerWidths[pageScaffoldId] = widget.drawerWidth;
-    _changeNotifier.collapsedDrawerWidths[pageScaffoldId] =
-        widget.compactDrawerWidth;
+    _changeNotifier.collapsedDrawerWidths[pageScaffoldId] = widget.compactDrawerWidth;
     _changeNotifier.validateDrawerWidth(
       pageScaffoldId,
       _screenChangeNotifier.isMobileLayout,
@@ -409,15 +375,12 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
   void _onDrawerScroll() {
     if (mounted && drawerContentScrollController.hasClients) {
       lockListenToDrawerScroll = true;
-      _changeNotifier.drawerContentScrollOffsets[pageScaffoldId]?.value =
-          drawerContentScrollController.position.pixels;
+      _changeNotifier.drawerContentScrollOffsets[pageScaffoldId]?.value = drawerContentScrollController.position.pixels;
     }
   }
 
   void _onDrawerScrollOffsetChanged() {
-    if (!lockListenToDrawerScroll &&
-        mounted &&
-        drawerContentScrollController.hasClients) {
+    if (!lockListenToDrawerScroll && mounted && drawerContentScrollController.hasClients) {
       drawerContentScrollController.jumpTo(
         _changeNotifier.drawerContentScrollOffsets[pageScaffoldId]?.value ?? 0,
       );
@@ -445,8 +408,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
         });
       }
     }
-    if (widget.drawerWidth != oldWidget.drawerWidth ||
-        widget.compactDrawerWidth != oldWidget.compactDrawerWidth) {
+    if (widget.drawerWidth != oldWidget.drawerWidth || widget.compactDrawerWidth != oldWidget.compactDrawerWidth) {
       validateDrawerWidth();
     }
   }
@@ -490,16 +452,11 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
           ),
         ],
         child: FadeUpwardsFadeTransition(
-          routeAnimation:
-              ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation,
+          routeAnimation: ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation,
           child: FadeUpwardsSlideTransition(
             routeAnimation:
-                ref
-                        .read(fromZeroScaffoldChangeNotifierProvider)
-                        .animationType ==
-                    ScaffoldTypeAnimation.other
-                ? (ModalRoute.of(context)?.animation ??
-                      kAlwaysCompleteAnimation)
+                ref.read(fromZeroScaffoldChangeNotifierProvider).animationType == ScaffoldTypeAnimation.other
+                ? (ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation)
                 : kAlwaysCompleteAnimation,
             child: Consumer(
               builder: (context, ref, child) {
@@ -526,12 +483,10 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                         ? 0
                                         : 12 +
                                               ((constraints.maxWidth -
-                                                          changeNotifier
-                                                              .getCurrentDrawerWidth(
-                                                                pageScaffoldId,
-                                                              ) -
-                                                          ScaffoldFromZero
-                                                              .screenSizeXLarge) /
+                                                          changeNotifier.getCurrentDrawerWidth(
+                                                            pageScaffoldId,
+                                                          ) -
+                                                          ScaffoldFromZero.screenSizeXLarge) /
                                                       2)
                                                   .coerceIn(0),
                                   ),
@@ -543,25 +498,24 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                             );
                             if (!canPop &&
                                 (PlatformExtended.isDesktop
-                                    ? FromZeroAppContentWrapper
-                                          .confirmAppCloseOnDesktop
-                                    : FromZeroAppContentWrapper
-                                          .confirmAppCloseOnMobile)) {
+                                    ? FromZeroAppContentWrapper.confirmAppCloseOnDesktop
+                                    : FromZeroAppContentWrapper.confirmAppCloseOnMobile)) {
+                              // WillPopScope may not end up being deprecated at all https://github.com/flutter/flutter/issues/138614.
+                              // If it does, we can do a workaround like https://github.com/flutter/flutter/issues/163052#issuecomment-2764601658
+                              // ignore: deprecated_member_use
                               result = WillPopScope(
                                 onWillPop: () async {
                                   try {
                                     final scaffold = Scaffold.of(
                                       context,
                                     ); // this context needs to be below the scaffold
-                                    if (scaffold.isDrawerOpen ||
-                                        scaffold.isEndDrawerOpen) {
+                                    if (scaffold.isDrawerOpen || scaffold.isEndDrawerOpen) {
                                       return Future.value(true);
                                     }
                                   } catch (_) {}
                                   return ((await showModalFromZero<bool?>(
                                         context: context,
-                                        builder: (context) =>
-                                            const CloseConfirmDialog(),
+                                        builder: (context) => const CloseConfirmDialog(),
                                       )) ??
                                       false);
                                 },
@@ -605,17 +559,14 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
         final mediaQueryPadding = MediaQuery.paddingOf(context);
         final addedPaddingWidth = isMobileLayout ? 0 : mediaQueryPadding.left;
         final calculatedDrawerWidth = widget.drawerWidth + addedPaddingWidth;
-        final currentDrawerWidth =
-            changeNotifier.getCurrentDrawerWidth(pageScaffoldId) +
-            addedPaddingWidth;
+        final currentDrawerWidth = changeNotifier.getCurrentDrawerWidth(pageScaffoldId) + addedPaddingWidth;
         final calculatedDrawerLeft = widget.useCompactDrawerInsteadOfClose
             ? 0.0
             : calculatedDrawerWidth == 0
             ? currentDrawerWidth - addedPaddingWidth
             : currentDrawerWidth -
                   calculatedDrawerWidth -
-                  addedPaddingWidth *
-                      (1 - currentDrawerWidth / calculatedDrawerWidth);
+                  addedPaddingWidth * (1 - currentDrawerWidth / calculatedDrawerWidth);
         final shadowsLeft = widget.useCompactDrawerInsteadOfClose
             ? calculatedDrawerLeft + currentDrawerWidth
             : calculatedDrawerLeft + calculatedDrawerWidth;
@@ -632,18 +583,14 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                   duration: widget.appbarAnimationDuration,
                   curve: widget.appbarAnimationCurve,
                   top: appbarChangeNotifier.currentBackgroundOffset,
-                  height:
-                      appbarChangeNotifier.safeAreaOffset +
-                      appbarChangeNotifier.backgroundHeight,
+                  height: appbarChangeNotifier.safeAreaOffset + appbarChangeNotifier.backgroundHeight,
                   left: 0,
                   right: 0,
                   child: child!,
                 );
               },
               child: Container(
-                color:
-                    (widget.collapsibleBackgroundColor ??
-                    Theme.of(context).primaryColorDark),
+                color: (widget.collapsibleBackgroundColor ?? Theme.of(context).primaryColorDark),
               ),
             ),
 
@@ -657,9 +604,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                   duration: widget.appbarAnimationDuration,
                   curve: widget.appbarAnimationCurve,
                   height: appbarChangeNotifier.currentAppbarHeight,
-                  color:
-                      Theme.of(context).appBarTheme.backgroundColor ??
-                      Theme.of(context).primaryColor,
+                  color: Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).primaryColor,
                 );
               },
             ),
@@ -685,8 +630,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                 final appbarChangeNotifier = ref.watch(
                   fromZeroAppbarChangeNotifierProvider,
                 );
-                if (!screen.isMobileLayout &&
-                    widget.drawerContentBuilder != null) {
+                if (!screen.isMobileLayout && widget.drawerContentBuilder != null) {
                   return AnimatedPositioned(
                     top: appbarChangeNotifier.currentAppbarHeight,
                     bottom: 0,
@@ -749,10 +693,8 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                     left: 0,
                     width: currentDrawerWidth + 18,
                     child: GestureDetector(
-                      onHorizontalDragUpdate: (details) =>
-                          onHorizontalDragUpdate(details, changeNotifier),
-                      onHorizontalDragEnd: (details) =>
-                          onHorizontalDragEnd(details, changeNotifier),
+                      onHorizontalDragUpdate: (details) => onHorizontalDragUpdate(details, changeNotifier),
+                      onHorizontalDragEnd: (details) => onHorizontalDragEnd(details, changeNotifier),
                       behavior: HitTestBehavior.translucent,
                       excludeFromSemantics: true,
                     ),
@@ -803,9 +745,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
       alignment: Alignment.topCenter,
       child: Container(
         alignment: Alignment.topCenter,
-        width: widget.constraintBodyOnXLargeScreens
-            ? ScaffoldFromZero.screenSizeXLarge
-            : double.infinity,
+        width: widget.constraintBodyOnXLargeScreens ? ScaffoldFromZero.screenSizeXLarge : double.infinity,
         child: widget.bodyTransitionBuilder(
           child: NotificationListener(
             key: bodyGlobalKey,
@@ -833,11 +773,8 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
               return false;
             },
           ),
-          animation:
-              ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation,
-          secondaryAnimation:
-              ModalRoute.of(context)?.secondaryAnimation ??
-              kAlwaysDismissedAnimation,
+          animation: ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation,
+          secondaryAnimation: ModalRoute.of(context)?.secondaryAnimation ?? kAlwaysDismissedAnimation,
           scaffoldChangeNotifier: changeNotifierNotListen,
         ),
       ),
@@ -868,26 +805,17 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                 height: appbarChangeNotifier.safeAreaOffset,
                 child: Builder(
                   builder: (context) {
-                    final statusBarColor =
-                        widget.backgroundColor ??
-                        Theme.of(context).scaffoldBackgroundColor;
+                    final statusBarColor = widget.backgroundColor ?? Theme.of(context).scaffoldBackgroundColor;
                     // ?? Theme.of(context).appBarTheme.backgroundColor
                     // ?? Theme.of(context).primaryColor;
-                    Brightness statusBarBrightness =
-                        ThemeData.estimateBrightnessForColor(statusBarColor);
-                    statusBarBrightness =
-                        statusBarBrightness == Brightness.light
-                        ? Brightness.dark
-                        : Brightness.light;
+                    Brightness statusBarBrightness = ThemeData.estimateBrightnessForColor(statusBarColor);
+                    statusBarBrightness = statusBarBrightness == Brightness.light ? Brightness.dark : Brightness.light;
                     return AnnotatedRegion<SystemUiOverlayStyle>(
                       value: SystemUiOverlayStyle(
-                        systemStatusBarContrastEnforced:
-                            false, // maybe make this optional or circumstantial ???
+                        systemStatusBarContrastEnforced: false, // maybe make this optional or circumstantial ???
                         statusBarColor: statusBarColor,
-                        statusBarIconBrightness:
-                            statusBarBrightness, // For Android (dark icons)
-                        statusBarBrightness:
-                            statusBarBrightness, // For iOS (dark icons)
+                        statusBarIconBrightness: statusBarBrightness, // For Android (dark icons)
+                        statusBarBrightness: statusBarBrightness, // For iOS (dark icons)
                       ),
                       child: ColoredBox(color: statusBarColor),
                     );
@@ -900,9 +828,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
               duration: widget.appbarAnimationDuration,
               curve: widget.appbarAnimationCurve,
               padding: EdgeInsets.only(
-                top: widget.bodyFloatsBelowAppbar
-                    ? 0
-                    : appbarChangeNotifier.currentAppbarHeight,
+                top: widget.bodyFloatsBelowAppbar ? 0 : appbarChangeNotifier.currentAppbarHeight,
               ),
               child: body,
             ),
@@ -933,9 +859,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                 duration: widget.appbarAnimationDuration,
                 curve: widget.appbarAnimationCurve,
                 top: appbarChangeNotifier.currentAppbarOffset,
-                height:
-                    appbarChangeNotifier.appbarHeight +
-                    appbarChangeNotifier.safeAreaOffset,
+                height: appbarChangeNotifier.appbarHeight + appbarChangeNotifier.safeAreaOffset,
                 left: 0,
                 right: 0,
                 child: Stack(
@@ -948,9 +872,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                           removeLeft: true,
                           child: AppbarFromZero(
                             key: appbarGlobalKey,
-                            mainAppbar:
-                                widget.isPrimaryScaffold &&
-                                changeNotifierNotListen.showWindowBarOnDesktop,
+                            mainAppbar: widget.isPrimaryScaffold && changeNotifierNotListen.showWindowBarOnDesktop,
                             controller: widget.appbarController,
                             onExpanded: widget.onAppbarActionExpanded,
                             onUnexpanded: widget.onAppbarActionUnexpanded,
@@ -968,25 +890,13 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                             toolbarHeight: widget.appbarHeight,
                             topSafePadding: appbarChangeNotifier.safeAreaOffset,
                             addContextMenu: widget.appbarAddContextMenu,
-                            paddingRight:
-                                widget.scrollbarType != ScrollBarType.overAppbar
+                            paddingRight: widget.scrollbarType != ScrollBarType.overAppbar
                                 ? 0
-                                : (Theme.of(context).scrollbarTheme.thickness
-                                              ?.resolve({}) ??
-                                          8) +
-                                      (Theme.of(context)
-                                                  .scrollbarTheme
-                                                  .crossAxisMargin ??
-                                              0)
-                                          .clamp(
-                                            (PlatformExtended
-                                                        .appWindow
-                                                        ?.isMaximized ??
-                                                    true)
-                                                ? 0
-                                                : 6,
-                                            double.infinity,
-                                          ),
+                                : (Theme.of(context).scrollbarTheme.thickness?.resolve({}) ?? 8) +
+                                      (Theme.of(context).scrollbarTheme.crossAxisMargin ?? 0).clamp(
+                                        (PlatformExtended.appWindow?.isMaximized ?? true) ? 0 : 6,
+                                        double.infinity,
+                                      ),
                             title: child!,
                           ),
                         );
@@ -1008,22 +918,20 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                               if ((widget.useCompactDrawerInsteadOfClose &&
                                       widget.drawerContentBuilder != null &&
                                       !isMobileLayout) ||
-                                  (!canPop &&
-                                      widget.drawerContentBuilder == null)) {
+                                  (!canPop && widget.drawerContentBuilder == null)) {
                                 return SizedBox(width: 4 + widget.titleSpacing);
                               } else {
                                 Widget result;
                                 if (canPop &&
                                     (widget.drawerContentBuilder == null ||
-                                        (!widget.alwaysShowHamburgerButtonOnMobile &&
-                                            isMobileLayout))) {
+                                        (!widget.alwaysShowHamburgerButtonOnMobile && isMobileLayout))) {
                                   Future<void> onPressed() async {
                                     var navigator = Navigator.of(context);
                                     if (navigator.canPop() &&
-                                        (await ModalRoute.of(
-                                              context,
-                                            )!.willPop() ==
-                                            RoutePopDisposition.pop)) {
+                                        // WillPopScope may not end up being deprecated at all https://github.com/flutter/flutter/issues/138614.
+                                        // If it does, we can do a workaround like https://github.com/flutter/flutter/issues/163052#issuecomment-2764601658
+                                        // ignore: deprecated_member_use
+                                        (await ModalRoute.of(context)!.willPop() == RoutePopDisposition.pop)) {
                                       navigator.pop();
                                     }
                                   }
@@ -1035,10 +943,8 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                       (Theme.of(
                                         context,
                                       ).textTheme.bodyLarge!.color!);
-                                  final iconButtonTransparentColor =
-                                      iconButtonColor.withValues(alpha: 0.05);
-                                  final iconButtonSemiTransparentColor =
-                                      iconButtonColor.withValues(alpha: 0.1);
+                                  final iconButtonTransparentColor = iconButtonColor.withValues(alpha: 0.05);
+                                  final iconButtonSemiTransparentColor = iconButtonColor.withValues(alpha: 0.1);
                                   result = TooltipFromZero(
                                     message: FromZeroLocalizations.of(
                                       context,
@@ -1047,12 +953,9 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                       icon: const Icon(Icons.arrow_back),
                                       color: iconButtonColor,
                                       hoverColor: iconButtonTransparentColor,
-                                      highlightColor:
-                                          iconButtonSemiTransparentColor,
-                                      focusColor:
-                                          iconButtonSemiTransparentColor,
-                                      splashColor:
-                                          iconButtonSemiTransparentColor,
+                                      highlightColor: iconButtonSemiTransparentColor,
+                                      focusColor: iconButtonSemiTransparentColor,
+                                      splashColor: iconButtonSemiTransparentColor,
                                       onPressed: onPressed,
                                     ),
                                   );
@@ -1064,10 +967,8 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                       (Theme.of(
                                         context,
                                       ).textTheme.bodyLarge!.color!);
-                                  final iconButtonTransparentColor =
-                                      iconButtonColor.withValues(alpha: 0.05);
-                                  final iconButtonSemiTransparentColor =
-                                      iconButtonColor.withValues(alpha: 0.1);
+                                  final iconButtonTransparentColor = iconButtonColor.withValues(alpha: 0.05);
+                                  final iconButtonSemiTransparentColor = iconButtonColor.withValues(alpha: 0.1);
                                   result = AnimatedBuilder(
                                     animation:
                                         ModalRoute.of(
@@ -1081,20 +982,15 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                       child: IconButton(
                                         color: iconButtonColor,
                                         hoverColor: iconButtonTransparentColor,
-                                        highlightColor:
-                                            iconButtonSemiTransparentColor,
-                                        focusColor:
-                                            iconButtonSemiTransparentColor,
-                                        splashColor:
-                                            iconButtonSemiTransparentColor,
+                                        highlightColor: iconButtonSemiTransparentColor,
+                                        focusColor: iconButtonSemiTransparentColor,
+                                        splashColor: iconButtonSemiTransparentColor,
                                         onPressed: () => _toggleDrawer(
                                           context,
                                           changeNotifierNotListen,
                                         ),
                                         icon: AnimatedIcon(
-                                          progress:
-                                              widget
-                                                  .alwaysShowHamburgerButtonOnMobile
+                                          progress: widget.alwaysShowHamburgerButtonOnMobile
                                               ? kAlwaysDismissedAnimation
                                               : (ModalRoute.of(
                                                       context,
@@ -1120,38 +1016,27 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                       final changeNotifier = ref.watch(
                                         fromZeroScaffoldChangeNotifierProvider,
                                       );
-                                      double currentWidth = changeNotifier
-                                          .getCurrentDrawerWidth(
-                                            pageScaffoldId,
-                                          );
-                                      final breakSpace =
-                                          (56 - 4 - widget.titleSpacing);
+                                      double currentWidth = changeNotifier.getCurrentDrawerWidth(
+                                        pageScaffoldId,
+                                      );
+                                      final breakSpace = (56 - 4 - widget.titleSpacing);
                                       return IgnorePointer(
                                         ignoring: currentWidth > breakSpace,
                                         child: ExcludeFocus(
                                           excluding: currentWidth > breakSpace,
                                           child: Focus(
                                             child: AnimatedOpacity(
-                                              opacity:
-                                                  1 -
-                                                          currentWidth /
-                                                              breakSpace <
-                                                      0
+                                              opacity: 1 - currentWidth / breakSpace < 0
                                                   ? 0
-                                                  : 1 -
-                                                        currentWidth /
-                                                            breakSpace,
-                                              duration: widget
-                                                  .drawerAnimationDuration,
-                                              curve:
-                                                  widget.drawerAnimationCurve,
+                                                  : 1 - currentWidth / breakSpace,
+                                              duration: widget.drawerAnimationDuration,
+                                              curve: widget.drawerAnimationCurve,
                                               child: AnimatedContainer(
                                                 width: currentWidth > breakSpace
                                                     ? 4 + widget.titleSpacing
                                                     : 56 - currentWidth,
                                                 height: widget.appbarHeight,
-                                                duration: widget
-                                                    .drawerAnimationDuration,
+                                                duration: widget.drawerAnimationDuration,
                                                 curve: Curves.easeOutCubic,
                                                 alignment: Alignment.centerLeft,
                                                 child: child,
@@ -1177,16 +1062,13 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                     alignment: Alignment.centerLeft,
                                     child: widget.titleTransitionBuilder(
                                       child: widget.title!,
-                                      animation:
-                                          ModalRoute.of(context)?.animation ??
-                                          kAlwaysCompleteAnimation,
+                                      animation: ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation,
                                       secondaryAnimation:
                                           ModalRoute.of(
                                             context,
                                           )?.secondaryAnimation ??
                                           kAlwaysDismissedAnimation,
-                                      scaffoldChangeNotifier:
-                                          changeNotifierNotListen,
+                                      scaffoldChangeNotifier: changeNotifierNotListen,
                                     ),
                                   ),
                                 ),
@@ -1217,8 +1099,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
             builder: (context, ref, child) {
               if (ref.watch(
                 fromZeroScreenProvider.select(
-                  (value) =>
-                      value.breakpoint < widget.bottomNavigationBarBreakpoint,
+                  (value) => value.breakpoint < widget.bottomNavigationBarBreakpoint,
                 ),
               )) {
                 return Stack(
@@ -1266,18 +1147,14 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
         ); // ! this used to be watch, might bring problems with drawer
         drawerContentScrollController = ScrollController(
           initialScrollOffset: widget.rememberDrawerScrollOffset
-              ? _changeNotifier
-                        .drawerContentScrollOffsets[pageScaffoldId]
-                        ?.value ??
-                    0
+              ? _changeNotifier.drawerContentScrollOffsets[pageScaffoldId]?.value ?? 0
               : 0,
         );
         drawerContentScrollController.addListener(_onDrawerScroll);
         final mediaQuery = MediaQuery.of(context);
         final addedPaddingWidth = isMobileLayout ? 0 : mediaQuery.padding.left;
         final calculatedDrawerWidth = widget.drawerWidth + addedPaddingWidth;
-        final calculatedCompactDrawerWidth =
-            !widget.useCompactDrawerInsteadOfClose
+        final calculatedCompactDrawerWidth = !widget.useCompactDrawerInsteadOfClose
             ? 0
             : widget.compactDrawerWidth + addedPaddingWidth;
         Widget drawerAppbar = MediaQuery(
@@ -1290,17 +1167,13 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
           child: AppbarFromZero(
             elevation: 0,
             toolbarHeight: widget.appbarHeight,
-            backgroundColor:
-                Theme.of(context).appBarTheme.backgroundColor ??
-                Theme.of(context).primaryColor,
+            backgroundColor: Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).primaryColor,
             mainAppbar: true,
             mainAppbarShowButtons: false,
             paddingRight: 8,
             titleSpacing: 0,
             title: SizedBox(
-              height:
-                  appbarChangeNotifier.appbarHeight +
-                  appbarChangeNotifier.safeAreaOffset,
+              height: appbarChangeNotifier.appbarHeight + appbarChangeNotifier.safeAreaOffset,
               child: Consumer(
                 builder: (context, ref, child) {
                   final isMobileLayout = ref.watch(
@@ -1314,8 +1187,10 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                       navigator.pop();
                     }
                     if (navigator.canPop() &&
-                        (await ModalRoute.of(context)!.willPop() ==
-                            RoutePopDisposition.pop)) {
+                        // WillPopScope may not end up being deprecated at all https://github.com/flutter/flutter/issues/138614.
+                        // If it does, we can do a workaround like https://github.com/flutter/flutter/issues/163052#issuecomment-2764601658
+                        // ignore: deprecated_member_use
+                        (await ModalRoute.of(context)!.willPop() == RoutePopDisposition.pop)) {
                       navigator.pop();
                     }
                   }
@@ -1326,11 +1201,8 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                   final iconButtonTransparentColor = iconButtonColor.withValues(
                     alpha: 0.05,
                   );
-                  final iconButtonSemiTransparentColor = iconButtonColor
-                      .withValues(alpha: 0.1);
-                  final showBackButton =
-                      canPop &&
-                      (PlatformExtended.isMobile ? !isMobileLayout : true);
+                  final iconButtonSemiTransparentColor = iconButtonColor.withValues(alpha: 0.1);
+                  final showBackButton = canPop && (PlatformExtended.isMobile ? !isMobileLayout : true);
                   return Stack(
                     fit: StackFit.expand,
                     children: [
@@ -1387,9 +1259,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                       (value) => value.isMobileLayout,
                     ),
                   );
-                  final isDrawerOpen =
-                      isMobileLayout ||
-                      changeNotifier.isDrawerExpanded(pageScaffoldId);
+                  final isDrawerOpen = isMobileLayout || changeNotifier.isDrawerExpanded(pageScaffoldId);
                   if (!isMobileLayout) {
                     void onTap() {
                       if (isMobileLayout) {
@@ -1402,10 +1272,8 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                     final iconButtonColor =
                         Theme.of(context).appBarTheme.toolbarTextStyle?.color ??
                         (Theme.of(context).textTheme.bodyLarge!.color!);
-                    final iconButtonTransparentColor = iconButtonColor
-                        .withValues(alpha: 0.05);
-                    final iconButtonSemiTransparentColor = iconButtonColor
-                        .withValues(alpha: 0.1);
+                    final iconButtonTransparentColor = iconButtonColor.withValues(alpha: 0.05);
+                    final iconButtonSemiTransparentColor = iconButtonColor.withValues(alpha: 0.1);
                     return TooltipFromZero(
                       message: isDrawerOpen
                           ? FromZeroLocalizations.of(
@@ -1436,9 +1304,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
             Builder(
               builder: (context) {
                 Widget result = Material(
-                  type: widget.drawerBackground == null
-                      ? MaterialType.card
-                      : MaterialType.transparency,
+                  type: widget.drawerBackground == null ? MaterialType.card : MaterialType.transparency,
                   child: Column(
                     children: [
                       Expanded(
@@ -1454,17 +1320,13 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                 addedPaddingWidth;
                             Widget result = _getUserDrawerContent(
                               context,
-                              currentDrawerWidth ==
-                                  calculatedCompactDrawerWidth,
+                              currentDrawerWidth == calculatedCompactDrawerWidth,
                             );
                             result = widget.drawerContentTransitionBuilder(
                               child: result,
-                              animation:
-                                  ModalRoute.of(context)?.animation ??
-                                  kAlwaysCompleteAnimation,
+                              animation: ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation,
                               secondaryAnimation:
-                                  ModalRoute.of(context)?.secondaryAnimation ??
-                                  kAlwaysDismissedAnimation,
+                                  ModalRoute.of(context)?.secondaryAnimation ?? kAlwaysDismissedAnimation,
                               scaffoldChangeNotifier: changeNotifierNotListen,
                             );
                             result = ScrollbarFromZero(
@@ -1493,36 +1355,24 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                   duration: widget.drawerAnimationDuration,
                                   curve: widget.appbarAnimationCurve,
                                   data: Theme.of(context).copyWith(
-                                    scrollbarTheme: Theme.of(context)
-                                        .scrollbarTheme
-                                        .copyWith(
-                                          thickness:
-                                              WidgetStateProperty.resolveWith((
-                                                states,
-                                              ) {
-                                                final baseThickness =
-                                                    Theme.of(context)
-                                                        .scrollbarTheme
-                                                        .thickness
-                                                        ?.resolve(states) ??
-                                                    (PlatformExtended.isMobile
-                                                        ? 4
-                                                        : states.contains(
-                                                            WidgetState.hovered,
-                                                          )
-                                                        ? 12.0
-                                                        : 8.0);
-                                                final removable =
-                                                    PlatformExtended.isMobile
-                                                    ? 0
-                                                    : 4;
-                                                return baseThickness +
-                                                    (calculatedDrawerWidth -
-                                                            currentDrawerWidth -
-                                                            removable)
-                                                        .coerceIn(0);
-                                              }),
-                                        ),
+                                    scrollbarTheme: Theme.of(context).scrollbarTheme.copyWith(
+                                      thickness: WidgetStateProperty.resolveWith((
+                                        states,
+                                      ) {
+                                        final baseThickness =
+                                            Theme.of(context).scrollbarTheme.thickness?.resolve(states) ??
+                                            (PlatformExtended.isMobile
+                                                ? 4
+                                                : states.contains(
+                                                    WidgetState.hovered,
+                                                  )
+                                                ? 12.0
+                                                : 8.0);
+                                        final removable = PlatformExtended.isMobile ? 0 : 4;
+                                        return baseThickness +
+                                            (calculatedDrawerWidth - currentDrawerWidth - removable).coerceIn(0);
+                                      }),
+                                    ),
                                   ),
                                   child: result,
                                 );
@@ -1556,8 +1406,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                             const SizedBox(height: 8),
                                             _getUserDrawerFooter(
                                               context,
-                                              currentDrawerWidth ==
-                                                  calculatedCompactDrawerWidth,
+                                              currentDrawerWidth == calculatedCompactDrawerWidth,
                                             ),
                                             const SizedBox(height: 12),
                                           ],
@@ -1565,8 +1414,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                       )
                                     : _getUserDrawerFooter(
                                         context,
-                                        currentDrawerWidth ==
-                                            calculatedCompactDrawerWidth,
+                                        currentDrawerWidth == calculatedCompactDrawerWidth,
                                       );
                               },
                             )
@@ -1618,17 +1466,14 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
           );
         }
         Widget result = Column(
-          verticalDirection: VerticalDirection
-              .up, // make sure appbar is painted on top of drawer
+          verticalDirection: VerticalDirection.up, // make sure appbar is painted on top of drawer
           children: <Widget>[
             //DRAWER CONTENT
             Expanded(child: drawerContent),
 
             //DRAWER APPBAR
             SizedBox(
-              height:
-                  appbarChangeNotifier.appbarHeight +
-                  appbarChangeNotifier.safeAreaOffset,
+              height: appbarChangeNotifier.appbarHeight + appbarChangeNotifier.safeAreaOffset,
               child: drawerAppbar,
             ),
           ],
@@ -1645,8 +1490,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
     );
   }
 
-  Widget _getUserDrawerFooter(BuildContext context, bool compact) =>
-      widget.drawerFooterBuilder!(context, compact);
+  Widget _getUserDrawerFooter(BuildContext context, bool compact) => widget.drawerFooterBuilder!(context, compact);
 
   void _toggleDrawer(
     BuildContext context,
@@ -1660,8 +1504,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
         scaffold.openDrawer();
       }
     } else {
-      if (changeNotifier.getCurrentDrawerWidth(pageScaffoldId) >
-          widget.compactDrawerWidth) {
+      if (changeNotifier.getCurrentDrawerWidth(pageScaffoldId) > widget.compactDrawerWidth) {
         changeNotifier.setCurrentDrawerWidth(
           pageScaffoldId,
           widget.compactDrawerWidth,
@@ -1679,8 +1522,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
     DragUpdateDetails details,
     ScaffoldFromZeroChangeNotifier changeNotifier,
   ) {
-    double jump =
-        changeNotifier.getCurrentDrawerWidth(pageScaffoldId) + details.delta.dx;
+    double jump = changeNotifier.getCurrentDrawerWidth(pageScaffoldId) + details.delta.dx;
     if (jump < widget.compactDrawerWidth) jump = widget.compactDrawerWidth;
     if (jump > widget.drawerWidth) jump = widget.drawerWidth;
     changeNotifier.setCurrentDrawerWidth(pageScaffoldId, jump);
@@ -1712,8 +1554,7 @@ class AppbarChangeNotifier extends ChangeNotifier {
   final double safeAreaOffset;
   final double backgroundHeight;
   final AppbarType appbarType;
-  final double appbarScrollMultiplier =
-      0.5; //TODO: 3 expose scroll appbar effect multipliers
+  final double appbarScrollMultiplier = 0.5; //TODO: 3 expose scroll appbar effect multipliers
   final double backgroundScrollMultiplier = 1.5;
   final double unaffectedScrollLength; //TODO: 3 expose this as well in Scaffold
 
@@ -1732,8 +1573,7 @@ class AppbarChangeNotifier extends ChangeNotifier {
     super.dispose();
   }
 
-  double get currentAppbarHeight =>
-      appbarHeight + safeAreaOffset + currentAppbarOffset;
+  double get currentAppbarHeight => appbarHeight + safeAreaOffset + currentAppbarOffset;
 
   double _currentAppbarOffset = 0;
   double get currentAppbarOffset => _currentAppbarOffset;
@@ -1750,8 +1590,7 @@ class AppbarChangeNotifier extends ChangeNotifier {
   }
 
   double mainScrollPosition = 0;
-  int?
-  lastScrollUpdateTime; //TODO: 2 wait for the scroll gesture to end instead of the timer ? how
+  int? lastScrollUpdateTime; //TODO: 2 wait for the scroll gesture to end instead of the timer ? how
   void handleMainScrollerControllerCall(ScrollController scrollController) {
     if (appbarType == AppbarType.static) return;
     if (!scrollController.hasClients) return;
@@ -1760,8 +1599,7 @@ class AppbarChangeNotifier extends ChangeNotifier {
     if (appbarType == AppbarType.collapse) {
       currentPosition = currentPosition.coerceIn(
         0,
-        unaffectedScrollLength +
-            (safeAreaOffset + appbarHeight) / appbarScrollMultiplier,
+        unaffectedScrollLength + (safeAreaOffset + appbarHeight) / appbarScrollMultiplier,
       );
     }
     double delta = currentPosition - mainScrollPosition;
@@ -1792,9 +1630,7 @@ class AppbarChangeNotifier extends ChangeNotifier {
       Future.doWhile(() async {
         await Future<dynamic>.delayed(80.milliseconds);
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          if (!disposed &&
-              DateTime.now().millisecondsSinceEpoch - lastScrollUpdateTime! >
-                  500) {
+          if (!disposed && DateTime.now().millisecondsSinceEpoch - lastScrollUpdateTime! > 500) {
             if (currentAppbarOffset > -(appbarHeight) / 2) {
               expand();
             } else {

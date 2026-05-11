@@ -91,6 +91,7 @@ extension Replace on GoRouter {
   }
 
   void _safeNotifyListeners() {
+    // ignore: invalid_use_of_protected_member
     scheduleMicrotask(routerDelegate.notifyListeners);
   }
 }

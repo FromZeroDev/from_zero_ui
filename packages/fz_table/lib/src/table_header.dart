@@ -6,6 +6,7 @@ import 'package:fz_actions/fz_actions.dart';
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_dao/fz_dao.dart';
 import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_platform/fz_platform.dart';
 import 'package:fz_table/fz_table.dart';
 import 'package:fz_ui_utility/fz_ui_utility.dart';
 

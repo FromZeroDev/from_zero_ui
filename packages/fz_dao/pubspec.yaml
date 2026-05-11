@@ -68,6 +68,8 @@ dependencies:
     path: ../fz_date_picker
   fz_popup:
     path: ../fz_popup
+  fz_opacity_gradient:
+    path: ../fz_opacity_gradient
   fz_log:
     path: ../fz_log
 

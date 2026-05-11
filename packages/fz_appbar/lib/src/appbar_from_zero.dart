@@ -124,6 +124,9 @@ class AppbarFromZeroState extends State<AppbarFromZero> {
 
   @override
   Widget build(BuildContext context) {
+    // WillPopScope may not end up being deprecated at all https://github.com/flutter/flutter/issues/138614.
+    // If it does, we can do a workaround like https://github.com/flutter/flutter/issues/163052#issuecomment-2764601658
+    // ignore: deprecated_member_use
     Widget result = WillPopScope(
       onWillPop: () async {
         if (forceExpanded == null) {
@@ -178,7 +181,7 @@ class AppbarFromZeroState extends State<AppbarFromZero> {
     actions = [];
     final actionsColor = widget.backgroundColor == null
         ? null
-        : widget.backgroundColor!.opacity < 0.3
+        : widget.backgroundColor!.a < 0.3
         ? Theme.of(context).textTheme.bodyLarge!.color
         : ThemeData.estimateBrightnessForColor(widget.backgroundColor!) == Brightness.light
         ? Colors.black

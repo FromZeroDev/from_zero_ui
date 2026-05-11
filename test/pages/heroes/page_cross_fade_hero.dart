@@ -24,25 +24,31 @@ class PageHeroesState extends State<PageCrossFadeHero> {
   }
 
   Widget _getPage(BuildContext context) {
+    // WillPopScope may not end up being deprecated at all https://github.com/flutter/flutter/issues/138614.
+    // If it does, we can do a workaround like https://github.com/flutter/flutter/issues/163052#issuecomment-2764601658
+    // ignore: deprecated_member_use
     return WillPopScope(
-      onWillPop: () async => await showModalFromZero(
-        context: context,
-        builder: (context) {
-          return DialogFromZero(
-            title: const Text("Sure?"),
-            dialogActions: [
-              SimpleDialogOption(
-                child: const Text("Cancel"),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              SimpleDialogOption(
-                child: const Text("OK"),
-                onPressed: () => Navigator.pop(context, true),
-              ),
-            ],
-          );
-        },
-      ),
+      onWillPop: () async {
+        final result = await showModalFromZero<bool>(
+          context: context,
+          builder: (context) {
+            return DialogFromZero(
+              title: const Text("Sure?"),
+              dialogActions: [
+                SimpleDialogOption(
+                  child: const Text("Cancel"),
+                  onPressed: () => Navigator.pop(context, false),
+                ),
+                SimpleDialogOption(
+                  child: const Text("OK"),
+                  onPressed: () => Navigator.pop(context, true),
+                ),
+              ],
+            );
+          },
+        );
+        return result ?? false;
+      },
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Card(

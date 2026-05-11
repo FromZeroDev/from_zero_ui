@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fz_actions/fz_actions.dart';
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_platform/fz_platform.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_selectable_icon/fz_selectable_icon.dart';
@@ -15,14 +16,14 @@ abstract class TableFromZeroManagePopup {
     required TableController<T> controller,
   }) async {
     final columns = controller.columns!;
-    final columnKeys = List.from(controller.columnKeys!);
+    final columnKeys = List<dynamic>.from(controller.columnKeys!);
     final columnVisibility = {
       for (final e in columnKeys) e: controller.currentColumnKeys!.contains(e),
     };
     final filterButtonGlobalKeys = {for (final e in columnKeys) e: GlobalKey()};
     bool modified = false;
     bool modifiedFilters = false;
-    final confirm = await showModalFromZero(
+    final confirm = await showModalFromZero<bool>(
       context: context,
       builder: (context) {
         ScrollController scrollController = ScrollController();
@@ -72,10 +73,7 @@ abstract class TableFromZeroManagePopup {
                                     child: FadeTransition(
                                       opacity: animation,
                                       child: ColoredBox(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withValues(alpha: 0.2),
+                                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                                       ),
                                     ),
                                   ),
@@ -132,30 +130,24 @@ abstract class TableFromZeroManagePopup {
                                       ),
                                       ListTile(
                                         title: Text(col.name),
-                                        subtitle: subtitleText.isBlank
-                                            ? null
-                                            : Text(subtitleText),
+                                        subtitle: subtitleText.isBlank ? null : Text(subtitleText),
                                         leading: leading,
                                         trailing: IntrinsicHeight(
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
                                               StatefulBuilder(
                                                 builder: (context, actionSetState) {
-                                                  final visible =
-                                                      columnVisibility[key]!;
+                                                  final visible = columnVisibility[key]!;
                                                   return ActionFromZero(
                                                     title: visible
                                                         ? 'Ocultar Columna'
                                                         : 'Mostrar Columna', // TODO: 3 internationalize
                                                     icon: SelectableIcon(
                                                       selected: visible,
-                                                      selectedIcon:
-                                                          Icons.visibility,
-                                                      icon:
-                                                          Icons.visibility_off,
+                                                      selectedIcon: Icons.visibility,
+                                                      icon: Icons.visibility_off,
                                                       selectedColor:
                                                           Theme.of(
                                                                 context,
@@ -164,17 +156,14 @@ abstract class TableFromZeroManagePopup {
                                                           ? Theme.of(
                                                               context,
                                                             ).primaryColor
-                                                          : Theme.of(context)
-                                                                .colorScheme
-                                                                .secondary,
+                                                          : Theme.of(context).colorScheme.secondary,
                                                       unselectedOffset: 0,
                                                       selectedOffset: 0,
                                                     ),
                                                     onTap: (context) {
                                                       modified = true;
                                                       setState(() {
-                                                        columnVisibility[key] =
-                                                            !visible;
+                                                        columnVisibility[key] = !visible;
                                                       });
                                                     },
                                                   ).buildIcon(context);
@@ -184,21 +173,16 @@ abstract class TableFromZeroManagePopup {
                                                 animation: controller,
                                                 builder: (context, child) {
                                                   return Container(
-                                                    key:
-                                                        filterButtonGlobalKeys[key],
+                                                    key: filterButtonGlobalKeys[key],
                                                     child: TableFromZeroState.getOpenFilterPopupAction(
                                                       context,
                                                       controller: controller,
                                                       col: col,
                                                       colKey: key,
-                                                      globalKey:
-                                                          filterButtonGlobalKeys[key],
-                                                      updateStateIfModified:
-                                                          false,
+                                                      globalKey: filterButtonGlobalKeys[key],
+                                                      updateStateIfModified: false,
                                                       onPopupResult: (value) {
-                                                        modifiedFilters =
-                                                            modifiedFilters ||
-                                                            value;
+                                                        modifiedFilters = modifiedFilters || value;
                                                         if (value) {
                                                           // itemSetState(() {});
                                                           setState(
@@ -228,11 +212,10 @@ abstract class TableFromZeroManagePopup {
                                     ],
                                   );
                                   if (!isDesktop) {
-                                    result =
-                                        ReorderableDelayedDragStartListener(
-                                          index: index,
-                                          child: result,
-                                        );
+                                    result = ReorderableDelayedDragStartListener(
+                                      index: index,
+                                      child: result,
+                                    );
                                   }
                                   return result;
                                 },
@@ -265,16 +248,12 @@ abstract class TableFromZeroManagePopup {
                           toolbarHeight: 64,
                           actions: [
                             ActionFromZero(
-                              title: isAnyColHidden
-                                  ? 'Mostrar todas las columnas'
-                                  : 'Ocultar todas las columnas',
+                              title: isAnyColHidden ? 'Mostrar todas las columnas' : 'Ocultar todas las columnas',
                               icon: SelectableIcon(
                                 selected: isAnyColHidden,
                                 selectedIcon: Icons.visibility,
                                 icon: Icons.visibility_off,
-                                selectedColor:
-                                    Theme.of(context).brightness ==
-                                        Brightness.light
+                                selectedColor: Theme.of(context).brightness == Brightness.light
                                     ? Theme.of(context).primaryColor
                                     : Theme.of(context).colorScheme.secondary,
                                 unselectedColor: Theme.of(
@@ -330,9 +309,7 @@ abstract class TableFromZeroManagePopup {
                                 children: [
                                   const DialogButton.cancel(),
                                   DialogButton.accept(
-                                    tooltip: visibleColumns.isEmpty
-                                        ? 'Debe haber al menos 1 columna visible'
-                                        : null,
+                                    tooltip: visibleColumns.isEmpty ? 'Debe haber al menos 1 columna visible' : null,
                                     onPressed: visibleColumns.isEmpty
                                         ? null
                                         : () {
@@ -356,16 +333,20 @@ abstract class TableFromZeroManagePopup {
     );
     if (confirm ?? false) {
       controller.columnKeys = columnKeys;
-      controller.currentColumnKeys = columnKeys
-          .where((e) => columnVisibility[e]!)
-          .toList();
+      controller.currentColumnKeys = columnKeys.where((e) => columnVisibility[e]!).toList();
     }
-    return ManagePopupResult(modified || modifiedFilters, modifiedFilters);
+    return ManagePopupResult(
+      modified: modified || modifiedFilters,
+      filtersModified: modifiedFilters,
+    );
   }
 }
 
 class ManagePopupResult {
   final bool modified;
   final bool filtersModified;
-  ManagePopupResult(this.modified, this.filtersModified);
+  ManagePopupResult({
+    required this.modified,
+    required this.filtersModified,
+  });
 }

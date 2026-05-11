@@ -12,7 +12,7 @@ import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_ui_utility/fz_ui_utility.dart';
 import 'package:fz_web_compile_file/fz_web_compile_file.dart';
 import 'package:url_launcher/link.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 enum FullscreenType {
   none,
@@ -75,7 +75,7 @@ class ImageFromZero extends StatefulWidget {
   @override
   ImageFromZeroState createState() => ImageFromZeroState();
 
-  void pushFullscreenImage({
+  Future<void> pushFullscreenImage({
     required BuildContext context,
     required String url,
     List<Widget> actions = const [],
@@ -85,10 +85,10 @@ class ImageFromZero extends StatefulWidget {
     bool retryable = false,
     bool applySafeAreaToActions = true,
     String? heroTag,
-  }) {
+  }) async {
     GlobalKey<ExtendedImageSlidePageState> slidePagekey = GlobalKey();
-    Navigator.of(context).push(
-      PageRouteBuilder(
+    await Navigator.of(context).push<void>(
+      PageRouteBuilder<void>(
         fullscreenDialog: true,
         opaque: false,
         pageBuilder: (context, animation, secondaryAnimation) {
@@ -424,10 +424,13 @@ class ImageFromZeroState extends State<ImageFromZero> with TickerProviderStateMi
     if (kIsWeb &&
         widget.fullscreenAsNewTabOnWeb &&
         widget.sourceType == ImageSourceType.network &&
-        (await canLaunch(widget.url))) {
-      launch(widget.url);
+        (await canLaunchUrlString(widget.url))) {
+      await launchUrlString(widget.url);
     } else {
-      widget.pushFullscreenImage(
+      if (!context.mounted) {
+        return;
+      }
+      await widget.pushFullscreenImage(
         context: context,
         url: widget.url,
         actions: widget.fullscreenActions,

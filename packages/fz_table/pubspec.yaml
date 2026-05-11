@@ -63,14 +63,15 @@ dependencies:
     path: ../fz_scaffold
   fz_selectable_icon:
     path: ../fz_selectable_icon
-
-
   fz_log:
     path: ../fz_log
   fz_date_picker:
     path: ../fz_date_picker
   fz_router:
     path: ../fz_router
+  fz_opacity_gradient:
+    path: ../fz_opacity_gradient
+
 dependency_overrides:
   intl: ^0.20.2
   archive: ^4.0.7

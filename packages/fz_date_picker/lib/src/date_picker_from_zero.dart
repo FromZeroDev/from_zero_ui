@@ -1,7 +1,6 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fz_copy_time_picker/fz_copy_time_picker.dart'
-    as time_picker_dialog_from_zero;
+import 'package:fz_copy_time_picker/fz_copy_time_picker.dart' as time_picker_dialog_from_zero;
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_popup/fz_popup.dart';
 import 'package:fz_tooltip/fz_tooltip.dart';
@@ -15,6 +14,7 @@ typedef DatePickerButtonChildBuilder =
       String? hint,
       DateTime? value,
       DateFormat formatter,
+      // ignore: avoid_positional_boolean_parameters
       bool enabled,
       bool showClearButton,
     );
@@ -80,6 +80,7 @@ class DatePickerFromZero extends StatefulWidget {
     dynamic value,
     DateTimePickerType type,
     DateFormat formatter,
+    // ignore: avoid_positional_boolean_parameters
     bool enabled,
     bool showClearButton,
   ) {

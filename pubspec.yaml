@@ -117,5 +117,3 @@ dependency_overrides:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/i18n/

@@ -11,12 +11,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_log/fz_log.dart';
+import 'package:fz_platform/fz_platform.dart';
 import 'package:fz_popup/fz_popup.dart';
 import 'package:fz_router/fz_router.dart';
 import 'package:fz_scaffold/src/scaffold_from_zero.dart';
 import 'package:fz_snackbar/fz_snackbar.dart';
 import 'package:fz_theme/fz_theme.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:window_manager/window_manager.dart';
@@ -25,21 +25,17 @@ var fromZeroScreenProvider = ChangeNotifierProvider<ScreenFromZero>((ref) {
   return ScreenFromZero();
 });
 
-var fromZeroScaffoldChangeNotifierProvider =
-    ChangeNotifierProvider<ScaffoldFromZeroChangeNotifier>((ref) {
-      return ScaffoldFromZeroChangeNotifier();
-    });
+var fromZeroScaffoldChangeNotifierProvider = ChangeNotifierProvider<ScaffoldFromZeroChangeNotifier>((ref) {
+  return ScaffoldFromZeroChangeNotifier();
+});
 
-var fromZeroAppbarChangeNotifierProvider =
-    ChangeNotifierProvider<AppbarChangeNotifier>((ref) {
-      return AppbarChangeNotifier(0, 0, 0, AppbarType.none, null);
-    });
+var fromZeroAppbarChangeNotifierProvider = ChangeNotifierProvider<AppbarChangeNotifier>((ref) {
+  return AppbarChangeNotifier(0, 0, 0, AppbarType.none, null);
+});
 
-var fromZeroThemeParametersProvider =
-    ChangeNotifierProvider<ThemeParametersFromZero>((ref) {
-      return ThemeParametersFromZero();
-    });
-
+var fromZeroThemeParametersProvider = ChangeNotifierProvider<ThemeParametersFromZero>((ref) {
+  return ThemeParametersFromZero();
+});
 
 /// Put this widget in the builder method of your MaterialApp.
 /// Controls different app-wide providers and features needed by other FromZeroWidgets
@@ -56,8 +52,7 @@ class FromZeroAppContentWrapper extends ConsumerStatefulWidget {
   });
 
   @override
-  FromZeroAppContentWrapperState createState() =>
-      FromZeroAppContentWrapperState();
+  FromZeroAppContentWrapperState createState() => FromZeroAppContentWrapperState();
 
   static bool confirmAppCloseOnMobile = true;
   static bool confirmAppCloseOnDesktop = false;
@@ -113,10 +108,7 @@ class FromZeroAppContentWrapper extends ConsumerStatefulWidget {
     final lines = const LineSplitter().convert(tasklistProc.stdout);
     final pids = <String, int>{};
     for (final line in lines) {
-      final elems = line
-          .split(',')
-          .map((elem) => elem.replaceAll('"', ''))
-          .toList();
+      final elems = line.split(',').map((elem) => elem.replaceAll('"', '')).toList();
       final name = elems[0];
       final pid = int.parse(elems[1]);
       //     final session = elems[2];
@@ -130,8 +122,7 @@ class FromZeroAppContentWrapper extends ConsumerStatefulWidget {
 
 ValueNotifier<bool> isMouseOverWindowBar = ValueNotifier(false);
 
-class FromZeroAppContentWrapperState
-    extends ConsumerState<FromZeroAppContentWrapper> {
+class FromZeroAppContentWrapperState extends ConsumerState<FromZeroAppContentWrapper> {
   @override
   void initState() {
     super.initState();
@@ -152,23 +143,26 @@ class FromZeroAppContentWrapperState
 
   @override
   Widget build(BuildContext context) {
-    var mediaQueryData = MediaQuery.of(context);
+    // PERF: 2 maybe we should skip most of these calculations and override (and listening to the entire MediaQuery) if scale==1 (which it is in most devices)
     final double scale =
         ref.watch(fromZeroScreenProvider.select((v) => v.scale)) ??
-        mediaQueryData.textScaleFactor;
+        // ignore: deprecated_member_use // this is fucking retarded, if they ever remove this maybe we have to do textScaler.scale(kDefFontSize); and get an approximated factor from there??
+        MediaQuery.textScalerOf(context).textScaleFactor;
     final extraScale = (scale - 1).clamp(0, 0.5); // assumes scale ranges 1 to 2
     final textScale = 1 + (extraScale * 0.3);
     final uiScale = 1 - (extraScale * 0.7);
-    mediaQueryData = mediaQueryData.copyWith(
-      size: mediaQueryData.size * uiScale, textScaler: TextScaler.linear(textScale),
+    var mediaQueryData = MediaQuery.of(context);
+    mediaQueryData = MediaQuery.of(context).copyWith(
+      size: mediaQueryData.size * uiScale,
+      // TODO: 2 this is potentially breaking non-linear scalers (on mobile I assume)
+      textScaler: TextScaler.linear(textScale),
     );
+
     final screen = ref.read(fromZeroScreenProvider);
     final scaffoldChangeNotifier = ref.read(
       fromZeroScaffoldChangeNotifierProvider,
     );
-    bool showWindowButtons =
-        PlatformExtended.appWindow != null &&
-        scaffoldChangeNotifier.showWindowBarOnDesktop;
+    bool showWindowButtons = PlatformExtended.appWindow != null && scaffoldChangeNotifier.showWindowBarOnDesktop;
     ScrollBehavior scrollConfiguration = ScrollConfiguration.of(
       context,
     ).copyWith(scrollbars: false);
@@ -177,6 +171,7 @@ class FromZeroAppContentWrapperState
         dragDevices: {...PointerDeviceKind.values},
       );
     }
+
     return ScrollConfiguration(
       behavior: scrollConfiguration,
       child: LayoutBuilder(
@@ -187,15 +182,12 @@ class FromZeroAppContentWrapperState
             screenWidth = constraints.maxWidth;
             screenHeight = constraints.maxHeight;
             if (scaffoldChangeNotifier.previousWidth == null) {
-              screen._isMobileLayout =
-                  constraints.maxWidth < ScaffoldFromZero.screenSizeMedium;
+              screen._isMobileLayout = constraints.maxWidth < ScaffoldFromZero.screenSizeMedium;
               if (constraints.maxWidth >= ScaffoldFromZero.screenSizeXLarge) {
                 screen._breakpoint = ScaffoldFromZero.screenSizeXLarge;
-              } else if (constraints.maxWidth >=
-                  ScaffoldFromZero.screenSizeLarge) {
+              } else if (constraints.maxWidth >= ScaffoldFromZero.screenSizeLarge) {
                 screen._breakpoint = ScaffoldFromZero.screenSizeLarge;
-              } else if (constraints.maxWidth >=
-                  ScaffoldFromZero.screenSizeMedium) {
+              } else if (constraints.maxWidth >= ScaffoldFromZero.screenSizeMedium) {
                 screen._breakpoint = ScaffoldFromZero.screenSizeMedium;
               } else {
                 screen._breakpoint = ScaffoldFromZero.screenSizeSmall;
@@ -204,15 +196,12 @@ class FromZeroAppContentWrapperState
               scaffoldChangeNotifier.previousHeight = constraints.maxHeight;
             } else {
               WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                screen._isMobileLayout =
-                    constraints.maxWidth < ScaffoldFromZero.screenSizeMedium;
+                screen._isMobileLayout = constraints.maxWidth < ScaffoldFromZero.screenSizeMedium;
                 if (constraints.maxWidth >= ScaffoldFromZero.screenSizeXLarge) {
                   screen.breakpoint = ScaffoldFromZero.screenSizeXLarge;
-                } else if (constraints.maxWidth >=
-                    ScaffoldFromZero.screenSizeLarge) {
+                } else if (constraints.maxWidth >= ScaffoldFromZero.screenSizeLarge) {
                   screen.breakpoint = ScaffoldFromZero.screenSizeLarge;
-                } else if (constraints.maxWidth >=
-                    ScaffoldFromZero.screenSizeMedium) {
+                } else if (constraints.maxWidth >= ScaffoldFromZero.screenSizeMedium) {
                   screen.breakpoint = ScaffoldFromZero.screenSizeMedium;
                 } else {
                   screen.breakpoint = ScaffoldFromZero.screenSizeSmall;
@@ -262,12 +251,7 @@ class FromZeroAppContentWrapperState
                                     goRouter: widget.goRouter,
                                     onMaximizeOrRestore: (context) {
                                       // hack so the windowBar doesn't get stuck after maximize
-                                      context
-                                              .findAncestorStateOfType<
-                                                AppearOnMouseOverState
-                                              >()!
-                                              .pressed =
-                                          false;
+                                      context.findAncestorStateOfType<AppearOnMouseOverState>()!.pressed = false;
                                     },
                                   ),
                                 );
@@ -396,9 +380,7 @@ class WindowBar extends StatelessWidget {
           children: [
             if (title != null) title!,
             if (title == null &&
-                (logoImageAssetsPath != null ||
-                    FromZeroAppContentWrapper.appNameForCloseConfirmation !=
-                        null))
+                (logoImageAssetsPath != null || FromZeroAppContentWrapper.appNameForCloseConfirmation != null))
               const SizedBox(width: 9),
             if (title == null && logoImageAssetsPath != null)
               IgnorePointer(
@@ -415,8 +397,7 @@ class WindowBar extends StatelessWidget {
                 logoImageAssetsPath != null &&
                 FromZeroAppContentWrapper.appNameForCloseConfirmation != null)
               const SizedBox(width: 7),
-            if (title == null &&
-                FromZeroAppContentWrapper.appNameForCloseConfirmation != null)
+            if (title == null && FromZeroAppContentWrapper.appNameForCloseConfirmation != null)
               IgnorePointer(
                 child: Material(
                   type: MaterialType.transparency,
@@ -501,14 +482,9 @@ class WindowBar extends StatelessWidget {
           type: FzLgType.routing,
         );
         if (await navigator.maybePop()) {
-          final previousGoRouteFromZero = goRoute is GoRouteFromZero
-              ? goRoute
-              : null;
-          final newGoRoute =
-              goRouter.routerDelegate.currentConfiguration.last.route;
-          final newGoRouteFromZero = newGoRoute is GoRouteFromZero
-              ? newGoRoute
-              : null;
+          final previousGoRouteFromZero = goRoute is GoRouteFromZero ? goRoute : null;
+          final newGoRoute = goRouter.routerDelegate.currentConfiguration.last.route;
+          final newGoRouteFromZero = newGoRoute is GoRouteFromZero ? newGoRoute : null;
           if (newGoRoute == goRoute) {
             // if route refused to pop, or popped route was a modal, stop iteration
             log(
@@ -518,8 +494,7 @@ class WindowBar extends StatelessWidget {
             );
             return;
           }
-          if (previousGoRouteFromZero?.pageScaffoldId !=
-              newGoRouteFromZero?.pageScaffoldId) {
+          if (previousGoRouteFromZero?.pageScaffoldId != newGoRouteFromZero?.pageScaffoldId) {
             // if new route is a different scaffold ID, stop iteration
             log(
               LgLvl.finer,
@@ -585,15 +560,13 @@ class _MoveWindowFromZeroState extends State<MoveWindowFromZero> {
 
   @override
   Widget build(BuildContext context) {
-    final Map<Type, GestureRecognizerFactory> gestures =
-        <Type, GestureRecognizerFactory>{};
-    gestures[TransparentTapGestureRecognizer] =
-        GestureRecognizerFactoryWithHandlers<TransparentTapGestureRecognizer>(
-          () => TransparentTapGestureRecognizer(debugOwner: this),
-          (TapGestureRecognizer instance) {
-            instance.onTapDown = onTapDown;
-          },
-        );
+    final Map<Type, GestureRecognizerFactory> gestures = <Type, GestureRecognizerFactory>{};
+    gestures[TransparentTapGestureRecognizer] = GestureRecognizerFactoryWithHandlers<TransparentTapGestureRecognizer>(
+      () => TransparentTapGestureRecognizer(debugOwner: this),
+      (TapGestureRecognizer instance) {
+        instance.onTapDown = onTapDown;
+      },
+    );
     return RawGestureDetector(
       behavior: HitTestBehavior.translucent,
       gestures: gestures,
@@ -623,7 +596,7 @@ class ScreenFromZero extends ChangeNotifier {
     notifyListeners();
   }
 
-  double? _scale = Hive.box('settings').get('ui_scale');
+  double? _scale = Hive.box<dynamic>('settings').get('ui_scale');
   double? get scale => _scale;
   set scale(double? value) {
     _scale = value;
@@ -702,24 +675,21 @@ class ScaffoldFromZeroChangeNotifier extends ChangeNotifier {
   bool get isCurrentDrawerExpanded => isDrawerExpanded();
   bool isDrawerExpanded([String? pageScaffoldId]) {
     pageScaffoldId ??= currentRouteState!.pageScaffoldId;
-    return getCurrentDrawerWidth(pageScaffoldId) ==
-        expandedDrawerWidths[pageScaffoldId];
+    return getCurrentDrawerWidth(pageScaffoldId) == expandedDrawerWidths[pageScaffoldId];
   }
 
   // Mechanism to automatically expand/collapse drawer in response to screen width changes in desktop
   double? previousWidth;
   double? previousHeight;
+  // ignore: avoid_positional_boolean_parameters
   void validateDrawerWidths(bool isMobileLayout, double width) {
     for (final e in _currentDrawerWidths.keys) {
       validateDrawerWidth(e, isMobileLayout, width);
     }
   }
 
-  void validateDrawerWidth(
-    String pageScaffoldId,
-    bool isMobileLayout,
-    double width,
-  ) {
+  // ignore: avoid_positional_boolean_parameters
+  void validateDrawerWidth(String pageScaffoldId, bool isMobileLayout, double width) {
     final collapsed = collapsedDrawerWidths[pageScaffoldId] ?? 56;
     final expanded = expandedDrawerWidths[pageScaffoldId] ?? 304;
     if (width < ScaffoldFromZero.screenSizeMedium) {
@@ -775,22 +745,17 @@ class ScaffoldFromZeroChangeNotifier extends ChangeNotifier {
   void updateAnimationTypes() {
     if (currentRouteState == null ||
         previousRouteState == null ||
-        currentRouteState!.pageScaffoldId !=
-            previousRouteState!.pageScaffoldId) {
+        currentRouteState!.pageScaffoldId != previousRouteState!.pageScaffoldId) {
       _animationType = ScaffoldTypeAnimation.other;
-    } else if (currentRouteState!.pageScaffoldDepth >
-        previousRouteState!.pageScaffoldDepth) {
+    } else if (currentRouteState!.pageScaffoldDepth > previousRouteState!.pageScaffoldDepth) {
       _animationType = ScaffoldTypeAnimation.inner;
-    } else if (currentRouteState!.pageScaffoldDepth <
-        previousRouteState!.pageScaffoldDepth) {
+    } else if (currentRouteState!.pageScaffoldDepth < previousRouteState!.pageScaffoldDepth) {
       _animationType = ScaffoldTypeAnimation.outer;
     } else {
       _animationType = ScaffoldTypeAnimation.same;
     }
     fadeAnim = animationType == ScaffoldTypeAnimation.same;
-    sharedAnim =
-        animationType == ScaffoldTypeAnimation.inner ||
-        animationType == ScaffoldTypeAnimation.outer;
+    sharedAnim = animationType == ScaffoldTypeAnimation.inner || animationType == ScaffoldTypeAnimation.outer;
     titleAnimation = animationType != ScaffoldTypeAnimation.other;
     // && currentRoute!=null && previousRoute!=null
     // && !(  (currentScaffold.title?.key!=null && previousScaffold.title?.key!=null

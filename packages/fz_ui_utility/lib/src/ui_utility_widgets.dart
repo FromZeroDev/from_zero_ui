@@ -1,23 +1,17 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:animations/animations.dart';
-import 'package:bitsdojo_window/bitsdojo_window.dart' as bitsdojo;
-import 'package:bitsdojo_window_platform_interface/window.dart'
-    as bitsdojo_window;
 import 'package:dartx/dartx.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_animations/fz_animations.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_platform/fz_platform.dart';
+import 'package:fz_opacity_gradient/fz_opacity_gradient.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:path_provider/path_provider.dart' as path_provider;
 
 // TODO: 2 break this up into individual files
 
@@ -67,9 +61,7 @@ class ResponsiveHorizontalInsets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final insets = EdgeInsets.symmetric(
-      horizontal: MediaQuery.sizeOf(context).width < breakpoint
-          ? smallPadding
-          : bigPadding,
+      horizontal: MediaQuery.sizeOf(context).width < breakpoint ? smallPadding : bigPadding,
     );
     if (asSliver) {
       return SliverPadding(padding: insets, sliver: child);
@@ -184,9 +176,7 @@ class LoadingCheckbox extends StatelessWidget {
     this.pageTransitionBuilder,
     AnimatedSwitcherTransitionBuilder? transitionBuilder,
     super.key,
-  }) : transitionBuilder =
-           transitionBuilder ??
-           (pageTransitionBuilder == null ? _defaultTransitionBuilder : null);
+  }) : transitionBuilder = transitionBuilder ?? (pageTransitionBuilder == null ? _defaultTransitionBuilder : null);
 
   @override
   Widget build(BuildContext context) {
@@ -376,210 +366,10 @@ class AppbarFiller extends ConsumerWidget {
     }
     return AnimatedPadding(
       padding: EdgeInsets.only(top: height),
-      duration:
-          scaffold?.appbarAnimationDuration ??
-          const Duration(milliseconds: 300),
+      duration: scaffold?.appbarAnimationDuration ?? const Duration(milliseconds: 300),
       curve: scaffold?.appbarAnimationCurve ?? Curves.easeOutCubic,
       child: child ?? const SizedBox.shrink(),
     );
-  }
-}
-
-class OpacityGradient extends StatelessWidget {
-  static const left = 0;
-  static const right = 1;
-  static const top = 2;
-  static const bottom = 3;
-  static const horizontal = 4;
-  static const vertical = 5;
-
-  final Widget child;
-  final int direction;
-  final double? size;
-  final double? percentage;
-
-  const OpacityGradient({
-    required this.child,
-    this.direction = vertical,
-    double? size,
-    this.percentage,
-    super.key,
-  }) : assert(
-         size == null || percentage == null,
-         "Can't set both a hard size and a percentage.",
-       ),
-       size = size == null && percentage == null ? 16 : size;
-
-  @override
-  Widget build(BuildContext context) {
-    if (kIsWeb) return child;
-    return ShaderMask(
-      shaderCallback: (bounds) => LinearGradient(
-        begin: direction == top || direction == bottom || direction == vertical
-            ? Alignment.topCenter
-            : Alignment.centerLeft,
-        end: direction == top || direction == bottom || direction == vertical
-            ? Alignment.bottomCenter
-            : Alignment.centerRight,
-        stops: [
-          0,
-          direction == bottom || direction == right
-              ? 0
-              : size == null
-              ? percentage!
-              : size! /
-                    (direction == top ||
-                            direction == bottom ||
-                            direction == vertical
-                        ? bounds.height
-                        : bounds.width),
-          direction == top || direction == left
-              ? 1
-              : size == null
-              ? 1 - percentage!
-              : 1 -
-                    size! /
-                        (direction == top ||
-                                direction == bottom ||
-                                direction == vertical
-                            ? bounds.height
-                            : bounds.width),
-          1,
-        ],
-        colors: const [
-          Colors.transparent,
-          Colors.black,
-          Colors.black,
-          Colors.transparent,
-        ],
-      ).createShader(Rect.fromLTRB(0, 0, bounds.width, bounds.height)),
-      blendMode: BlendMode.dstIn,
-      child: child,
-    );
-  }
-}
-
-class ScrollOpacityGradient extends StatefulWidget {
-  final ScrollController scrollController;
-  final Widget child;
-  final double maxSize;
-  final int direction;
-  final bool applyAtStart;
-  final bool applyAtEnd;
-
-  const ScrollOpacityGradient({
-    required this.scrollController,
-    required this.child,
-    this.maxSize = 16,
-    this.direction = OpacityGradient.vertical,
-    this.applyAtEnd = true,
-    this.applyAtStart = true,
-    super.key,
-  });
-
-  @override
-  ScrollOpacityGradientState createState() => ScrollOpacityGradientState();
-}
-
-class ScrollOpacityGradientState extends State<ScrollOpacityGradient> {
-  double size1 = 0;
-  double size2 = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _addListener(widget.scrollController);
-    _updateScroll();
-  }
-
-  @override
-  void didUpdateWidget(ScrollOpacityGradient oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.scrollController != widget.scrollController) {
-      _removeListener(oldWidget.scrollController);
-      _addListener(widget.scrollController);
-    }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _removeListener(widget.scrollController);
-  }
-
-  void _addListener(ScrollController scrollController) {
-    scrollController.addListener(_updateScroll);
-  }
-
-  void _removeListener(ScrollController scrollController) {
-    scrollController.removeListener(_updateScroll);
-  }
-
-  void _updateScroll() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        double newSize1, newSize2;
-        try {
-          newSize1 = widget.scrollController.position.pixels.clamp(
-            0,
-            widget.maxSize,
-          );
-          newSize2 =
-              (widget.scrollController.position.maxScrollExtent -
-                      widget.scrollController.position.pixels)
-                  .clamp(0, widget.maxSize);
-        } catch (e) {
-          newSize1 = 0;
-          newSize2 = 0;
-        }
-        if (newSize1 != size1 || newSize2 != size2) {
-          setState(() {
-            size1 = newSize1;
-            size2 = newSize2;
-          });
-        }
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final child = NotificationListener(
-      child: widget.child,
-      onNotification: (notification) {
-        if (notification is ScrollMetricsNotification ||
-            notification is ScrollNotification) {
-          _updateScroll();
-        }
-        return false;
-      },
-    );
-    if (widget.direction == OpacityGradient.horizontal ||
-        widget.direction == OpacityGradient.vertical) {
-      return OpacityGradient(
-        size: widget.applyAtStart ? size1 : 0,
-        direction: widget.direction == OpacityGradient.horizontal
-            ? OpacityGradient.left
-            : OpacityGradient.top,
-        child: OpacityGradient(
-          size: widget.applyAtEnd ? size2 : 0,
-          direction: widget.direction == OpacityGradient.horizontal
-              ? OpacityGradient.right
-              : OpacityGradient.bottom,
-          child: child,
-        ),
-      );
-    } else {
-      return OpacityGradient(
-        size:
-            widget.direction == OpacityGradient.left ||
-                widget.direction == OpacityGradient.top
-            ? size1
-            : size2,
-        direction: widget.direction,
-        child: child,
-      );
-    }
   }
 }
 
@@ -636,11 +426,7 @@ class OverflowScrollState extends State<OverflowScroll> {
     await Future<dynamic>.delayed(waitDuration ?? widget.autoscrollWaitTime);
     if (!mounted) return;
     try {
-      Duration duration =
-          (1000 *
-                  scrollController.position.maxScrollExtent /
-                  widget.autoscrollSpeed!)
-              .milliseconds;
+      Duration duration = (1000 * scrollController.position.maxScrollExtent / widget.autoscrollSpeed!).milliseconds;
       if (forward) {
         await scrollController.animateTo(
           scrollController.position.maxScrollExtent,
@@ -669,9 +455,7 @@ class OverflowScrollState extends State<OverflowScroll> {
     if (widget.opacityGradientSize > 0) {
       result = ScrollOpacityGradient(
         scrollController: scrollController,
-        direction: widget.scrollDirection == Axis.horizontal
-            ? OpacityGradient.horizontal
-            : OpacityGradient.vertical,
+        direction: widget.scrollDirection == Axis.horizontal ? OpacityGradient.horizontal : OpacityGradient.vertical,
         maxSize: widget.opacityGradientSize,
         child: result,
       );
@@ -686,7 +470,7 @@ class OverflowScrollState extends State<OverflowScroll> {
 
 class ExpandIconButton extends StatefulWidget {
   final bool value;
-  final void Function(bool value)? onPressed;
+  final ValueChanged<bool>? onPressed;
   final EdgeInsetsGeometry padding;
 
   const ExpandIconButton({
@@ -700,8 +484,7 @@ class ExpandIconButton extends StatefulWidget {
   ExpandIconButtonState createState() => ExpandIconButtonState();
 }
 
-class ExpandIconButtonState extends State<ExpandIconButton>
-    with SingleTickerProviderStateMixin {
+class ExpandIconButtonState extends State<ExpandIconButton> with SingleTickerProviderStateMixin {
   late final AnimationController controlPanelAnimationController;
   late final Animatable<double> _halfTween;
   late final Animation<double> _iconTurns;
@@ -930,9 +713,7 @@ class TextIcon extends StatelessWidget {
         height: height,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Theme.of(context).brightness == Brightness.light
-              ? Colors.black45
-              : Colors.white,
+          color: Theme.of(context).brightness == Brightness.light ? Colors.black45 : Colors.white,
         ),
         child: Center(
           child: Text(
@@ -974,18 +755,15 @@ class TitleTextBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor =
-        this.backgroundColor ?? Theme.of(context).canvasColor;
+    final backgroundColor = this.backgroundColor ?? Theme.of(context).canvasColor;
     return Stack(
       fit: StackFit.passthrough,
       children: <Widget>[
         Positioned.fill(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              double stopPercentageLeft = (paddingLeft / constraints.maxWidth)
-                  .clamp(0, 1);
-              double stopPercentageRight =
-                  1 - (paddingRight / constraints.maxWidth).clamp(0, 1);
+              double stopPercentageLeft = (paddingLeft / constraints.maxWidth).clamp(0, 1);
+              double stopPercentageRight = 1 - (paddingRight / constraints.maxWidth).clamp(0, 1);
               return Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -1075,8 +853,7 @@ class AnimatedIconFromZero extends StatefulWidget {
   State<AnimatedIconFromZero> createState() => _AnimatedIconFromZeroState();
 }
 
-class _AnimatedIconFromZeroState extends State<AnimatedIconFromZero>
-    with SingleTickerProviderStateMixin {
+class _AnimatedIconFromZeroState extends State<AnimatedIconFromZero> with SingleTickerProviderStateMixin {
   late final controller = AnimationController(
     vsync: this,
     value: widget.value ? 0 : 1,
@@ -1179,8 +956,7 @@ class FrameThrottleWidgetState extends State<FrameThrottleWidget> {
       for (int i = 0; i < statesWantingToBuild.length; i++) {
         final e = statesWantingToBuild[i];
         e.skipFramesLeft--;
-        if (widgetsBuildThisFrame < e.widget.maxWidgetsBuiltPerFrame &&
-            e.skipFramesLeft <= 0) {
+        if (widgetsBuildThisFrame < e.widget.maxWidgetsBuiltPerFrame && e.skipFramesLeft <= 0) {
           statesWantingToBuild.first.setState(() {});
           statesWantingToBuild.removeAt(i);
           i--;
@@ -1213,8 +989,7 @@ class FrameThrottleWidgetState extends State<FrameThrottleWidget> {
   }
 }
 
-typedef InitiallyAnimatedWidgetBuilder =
-    Widget Function(Animation<double> animation, Widget? child);
+typedef InitiallyAnimatedWidgetBuilder = Widget Function(Animation<double> animation, Widget? child);
 
 class InitiallyAnimatedWidget extends StatefulWidget {
   final InitiallyAnimatedWidgetBuilder? builder;
@@ -1245,8 +1020,7 @@ class InitiallyAnimatedWidget extends StatefulWidget {
   InitiallyAnimatedWidgetState createState() => InitiallyAnimatedWidgetState();
 }
 
-class InitiallyAnimatedWidgetState extends State<InitiallyAnimatedWidget>
-    with SingleTickerProviderStateMixin {
+class InitiallyAnimatedWidgetState extends State<InitiallyAnimatedWidget> with SingleTickerProviderStateMixin {
   late AnimationController animationController;
   late Animation<double> animation;
 
@@ -1394,9 +1168,7 @@ class FlexibleLayoutFromZero extends StatelessWidget {
   Widget build(BuildContext context) {
     if (relevantAxisMaxSize != null) {
       final size = MediaQuery.sizeOf(context);
-      final relevantScreenSize = axis == Axis.horizontal
-          ? size.width
-          : size.height;
+      final relevantScreenSize = axis == Axis.horizontal ? size.width : size.height;
       return buildInternal(
         context,
         min(relevantAxisMaxSize!, relevantScreenSize),
@@ -1406,9 +1178,7 @@ class FlexibleLayoutFromZero extends StatelessWidget {
         builder: (context, constraints) {
           return buildInternal(
             context,
-            axis == Axis.horizontal
-                ? constraints.maxWidth
-                : constraints.maxHeight,
+            axis == Axis.horizontal ? constraints.maxWidth : constraints.maxHeight,
           );
         },
       );
@@ -1433,9 +1203,7 @@ class FlexibleLayoutFromZero extends StatelessWidget {
     while (extraSize != 0 && expandableItems.isNotEmpty) {
       double totalFlex = expandableItems.values.sumBy((e) => e.flex);
       for (final key in expandableItems.keys) {
-        final percentage = totalFlex == 0
-            ? 1 / expandableItems.length
-            : expandableItems[key]!.flex / totalFlex;
+        final percentage = totalFlex == 0 ? 1 / expandableItems.length : expandableItems[key]!.flex / totalFlex;
         itemSizes[key] = itemSizes[key]! + (extraSize * percentage);
       }
       extraSize = 0;
@@ -1483,9 +1251,7 @@ class FlexibleLayoutFromZero extends StatelessWidget {
       final scrollController = ScrollController();
       result = ScrollbarFromZero(
         controller: scrollController,
-        opacityGradientDirection: axis == Axis.horizontal
-            ? OpacityGradient.horizontal
-            : OpacityGradient.vertical,
+        opacityGradientDirection: axis == Axis.horizontal ? OpacityGradient.horizontal : OpacityGradient.vertical,
         child: SingleChildScrollView(
           controller: scrollController,
           scrollDirection: axis,
@@ -1559,8 +1325,7 @@ class TimedOverlay extends StatefulWidget {
     required Duration remaining,
     BorderRadiusGeometry? borderRadius,
   }) {
-    final remainingSeconds =
-        (remaining.inMicroseconds / Duration.microsecondsPerSecond).ceil();
+    final remainingSeconds = (remaining.inMicroseconds / Duration.microsecondsPerSecond).ceil();
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -1589,16 +1354,12 @@ class _TimedOverlayState extends State<TimedOverlay> {
   @override
   void initState() {
     super.initState();
-    lastRemainingCount =
-        (widget.duration.inMicroseconds / widget.rebuildInterval.inMicroseconds)
-            .ceil();
+    lastRemainingCount = (widget.duration.inMicroseconds / widget.rebuildInterval.inMicroseconds).ceil();
     Timer.periodic(const Duration(milliseconds: 10), (timer) {
       if (mounted) {
         elapsed += const Duration(milliseconds: 10);
         final remaining = widget.duration - elapsed;
-        final remainingCount =
-            (remaining.inMicroseconds / widget.rebuildInterval.inMicroseconds)
-                .ceil();
+        final remainingCount = (remaining.inMicroseconds / widget.rebuildInterval.inMicroseconds).ceil();
         if (remainingCount < lastRemainingCount || elapsed >= widget.duration) {
           setState(() {
             lastRemainingCount = remainingCount;
@@ -1634,96 +1395,6 @@ class _TimedOverlayState extends State<TimedOverlay> {
   }
 }
 
-class PlatformExtended {
-  static final _appWindow = kIsWeb || isMobile ? null : bitsdojo.appWindow;
-  static bitsdojo_window.DesktopWindow? get appWindow =>
-      !windowsDesktopBitsdojoWorking ? null : _appWindow;
-
-  static bool get isWindows {
-    if (kIsWeb) {
-      return defaultTargetPlatform == TargetPlatform.windows;
-    } else {
-      return Platform.isWindows;
-    }
-  }
-
-  static bool get isAndroid {
-    if (kIsWeb) {
-      return defaultTargetPlatform == TargetPlatform.android;
-    } else {
-      return Platform.isAndroid;
-    }
-  }
-
-  static bool get isIOS {
-    if (kIsWeb) {
-      return defaultTargetPlatform == TargetPlatform.iOS;
-    } else {
-      return Platform.isIOS;
-    }
-  }
-
-  static bool get isLinux {
-    if (kIsWeb) {
-      return defaultTargetPlatform == TargetPlatform.linux;
-    } else {
-      return Platform.isLinux;
-    }
-  }
-
-  static bool get isMacOS {
-    if (kIsWeb) {
-      return defaultTargetPlatform == TargetPlatform.macOS;
-    } else {
-      return Platform.isMacOS;
-    }
-  }
-
-  static bool get isFuchsia {
-    if (kIsWeb) {
-      return defaultTargetPlatform == TargetPlatform.fuchsia;
-    } else {
-      return Platform.isFuchsia;
-    }
-  }
-
-  static bool get isMobile {
-    return PlatformExtended.isAndroid || PlatformExtended.isIOS;
-  }
-
-  static bool get isDesktop {
-    return !PlatformExtended.isMobile;
-  }
-
-  static String? customDownloadsDirectory;
-  static Future<Directory> getDownloadsDirectory() async {
-    if (customDownloadsDirectory != null) {
-      return Directory(customDownloadsDirectory!);
-    }
-    if (kIsWeb) {
-      throw UnimplementedError('Web needs to download through the browser');
-    }
-
-    Directory? result;
-    if (Platform.isWindows) {
-      result = await path_provider.getApplicationDocumentsDirectory();
-      if (!(await result.exists())) {
-        result = await getDownloadsDirectory();
-      }
-    } else if (Platform.isAndroid) {
-      result = Directory('/storage/emulated/0/Download');
-      if (!(await result.exists())) {
-        result = await path_provider.getExternalStorageDirectory();
-      }
-    }
-
-    if (result == null || !(await result.exists())) {
-      result = await path_provider.getApplicationDocumentsDirectory();
-    }
-    return result;
-  }
-}
-
 extension HexColor on Color {
   /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
   static Color fromHex(String hexString) {
@@ -1736,15 +1407,14 @@ extension HexColor on Color {
   /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
   String toHex({bool leadingHashSign = true, bool includeAlpha = true}) =>
       '${leadingHashSign ? '#' : ''}'
-      '${includeAlpha ? alpha.toRadixString(16).padLeft(2, '0') : ''}'
-      '${red.toRadixString(16).padLeft(2, '0')}'
-      '${green.toRadixString(16).padLeft(2, '0')}'
-      '${blue.toRadixString(16).padLeft(2, '0')}';
+      '${includeAlpha ? (a * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0') : ''}'
+      '${(r * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0')}'
+      '${(g * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0')}'
+      '${(b * 255.0).round().clamp(0, 255).toRadixString(16).padLeft(2, '0')}';
 }
 
 extension InverseBrigtenes on Brightness {
-  Brightness get inverse =>
-      this == Brightness.light ? Brightness.dark : Brightness.light;
+  Brightness get inverse => this == Brightness.light ? Brightness.dark : Brightness.light;
 }
 
 class SideClipper extends CustomClipper<Path> {
@@ -1758,16 +1428,8 @@ class SideClipper extends CustomClipper<Path> {
     this.clipTop = false,
     this.clipBottom = false,
   });
-  SideClipper.vertical()
-    : clipLeft = false,
-      clipRight = false,
-      clipTop = true,
-      clipBottom = true;
-  SideClipper.horizontal()
-    : clipLeft = true,
-      clipRight = true,
-      clipTop = false,
-      clipBottom = false;
+  SideClipper.vertical() : clipLeft = false, clipRight = false, clipTop = true, clipBottom = true;
+  SideClipper.horizontal() : clipLeft = true, clipRight = true, clipTop = false, clipBottom = false;
 
   @override
   Path getClip(Size size) {

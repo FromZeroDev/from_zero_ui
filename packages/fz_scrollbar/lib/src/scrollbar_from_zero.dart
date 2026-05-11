@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/scheduler/ticker.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:fz_opacity_gradient/fz_opacity_gradient.dart';
 import 'package:fz_platform/fz_platform.dart';
 
@@ -173,6 +173,7 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
     return NotificationListener(
       onNotification: (notification) {
         if (notification is ScrollMetricsNotification) {
+          // ignore: invalid_use_of_protected_member
           widget.controller?.notifyListeners();
           return true;
         }

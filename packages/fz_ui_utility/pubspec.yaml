@@ -36,9 +36,9 @@ dependencies:
     path: ../fz_translucent_ink_well
   fz_value_string:
     path: ../fz_value_string
+  fz_opacity_gradient:
+    path: ../fz_opacity_gradient
 
-  fz_platform:
-    path: ../fz_platform
 dependency_overrides:
   intl: ^0.20.2
   archive: ^4.0.7

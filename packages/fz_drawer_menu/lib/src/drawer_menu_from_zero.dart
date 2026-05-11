@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -203,10 +205,11 @@ class ResponsiveDrawerMenuItem {
 }
 
 class DrawerMenuFromZero extends ConsumerStatefulWidget {
+  // TODO: 1 change this into a proper enum
   static const int go = 10;
   static const int replace = 1;
   static const int push = 2;
-  @deprecated
+  @Deprecated('Use .go instead (GoRouter)')
   static const int keepRootAlive = 0;
 
   static const int styleDrawerMenu = 0;
@@ -566,6 +569,9 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
                         if (tabs[i].route == widget.homeRoute) {
                           if (goRouter == null) {
                             if (navigator.canPop() &&
+                                // WillPopScope may not end up being deprecated at all https://github.com/flutter/flutter/issues/138614.
+                                // If it does, we can do a workaround like https://github.com/flutter/flutter/issues/163052#issuecomment-2764601658
+                                // ignore: deprecated_member_use
                                 (await ModalRoute.of(context)!.willPop() == RoutePopDisposition.pop)) {
                               navigator.popUntil(ModalRoute.withName(widget.homeRoute!));
                             }
@@ -577,6 +583,9 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
                           }
                         } else {
                           if (navigator.canPop() &&
+                              // WillPopScope may not end up being deprecated at all https://github.com/flutter/flutter/issues/138614.
+                              // If it does, we can do a workaround like https://github.com/flutter/flutter/issues/163052#issuecomment-2764601658
+                              // ignore: deprecated_member_use
                               (await ModalRoute.of(context)!.willPop() == RoutePopDisposition.pop)) {
                             if (goRouter == null) {
                               navigator.pushNamedAndRemoveUntil(
@@ -612,7 +621,11 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
                         );
                       }
                     } else if (widget.pushType == DrawerMenuFromZero.replace) {
-                      if (navigator.canPop() && (await ModalRoute.of(context)!.willPop() == RoutePopDisposition.pop)) {
+                      if (navigator.canPop() &&
+                          // WillPopScope may not end up being deprecated at all https://github.com/flutter/flutter/issues/138614.
+                          // If it does, we can do a workaround like https://github.com/flutter/flutter/issues/163052#issuecomment-2764601658
+                          // ignore: deprecated_member_use
+                          (await ModalRoute.of(context)!.willPop() == RoutePopDisposition.pop)) {
                         List<String> routes = [];
                         if (widget.homeRoute != null) {
                           routes.add(widget.homeRoute!);
@@ -793,7 +806,7 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
                               decoration: BoxDecoration(
                                 borderRadius: const BorderRadius.only(topRight: Radius.circular(16)),
                                 color: Color.alphaBlend(
-                                  theme.dividerColor.withValues(alpha: theme.dividerColor.opacity * 0.5),
+                                  theme.dividerColor.withValues(alpha: theme.dividerColor.a * 0.5),
                                   Material.maybeOf(context)?.color ?? theme.cardColor,
                                 ),
                                 // color: Color.alphaBlend(
