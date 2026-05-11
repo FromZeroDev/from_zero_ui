@@ -3,24 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_api_handling/fz_api_handling.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
-import 'package:fz_popup/fz_popup.dart';
-import 'package:fz_table/fz_table.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_dao/fz_dao.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
+import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_popup/fz_popup.dart';
+import 'package:fz_scrollbar/fz_scrollbar.dart';
+import 'package:fz_table/fz_table.dart';
 import 'package:fz_tooltip/fz_tooltip.dart';
+import 'package:fz_ui_utility/fz_ui_utility.dart';
 
 typedef ButtonChildBuilder<T> =
     Widget Function(
-      BuildContext context,
-      String? title,
-      String? hint,
-      T? value,
-      bool enabled,
-      bool clearable, {
+      BuildContext context, {
+      required String? title,
+      required String? hint,
+      required T? value,
+      required bool enabled,
+      required bool clearable,
       bool showDropdownIcon,
+      bool dense,
     });
 
 /// returns true if navigator should pop after (default true)
@@ -279,11 +280,11 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
     } else {
       result = widget.buttonChildBuilder!(
         context,
-        widget.title,
-        widget.hint,
-        widget.value,
-        widget.enabled,
-        widget.clearable,
+        title: widget.title,
+        hint: widget.hint,
+        value: widget.value,
+        enabled: widget.enabled,
+        clearable: widget.clearable,
         showDropdownIcon: widget.showDropdownIcon,
       );
     }
@@ -323,11 +324,11 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
     } else {
       result = widget.buttonChildBuilder!(
         context,
-        widget.title,
-        widget.hint,
-        widget.value,
-        widget.enabled,
-        widget.clearable,
+        title: widget.title,
+        hint: widget.hint,
+        value: widget.value,
+        enabled: widget.enabled,
+        clearable: widget.clearable,
         showDropdownIcon: widget.showDropdownIcon,
       );
     }

@@ -1,34 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_dao/fz_dao.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_snackbar/fz_snackbar.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_combo/fz_combo.dart';
-import 'package:fz_value_string/fz_value_string.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
-import 'package:fz_file_picker/fz_file_picker.dart';
-import 'package:fz_comparable_list/fz_comparable_list.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
+import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_appbar/fz_appbar.dart';
+import 'package:fz_combo/fz_combo.dart';
+import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
+import 'package:fz_dao/fz_dao.dart';
+import 'package:fz_future_handling/fz_future_handling.dart';
+import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_table/fz_table.dart';
-import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
-import 'package:fz_selectable_icon/fz_selectable_icon.dart';
-import 'package:fz_log/fz_log.dart';
-import 'package:fz_date_picker/fz_date_picker.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
+import 'package:fz_ui_utility/fz_ui_utility.dart';
 
 typedef FilteredValuesGetter<T, R extends Field> =
-    T Function(String value)? Function(BuildContext context, R field, DAO dao);
+    T Function(String value)? Function(BuildContext context, R field, DAO<dynamic> dao);
 
-class ComboField<T extends DAO> extends Field<T> {
+class ComboField<T extends DAO<dynamic>> extends Field<T> {
   ContextFulFieldValueGetter<List<T>?, ComboField<T>>? possibleValuesGetter;
   ContextFulFieldValueGetter<Future<List<T>>?, ComboField<T>>? possibleValuesFutureGetter;
   ContextFulFieldValueGetter<AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>?, ComboField<T>>?
@@ -39,8 +27,8 @@ class ComboField<T extends DAO> extends Field<T> {
   filteredValuesProviderGetter;
   bool? showSearchBox;
   ExtraWidgetBuilder<T>? extraWidget;
-  FieldValueGetter<DAO?, ComboField<T>>? newObjectTemplateGetter;
-  DAO? get newObjectTemplate => newObjectTemplateGetter?.call(this, dao);
+  FieldValueGetter<DAO<dynamic>?, ComboField<T>>? newObjectTemplateGetter;
+  DAO<dynamic>? get newObjectTemplate => newObjectTemplateGetter?.call(this, dao);
   bool sort;
   bool showViewActionOnDAOs;
   bool showDropdownIcon;
@@ -150,10 +138,10 @@ class ComboField<T extends DAO> extends Field<T> {
     FieldValueGetter<bool, Field>? hiddenInTableGetter,
     FieldValueGetter<bool, Field>? hiddenInViewGetter,
     FieldValueGetter<bool, Field>? hiddenInFormGetter,
-    FieldValueGetter<DAO?, ComboField<T>>? newObjectTemplateGetter,
+    FieldValueGetter<DAO<dynamic>?, ComboField<T>>? newObjectTemplateGetter,
     FieldValueGetter<List<FieldValidator<T>>, Field>? validatorsGetter,
     bool? validateOnlyOnConfirm,
-    FieldValueGetter<SimpleColModel, Field>? colModelBuilder,
+    FieldValueGetter<SimpleColModel<dynamic>, Field>? colModelBuilder,
     List<T?>? undoValues,
     List<T?>? redoValues,
     bool? invalidateValuesNotInPossibleValues,
@@ -219,7 +207,7 @@ class ComboField<T extends DAO> extends Field<T> {
   @override
   Future<bool> validate(
     BuildContext context,
-    DAO dao,
+    DAO<dynamic> dao,
     int currentValidationId, {
     bool validateIfNotEdited = false,
     bool validateIfHidden = false,
@@ -436,23 +424,33 @@ class ComboField<T extends DAO> extends Field<T> {
           onSelected: (v) => _onSelected(v, focusNode),
           // popupWidth: maxWidth,
           buttonStyle: addCard || dense ? null : TextButton.styleFrom(padding: EdgeInsets.zero),
-          buttonChildBuilder: (context, title, hint, value, enabled, clearable, {showDropdownIcon = false}) {
-            return Padding(
-              padding: EdgeInsets.only(
-                right: dense ? 0 : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40,
-              ),
-              child: buttonContentBuilder(
-                context,
-                title,
-                hint,
-                (dense ? value?.uiNameDense : value),
-                enabled,
-                false,
-                showDropdownIcon: showDropdownIcon,
-                dense: dense,
-              ),
-            );
-          },
+          buttonChildBuilder:
+              (
+                context, {
+                required title,
+                required hint,
+                required value,
+                required enabled,
+                required clearable,
+                showDropdownIcon = false,
+                dense = false,
+              }) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    right: dense ? 0 : context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40,
+                  ),
+                  child: buttonContentBuilder(
+                    context,
+                    title: title,
+                    hint: hint,
+                    value: (dense ? value?.uiNameDense : value),
+                    enabled: enabled,
+                    clearable: false,
+                    showDropdownIcon: showDropdownIcon,
+                    dense: dense,
+                  ),
+                );
+              },
           extraWidget: extraWidget ?? this.extraWidget,
           showViewActionOnDAOs: showViewActionOnDAOs,
           showDropdownIcon: showDropdownIcon,
@@ -611,13 +609,14 @@ class ComboField<T extends DAO> extends Field<T> {
     focusNode.requestFocus();
   }
 
+  // TODO: 2 this should probably be a StatelessWidget
   static Widget buttonContentBuilder(
-    BuildContext context,
-    String? title,
-    String? hint,
-    dynamic value,
-    bool enabled,
-    bool clearable, {
+    BuildContext context, {
+    required String? title,
+    required String? hint,
+    required dynamic value,
+    required bool enabled,
+    required bool clearable,
     bool showDropdownIcon = false,
     bool dense = false,
   }) {

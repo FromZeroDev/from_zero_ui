@@ -2,30 +2,11 @@ import 'package:dartx/dartx.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
+import 'package:fz_comparable_list/fz_comparable_list.dart';
 import 'package:fz_dao/fz_dao.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_snackbar/fz_snackbar.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_combo/fz_combo.dart';
-import 'package:fz_value_string/fz_value_string.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
-import 'package:fz_file_picker/fz_file_picker.dart';
-import 'package:fz_comparable_list/fz_comparable_list.dart';
 import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_comparable_list/fz_comparable_list.dart';
-import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
-import 'package:fz_appbar/fz_appbar.dart';
-import 'package:fz_table/fz_table.dart';
-import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
-import 'package:fz_selectable_icon/fz_selectable_icon.dart';
-import 'package:fz_log/fz_log.dart';
-import 'package:fz_date_picker/fz_date_picker.dart';
 
 enum ValidationErrorSeverity {
   warning,
@@ -98,7 +79,7 @@ class ValidationError {
   }
 }
 
-class InvalidatingError<T extends Comparable> extends ValidationError {
+class InvalidatingError<T extends Comparable<dynamic>> extends ValidationError {
   T? defaultValue;
   bool showVisualConfirmation;
   bool allowUndoInvalidatingChange;
@@ -130,10 +111,10 @@ class InvalidatingError<T extends Comparable> extends ValidationError {
     return InvalidatingError<T>(
       field: field as Field<T>,
       error: error ?? this.error,
-      defaultValue: this.defaultValue,
-      showVisualConfirmation: this.showVisualConfirmation,
-      allowSetThisFieldToDefaultValue: this.allowSetThisFieldToDefaultValue,
-      allowUndoInvalidatingChange: this.allowUndoInvalidatingChange,
+      defaultValue: defaultValue,
+      showVisualConfirmation: showVisualConfirmation,
+      allowSetThisFieldToDefaultValue: allowSetThisFieldToDefaultValue,
+      allowUndoInvalidatingChange: allowUndoInvalidatingChange,
       isVisibleAsSaveConfirmation: isVisibleAsSaveConfirmation ?? this.isVisibleAsSaveConfirmation,
       isVisibleAsHintMessage: isVisibleAsHintMessage ?? this.isVisibleAsHintMessage,
       isVisibleAsTooltip: isVisibleAsTooltip ?? this.isVisibleAsTooltip,
@@ -141,7 +122,7 @@ class InvalidatingError<T extends Comparable> extends ValidationError {
   }
 }
 
-class ForcedValueError<T extends Comparable> extends InvalidatingError<T> {
+class ForcedValueError<T extends Comparable<dynamic>> extends InvalidatingError<T> {
   bool Function(T? value, T? defaultValue)? comparator;
   ForcedValueError({
     required Field<T> field,
@@ -211,9 +192,9 @@ class MultiValidationError extends ValidationError {
        );
 }
 
-ValidationError? fieldValidatorRequired<T extends Comparable>(
+ValidationError? fieldValidatorRequired<T extends Comparable<dynamic>>(
   BuildContext context,
-  DAO dao,
+  DAO<dynamic> dao,
   Field<T> field, {
   String? errorMessage,
   ValidationErrorSeverity severity = ValidationErrorSeverity.error,
@@ -230,9 +211,9 @@ ValidationError? fieldValidatorRequired<T extends Comparable>(
       : null;
 }
 
-ValidationError? fieldValidatorListNotEmpty<T extends Comparable>(
+ValidationError? fieldValidatorListNotEmpty<T extends Comparable<dynamic>>(
   BuildContext context,
-  DAO dao,
+  DAO<dynamic> dao,
   Field<T> field, {
   String? errorMessage,
   ValidationErrorSeverity severity = ValidationErrorSeverity.error,
@@ -250,7 +231,7 @@ ValidationError? fieldValidatorListNotEmpty<T extends Comparable>(
 
 ValidationError? fieldValidatorNumberNotNegative(
   BuildContext context,
-  DAO dao,
+  DAO<dynamic> dao,
   Field<num> field, {
   String? errorMessage,
   ValidationErrorSeverity severity = ValidationErrorSeverity.error,
@@ -270,7 +251,7 @@ ValidationError? fieldValidatorNumberNotNegative(
 
 ValidationError? fieldValidatorNumberNotZero(
   BuildContext context,
-  DAO dao,
+  DAO<dynamic> dao,
   Field<num> field, {
   String? errorMessage,
   ValidationErrorSeverity severity = ValidationErrorSeverity.error,
@@ -290,7 +271,7 @@ ValidationError? fieldValidatorNumberNotZero(
 
 ValidationError? fieldValidatorStringIsEmail(
   BuildContext context,
-  DAO dao,
+  DAO<dynamic> dao,
   Field<String> field, {
   String? errorMessage,
   ValidationErrorSeverity severity = ValidationErrorSeverity.error,
@@ -310,7 +291,7 @@ ValidationError? fieldValidatorStringIsEmail(
         );
 }
 
-class FieldDiffMessage<T extends Comparable> extends StatelessWidget {
+class FieldDiffMessage<T extends Comparable<dynamic>> extends StatelessWidget {
   final Field<T> field;
   final T? oldValue;
   final T? newValue;

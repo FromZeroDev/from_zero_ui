@@ -1,11 +1,11 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_router/fz_router.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_expansion_tile/fz_expansion_tile.dart';
 import 'package:fz_popup/fz_popup.dart';
+import 'package:fz_router/fz_router.dart';
+import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_ui_utility/fz_ui_utility.dart';
@@ -406,6 +406,7 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
             if (homeRoutePaths.isNotEmpty) {
               homeRoutePaths.removeLast();
               while (homeRoutePaths.isNotEmpty && homeRoutePaths[0] == paths[0]) {
+                // ignore: use_string_buffers
                 cumulativePath += '/${paths[0]}';
                 homeRoutePaths.removeAt(0);
                 paths.removeAt(0);
@@ -413,6 +414,7 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
             }
           }
           for (var i = 0; i < paths.length; ++i) {
+            // ignore: use_string_buffers
             cumulativePath += '/${paths[i]}';
             if (i == 0) {
               _selected = _tabs.indexWhere((e) => e.route == cumulativePath);
@@ -543,7 +545,7 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
                       if (scaffold.hasDrawer && scaffold.isDrawerOpen) {
                         navigator.pop();
                       }
-                    } catch (_, __) {}
+                    } catch (_, _) {}
                     if (widget.pushType == DrawerMenuFromZero.keepRootAlive) {
                       // ! this will break if the homeRoute is NOT in the stack
                       if (selected >= 0 && tabs[selected].route == widget.homeRoute) {
@@ -737,9 +739,9 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
               trailing: widget.depth == 0 && !widget.allowCollapseRoot
                   ? const SizedBox.shrink()
                   : tabs[i].customExpansionTileTrailing ?? (tabs[i].forcePopup ? const SizedBox.shrink() : null),
-              titleBuilder: (context, expanded) {
+              titleBuilder: (context, {bool isExpanded = false}) {
                 return Padding(
-                  padding: expanded
+                  padding: isExpanded
                       ? EdgeInsets.only(top: widget.style == DrawerMenuFromZero.styleTree ? 4 : 6)
                       : EdgeInsets.symmetric(vertical: widget.style == DrawerMenuFromZero.styleTree ? 4 : 6),
                   child: getTreeOverlay(
@@ -750,7 +752,7 @@ class DrawerMenuFromZeroState extends ConsumerState<DrawerMenuFromZero> {
                       titleWidget: tabs[i].titleBuilder?.call(tabs[i].title),
                       subtitle: tabs[i].subtitle,
                       subtitleRight: tabs[i].subtitleRight,
-                      selected: selected == i && (tabs[i].selectedChild < 0 || !expanded),
+                      selected: selected == i && (tabs[i].selectedChild < 0 || !isExpanded),
                       compact: widget.compact,
                       dense: tabs[i].dense,
                       titleHorizontalOffset: tabs[i].titleHorizontalOffset,

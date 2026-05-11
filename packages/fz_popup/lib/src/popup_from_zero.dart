@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_snackbar/fz_snackbar.dart';
@@ -314,7 +313,7 @@ class RectPercentageClipper extends CustomClipper<Rect> {
   }
 
   @override
-  bool shouldReclip(covariant CustomClipper oldClipper) {
+  bool shouldReclip(covariant CustomClipper<dynamic> oldClipper) {
     return true;
   }
 }

@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/src/scheduler/ticker.dart';
-import 'package:fz_platform/fz_platform.dart';
 import 'package:fz_opacity_gradient/fz_opacity_gradient.dart';
+import 'package:fz_platform/fz_platform.dart';
 
 /// extends default scroll controller by notifying listeners in extra cases
 /// for example, on attach/detach scroll position. This means it is slightly

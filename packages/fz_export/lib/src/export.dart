@@ -6,22 +6,21 @@ import 'package:animations/animations.dart';
 import 'package:dartx/dartx.dart';
 import 'package:date/date.dart';
 import 'package:excel/excel.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as material;
-import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' as rendering;
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
-import 'package:fz_theme/fz_theme.dart';
-import 'package:fz_table/fz_table.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_file_saver/fz_file_saver.dart';
-import 'package:fz_value_string/fz_value_string.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_dao/fz_dao.dart';
 import 'package:fz_copy_page_indicator/fz_copy_page_indicator.dart' as my_arrow_page_indicator;
+import 'package:fz_dao/fz_dao.dart';
+import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_file_saver/fz_file_saver.dart';
+import 'package:fz_scaffold/fz_scaffold.dart';
+import 'package:fz_table/fz_table.dart';
+import 'package:fz_theme/fz_theme.dart';
+import 'package:fz_ui_utility/fz_ui_utility.dart';
+import 'package:fz_value_string/fz_value_string.dart';
 import 'package:intl/intl.dart';
 import 'package:page_view_indicators/page_view_indicators.dart';
 import 'package:path/path.dart' as p;
@@ -75,7 +74,7 @@ class Export extends StatefulWidget {
   final BuildContext? scaffoldContext;
   final Widget? dummyChild;
   final List<GlobalKey>? significantWidgetsKeys;
-  final Map<String, TableController>? Function()? excelSheets;
+  final Map<String, TableController<dynamic>>? Function()? excelSheets;
   final bool isPdfFormatAvailable;
   final bool isPngFormatAvailable;
   final bool autoExport;
@@ -450,7 +449,7 @@ class ExportState extends State<Export> {
             [],
       );
       for (var i = value.currentState!.widget.columns == null ? 0 : -1; i < value.currentState!.filtered.length; ++i) {
-        RowModel row;
+        RowModel<dynamic> row;
         if (i == -1) {
           row = SimpleRowModel(
             id: value.currentState!.widget.columns,
@@ -470,7 +469,7 @@ class ExportState extends State<Export> {
           for (int j = 0; j < keys.length + 1; j++) {
             if (j < keys.length) {
               final key = keys[j];
-              ColModel? col = value.currentState!.widget.columns == null
+              ColModel<dynamic>? col = value.currentState!.widget.columns == null
                   ? null
                   : value.currentState!.widget.columns![key];
               if (!flexCalc) {

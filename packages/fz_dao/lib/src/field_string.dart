@@ -4,31 +4,15 @@ import 'package:dartx/dartx.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fz_dao/fz_dao.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_snackbar/fz_snackbar.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_combo/fz_combo.dart';
-import 'package:fz_value_string/fz_value_string.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
-import 'package:fz_file_picker/fz_file_picker.dart';
-import 'package:fz_comparable_list/fz_comparable_list.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_appbar/fz_appbar.dart';
-import 'package:fz_table/fz_table.dart';
-import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
-import 'package:fz_selectable_icon/fz_selectable_icon.dart';
-import 'package:fz_log/fz_log.dart';
-import 'package:fz_date_picker/fz_date_picker.dart';
+import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
+import 'package:fz_dao/fz_dao.dart';
 import 'package:fz_popup/fz_popup.dart';
+import 'package:fz_scaffold/fz_scaffold.dart';
+import 'package:fz_table/fz_table.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
+import 'package:fz_ui_utility/fz_ui_utility.dart';
 
 enum StringFieldType {
   short,
@@ -53,9 +37,8 @@ class StringField extends Field<String> {
   }
 
   @override
+  // ignore: must_call_super // this is intentional :) commitValue(v) calls super
   set value(String? v) {
-    // ignore: must_call_super
-    // this is intentional :) commitValue(v) calls super
     valUpdateTimer?.cancel();
     v ??= '';
     if (v.isEmpty || v.characters.last == ' ' || v.characters.last == '\n' || !isEdited) {
@@ -180,7 +163,7 @@ class StringField extends Field<String> {
     FieldValueGetter<bool, Field>? hiddenInFormGetter,
     FieldValueGetter<List<FieldValidator<String>>, Field>? validatorsGetter,
     bool? validateOnlyOnConfirm,
-    FieldValueGetter<SimpleColModel, Field>? colModelBuilder,
+    FieldValueGetter<SimpleColModel<dynamic>, Field>? colModelBuilder,
     List<String?>? undoValues,
     List<String?>? redoValues,
     bool? invalidateNonEmptyValuesIfHiddenInForm,
@@ -352,7 +335,7 @@ class StringField extends Field<String> {
                     final backgroundColor = this.backgroundColor?.call(context, this, dao);
                     final focusColor = Theme.of(
                       context,
-                    ).focusColor.withValues(alpha: Theme.of(context).focusColor.opacity * 0.6);
+                    ).focusColor.withValues(alpha: Theme.of(context).focusColor.a * 0.6);
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
                       color: dense && visibleValidationErrors.isNotEmpty
@@ -375,7 +358,7 @@ class StringField extends Field<String> {
                 includeSemantics: false,
                 focusNode: FocusNode(skipTraversal: true),
                 onKeyEvent: (value) =>
-                    defaultOnKeyEvent(value, controller, focusNode, maxLines != null && maxLines! <= 1),
+                    defaultOnKeyEvent(value, controller, focusNode, isSingleLine: maxLines != null && maxLines! <= 1),
                 child: RawGestureDetector(
                   behavior: HitTestBehavior.translucent,
                   gestures: {
@@ -647,9 +630,9 @@ class StringField extends Field<String> {
   static void defaultOnKeyEvent(
     KeyEvent value,
     TextEditingController controller,
-    FocusNode focusNode,
-    bool isSingleLine,
-  ) {
+    FocusNode focusNode, {
+    required bool isSingleLine,
+  }) {
     if (value is KeyDownEvent) {
       final selectionStart = controller.selection.start;
       if (selectionStart != controller.selection.end) {

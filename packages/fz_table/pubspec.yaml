@@ -67,10 +67,13 @@ dependencies:
 
   fz_log:
     path: ../fz_log
+  fz_date_picker:
+    path: ../fz_date_picker
+  fz_router:
+    path: ../fz_router
 dependency_overrides:
   intl: ^0.20.2
   archive: ^4.0.7
-  fz_router:
-    path: ../fz_router
-  fz_date_picker:
-    path: ../fz_date_picker
+
+dev_dependencies:
+  flutter_lints: ^5.0.0

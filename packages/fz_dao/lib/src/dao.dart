@@ -9,31 +9,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_dao/fz_dao.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_snackbar/fz_snackbar.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_combo/fz_combo.dart';
-import 'package:fz_value_string/fz_value_string.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
-import 'package:fz_file_picker/fz_file_picker.dart';
-import 'package:fz_comparable_list/fz_comparable_list.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 import 'package:fz_actions/fz_actions.dart';
+import 'package:fz_animations/fz_animations.dart';
+import 'package:fz_api_handling/fz_api_handling.dart';
+import 'package:fz_appbar/fz_appbar.dart';
+import 'package:fz_comparable_list/fz_comparable_list.dart';
+import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
+import 'package:fz_dao/fz_dao.dart';
+import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_future_handling/fz_future_handling.dart';
+import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_log/fz_log.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
-import 'package:fz_appbar/fz_appbar.dart';
+import 'package:fz_snackbar/fz_snackbar.dart';
 import 'package:fz_table/fz_table.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
-import 'package:fz_selectable_icon/fz_selectable_icon.dart';
-import 'package:fz_log/fz_log.dart';
+import 'package:fz_ui_utility/fz_ui_utility.dart';
+import 'package:fz_value_string/fz_value_string.dart';
 import 'package:preload_page_view/preload_page_view.dart';
-import 'package:fz_date_picker/fz_date_picker.dart';
 
 part 'field.dart';
 part 'lazy_dao.dart';
@@ -42,7 +37,7 @@ typedef OnSaveCallback<ModelType> = FutureOr<ModelType?> Function(BuildContext c
 typedef OnSaveAPICallback<ModelType> = ApiState<ModelType?> Function(BuildContext context, DAO<ModelType> e);
 typedef OnDidSaveCallback<ModelType> = void Function(BuildContext context, ModelType? model, DAO<ModelType> dao);
 typedef OnDeleteCallback<ModelType> = FutureOr<String?> Function(BuildContext context, DAO<ModelType> e);
-typedef OnDeleteAPICallback<ModelType> = ApiState Function(BuildContext context, DAO<ModelType> e);
+typedef OnDeleteAPICallback<ModelType> = ApiState<dynamic> Function(BuildContext context, DAO<ModelType> e);
 typedef OnDidDeleteCallback<ModelType> = void Function(BuildContext context, DAO<ModelType> dao);
 typedef DAOWidgetBuilder<ModelType> = Widget Function(BuildContext context, DAO<ModelType> dao);
 typedef DAOValueGetter<T, ModelType> = T Function(DAO<ModelType> dao);
@@ -53,7 +48,7 @@ enum DoubleColumnLayoutType {
   none,
 }
 
-class DAO<ModelType> extends ChangeNotifier implements Comparable {
+class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
   static bool ignoreBlockingErrors = false; // VERY careful with this
   covariant dynamic id; // TODO: 3 id type should be declared as <>
   late DAOValueGetter<String, ModelType> classUiNameGetter;
@@ -97,7 +92,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
   late bool enableUndoRedoMechanism;
   late bool showConfirmDialogWithBlockingErrors;
   DAOValueGetter<DoubleColumnLayoutType, ModelType>? doubleColumnLayoutType;
-  DAO? parentDAO;
+  DAO<dynamic>? parentDAO;
 
   /// if not null, undo/redo calls will be relayed to the parent
   DAOValueGetter<String, ModelType>? editDialogTitle;
@@ -142,10 +137,10 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     this.saveConfirmationDialogDescription,
   }) : _undoRecord = undoRecord ?? [],
        _redoRecord = redoRecord ?? [] {
-    this.props.forEach((key, value) {
-      value.dao = this;
-      value.addListener(notifyListeners);
-    });
+    for (final e in props.values) {
+      e.dao = this;
+      e.addListener(notifyListeners);
+    }
     addListener(() {
       for (final element in _selfUpdateListeners) {
         element(this);
@@ -182,8 +177,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     List<List<Field>>? undoRecord,
     List<List<Field>>? redoRecord,
     bool? showConfirmDialogWithBlockingErrors,
-    DAO? parentDAO,
-    DAOValueGetter<DoubleColumnLayoutType, ModelType>? enableDoubleColumnLayout,
+    DAO<dynamic>? parentDAO,
+    DAOValueGetter<DoubleColumnLayoutType, ModelType>? doubleColumnLayoutType,
     DAOValueGetter<String, ModelType>? searchNameGetter,
     DAOValueGetter<String, ModelType>? editDialogTitle,
     DAOValueGetter<String, ModelType>? saveConfirmationDialogTitle,
@@ -213,12 +208,12 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       viewDialogShowsEditButton: viewDialogShowsEditButton ?? this.viewDialogShowsEditButton,
       viewDialogShowsDeleteButton: viewDialogShowsDeleteButton ?? this.viewDialogShowsDeleteButton,
       wantsLinkToSelfFromOtherDAOs: wantsLinkToSelfFromOtherDAOs ?? this.wantsLinkToSelfFromOtherDAOs,
-      undoRecord: undoRecord ?? this._undoRecord,
-      redoRecord: redoRecord ?? this._redoRecord,
+      undoRecord: undoRecord ?? _undoRecord,
+      redoRecord: redoRecord ?? _redoRecord,
       showConfirmDialogWithBlockingErrors:
           showConfirmDialogWithBlockingErrors ?? this.showConfirmDialogWithBlockingErrors,
       parentDAO: parentDAO ?? this.parentDAO,
-      doubleColumnLayoutType: enableDoubleColumnLayout ?? this.doubleColumnLayoutType,
+      doubleColumnLayoutType: doubleColumnLayoutType ?? this.doubleColumnLayoutType,
       searchNameGetter: searchNameGetter ?? this.searchNameGetter,
       editDialogTitle: editDialogTitle ?? this.editDialogTitle,
       saveConfirmationDialogTitle: saveConfirmationDialogTitle ?? this.saveConfirmationDialogTitle,
@@ -243,8 +238,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
   String toString() => uiName;
 
   @override
-  bool operator ==(Object other) =>
-      (other is DAO) && (id == null ? this.hashCode == other.hashCode : this.id == other.id);
+  bool operator ==(Object other) => (other is DAO) && (id == null ? hashCode == other.hashCode : id == other.id);
 
   @override
   int get hashCode => id == null ? super.hashCode : id.hashCode;
@@ -252,7 +246,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
   bool blockNotifyListeners = false;
   BuildContext? _contextForValidation;
   set contextForValidation(BuildContext? value) => _contextForValidation = value;
-  BuildContext? get contextForValidation => this._contextForValidation ?? parentDAO?.contextForValidation;
+  BuildContext? get contextForValidation => _contextForValidation ?? parentDAO?.contextForValidation;
   @override
   void notifyListeners() {
     if (blockNotifyListeners) {
@@ -261,13 +255,13 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     super.notifyListeners();
   }
 
-  void addOnUpdate(ValueChanged<DAO> o) {
+  void addOnUpdate(ValueChanged<DAO<dynamic>> o) {
     if (!_selfUpdateListeners.contains(o)) {
       _selfUpdateListeners.add(o);
     }
   }
 
-  bool removeOnUpdate(ValueChanged<DAO> o) {
+  bool removeOnUpdate(ValueChanged<DAO<dynamic>> o) {
     return _selfUpdateListeners.remove(o);
   }
 
@@ -636,8 +630,11 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                 }
                 String shownName = uiName;
                 if (shownName.isNullOrEmpty) shownName = classUiName;
-                Duration timedOverlayRemaining =
-                    Duration.zero; // hack to make ctrl+enter action also wait for TimedOverlay countdown
+                // hack to make ctrl+enter action also wait for TimedOverlay countdown
+                Duration timedOverlayRemaining = Duration.zero;
+                final uniqueErrors = validationErrors
+                    .where((e) => e.isVisibleAsSaveConfirmation)
+                    .distinctBy((e) => e.error);
                 return DialogFromZero(
                   includeDialogWidget: false,
                   maxWidth: 512,
@@ -679,17 +676,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                       key: timerGlobalKey,
                       duration: validationErrors.isEmpty || !validation
                           ? Duration.zero
-                          : Duration(
-                              milliseconds:
-                                  (1000 +
-                                          500 *
-                                              Set.from(
-                                                validationErrors
-                                                    .where((e) => e.isVisibleAsSaveConfirmation)
-                                                    .map((e) => e.error),
-                                              ).length)
-                                      .clamp(0, 10000),
-                            ),
+                          : Duration(milliseconds: (1000 + 500 * uniqueErrors.length).clamp(0, 10000)),
                       borderRadius: const BorderRadius.all(Radius.circular(999)),
                       builder:
                           (
@@ -730,6 +717,19 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
       },
     );
     if (confirm ?? false) {
+      if (!context.mounted) {
+        // TODO: 3 this would probably be fixed if the whole dao Form was its own widget
+        log(
+          LgLvl.error,
+          'The original context passed to maybeSave was unmounted as the save confirmation was given.'
+          ' This is really weird since usually when this parent context is unmounted, it means the whole dialog was'
+          ' dismissed, in which case confirmation would be null (assumed false).'
+          ' The save won\'t be performed, since we need a live context.',
+          e: 'Context unmounted',
+          st: StackTrace.current,
+        );
+        return null;
+      }
       return save(
         context,
         skipValidation: true,
@@ -737,7 +737,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         showDefaultSnackBar: showDefaultSnackBars,
         snackBarCancellable: snackBarCancellable,
       );
-    } else if (confirm == null) {
+    }
+    if (confirm == null) {
       final errors = validationErrors.where((e) => e.severity != ValidationErrorSeverity.unfinished).toList();
       if (errors.isNotEmpty) {
         errors.sort((a, b) => a.severity.weight.compareTo(b.severity.weight));
@@ -759,6 +760,17 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         context,
         validateNonEditedFields: true,
       );
+      if (!context.mounted) {
+        log(
+          LgLvl.error,
+          'DAO context was unmounted after save() was called, while waiting for validation.'
+          ' This shouldn\'t happen, at this point, the UI should be blocked until save operation'
+          ' finishes so it can\'t be popped',
+          e: 'Context unmounted',
+          st: StackTrace.current,
+        );
+        return null;
+      }
       if (!validation) {
         focusFirstBlockingError();
         return null;
@@ -774,7 +786,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     ModelType? model;
     if (onSaveAPI != null) {
       final stateNotifier = onSaveAPI!.call(contextForValidation ?? context, this);
-      final completer = Completer();
+      final completer = Completer<dynamic>();
       final removeListener = stateNotifier.addListener((state) {
         state.mapOrNull(
           data: (data) {
@@ -818,6 +830,17 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         success = false;
         log(LgLvl.error, 'Error while saving $classUiName: $uiName', e: e, st: st, type: FzLgType.dao);
       }
+    }
+    if (!context.mounted) {
+      log(
+        LgLvl.error,
+        'DAO context was unmounted while waiting for save().'
+        ' The save operation was probably completed, but this is a problem'
+        ' because now didSave() and result snackbar won\'t be called.',
+        e: 'Context unmounted',
+        st: StackTrace.current,
+      );
+      return model;
     }
     if (success) {
       didSave(context, model);
@@ -881,6 +904,17 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
           false;
     }
     if (confirm) {
+      if (!context.mounted) {
+        log(
+          LgLvl.error,
+          'DAO context was unmounted while waiting for delete confirmation in maybeDelete(),'
+          ' and the confirmation was true. This is not fatal, but it\'s weird behaviour,'
+          ' because the delete operation requested and confirmed by the user will be ignored.',
+          e: 'Context unmounted',
+          st: StackTrace.current,
+        );
+        return false;
+      }
       return delete(
         context,
         showDefaultSnackBar: showDefaultSnackBars,
@@ -899,7 +933,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
     showDefaultSnackBar = showDefaultSnackBar ?? canDelete;
     if (onDeleteAPI != null) {
       final stateNotifier = onDeleteAPI!.call(contextForValidation ?? context, this);
-      final Completer completer = Completer();
+      final Completer<dynamic> completer = Completer<dynamic>();
       final removeListener = stateNotifier.addListener((state) {
         state.mapOrNull(
           data: (data) {
@@ -1564,6 +1598,9 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
             askForSaveConfirmation: askForSaveConfirmation!,
           );
           if (result != null) {
+            if (!context.mounted) {
+              return; // already popped, probably
+            }
             Navigator.of(context).pop(result);
           }
         },
@@ -1613,7 +1650,12 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                   value.value = tempProps[key]!.value;
                 }
               });
-              if (popAfterEditOrDeleteActions) Navigator.of(context).pop();
+              if (popAfterEditOrDeleteActions) {
+                if (!context.mounted) {
+                  return; // already popped, probably
+                }
+                Navigator.of(context).pop();
+              }
             }
           },
         ),
@@ -1626,8 +1668,11 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
           breakpoints: {0: ActionState.overflow},
           onTap: (context) async {
             final result = await maybeDelete(context);
-            if (result) {
-              if (popAfterEditOrDeleteActions) Navigator.of(context).pop();
+            if (result && popAfterEditOrDeleteActions) {
+              if (!context.mounted) {
+                return; // already popped, probably
+              }
+              Navigator.of(context).pop();
             }
           },
         ),
@@ -2281,6 +2326,9 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
         height: topSpace,
       ),
       Center(
+        // WillPopScope may not end up being deprecated at all https://github.com/flutter/flutter/issues/138614.
+        // If it does, we can do a workaround like https://github.com/flutter/flutter/issues/163052#issuecomment-2764601658
+        // ignore: deprecated_member_use
         child: WillPopScope(
           onWillPop: () async {
             if (!userInteracted || !isEdited) return true;
@@ -2388,10 +2436,11 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable {
                                 showDefaultSnackBars: showDefaultSnackBars,
                                 askForSaveConfirmation: askForSaveConfirmation,
                               );
-                              if (result != null) {
-                                if (popAfterSuccessfulSave) {
-                                  Navigator.of(context).pop(result);
+                              if (result != null && popAfterSuccessfulSave) {
+                                if (!context.mounted) {
+                                  return; // already popped, probably
                                 }
+                                Navigator.of(context).pop(result);
                               }
                             }
                           : null,

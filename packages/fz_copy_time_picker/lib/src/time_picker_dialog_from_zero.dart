@@ -526,7 +526,7 @@ class _DayPeriodControl extends StatelessWidget {
     final BorderSide borderSide =
         timePickerTheme.dayPeriodBorderSide ??
         BorderSide(
-          color: Color.alphaBlend(colorScheme.onBackground.withValues(alpha: 0.38), colorScheme.surface),
+          color: Color.alphaBlend(colorScheme.onSurface.withValues(alpha: 0.38), colorScheme.surface),
         );
     // Apply the custom borderSide.
     shape = shape.copyWith(
@@ -906,7 +906,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
       vsync: this,
     );
     _thetaTween = Tween<double>(begin: _getThetaForTime(widget.selectedTime));
-    _theta = _thetaController.drive(CurveTween(curve: standardEasing)).drive(_thetaTween)
+    _theta = _thetaController.drive(CurveTween(curve: Easing.legacy)).drive(_thetaTween)
       ..addListener(
         () => setState(() {
           /* _theta.value has changed */
@@ -1206,7 +1206,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
     final ThemeData theme = Theme.of(context);
     final TimePickerThemeData pickerTheme = TimePickerTheme.of(context);
     final Color backgroundColor =
-        pickerTheme.dialBackgroundColor ?? themeData.colorScheme.onBackground.withValues(alpha: 0.12);
+        pickerTheme.dialBackgroundColor ?? themeData.colorScheme.onSurface.withValues(alpha: 0.12);
     final Color accentColor = pickerTheme.dialHandColor ?? themeData.colorScheme.primary;
     final Color primaryLabelColor =
         WidgetStateProperty.resolveAs(pickerTheme.dialTextColor, <WidgetState>{}) ?? themeData.colorScheme.onSurface;
@@ -1727,7 +1727,7 @@ class _HourMinuteTextFieldState extends State<_HourMinuteTextField> with Restora
     return SizedBox(
       height: _kTimePickerHeaderControlHeight,
       child: MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+        data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
         child: UnmanagedRestorationScope(
           bucket: bucket,
           child: TextFormField(

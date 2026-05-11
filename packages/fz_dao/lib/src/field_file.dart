@@ -1,35 +1,17 @@
 import 'dart:io';
 
 import 'package:dartx/dartx.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fz_dao/fz_dao.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_snackbar/fz_snackbar.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_combo/fz_combo.dart';
-import 'package:fz_value_string/fz_value_string.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
-import 'package:fz_file_picker/fz_file_picker.dart';
-import 'package:fz_comparable_list/fz_comparable_list.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_file_picker/fz_file_picker.dart';
-import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
-import 'package:path/path.dart' as path;
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_appbar/fz_appbar.dart';
+import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
+import 'package:fz_dao/fz_dao.dart';
+import 'package:fz_file_picker/fz_file_picker.dart';
+import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_table/fz_table.dart';
-import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
-import 'package:fz_selectable_icon/fz_selectable_icon.dart';
-import 'package:fz_log/fz_log.dart';
-import 'package:fz_date_picker/fz_date_picker.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
+import 'package:path/path.dart' as path;
 
 class FileField extends StringField {
   final FileType fileType;
@@ -106,7 +88,7 @@ class FileField extends StringField {
     FieldValueGetter<bool, Field>? hiddenInFormGetter,
     FieldValueGetter<List<FieldValidator<String>>, Field>? validatorsGetter,
     bool? validateOnlyOnConfirm,
-    FieldValueGetter<SimpleColModel, Field>? colModelBuilder,
+    FieldValueGetter<SimpleColModel<dynamic>, Field>? colModelBuilder,
     List<String?>? undoValues,
     List<String?>? redoValues,
     bool? invalidateNonEmptyValuesIfHiddenInForm,
@@ -324,11 +306,11 @@ class FileField extends StringField {
                         ),
                         child: ComboField.buttonContentBuilder(
                           context,
-                          uiName,
-                          hint,
-                          filename,
-                          enabled,
-                          false,
+                          title: uiName,
+                          hint: hint,
+                          value: filename,
+                          enabled: enabled,
+                          clearable: false,
                           dense: dense,
                           showDropdownIcon: false,
                         ),

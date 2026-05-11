@@ -31,7 +31,7 @@ class SimpleValueString<T> implements ContainsValue<T> {
   }
 }
 
-class ValueString<T> implements Comparable, ContainsValue<T> {
+class ValueString<T> implements Comparable<dynamic>, ContainsValue<T> {
   @override
   T? value;
   Object string;
@@ -44,7 +44,7 @@ class ValueString<T> implements Comparable, ContainsValue<T> {
   }
 
   @override
-  bool operator ==(Object other) => other is ValueString && this.value == other.value || value == other;
+  bool operator ==(Object other) => other is ValueString && value == other.value || value == other;
   @override
   int get hashCode => value.hashCode;
   @override

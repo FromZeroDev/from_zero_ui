@@ -1,13 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:fz_actions/fz_actions.dart';
+import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 import 'package:fz_drawer_menu/fz_drawer_menu.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
 import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 
 const Duration _kExpand = Duration(milliseconds: 200);
 
@@ -65,7 +64,7 @@ class ExpansionTileFromZero extends StatefulWidget {
        );
 
   final bool? expanded;
-  final void Function(bool)? onPostExpansionChanged;
+  final ValueChanged<bool>? onPostExpansionChanged;
   final int? style;
   final EdgeInsets actionPadding;
   final bool addExpandCollapseContextMenuAction;
@@ -73,7 +72,7 @@ class ExpansionTileFromZero extends StatefulWidget {
   final List<GlobalKey<ExpansionTileFromZeroState>>? childrenKeysForExpandCollapse;
   final bool enabled;
   final bool inkWellEnabled;
-  final Widget Function(BuildContext context, bool expanded)? titleBuilder;
+  final Widget Function(BuildContext context, {bool isExpanded})? titleBuilder;
   final BorderRadius? borderRadius;
 
   /// A widget to display before the title.
@@ -97,6 +96,7 @@ class ExpansionTileFromZero extends StatefulWidget {
   /// When the tile starts expanding, this function is called with the value
   /// true. When the tile starts collapsing, this function is called with
   /// the value false.
+  // ignore: avoid_positional_boolean_parameters // this is copied as-is from flutter
   final FutureOr<bool> Function(bool)? onExpansionChanged;
 
   /// The widgets that are displayed when the tile expands.
@@ -246,7 +246,8 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
     }
   }
 
-  void setExpanded(bool expanded, [force = false]) {
+  // ignore: avoid_positional_boolean_parameters // it's fine when it's the only argument of a set
+  void setExpanded(bool expanded, {bool force = false}) {
     //    if (widget.expanded!=null) expanded=widget.expanded;
     if (widget.enabled && _isExpanded != expanded) {
       setState(() {
@@ -280,7 +281,7 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
           animateWidth: false,
           child: Container(
             key: ValueKey(_isExpanded),
-            child: widget.titleBuilder?.call(context, _isExpanded) ?? widget.title,
+            child: widget.titleBuilder?.call(context, isExpanded: _isExpanded) ?? widget.title,
           ),
         ),
         if (widget.enabled && widget.inkWellEnabled)
@@ -352,7 +353,6 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
       ],
     );
     // if (widget.contextMenuActions.isNotEmpty || widget.addExpandCollapseContextMenuAction) { // always add this, so child tree isn't rebuilt on compact/decompact drawer
-    final prevTitle = title;
     VoidCallback onNextFrame = () {};
     if (widget.addExpandCollapseContextMenuAction) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -361,6 +361,7 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
         }
       });
     }
+    // final prevTitle = title;
     // title = StatefulBuilder(
     //   builder: (context, setState) {
     //     onNextFrame = () {

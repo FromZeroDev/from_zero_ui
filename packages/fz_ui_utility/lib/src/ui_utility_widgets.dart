@@ -10,18 +10,13 @@ import 'package:dartx/dartx.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
-import 'package:fz_simple_shadow/fz_simple_shadow.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_value_string/fz_value_string.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
-import 'package:fz_logo/fz_logo.dart';
+import 'package:fz_future_handling/fz_future_handling.dart';
+import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_platform/fz_platform.dart';
+import 'package:fz_scaffold/fz_scaffold.dart';
+import 'package:fz_scrollbar/fz_scrollbar.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
 // TODO: 2 break this up into individual files
@@ -1242,7 +1237,7 @@ class InitiallyAnimatedWidget extends StatefulWidget {
     this.reverse = true,
     this.onFinish,
   }) : assert(
-         !(repeat == true && onFinish != null),
+         !((repeat ?? false) && onFinish != null),
          "Can't specify onFinish callbacks for an infinite loop",
        );
 
@@ -1702,8 +1697,9 @@ class PlatformExtended {
 
   static String? customDownloadsDirectory;
   static Future<Directory> getDownloadsDirectory() async {
-    if (customDownloadsDirectory != null)
+    if (customDownloadsDirectory != null) {
       return Directory(customDownloadsDirectory!);
+    }
     if (kIsWeb) {
       throw UnimplementedError('Web needs to download through the browser');
     }

@@ -2,31 +2,15 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
-import 'package:fz_dao/fz_dao.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_snackbar/fz_snackbar.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_combo/fz_combo.dart';
-import 'package:fz_value_string/fz_value_string.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
-import 'package:fz_file_picker/fz_file_picker.dart';
-import 'package:fz_comparable_list/fz_comparable_list.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
-import 'package:fz_focus_traversal/fz_focus_traversal.dart';
 import 'package:fz_actions/fz_actions.dart';
+import 'package:fz_combo/fz_combo.dart';
+import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
+import 'package:fz_dao/fz_dao.dart';
+import 'package:fz_focus_traversal/fz_focus_traversal.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
-import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_table/fz_table.dart';
-import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
-import 'package:fz_selectable_icon/fz_selectable_icon.dart';
-import 'package:fz_log/fz_log.dart';
-import 'package:fz_date_picker/fz_date_picker.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
+import 'package:fz_ui_utility/fz_ui_utility.dart';
 
 class BoolComparable implements Comparable<dynamic> {
   final bool value;
@@ -189,7 +173,7 @@ class BoolField extends Field<BoolComparable> {
     FieldValueGetter<bool, Field>? hiddenInFormGetter,
     FieldValueGetter<List<FieldValidator<BoolComparable>>, Field>? validatorsGetter,
     bool? validateOnlyOnConfirm,
-    FieldValueGetter<SimpleColModel, Field>? colModelBuilder,
+    FieldValueGetter<SimpleColModel<dynamic>, Field>? colModelBuilder,
     List<BoolComparable?>? undoValues,
     List<BoolComparable?>? redoValues,
     bool? invalidateNonEmptyValuesIfHiddenInForm,
@@ -247,9 +231,9 @@ class BoolField extends Field<BoolComparable> {
   @override
   Future<bool> validateRequired(
     BuildContext context,
-    DAO dao,
-    int currentValidationId,
-    bool normalValidationResult, {
+    DAO<dynamic> dao, {
+    required int currentValidationId,
+    required bool normalValidationResult,
     BoolComparable? emptyValue,
   }) async => false; // BoolField is never nullable
 
@@ -536,7 +520,7 @@ class BoolField extends Field<BoolComparable> {
                             .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
                             .withValues(alpha: 0.2)
                       : backgroundColor?.call(context, this, dao),
-                  activeColor: selectedColor?.call(context, this, dao),
+                  activeThumbColor: selectedColor?.call(context, this, dao),
                   activeTrackColor: selectedColor?.call(context, this, dao)?.withValues(alpha: 0.33),
                   title: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -683,7 +667,7 @@ class BoolField extends Field<BoolComparable> {
                             filterQuality: FilterQuality.low,
                             child: Switch(
                               value: value!.value,
-                              activeColor: selectedColor?.call(context, this, dao),
+                              activeThumbColor: selectedColor?.call(context, this, dao),
                               activeTrackColor: selectedColor?.call(context, this, dao)?.withValues(alpha: 0.33),
                               onChanged: !enabled
                                   ? null
@@ -730,7 +714,7 @@ class BoolField extends Field<BoolComparable> {
               ],
             );
           case BoolFieldDisplayType.combo:
-            result = ComboFromZero<DAO>(
+            result = ComboFromZero<DAO<dynamic>>(
               focusNode: focusNode,
               enabled: enabled,
               clearable: false,
@@ -760,9 +744,10 @@ class BoolField extends Field<BoolComparable> {
                 this.value = value!.id as BoolComparable;
               },
               popupWidth: maxWidth,
-              buttonChildBuilder: ComboField.buttonContentBuilder,
               showViewActionOnDAOs: false,
               showDropdownIcon: true,
+
+              buttonChildBuilder: ComboField.buttonContentBuilder,
             );
           case BoolFieldDisplayType.radio:
             result = const Text('Unimplemented type'); // TODO: 3 implement radio BoolField, maybe also radio ComboField
@@ -823,7 +808,7 @@ class BoolField extends Field<BoolComparable> {
     return result;
   }
 
-  static SimpleColModel numFieldDefaultGetColumn(Field field, DAO dao) {
+  static SimpleColModel<dynamic> numFieldDefaultGetColumn(Field field, DAO<dynamic> dao) {
     return BoolColModel(
       name: field.uiName,
       flex: field.tableColumnWidth?.round() ?? 192,

@@ -2,28 +2,12 @@ import 'dart:async';
 
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fz_table/fz_table.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_dao/fz_dao.dart';
-import 'package:fz_value_string/fz_value_string.dart';
-import 'package:fz_comparable_list/fz_comparable_list.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
-import 'package:fz_popup/fz_popup.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
-import 'package:fz_simple_shadow/fz_simple_shadow.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_export/fz_export.dart';
-import 'package:fz_animations/fz_animations.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_selectable_icon/fz_selectable_icon.dart';
 import 'package:fz_appbar/fz_appbar.dart';
-import 'package:fz_notification_relayer/fz_notification_relayer.dart';
-import 'package:fz_log/fz_log.dart';
-import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_dao/fz_dao.dart';
+import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_table/fz_table.dart';
+import 'package:fz_ui_utility/fz_ui_utility.dart';
 
 class TableHeaderFromZero<T> extends StatefulWidget {
   final TableController<T> controller;
@@ -117,7 +101,7 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
         } catch (_) {}
         int selectedCount = filtered == null
             ? 0
-            : filtered.where((e) => e.onCheckBoxSelected != null && e.selected == true).length;
+            : filtered.where((e) => e.onCheckBoxSelected != null && (e.selected ?? false)).length;
         Widget subtitle;
         if (selectedCount == 0) {
           if (filtered != null && widget.showElementCount) {
@@ -167,7 +151,7 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
         return Theme(
           data: Theme.of(context).copyWith(
             appBarTheme: Theme.of(context).appBarTheme.copyWith(
-              color:
+              backgroundColor:
                   widget.backgroundColor ??
                   Material.of(context).color ??
                   Theme.of(context).cardColor, // Colors.transparent
@@ -321,7 +305,7 @@ class TableHeaderFromZeroState<T> extends State<TableHeaderFromZero<T>> {
     if (searchQuery == null || searchQuery!.isEmpty) {
       return rows;
     } else {
-      final q = this.searchQuery!.trim().toUpperCase();
+      final q = searchQuery!.trim().toUpperCase();
       for (final e in rows) {
         if (e.id is DAO) {
           final value = (e.id as DAO).searchName.toUpperCase();

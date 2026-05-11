@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_future_handling/src/future_handling.dart';
 import 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
+import 'package:fz_future_handling/src/future_handling.dart';
+import 'package:fz_localizations/fz_localizations.dart';
 
 typedef DataBuilder<T> = Widget Function(BuildContext context, T data);
 typedef DataMultiBuilder<T> =

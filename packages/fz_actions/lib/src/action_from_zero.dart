@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
+import 'package:fz_scaffold/fz_scaffold.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';
 
 enum ActionState {
@@ -391,6 +391,8 @@ class ActionFromZero extends StatelessWidget {
   }
 }
 
+// TODO: 2 delete this monstruosity and implement a good way to have an action react to a Listenable/Animation
+// ignore: must_be_immutable
 class AnimatedActionFromZero extends StatelessWidget implements ActionFromZero {
   final Listenable animation;
   final ActionFromZero Function() builder;
@@ -501,7 +503,6 @@ class _LifecycleHook extends StatefulWidget {
     required this.child,
     this.onInitState,
     this.onDispose,
-    super.key,
   });
   @override
   State<_LifecycleHook> createState() => _LifecycleHookState();
@@ -529,8 +530,7 @@ class _LifecycleHookState extends State<_LifecycleHook> {
 typedef ApiActionCallback<T, R> = R Function(BuildContext context, List<T> data);
 
 class APIActionFromZero<T> extends ActionFromZero {
-  @override
-  final List<ValueListenable> dependedNotifiers;
+  final List<ValueListenable<dynamic>> dependedNotifiers;
   final List<ApiProvider<T>> Function(List<dynamic> values) providersBuilder;
   final ApiActionCallback<T, void>? onTapApi;
   final ApiActionCallback<T, String?>? disablingErrorBuilder;
@@ -561,7 +561,7 @@ class APIActionFromZero<T> extends ActionFromZero {
 
   static Widget _maybeAddMultiValueListenableBuilder(
     BuildContext context, {
-    required List<ValueListenable> valueListenables,
+    required List<ValueListenable<dynamic>> valueListenables,
     required Widget Function(BuildContext context, List<dynamic> values, Widget? child) builder,
     Widget? child,
   }) {

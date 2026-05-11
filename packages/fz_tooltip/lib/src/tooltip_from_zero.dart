@@ -606,7 +606,7 @@ class _TooltipFromZeroState extends State<TooltipFromZero> with SingleTickerProv
       );
     }
 
-    height = widget.height ?? tooltipTheme.height ?? _getDefaultTooltipHeight();
+    height = widget.height ?? tooltipTheme.constraints?.minHeight ?? _getDefaultTooltipHeight();
     padding = widget.padding ?? tooltipTheme.padding ?? _getDefaultPadding();
     margin = widget.margin ?? tooltipTheme.margin ?? _defaultMargin;
     verticalOffset = widget.verticalOffset ?? tooltipTheme.verticalOffset ?? _defaultVerticalOffset;

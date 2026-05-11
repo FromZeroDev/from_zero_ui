@@ -1,11 +1,11 @@
 part of 'dao.dart';
 
-typedef FieldValidator<T extends Comparable> =
-    FutureOr<ValidationError?> Function(BuildContext context, DAO dao, Field<T> field);
-typedef FieldValueGetter<T, R extends Field> = T Function(R field, DAO dao);
-typedef ContextFulFieldValueGetter<T, R extends Field> = T Function(BuildContext context, R field, DAO dao);
-typedef OnFieldValueChanged<T> = void Function(DAO dao, Field field, T value, T previousValue);
-typedef ViewWidgetBuilder<T extends Comparable> =
+typedef FieldValidator<T extends Comparable<dynamic>> =
+    FutureOr<ValidationError?> Function(BuildContext context, DAO<dynamic> dao, Field<T> field);
+typedef FieldValueGetter<T, R extends Field> = T Function(R field, DAO<dynamic> dao);
+typedef ContextFulFieldValueGetter<T, R extends Field> = T Function(BuildContext context, R field, DAO<dynamic> dao);
+typedef OnFieldValueChanged<T> = void Function(DAO<dynamic> dao, Field field, T value, T previousValue);
+typedef ViewWidgetBuilder<T extends Comparable<dynamic>> =
     Widget Function(
       BuildContext context,
       Field<T> field, {
@@ -17,10 +17,10 @@ typedef ViewWidgetBuilder<T extends Comparable> =
     });
 bool trueFieldGetter(_, __) => true;
 bool falseFieldGetter(_, __) => false;
-List defaultValidatorsGetter(_, __) => [];
+List<dynamic> defaultValidatorsGetter(_, __) => [];
 
-class Field<T extends Comparable> extends ChangeNotifier implements Comparable, ContainsValue<T> {
-  late DAO dao;
+class Field<T extends Comparable<dynamic>> extends ChangeNotifier implements Comparable<dynamic>, ContainsValue<T> {
+  late DAO<dynamic> dao;
   FieldValueGetter<String, Field> uiNameGetter;
   String get uiName => uiNameGetter(this, dao);
   FieldValueGetter<String?, Field>? hintGetter;
@@ -61,7 +61,7 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
 
   bool isRequired = false;
   List<ValidationError> validationErrors = [];
-  FieldValueGetter<SimpleColModel, Field> colModelBuilder;
+  FieldValueGetter<SimpleColModel<dynamic>, Field> colModelBuilder;
   bool invalidateNonEmptyValuesIfHiddenInForm;
   ContextFulFieldValueGetter<Color?, Field>? backgroundColor;
 
@@ -188,7 +188,7 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
     FieldValueGetter<bool, Field>? hiddenInFormGetter,
     FieldValueGetter<List<FieldValidator<T>>, Field>? validatorsGetter,
     bool? validateOnlyOnConfirm,
-    FieldValueGetter<SimpleColModel, Field>? colModelBuilder,
+    FieldValueGetter<SimpleColModel<dynamic>, Field>? colModelBuilder,
     List<T?>? undoValues,
     List<T?>? redoValues,
     bool? invalidateNonEmptyValuesIfHiddenInForm,
@@ -231,7 +231,7 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
   String toString() => value == null ? '' : value.toString();
 
   @override
-  bool operator ==(Object other) => other is Field<T> && this.value == other.value;
+  bool operator ==(Object other) => other is Field<T> && value == other.value;
 
   @override
   int get hashCode => value.hashCode;
@@ -328,7 +328,7 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
 
   Future<bool> validate(
     BuildContext context,
-    DAO dao,
+    DAO<dynamic> dao,
     int currentValidationId, {
     bool validateIfNotEdited = false,
     bool validateIfHidden = false,
@@ -357,16 +357,21 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
     validationErrors.sort((a, b) => a.severity.weight.compareTo(b.severity.weight));
     final result = validationErrors.where((e) => e.isBlocking).isEmpty;
     if (!context.mounted) return false;
-    await validateRequired(context, dao, currentValidationId, result);
+    await validateRequired(
+      context,
+      dao,
+      currentValidationId: currentValidationId,
+      normalValidationResult: result,
+    );
     this.validationErrors = validationErrors;
     return result;
   }
 
   Future<bool> validateRequired(
     BuildContext context,
-    DAO dao,
-    int currentValidationId,
-    bool normalValidationResult, {
+    DAO<dynamic> dao, {
+    required int currentValidationId,
+    required bool normalValidationResult,
     T? emptyValue,
   }) async {
     bool isRequired = false;
@@ -376,7 +381,7 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
       isRequired = !normalValidationResult;
     } else {
       try {
-        final emptyField = this.copyWith().._value = emptyValue;
+        final emptyField = copyWith().._value = emptyValue;
         emptyField.dao = dao;
         final emptyValidationErrors = await _getValidationErrors<T>(context, dao, emptyField, currentValidationId);
         isRequired = emptyValidationErrors.where((e) => e.isBlocking).isNotEmpty;
@@ -395,9 +400,9 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
     return isRequired;
   }
 
-  static Future<List<ValidationError>> _getValidationErrors<T extends Comparable>(
+  static Future<List<ValidationError>> _getValidationErrors<T extends Comparable<dynamic>>(
     BuildContext context,
-    DAO dao,
+    DAO<dynamic> dao,
     Field<T> field,
     int currentValidationId,
   ) async {
@@ -411,12 +416,24 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
     try {
       await Future.wait<ValidationError?>(futureErrors.map((e) async => e));
     } catch (_) {}
+    if (!context.mounted) {
+      // form dialog popped
+      return [];
+    }
     final result = <ValidationError>[];
     for (final e in futureErrors) {
       ValidationError? error;
       try {
         error = await e;
+        if (!context.mounted) {
+          // form dialog popped
+          return [];
+        }
       } catch (e, st) {
+        if (!context.mounted) {
+          // form dialog popped
+          return [];
+        }
         final message =
             'Error al ejecutar validación: '
             '${ApiProviderBuilder.getErrorTitle(context, e, st)}'
@@ -457,8 +474,8 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
     // } catch(_) {}
   }
 
-  SimpleColModel getColModel() => colModelBuilder(this, dao);
-  static SimpleColModel fieldDefaultGetColumn(Field field, DAO dao) {
+  SimpleColModel<dynamic> getColModel() => colModelBuilder(this, dao);
+  static SimpleColModel<dynamic> fieldDefaultGetColumn(Field field, DAO<dynamic> dao) {
     return SimpleColModel(
       name: field.uiName,
       filterEnabled: true,
@@ -536,7 +553,7 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
     );
   }
 
-  static Widget defaultViewWidgetBuilder<T extends Comparable>(
+  static Widget defaultViewWidgetBuilder<T extends Comparable<dynamic>>(
     BuildContext context,
     Field field, {
     bool linkToInnerDAOs = true,
@@ -689,7 +706,7 @@ class Field<T extends Comparable> extends ChangeNotifier implements Comparable, 
     ];
   }
 
-  static bool defaultClearableGetter<T extends Comparable>(Field field, DAO dao) {
+  static bool defaultClearableGetter<T extends Comparable<dynamic>>(Field field, DAO<dynamic> dao) {
     return trueFieldGetter(field, dao);
     //return !field.validators.contains(fieldValidatorRequired<T>);
   }
@@ -759,29 +776,29 @@ class HiddenValueField<T> extends Field<BoolComparable> {
       );
   @override
   Field<BoolComparable> copyWith({
-    FieldValueGetter<String, Field<Comparable>>? uiNameGetter,
+    FieldValueGetter<String, Field<Comparable<dynamic>>>? uiNameGetter,
     BoolComparable? value,
     BoolComparable? dbValue,
-    FieldValueGetter<bool, Field<Comparable>>? clearableGetter,
+    FieldValueGetter<bool, Field<Comparable<dynamic>>>? clearableGetter,
     double? maxWidth,
     double? minWidth,
     double? flex,
-    FieldValueGetter<String?, Field<Comparable>>? hintGetter,
-    FieldValueGetter<String?, Field<Comparable>>? tooltipGetter,
+    FieldValueGetter<String?, Field<Comparable<dynamic>>>? hintGetter,
+    FieldValueGetter<String?, Field<Comparable<dynamic>>>? tooltipGetter,
     double? tableColumnWidth,
-    FieldValueGetter<bool, Field<Comparable>>? hiddenGetter,
-    FieldValueGetter<bool, Field<Comparable>>? hiddenInTableGetter,
-    FieldValueGetter<bool, Field<Comparable>>? hiddenInViewGetter,
-    FieldValueGetter<bool, Field<Comparable>>? hiddenInFormGetter,
-    FieldValueGetter<List<FieldValidator<BoolComparable>>, Field<Comparable>>? validatorsGetter,
+    FieldValueGetter<bool, Field<Comparable<dynamic>>>? hiddenGetter,
+    FieldValueGetter<bool, Field<Comparable<dynamic>>>? hiddenInTableGetter,
+    FieldValueGetter<bool, Field<Comparable<dynamic>>>? hiddenInViewGetter,
+    FieldValueGetter<bool, Field<Comparable<dynamic>>>? hiddenInFormGetter,
+    FieldValueGetter<List<FieldValidator<BoolComparable>>, Field<Comparable<dynamic>>>? validatorsGetter,
     bool? validateOnlyOnConfirm,
-    FieldValueGetter<SimpleColModel, Field<Comparable>>? colModelBuilder,
+    FieldValueGetter<SimpleColModel<dynamic>, Field<Comparable<dynamic>>>? colModelBuilder,
     List<BoolComparable?>? undoValues,
     List<BoolComparable?>? redoValues,
     bool? invalidateNonEmptyValuesIfHiddenInForm,
     BoolComparable? defaultValue,
-    ContextFulFieldValueGetter<Color?, Field<Comparable>>? backgroundColor,
-    ContextFulFieldValueGetter<List<ActionFromZero>, Field<Comparable>>? actionsGetter,
+    ContextFulFieldValueGetter<Color?, Field<Comparable<dynamic>>>? backgroundColor,
+    ContextFulFieldValueGetter<List<ActionFromZero>, Field<Comparable<dynamic>>>? actionsGetter,
     ViewWidgetBuilder<BoolComparable>? viewWidgetBuilder,
     OnFieldValueChanged<BoolComparable>? onValueChanged,
   }) {

@@ -37,6 +37,11 @@ dependencies:
   fz_value_string:
     path: ../fz_value_string
 
+  fz_platform:
+    path: ../fz_platform
 dependency_overrides:
   intl: ^0.20.2
   archive: ^4.0.7
+
+dev_dependencies:
+  flutter_lints: ^5.0.0

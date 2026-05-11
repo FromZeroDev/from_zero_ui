@@ -1,29 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:fz_dao/fz_dao.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_snackbar/fz_snackbar.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_combo/fz_combo.dart';
-import 'package:fz_value_string/fz_value_string.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
-import 'package:fz_file_picker/fz_file_picker.dart';
-import 'package:fz_comparable_list/fz_comparable_list.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
-import 'package:intl/intl.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_appbar/fz_appbar.dart';
-import 'package:fz_table/fz_table.dart';
-import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
-import 'package:fz_selectable_icon/fz_selectable_icon.dart';
-import 'package:fz_log/fz_log.dart';
+import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
+import 'package:fz_dao/fz_dao.dart';
 import 'package:fz_date_picker/fz_date_picker.dart';
+import 'package:fz_scaffold/fz_scaffold.dart';
+import 'package:fz_table/fz_table.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
+import 'package:fz_ui_utility/fz_ui_utility.dart';
+import 'package:intl/intl.dart';
 
 class DateField extends Field<DateTime> {
   DateFormat formatter;
@@ -101,7 +86,7 @@ class DateField extends Field<DateTime> {
     FieldValueGetter<bool, Field>? hiddenInFormGetter,
     FieldValueGetter<List<FieldValidator<DateTime>>, Field>? validatorsGetter,
     bool? validateOnlyOnConfirm,
-    FieldValueGetter<SimpleColModel, Field>? colModelBuilder,
+    FieldValueGetter<SimpleColModel<dynamic>, Field>? colModelBuilder,
     List<DateTime?>? undoValues,
     List<DateTime?>? redoValues,
     bool? invalidateNonEmptyValuesIfHiddenInForm,
@@ -390,16 +375,16 @@ class DateField extends Field<DateTime> {
         : formatter.format(value);
     return ComboField.buttonContentBuilder(
       context,
-      title,
-      hint,
-      formattedValue,
-      enabled,
-      clearable,
+      title: title,
+      hint: hint,
+      value: formattedValue,
+      enabled: enabled,
+      clearable: clearable,
       dense: dense,
     );
   }
 
-  static SimpleColModel dateFieldDefaultGetColumn(Field field, DAO dao) {
+  static SimpleColModel<dynamic> dateFieldDefaultGetColumn(Field field, DAO<dynamic> dao) {
     if (field is! DateField || field.type == DateTimePickerType.date) {
       return DateColModel(
         name: field.uiName,

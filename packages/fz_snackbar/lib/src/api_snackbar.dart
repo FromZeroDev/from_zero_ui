@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
@@ -41,23 +40,23 @@ class APISnackBar<T> extends SnackBarFromZero {
     state.whenOrNull(
       error: (error, stackTrace) {
         bool blockUI =
-            this.blockUIType == APISnackBarBlockUIType.always ||
-            this.blockUIType == APISnackBarBlockUIType.whileLoadingOrError;
+            blockUIType == APISnackBarBlockUIType.always ||
+            blockUIType == APISnackBarBlockUIType.whileLoadingOrError;
         if (blockUI != this.blockUI.value) {
           this.blockUI.value = blockUI;
         }
       },
       data: (data) {
-        bool blockUI = this.blockUIType == APISnackBarBlockUIType.always;
+        bool blockUI = blockUIType == APISnackBarBlockUIType.always;
         if (blockUI != this.blockUI.value) {
           this.blockUI.value = blockUI;
         }
       },
       loading: () {
         bool blockUI =
-            this.blockUIType == APISnackBarBlockUIType.always ||
-            this.blockUIType == APISnackBarBlockUIType.whileLoading ||
-            this.blockUIType == APISnackBarBlockUIType.whileLoadingOrError;
+            blockUIType == APISnackBarBlockUIType.always ||
+            blockUIType == APISnackBarBlockUIType.whileLoading ||
+            blockUIType == APISnackBarBlockUIType.whileLoadingOrError;
         if (blockUI != this.blockUI.value) {
           this.blockUI.value = blockUI;
         }

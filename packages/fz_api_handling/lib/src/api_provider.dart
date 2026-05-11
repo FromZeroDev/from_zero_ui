@@ -5,20 +5,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
+import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_snackbar/fz_snackbar.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_animations/fz_animations.dart';
 import 'package:fz_log/fz_log.dart';
-import 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
+import 'package:fz_snackbar/fz_snackbar.dart';
 
 typedef ApiProvider<T> = AutoDisposeStateNotifierProvider<ApiState<T>, AsyncValue<T>>;
 typedef ApiProviderFamily<T, P> = AutoDisposeStateNotifierProviderFamily<ApiState<T>, AsyncValue<T>, P>;
 
 class ApiState<T> extends StateNotifier<AsyncValue<T>> {
   // StateNotifierProviderRef<ApiState<State>, AsyncValue<State>> _ref;
-  AutoDisposeRef? _ref;
+  AutoDisposeRef<dynamic>? _ref;
   final Future<T> Function(ApiState<T>) _create;
   late Future<T> future;
   bool _running = true;
@@ -27,14 +26,14 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
   late final ValueNotifier<double?> wholeTotalNotifier;
   late final ValueNotifier<double?> wholeProgressNotifier;
   late final ValueNotifier<double?> wholePercentageNotifier;
-  final List<ApiProvider> _watching = [];
+  final List<ApiProvider<dynamic>> _watching = [];
   final List<CancelToken> _cancelTokens = [];
   void addCancelToken(CancelToken ct) {
     _cancelTokens.add(ct);
   }
 
   ApiState(
-    AutoDisposeRef ref,
+    AutoDisposeRef<dynamic> ref,
     this._create,
   ) : _ref = ref,
       super(AsyncValue.loading()) {
@@ -64,7 +63,7 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
     _runFuture();
   }
 
-  Future<T> watch<T>(ApiProvider<T> watchProvider) async {
+  Future<WatchedT> watch<WatchedT>(ApiProvider<WatchedT> watchProvider) async {
     assert(_ref != null);
     if (!_watching.contains(watchProvider)) {
       _watching.add(watchProvider);
@@ -80,7 +79,7 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
   }
 
   // a new ref needs to be passed to read the watching notifiers. watch() won't be called on it.
-  bool retry(WidgetRef? widgetRef, [ProviderBase? providerForInvalidationInsteadOfRefresh]) {
+  bool retry(WidgetRef? widgetRef, [ProviderBase<dynamic>? providerForInvalidationInsteadOfRefresh]) {
     bool refreshed = false;
     if ((widgetRef ?? _ref) != null) {
       try {
@@ -103,7 +102,7 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
     return refreshed;
   }
 
-  void refresh(WidgetRef? widgetRef, [ProviderBase? providerForInvalidationInsteadOfRefresh]) {
+  void refresh(WidgetRef? widgetRef, [ProviderBase<dynamic>? providerForInvalidationInsteadOfRefresh]) {
     bool refreshed = false;
     if ((widgetRef ?? _ref) != null) {
       final watchingNotifiers = {
@@ -253,7 +252,7 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
           : progress == null || total == 0
           ? 0
           : progress / total;
-      final allWatching = List<ApiProvider>.from(_watching);
+      final allWatching = List<ApiProvider<dynamic>>.from(_watching);
       for (int i = 0; i < allWatching.length; i++) {
         for (final e in _ref!.read(allWatching[i].notifier)._watching) {
           if (!allWatching.contains(e)) {
@@ -338,10 +337,12 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
     //   }
     // }
     ApiState<T> stateNotifier = ref.watch(provider.notifier);
+    // ignore: unused_local_variable
     AsyncValue<T> value = ref.watch(provider);
     return AsyncValueBuilder<T>(
-      asyncValue: stateNotifier
-          .state, // using stateNotifier.state instead of value because value is kept when realoading, so loading state is never shown
+      // using stateNotifier.state instead of value because value is kept when reloading, so loading state is never shown
+      // ignore: invalid_use_of_protected_member
+      asyncValue: stateNotifier.state,
       dataBuilder: dataBuilder,
       alignment: alignment,
       loadingBuilder: (context) {
@@ -556,7 +557,7 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
   }
 
   static void showErrorDetailsDialog(BuildContext context, Object? error, StackTrace? stackTrace) {
-    showModalFromZero(
+    showModalFromZero<dynamic>(
       context: context,
       builder: (context) {
         return DialogFromZero(
@@ -656,9 +657,9 @@ class ApiProviderMultiBuilder<T> extends ConsumerWidget {
       final stateNotifier = ref.watch(e.notifier);
       ref.watch(e);
       stateNotifiers.add(stateNotifier);
-      values.add(
-        stateNotifier.state,
-      ); // using stateNotifier.state instead of value because value is kept when realoading, so loading state is never shown
+      // using stateNotifier.state instead of value because value is kept when realoading, so loading state is never shown
+      // ignore: invalid_use_of_protected_member
+      values.add(stateNotifier.state);
     }
     final listenables = stateNotifiers.map((e) => e.wholePercentageNotifier);
     final unifiedListenable = UnitedValueListenable(listenables, (values) {
@@ -798,6 +799,7 @@ class ApiStateBuilderState<T> extends ConsumerState<ApiStateBuilder<T>> {
   @override
   void initState() {
     super.initState();
+    // ignore: invalid_use_of_protected_member
     value = widget.stateNotifier.state;
     widget.stateNotifier.addListener(
       (state) {

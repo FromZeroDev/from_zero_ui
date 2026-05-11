@@ -22,7 +22,7 @@ class DeepEqualityList<T> extends ComparableListBase<T> {
 }
 
 /// for use in ListField, elements have to also be Comparable
-class ComparableList<T extends Comparable> extends ComparableListBase<T> {
+class ComparableList<T extends Comparable<dynamic>> extends ComparableListBase<T> {
   ComparableList({
     super.list,
   });
@@ -38,6 +38,7 @@ class ComparableList<T extends Comparable> extends ComparableListBase<T> {
               ? List.from(this.list)
               : this.list.map((dynamic e) {
                   try {
+                    // ignore: avoid_dynamic_calls
                     return e.copyWith() as T;
                   } catch (_) {}
                   return e as T;
@@ -63,7 +64,7 @@ class ComparableList<T extends Comparable> extends ComparableListBase<T> {
   }
 }
 
-abstract class ComparableListBase<T> implements Comparable, ContainsValue<List<T>> {
+abstract class ComparableListBase<T> implements Comparable<dynamic>, ContainsValue<List<T>> {
   final List<T> list;
   @override
   List<T>? get value => list;

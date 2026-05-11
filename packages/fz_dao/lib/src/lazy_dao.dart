@@ -148,8 +148,8 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     List<List<Field>>? undoRecord,
     List<List<Field>>? redoRecord,
     bool? showConfirmDialogWithBlockingErrors,
-    DAO? parentDAO,
-    DAOValueGetter<DoubleColumnLayoutType, ModelType>? enableDoubleColumnLayout,
+    DAO<dynamic>? parentDAO,
+    DAOValueGetter<DoubleColumnLayoutType, ModelType>? doubleColumnLayoutType,
     DAOValueGetter<String, ModelType>? searchNameGetter,
     DAOValueGetter<String, ModelType>? editDialogTitle,
     DAOValueGetter<String, ModelType>? saveConfirmationDialogTitle,
@@ -184,7 +184,7 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
         redoRecord != null ||
         showConfirmDialogWithBlockingErrors != null ||
         parentDAO != null ||
-        enableDoubleColumnLayout != null ||
+        doubleColumnLayoutType != null ||
         searchNameGetter != null ||
         editDialogTitle != null ||
         saveConfirmationDialogTitle != null ||
@@ -221,7 +221,7 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
         showConfirmDialogWithBlockingErrors:
             showConfirmDialogWithBlockingErrors ?? this.showConfirmDialogWithBlockingErrors,
         // parentDAO: parentDAO??this.parentDAO,
-        enableDoubleColumnLayout: enableDoubleColumnLayout ?? doubleColumnLayoutType,
+        enableDoubleColumnLayout: doubleColumnLayoutType ?? doubleColumnLayoutType,
         searchNameGetter: searchNameGetter ?? this.searchNameGetter,
         editDialogTitle: editDialogTitle ?? this.editDialogTitle,
         saveConfirmationDialogTitle: saveConfirmationDialogTitle ?? this.saveConfirmationDialogTitle,
@@ -279,7 +279,7 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     try {
       return super.classUiNamePlural;
     } catch (e) {
-      assert(isInitialized, 'classUiNamePlural called without initializing DAO: $runtimeType: ${this.classUiName}');
+      assert(isInitialized, 'classUiNamePlural called without initializing DAO: $runtimeType: $classUiName');
       rethrow;
     }
   }
@@ -290,7 +290,7 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
     try {
       return super.searchName;
     } catch (e) {
-      assert(isInitialized, 'searchName called without initializing DAO: $runtimeType: ${this.classUiName}');
+      assert(isInitialized, 'searchName called without initializing DAO: $runtimeType: $classUiName');
       rethrow;
     }
   }
@@ -543,7 +543,7 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
   @override
   List<Widget> buildFormWidgets(
     BuildContext context, {
-    Map<String, Field<Comparable>>? props,
+    Map<String, Field<Comparable<dynamic>>>? props,
     ScrollController? mainScrollController,
     bool asSlivers = true,
     bool showActionButtons = true,
@@ -656,7 +656,7 @@ abstract class LazyDAO<ModelType> extends DAO<ModelType> {
   }
 
   @override
-  Future pushViewDialog(
+  Future<void> pushViewDialog(
     BuildContext mainContext, {
     bool? showEditButton,
     bool? showDeleteButton,

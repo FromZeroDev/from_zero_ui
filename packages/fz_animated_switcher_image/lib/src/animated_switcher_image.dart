@@ -298,6 +298,7 @@ class _AnimatedSwitcherImageState extends State<AnimatedSwitcherImage> with Tick
 
   Future<MemoryImage?> _getImageFromEntry(_ChildEntry entry) async {
     final boundary = entry.boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    // ignore: invalid_use_of_protected_member
     final layer = boundary?.layer;
     // print ('start getting image ${entry.hashCode} $boundary $layer');
     try {

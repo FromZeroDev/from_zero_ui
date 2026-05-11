@@ -8,13 +8,13 @@ import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_installer/flutter_app_installer.dart';
-import 'package:fz_scaffold/fz_scaffold.dart';
-import 'package:fz_file_saver/fz_file_saver.dart';
 import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_file_saver/fz_file_saver.dart';
 import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:intl/intl.dart';
 import 'package:fz_log/fz_log.dart';
+import 'package:fz_platform/fz_platform.dart';
+import 'package:fz_scaffold/fz_scaffold.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -138,7 +138,7 @@ class UpdateFromZero {
 
   Future<UpdateFromZero> _checkUpdateInternal() async {
     if (versionInfo == null) {
-      final response = await dio.get(versionJsonUrl);
+      final response = await dio.get<Map<String, dynamic>>(versionJsonUrl);
       versionInfo = response.data;
     }
     ver = versionInfo![getPlatformString()];
@@ -228,7 +228,9 @@ class UpdateFromZero {
               type: FzLgType.appUpdate,
             );
             // Assume update is a zip file and manually extract it
-            appWindow.title = FromZeroLocalizations.of(context).translate('processing_update');
+            appWindow.title = context.mounted
+                ? FromZeroLocalizations.of(context).translate('processing_update')
+                : 'Processing update...';
             final file = File(downloadPath);
             final bytes = await file.readAsBytes();
             final archive = ZipDecoder().decodeBytes(bytes);
@@ -418,6 +420,7 @@ class __UpdateWidgetState extends State<_UpdateWidget> {
                   });
                 },
               );
+              if (!context.mounted) return;
               Navigator.of(context).pop();
             },
           ),

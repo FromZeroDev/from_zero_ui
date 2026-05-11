@@ -5,21 +5,20 @@ import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:dartx/dartx.dart';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_snackbar/fz_snackbar.dart';
-import 'package:fz_router/fz_router.dart';
 import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_log/fz_log.dart';
+import 'package:fz_popup/fz_popup.dart';
+import 'package:fz_router/fz_router.dart';
+import 'package:fz_scaffold/src/scaffold_from_zero.dart';
+import 'package:fz_snackbar/fz_snackbar.dart';
 import 'package:fz_theme/fz_theme.dart';
 import 'package:fz_ui_utility/fz_ui_utility.dart';
-import 'package:fz_popup/fz_popup.dart';
-import 'package:fz_scaffold/src/scaffold_from_zero.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
-import 'package:fz_log/fz_log.dart';
 import 'package:window_manager/window_manager.dart';
 
 var fromZeroScreenProvider = ChangeNotifierProvider<ScreenFromZero>((ref) {
@@ -161,8 +160,7 @@ class FromZeroAppContentWrapperState
     final textScale = 1 + (extraScale * 0.3);
     final uiScale = 1 - (extraScale * 0.7);
     mediaQueryData = mediaQueryData.copyWith(
-      textScaleFactor: textScale,
-      size: mediaQueryData.size * uiScale,
+      size: mediaQueryData.size * uiScale, textScaler: TextScaler.linear(textScale),
     );
     final screen = ref.read(fromZeroScreenProvider);
     final scaffoldChangeNotifier = ref.read(

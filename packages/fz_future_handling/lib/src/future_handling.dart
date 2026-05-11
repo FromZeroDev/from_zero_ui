@@ -2,17 +2,16 @@ import 'dart:math';
 
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart'
-    hide OpacityGradient, ScrollOpacityGradient;
-import 'package:fz_opacity_gradient/fz_opacity_gradient.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
-import 'package:fz_export/fz_export.dart';
+import 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
 import 'package:fz_animations/fz_animations.dart';
 import 'package:fz_api_handling/fz_api_handling.dart';
+import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_export/fz_export.dart';
 import 'package:fz_future_handling/src/async_value_builder.dart';
-import 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
+import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_opacity_gradient/fz_opacity_gradient.dart';
+import 'package:fz_scrollbar/fz_scrollbar.dart';
+import 'package:fz_ui_utility/fz_ui_utility.dart' hide OpacityGradient, ScrollOpacityGradient;
 
 class LoadingSign extends ImplicitlyAnimatedWidget {
   final double? value;
@@ -35,8 +34,7 @@ class LoadingSign extends ImplicitlyAnimatedWidget {
   });
 
   @override
-  ImplicitlyAnimatedWidgetState<LoadingSign> createState() =>
-      _LoadingSignState();
+  ImplicitlyAnimatedWidgetState<LoadingSign> createState() => _LoadingSignState();
 }
 
 class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
@@ -176,22 +174,14 @@ class _LoadingSignState extends ImplicitlyAnimatedWidgetState<LoadingSign> {
                                 (value * 100).round().toString(),
                                 style: TextStyle(
                                   fontSize: fontSize,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .color!
-                                      .withValues(alpha: 0.75),
+                                  color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75),
                                 ),
                               ),
                               Text(
                                 '%',
                                 style: TextStyle(
                                   fontSize: fontSize,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .color!
-                                      .withValues(alpha: 0.75),
+                                  color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.75),
                                 ),
                               ),
                             ],
@@ -344,13 +334,12 @@ class ErrorSign extends StatelessWidget {
 }
 
 typedef SuccessBuilder<T> = Widget Function(BuildContext context, T data);
-typedef FutureErrorBuilder =
-    Widget Function(BuildContext context, Object? error, Object? stackTrace);
+typedef FutureErrorBuilder = Widget Function(BuildContext context, Object? error, Object? stackTrace);
 typedef FutureLoadingBuilder = Widget Function(BuildContext context);
 
 class FutureBuilderFromZero<T> extends StatefulWidget {
   final T? initialData;
-  final Future future;
+  final Future<dynamic> future;
   final SuccessBuilder<T> successBuilder;
   final bool applyAnimatedContainerFromChildSize;
   final bool keepPreviousDataWhileLoading;
@@ -390,8 +379,7 @@ class FutureBuilderFromZero<T> extends StatefulWidget {
   });
 
   @override
-  FutureBuilderFromZeroState<T> createState() =>
-      FutureBuilderFromZeroState<T>();
+  FutureBuilderFromZeroState<T> createState() => FutureBuilderFromZeroState<T>();
 
   static Widget defaultLoadingBuilder(BuildContext context) {
     return ApiProviderBuilder.defaultLoadingBuilder(context, null);
@@ -494,25 +482,20 @@ class FutureBuilderFromZeroState<T> extends State<FutureBuilderFromZero<T>> {
         if (state == 1) {
           updatePreviousData();
         }
-        int milliseconds =
-            (DateTime.now().millisecondsSinceEpoch - initialTimestamp).clamp(
-              0,
-              widget.transitionDuration.inMilliseconds,
-            );
+        int milliseconds = (DateTime.now().millisecondsSinceEpoch - initialTimestamp).clamp(
+          0,
+          widget.transitionDuration.inMilliseconds,
+        );
         result = AsyncBuilderAnimationWrapper(
-          transitionBuilder: (context, child, animation) =>
-              widget.transitionBuilder(child, animation),
+          transitionBuilder: (context, child, animation) => widget.transitionBuilder(child, animation),
           transitionDuration: Duration(milliseconds: milliseconds),
           transitionInCurve: widget.transitionInCurve,
           transitionOutCurve: widget.transitionOutCurve,
-          applyAnimatedContainerFromChildSize:
-              widget.applyAnimatedContainerFromChildSize,
+          applyAnimatedContainerFromChildSize: widget.applyAnimatedContainerFromChildSize,
           layoutBuilder: widget.layoutBuilder,
           alignment: widget.alignment,
           animatedSwitcherType: widget.animatedSwitcherType,
-          loadingState: widget.addLoadingStateAsValueKeys
-              ? state.toString()
-              : null,
+          loadingState: widget.addLoadingStateAsValueKeys ? state.toString() : null,
           clipBehaviour: widget.clipBehaviour,
           child: result,
         );
@@ -548,12 +531,10 @@ class AnimatedContainerFromChildSize extends StatefulWidget {
   });
 
   @override
-  AnimatedContainerFromChildSizeState createState() =>
-      AnimatedContainerFromChildSizeState();
+  AnimatedContainerFromChildSizeState createState() => AnimatedContainerFromChildSizeState();
 }
 
-class AnimatedContainerFromChildSizeState
-    extends State<AnimatedContainerFromChildSize> {
+class AnimatedContainerFromChildSizeState extends State<AnimatedContainerFromChildSize> {
   GlobalKey globalKey = GlobalKey();
   Size? previousSize;
   Size? _size;
@@ -594,14 +575,13 @@ class AnimatedContainerFromChildSizeState
     if (widget.child != oldWidget?.child) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         try {
-          RenderBox renderBox =
-              globalKey.currentContext!.findRenderObject()! as RenderBox;
+          RenderBox renderBox = globalKey.currentContext!.findRenderObject()! as RenderBox;
           previousSize = size;
           size = renderBox.size;
           if (size != previousSize) {
             setState(() {});
           }
-        } catch (_, __) {}
+        } catch (_) {}
       });
     }
   }
@@ -620,8 +600,7 @@ class AnimatedContainerFromChildSizeState
         _addCallback(null);
         Widget child = NotificationListener(
           onNotification: (notification) {
-            if (notification is ScrollMetricsNotification ||
-                notification is SizeChangedLayoutNotification) {
+            if (notification is ScrollMetricsNotification || notification is SizeChangedLayoutNotification) {
               _addCallback(null);
             }
             return false;
@@ -641,10 +620,9 @@ class AnimatedContainerFromChildSizeState
           //   double previousWidth = max(previousSize!.width, constraints.minWidth);
           //   durationMult = ((max((previousHeight-height).abs(), (previousWidth-width).abs()))/64).clamp(0.0, 1.0); TODO: 3 make this work right when called multiple times in succesion by LayoutBuilder
           // }
-          int milliseconds =
-              (DateTime.now().millisecondsSinceEpoch - initialTimestamp)
-                  .clamp(0, widget.duration.inMilliseconds * durationMult)
-                  .toInt();
+          int milliseconds = (DateTime.now().millisecondsSinceEpoch - initialTimestamp)
+              .clamp(0, widget.duration.inMilliseconds * durationMult)
+              .toInt();
 
           Widget result = OverflowBox(
             maxWidth: constraints.maxWidth,

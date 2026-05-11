@@ -1,64 +1,45 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:animations/animations.dart' hide SharedAxisTransition, SharedAxisTransitionType hide FadeThroughTransition;
+import 'package:animations/animations.dart' hide SharedAxisTransition, SharedAxisTransitionType, FadeThroughTransition;
 import 'package:dartx/dartx.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_dao/fz_dao.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_snackbar/fz_snackbar.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_combo/fz_combo.dart';
-import 'package:fz_value_string/fz_value_string.dart';
-import 'package:fz_future_handling/fz_future_handling.dart';
-import 'package:fz_file_picker/fz_file_picker.dart';
-import 'package:fz_comparable_list/fz_comparable_list.dart';
-import 'package:fz_ui_utility/fz_ui_utility.dart';
+import 'package:fz_actions/fz_actions.dart';
 import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_platform/fz_platform.dart';
+import 'package:fz_api_handling/fz_api_handling.dart';
+import 'package:fz_appbar/fz_appbar.dart';
+import 'package:fz_combo/fz_combo.dart';
 import 'package:fz_comparable_list/fz_comparable_list.dart';
 import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
-import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';
-import 'package:sliver_tools/sliver_tools.dart';
-import 'package:fz_actions/fz_actions.dart';
+import 'package:fz_dao/fz_dao.dart';
+import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_future_handling/fz_future_handling.dart';
+import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_log/fz_log.dart';
+import 'package:fz_popup/fz_popup.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
-import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_table/fz_table.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
-import 'package:fz_selectable_icon/fz_selectable_icon.dart';
-import 'package:fz_log/fz_log.dart';
-import 'package:fz_date_picker/fz_date_picker.dart';
-import 'package:fz_popup/fz_popup.dart';
-
-enum RowTapType { view, edit, none }
-
-enum ListFieldDisplayType {
-  table,
-  combo,
-  popupButton,
-  tabbedForm,
-}
+import 'package:fz_ui_utility/fz_ui_utility.dart';
+import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
 typedef AvailablePoolTransformerFunction<T> = T Function(T selected);
+
 typedef TableErrorWidgetBuilder<T, R extends Field> =
-    T Function(BuildContext context, R field, DAO dao, List<ActionFromZero> actions);
+    T Function(BuildContext context, R field, DAO<dynamic> dao, List<ActionFromZero> actions);
 
 class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   FieldValueGetter<T, ListField<T, U>> objectTemplateGetter;
   TableController<T>? _tableController;
-  TableController<T> get tableController {
-    _tableController ??= TableController<T>();
-    return _tableController!;
-  }
-
   ContextFulFieldValueGetter<Future<List<T>>, ListField<T, U>>? availableObjectsPoolGetter;
+
   ContextFulFieldValueGetter<ApiProvider<List<T>>, ListField<T, U>>? availableObjectsPoolProvider;
   bool invalidateValuesNotInAvailablePool;
   bool allowDuplicateObjectsFromAvailablePool;
@@ -69,15 +50,12 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
 
   /// transformation applied to selected items from available pool before adding them to ListField rows
   ContextFulFieldValueGetter<List<ActionFromZero>, Field>? availablePoolTableActions;
-  bool? _allowAddNew;
-  bool get allowAddNew => _allowAddNew ?? objectTemplate.canSave;
-  set allowAddNew(bool? value) {
-    _allowAddNew = value;
-  }
 
+  bool? _allowAddNew;
   bool showBigAddButtonIfEmpty;
   bool collapsed;
   bool allowMultipleSelection;
+
   bool selectionDefault;
   bool tableCellsEditable;
   bool collapsible;
@@ -92,13 +70,14 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   Map<double, ActionState> actionEditBreakpoints;
   Map<double, ActionState> actionDuplicateBreakpoints;
   Map<double, ActionState> actionDeleteBreakpoints;
-  Map<String, ColModel> Function(DAO dao, ListField<T, U> listField, T objectTemplate)? tableColumnsBuilder;
+  Map<String, ColModel<dynamic>> Function(DAO<dynamic> dao, ListField<T, U> listField, T objectTemplate)?
+  tableColumnsBuilder;
   RowModel<T> Function(
     T element,
     BuildContext context,
     ListField<T, U> field,
-    DAO dao,
-    Map<String, ColModel> columns,
+    DAO<dynamic> dao,
+    Map<String, ColModel<dynamic>> columns,
     ValueChanged<RowModel<T>>? onRowTap,
     Widget? rowAddonWidget,
   )?
@@ -111,19 +90,24 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     Widget Function(BuildContext context, RowModel<T> row, int index, double? minWidth) defaultRowBuilder,
   )?
   tableRowWidgetBuilder;
-  Widget? Function(BuildContext context, RowModel<T> row, dynamic colKey, ColModel? col, CellBuilder<T> defaultBuilder)?
+  Widget? Function(
+    BuildContext context,
+    RowModel<T> row,
+    dynamic colKey,
+    ColModel<dynamic>? col,
+    CellBuilder<T> defaultBuilder,
+  )?
   tableCellBuilder;
 
   /// this means that save() will be called on the object when adding a row
   /// and delete() will be called when removing a row, default false
   final bool? _skipDeleteConfirmation;
-  bool get skipDeleteConfirmation => _skipDeleteConfirmation ?? !objectTemplate.canDelete;
   bool showTableHeaders;
   bool showTableHeaderAddon;
+
   bool showElementCount;
   double? rowHeight;
   final bool? _showDefaultSnackBars;
-  bool get showDefaultSnackBars => _showDefaultSnackBars ?? objectTemplate.canSave;
   ContextFulFieldValueGetter<List<RowAction<T>>, ListField<T, U>>?
   extraRowActionsBuilder; //TODO: 3 also allow global action builders
   bool showEditDialogOnAdd;
@@ -144,6 +128,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   bool buildViewWidgetAsTable;
   bool addSearchAction;
   double tableFooterStickyOffset;
+
   double tableHorizontalPadding;
   String? rowAddonField;
   double? separateScrollableBreakpoint;
@@ -153,145 +138,13 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   String? Function(RowModel<T> row)? rowTooltipGetter;
   void Function(List<RowModel<T>> rows)? onSort;
   bool enableMaximizeActionInForm;
-
-  T get objectTemplate => objectTemplateGetter(this, dao)..parentDAO = dao;
-  List<T> get objects {
-    if (proxiedListFields == null) {
-      return value!.list;
-    } else {
-      final proxiedFields = proxiedListFields!(this, dao);
-      return [
-        ...value!.list,
-        ...proxiedFields.map((e) {
-          e.addListener(notifyListenersAndReinitTable);
-          for (final e in e.value!.list) {
-            e.addListener(notifyListenersAndReinitTable);
-          }
-          return e.value!.list;
-        }).flatten(),
-      ];
-    }
-  }
-
-  List<T> get dbObjects {
-    if (proxiedListFields == null) {
-      return dbValue!.list;
-    } else {
-      final proxiedFields = proxiedListFields!(this, dao);
-      return [
-        ...dbValue!.list,
-        ...proxiedFields.map((e) => e.dbValue!.list).flatten(),
-      ];
-    }
-  }
-
-  void notifyListenersAndReinitTable() {
-    tableController.reInit();
-    notifyListeners();
-  }
-
-  @override
-  set value(ComparableList<T>? value) {
-    assert(value != null, 'ListField is non-nullable by design.');
-    super.value = value;
-    tableController.reInit();
-  }
-
-  @override
-  void commitUndo(
-    ComparableList<T>? currentValue, {
-    bool removeEntryFromDAO = false,
-    bool requestFocus = true,
-  }) {
-    super.commitUndo(
-      currentValue,
-      removeEntryFromDAO: removeEntryFromDAO,
-      requestFocus: requestFocus,
-    );
-    tableController.reInit();
-  }
-
-  @override
-  void commitRedo(
-    ComparableList<T>? currentValue, {
-    bool removeEntryFromDAO = false,
-    bool requestFocus = true,
-  }) {
-    super.commitRedo(
-      currentValue,
-      removeEntryFromDAO: removeEntryFromDAO,
-      requestFocus: requestFocus,
-    );
-    tableController.reInit();
-  }
-
-  @override
-  void revertChanges() {
-    super.revertChanges();
-    tableController.reInit();
-  }
-
-  @override
-  bool get enabled => DAO.ignoreBlockingErrors
-      ? true
-      : listFieldValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling).isEmpty;
-
-  @override
-  bool get userInteracted => super.userInteracted || objects.any((e) => e.userInteracted);
-  @override
-  bool get passedFirstEdit => super.passedFirstEdit || objects.any((e) => e.props.values.any((e) => e.passedFirstEdit));
-
   late ValueNotifier<Map<T, bool>> selectedObjects;
+  GlobalKey headerGlobalKey = GlobalKey();
+  ValueNotifier<int>? pageNotifier;
+  int? lastPage;
+  late final _errorWidgetFocusNode = FocusNode();
 
-  static String defaultToString(ListField field) {
-    return listToStringSmart(
-      field.objects,
-      modelNameSingular: field.objectTemplate.classUiName,
-      modelNamePlural: field.objectTemplate.classUiNamePlural,
-    );
-  }
-
-  static String listToStringSmart(
-    List list, {
-    String? modelNameSingular,
-    String? modelNamePlural,
-    BuildContext? context, // for localization
-  }) {
-    return list.length > 5
-        ? listToStringCount(list, modelNameSingular: modelNameSingular, modelNamePlural: modelNamePlural)
-        : listToStringAll(list);
-  }
-
-  static String listToStringAll<T>(
-    Iterable<T> list, {
-    String Function(T value)? converter,
-  }) {
-    String result = '';
-    for (final e in list) {
-      if (result.isNotEmpty) {
-        result += ', ';
-      }
-      result += converter?.call(e) ?? e.toString();
-    }
-    return result;
-  }
-
-  static String listToStringCount(
-    Iterable list, {
-    String? modelNameSingular,
-    String? modelNamePlural,
-    BuildContext? context, // for localization
-  }) {
-    final name = list.length == 1
-        ? (modelNameSingular.isNotNullOrBlank
-              ? modelNameSingular
-              : (context == null ? '' : FromZeroLocalizations.of(context).translate('element_sing')))
-        : (modelNamePlural.isNotNullOrBlank
-              ? modelNamePlural
-              : (context == null ? '' : FromZeroLocalizations.of(context).translate('element_plur')));
-    return '${list.length} $name';
-  }
-
+  late Map<T, RowModel<T>> _builtRows;
   ListField({
     required super.uiNameGetter,
     required this.objectTemplateGetter,
@@ -411,24 +264,38 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     addListeners();
   }
 
-  void addListeners() {
-    for (final element in value!.list) {
-      element.addListener(notifyListeners);
-    }
+  bool get allowAddNew => _allowAddNew ?? objectTemplate.canSave;
+
+  set allowAddNew(bool? value) {
+    _allowAddNew = value;
   }
 
   @override
-  set dao(DAO dao) {
+  set dao(DAO<dynamic> dao) {
     super.dao = dao;
     for (final element in value!.list) {
       element.parentDAO = dao;
     }
   }
 
-  @override
-  String toString() {
-    return toStringGetter(this);
+  List<T> get dbObjects {
+    if (proxiedListFields == null) {
+      return dbValue!.list;
+    } else {
+      final proxiedFields = proxiedListFields!(this, dao);
+      return [
+        ...dbValue!.list,
+        ...proxiedFields.map((e) => e.dbValue!.list).flatten(),
+      ];
+    }
   }
+
+  @override
+  bool get enabled => DAO.ignoreBlockingErrors
+      ? true
+      : listFieldValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling).isEmpty;
+
+  bool get hasAvailableObjectsPool => availableObjectsPoolGetter != null || availableObjectsPoolProvider != null;
 
   @override
   bool get isEdited {
@@ -442,328 +309,52 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     return edited;
   }
 
-  bool get hasAvailableObjectsPool => availableObjectsPoolGetter != null || availableObjectsPoolProvider != null;
+  List<T> get objects {
+    if (proxiedListFields == null) {
+      return value!.list;
+    } else {
+      final proxiedFields = proxiedListFields!(this, dao);
+      return [
+        ...value!.list,
+        ...proxiedFields.map((e) {
+          e.addListener(notifyListenersAndReinitTable);
+          for (final e in e.value!.list) {
+            e.addListener(notifyListenersAndReinitTable);
+          }
+          return e.value!.list;
+        }).flatten(),
+      ];
+    }
+  }
+
+  T get objectTemplate => objectTemplateGetter(this, dao)..parentDAO = dao;
 
   @override
-  Future<bool> validate(
-    BuildContext context,
-    DAO dao,
-    int currentValidationId, {
-    bool validateIfNotEdited = false,
-    bool validateIfHidden = false,
-  }) async {
-    final objects = this.objects;
-    final superResult = super.validate(
-      context,
-      dao,
-      currentValidationId,
-      validateIfNotEdited: validateIfNotEdited,
-      validateIfHidden: validateIfHidden,
-    );
-    if (currentValidationId != dao.validationCallCount) return false;
-    if (!validateChildren && !invalidateValuesNotInAvailablePool) {
-      bool success = await superResult;
-      listFieldValidationErrors = List.from(validationErrors);
-      return success;
-    }
-    List<Future<bool>> results = [];
-    final templateProps = transformSelectedFromAvailablePool == null
-        ? objectTemplate.props
-        : transformSelectedFromAvailablePool!(objectTemplate).props;
-    List<T>? possibleValues;
-    List<T>? confirmedValidValues;
-    if (invalidateValuesNotInAvailablePool) {
-      confirmedValidValues = [];
-      final provider = availableObjectsPoolProvider?.call(context, this, dao);
-      if (provider != null) {
-        possibleValues = await (context as WidgetRef).watch(provider.notifier).future;
-      } else {
-        possibleValues = await availableObjectsPoolGetter?.call(context, this, dao);
-      }
-    }
-    for (final e in objects) {
-      final objectProps = e.props;
-      if (invalidateValuesNotInAvailablePool && possibleValues != null && !possibleValues.contains(e)) {
-        // don't add to confirmed, so it will be removed by the invalidatingError
-      } else {
-        confirmedValidValues?.add(e);
-        if (validateChildren) {
-          for (final key in templateProps.keys) {
-            final field = objectProps[key];
-            if (field != null) {
-              if (currentValidationId != dao.validationCallCount) return false;
-              results.add(
-                field.validate(
-                  context,
-                  e,
-                  currentValidationId,
-                  validateIfNotEdited: validateIfNotEdited,
-                ),
-              );
-            }
-          }
-        }
-      }
-    }
-    if (currentValidationId != dao.validationCallCount) return false;
-    bool success = await superResult;
-    listFieldValidationErrors = List.from(validationErrors);
-    for (final e in results) {
-      success = success && await e;
-      if (currentValidationId != dao.validationCallCount) return false;
-    }
-    if (invalidateValuesNotInAvailablePool &&
-        confirmedValidValues != null &&
-        confirmedValidValues.length != objects.length) {
-      validationErrors.add(
-        InvalidatingError<ComparableList<T>>(
-          field: this,
-          error: FromZeroLocalizations.of(context).translate("validation_combo_not_possible"),
-          defaultValue: ComparableList(list: confirmedValidValues),
-        ),
-      );
-    }
-    for (final e in objects) {
-      final objectProps = e.props;
-      for (final key in templateProps.keys) {
-        final field = objectProps[key];
-        if (field != null) {
-          validationErrors.addAll(
-            field.validationErrors.map(
-              (err) => err.copyWith(
-                error: err.error.isNullOrBlank ? '' : '${e.classUiName} - ${err.error}',
-              ),
-            ),
-          );
-        }
-      }
-    }
-    validationErrors.sort((a, b) => a.severity.weight.compareTo(b.severity.weight));
-    return validationErrors.where((e) => e.isBlocking).isEmpty;
+  bool get passedFirstEdit => super.passedFirstEdit || objects.any((e) => e.props.values.any((e) => e.passedFirstEdit));
+
+  bool get showDefaultSnackBars => _showDefaultSnackBars ?? objectTemplate.canSave;
+
+  bool get skipDeleteConfirmation => _skipDeleteConfirmation ?? !objectTemplate.canDelete;
+
+  TableController<T> get tableController {
+    _tableController ??= TableController<T>();
+    return _tableController!;
   }
 
   @override
-  Future<bool> validateRequired(
-    BuildContext context,
-    DAO dao,
-    int currentValidationId,
-    bool normalValidationResult, {
-    ComparableList<T>? emptyValue,
-  }) async => super.validateRequired(
-    context,
-    dao,
-    currentValidationId,
-    normalValidationResult,
-    emptyValue: emptyValue ?? ComparableList<T>(),
-  );
+  bool get userInteracted => super.userInteracted || objects.any((e) => e.userInteracted);
 
   @override
-  ListField<T, U> copyWith({
-    FieldValueGetter<String, Field>? uiNameGetter,
-    ComparableList<T>? value,
-    ComparableList<T>? dbValue,
-    FieldValueGetter<String?, Field>? hintGetter,
-    FieldValueGetter<String?, Field>? tooltipGetter,
-    FieldValueGetter<bool, Field>? clearableGetter,
-    double? maxWidth,
-    double? minWidth,
-    double? flex,
-    FieldValueGetter<T, ListField<T, U>>? objectTemplateGetter,
-    Future<List<T>>? futureObjects,
-    List<T>? objects,
-    List<T>? dbObjects,
-    double? tableColumnWidth,
-    FieldValueGetter<bool, Field>? hiddenGetter,
-    FieldValueGetter<bool, Field>? hiddenInTableGetter,
-    FieldValueGetter<bool, Field>? hiddenInViewGetter,
-    FieldValueGetter<bool, Field>? hiddenInFormGetter,
-    bool? collapsible,
-    Map<double, ActionState>? actionAddBreakpoints,
-    Map<double, ActionState>? actionViewBreakpoints,
-    Map<double, ActionState>? actionEditBreakpoints,
-    Map<double, ActionState>? actionDuplicateBreakpoints,
-    Map<double, ActionState>? actionDeleteBreakpoints,
-    Map<String, ColModel> Function(DAO dao, ListField<T, U> listField, T objectTemplate)? tableColumnsBuilder,
-    RowModel<T> Function(
-      T element,
-      BuildContext context,
-      ListField<T, U> field,
-      DAO dao,
-      Map<String, ColModel> columns,
-      ValueChanged<RowModel<T>>? onRowTap,
-      Widget? rowAddonWidget,
-    )?
-    tableRowBuilder,
-    Widget? Function(
-      BuildContext context,
-      RowModel<T> row,
-      int index,
-      double? minWidth,
-      Widget Function(BuildContext context, RowModel<T> row, int index, double? minWidth) defaultRowBuilder,
-    )?
-    tableRowWidgetBuilder,
-    Widget? Function(
-      BuildContext context,
-      RowModel<T> row,
-      dynamic colKey,
-      ColModel? col,
-      CellBuilder<T> defaultBuilder,
-    )?
-    tableCellBuilder,
-    bool? skipDeleteConfirmation,
-    bool? showTableHeaders,
-    bool? showTableHeaderAddon,
-    bool? showElementCount,
-    double? rowHeight,
-    ContextFulFieldValueGetter<Future<List<T>>, ListField<T, U>>? availableObjectsPoolGetter,
-    ContextFulFieldValueGetter<ApiProvider<List<T>>, ListField<T, U>>? availableObjectsPoolProvider,
-    bool? allowDuplicateObjectsFromAvailablePool,
-    bool? showObjectsFromAvailablePoolAsTable,
-    bool? sortObjectsFromAvailablePool,
-    AvailablePoolTransformerFunction<T>? transformSelectedFromAvailablePool,
-    ContextFulFieldValueGetter<List<ActionFromZero>, Field>? availablePoolTableActions,
-    bool? allowAddNew,
-    ListFieldDisplayType? displayType,
-    String Function(ListField field)? toStringGetter,
-    ContextFulFieldValueGetter<List<RowAction<T>>, ListField<T, U>>? extraRowActionBuilders,
-    int? initialSortColumn,
-    bool? sortNullOnTop,
-    bool? tableCellsEditable,
-    bool? allowTableCustomization,
-    bool? ignoreWidthGettersIfEmpty,
-    bool? allowMultipleSelection,
-    bool? selectionDefault,
-    ValueChanged<RowModel>? onRowTap,
-    bool? showAddButtonAtEndOfTable,
-    bool? showEditDialogOnAdd,
-    TableErrorWidgetBuilder<Widget, ListField<T, U>>? tableErrorWidget,
-    bool? showDefaultSnackBars,
-    FieldValueGetter<List<FieldValidator<ComparableList<T>>>, Field>? validatorsGetter,
-    bool? validateOnlyOnConfirm,
-    TableController<T>? tableController,
-    bool? tableSortable,
-    bool? tableFilterable,
-    FieldValueGetter<SimpleColModel, Field>? colModelBuilder,
-    List<ComparableList<T>?>? undoValues,
-    List<ComparableList<T>?>? redoValues,
-    bool? invalidateNonEmptyValuesIfHiddenInForm,
-    bool? invalidateValuesNotInAvailablePool,
-    ComparableList<T>? defaultValue,
-    bool? expandHorizontally,
-    ContextFulFieldValueGetter<Color?, Field>? backgroundColor,
-    ContextFulFieldValueGetter<List<ActionFromZero>, Field>? actionsGetter,
-    ViewWidgetBuilder<ComparableList<T>>? viewWidgetBuilder,
-    Widget? icon,
-    List<RowModel<T>> Function(List<RowModel<T>>)? onFilter,
-    FutureOr<String>? exportPathForExcel,
-    bool? buildViewWidgetAsTable,
-    bool? addSearchAction,
-    OnFieldValueChanged<ComparableList<T>?>? onValueChanged,
-    RowTapType? rowTapType,
-    double? tableFooterStickyOffset,
-    double? tableHorizontalPadding,
-    String? rowAddonField,
-    bool? allowAddMultipleFromAvailablePool,
-    ValueNotifier<int>? pageNotifier,
-    double? separateScrollableBreakpoint,
-    FieldValueGetter<List<ListField<T, U>>, ListField<T, U>>? proxiedListFields,
-    String? Function(RowModel<T> row)? rowDisabledValidator,
-    String? Function(RowModel<T> row)? rowTooltipGetter,
-    void Function(List<RowModel<T>> rows)? onSort,
-    bool? showBigAddButtonIfEmpty,
-    bool? enableMaximizeActionInForm,
-  }) {
-    return ListField<T, U>(
-      uiNameGetter: uiNameGetter ?? this.uiNameGetter,
-      clearableGetter: clearableGetter ?? this.clearableGetter,
-      maxWidth: maxWidth ?? this.maxWidth,
-      minWidth: minWidth ?? this.minWidth,
-      flex: flex ?? this.flex,
-      objectTemplateGetter: objectTemplateGetter ?? this.objectTemplateGetter,
-      objects: objects ?? this.objects.map((e) => e.copyWith() as T).toList(),
-      dbObjects: dbObjects ?? objects ?? this.dbObjects.map((e) => e.copyWith() as T).toList(),
-      hintGetter: hintGetter ?? this.hintGetter,
-      tooltipGetter: tooltipGetter ?? this.tooltipGetter,
-      tableColumnWidth: tableColumnWidth ?? this.tableColumnWidth,
-      hiddenInTableGetter: hiddenInTableGetter ?? hiddenGetter ?? this.hiddenInTableGetter,
-      hiddenInViewGetter: hiddenInViewGetter ?? hiddenGetter ?? this.hiddenInViewGetter,
-      hiddenInFormGetter: hiddenInFormGetter ?? hiddenGetter ?? this.hiddenInFormGetter,
-      collapsible: collapsible ?? this.collapsible,
-      actionAddBreakpoints: actionAddBreakpoints ?? this.actionAddBreakpoints,
-      actionViewBreakpoints: actionViewBreakpoints ?? this.actionViewBreakpoints,
-      actionEditBreakpoints: actionEditBreakpoints ?? this.actionEditBreakpoints,
-      actionDuplicateBreakpoints: actionDuplicateBreakpoints ?? this.actionDuplicateBreakpoints,
-      actionDeleteBreakpoints: actionDeleteBreakpoints ?? this.actionDeleteBreakpoints,
-      availableObjectsPoolGetter: availableObjectsPoolGetter ?? this.availableObjectsPoolGetter,
-      availableObjectsPoolProvider: availableObjectsPoolProvider ?? this.availableObjectsPoolProvider,
-      allowDuplicateObjectsFromAvailablePool:
-          allowDuplicateObjectsFromAvailablePool ?? this.allowDuplicateObjectsFromAvailablePool,
-      availablePoolTableActions: availablePoolTableActions ?? this.availablePoolTableActions,
-      allowAddNew: allowAddNew ?? this._allowAddNew,
-      displayType: displayType ?? this.displayType,
-      toStringGetter: toStringGetter ?? this.toStringGetter,
-      extraRowActionsBuilder: extraRowActionBuilders ?? this.extraRowActionsBuilder,
-      skipDeleteConfirmation: skipDeleteConfirmation ?? this._skipDeleteConfirmation,
-      showTableHeaders: showTableHeaders ?? this.showTableHeaders,
-      showTableHeaderAddon: showTableHeaderAddon ?? this.showTableHeaderAddon,
-      showElementCount: showElementCount ?? this.showElementCount,
-      rowHeight: rowHeight ?? this.rowHeight,
-      initialSortedColumn: initialSortColumn ?? this.initialSortedColumn,
-      sortNullOnTop: sortNullOnTop ?? this.sortNullOnTop,
-      tableCellsEditable: tableCellsEditable ?? this.tableCellsEditable,
-      allowTableCustomization: allowTableCustomization ?? this.allowTableCustomization,
-      ignoreWidthGettersIfEmpty: ignoreWidthGettersIfEmpty ?? this.ignoreWidthGettersIfEmpty,
-      allowMultipleSelection: allowMultipleSelection ?? this.allowMultipleSelection,
-      selectionDefault: selectionDefault ?? this.selectionDefault,
-      onRowTap: onRowTap ?? this.onRowTap,
-      showAddButtonAtEndOfTable: showAddButtonAtEndOfTable ?? this.showAddButtonAtEndOfTable,
-      showEditDialogOnAdd: showEditDialogOnAdd ?? this.showEditDialogOnAdd,
-      tableErrorWidget: tableErrorWidget ?? this.tableErrorWidget,
-      showDefaultSnackBars: showDefaultSnackBars ?? this._showDefaultSnackBars,
-      validatorsGetter: validatorsGetter ?? this.validatorsGetter,
-      validateOnlyOnConfirm: validateOnlyOnConfirm ?? this.validateOnlyOnConfirm,
-      showObjectsFromAvailablePoolAsTable:
-          showObjectsFromAvailablePoolAsTable ?? this.showObjectsFromAvailablePoolAsTable,
-      sortObjectsFromAvailablePool: sortObjectsFromAvailablePool ?? this.sortObjectsFromAvailablePool,
-      transformSelectedFromAvailablePool: transformSelectedFromAvailablePool ?? this.transformSelectedFromAvailablePool,
-      tableController: tableController ?? this.tableController,
-      tableSortable: tableSortable ?? this.tableSortable,
-      tableFilterable: tableFilterable ?? this.tableFilterable,
-      colModelBuilder: colModelBuilder ?? this.colModelBuilder,
-      undoValues: undoValues ?? List.from(this.undoValues),
-      redoValues: redoValues ?? List.from(this.redoValues),
-      invalidateNonEmptyValuesIfHiddenInForm:
-          invalidateNonEmptyValuesIfHiddenInForm ?? this.invalidateNonEmptyValuesIfHiddenInForm,
-      invalidateValuesNotInAvailablePool: invalidateValuesNotInAvailablePool ?? this.invalidateValuesNotInAvailablePool,
-      defaultValue: defaultValue ?? this.defaultValue,
-      expandHorizontally: expandHorizontally ?? this.expandHorizontally,
-      backgroundColor: backgroundColor ?? this.backgroundColor,
-      actionsGetter: actionsGetter ?? this.actionsGetter,
-      viewWidgetBuilder: viewWidgetBuilder ?? this.viewWidgetBuilder,
-      icon: icon ?? this.icon,
-      onFilter: onFilter ?? this.onFilter,
-      exportPathForExcel: exportPathForExcel ?? this.exportPathForExcel,
-      buildViewWidgetAsTable: buildViewWidgetAsTable ?? this.buildViewWidgetAsTable,
-      addSearchAction: addSearchAction ?? this.addSearchAction,
-      onValueChanged: onValueChanged ?? this.onValueChanged,
-      rowTapType: rowTapType ?? this.rowTapType,
-      tableColumnsBuilder: tableColumnsBuilder ?? this.tableColumnsBuilder,
-      tableRowBuilder: tableRowBuilder ?? this.tableRowBuilder,
-      tableRowWidgetBuilder: tableRowWidgetBuilder ?? this.tableRowWidgetBuilder,
-      tableCellBuilder: tableCellBuilder ?? this.tableCellBuilder,
-      tableFooterStickyOffset: tableFooterStickyOffset ?? this.tableFooterStickyOffset,
-      tableHorizontalPadding: tableHorizontalPadding ?? this.tableHorizontalPadding,
-      rowAddonField: rowAddonField ?? this.rowAddonField,
-      allowAddMultipleFromAvailablePool: allowAddMultipleFromAvailablePool ?? this.allowAddMultipleFromAvailablePool,
-      pageNotifier: pageNotifier ?? this.pageNotifier,
-      separateScrollableBreakpoint: separateScrollableBreakpoint ?? this.separateScrollableBreakpoint,
-      proxiedListFields: proxiedListFields ?? this.proxiedListFields,
-      rowDisabledValidator: rowDisabledValidator ?? this.rowDisabledValidator,
-      rowTooltipGetter: rowTooltipGetter ?? this.rowTooltipGetter,
-      onSort: onSort ?? this.onSort,
-      showBigAddButtonIfEmpty: showBigAddButtonIfEmpty ?? this.showBigAddButtonIfEmpty,
-      enableMaximizeActionInForm: enableMaximizeActionInForm ?? this.enableMaximizeActionInForm,
-    );
+  set value(ComparableList<T>? value) {
+    assert(value != null, 'ListField is non-nullable by design.');
+    super.value = value;
+    tableController.reInit();
+  }
+
+  void addListeners() {
+    for (final element in value!.list) {
+      element.addListener(notifyListeners);
+    }
   }
 
   void addRow(
@@ -775,6 +366,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     insertIndex: insertIndex,
     focusAdded: focusAdded,
   );
+
   void addRows(
     Iterable<T> elements, {
     int? insertIndex,
@@ -800,753 +392,53 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     }
   }
 
-  bool replaceRow(
-    T oldRow,
-    T newRow, {
-    bool focusAdded = true,
-  }) => replaceRows(
-    {oldRow: newRow},
-    focusAdded: focusAdded,
-  );
-  bool replaceRows(
-    Map<T, T> elements, {
-    bool focusAdded = true,
+  Widget buildAddAddon({
+    required BuildContext context,
+    required bool? collapsed,
+    T? objectTemplate,
+    VoidCallback? onPressed,
+    bool addonEnabled = true,
   }) {
-    if (elements.isEmpty) return false;
-    bool result = true;
-    final newValue = value!.copyWith();
-    elements.forEach((key, value) {
-      value.parentDAO = dao;
-      int index = newValue.indexOf(key);
-      bool foundInProxy = false;
-      if (index < 0 && proxiedListFields != null) {
-        for (final proxiedList in proxiedListFields!(this, dao)) {
-          if (proxiedList.value!.contains(key)) {
-            foundInProxy = true;
-            proxiedList.replaceRow(key, value);
-          }
+    objectTemplate ??= this.objectTemplate;
+    collapsed ??= this.collapsed;
+    return AnimatedBuilder(
+      animation: this,
+      builder: (context, child) {
+        if (collapsed! || !enabled) {
+          return const SizedBox.shrink();
         }
-      }
-      if (!foundInProxy) {
-        if (index >= 0) {
-          newValue.removeAt(index);
-        } else {
-          result = false;
-        }
-        if (index >= 0) {
-          newValue.insert(index, value);
-        } else {
-          newValue.add(value);
-        }
-      }
-    });
-    value = newValue;
-    if (focusAdded) {
-      focusObject(elements.values.first);
-    }
-    return result;
-  }
-
-  void duplicateRow(
-    T element, {
-    bool focusAdded = true,
-  }) => duplicateRows(
-    [element],
-    focusAdded: focusAdded,
-  );
-  void duplicateRows(
-    Iterable<T> elements, {
-    bool focusAdded = true,
-  }) {
-    if (elements.isEmpty) return;
-    final newValue = value!.copyWith();
-    for (final e in elements) {
-      int index = newValue.indexOf(e);
-      final newItem = e.copyWith() as T;
-      if (e is LazyDAO) (e as LazyDAO).ensureInitialized();
-      newItem.id = null;
-      newItem.parentDAO = dao;
-      if (index < 0) {
-        newValue.add(newItem);
-      } else {
-        newValue.insert(index + 1, newItem);
-      }
-    }
-    value = newValue;
-    if (focusAdded) {
-      focusObject(elements.first);
-    }
-  }
-
-  bool removeRow(T element) => removeRows([element]);
-  bool removeRows(Iterable<T> elements) {
-    if (elements.isEmpty) return false;
-    bool result = false;
-    final newValue = value!.copyWith();
-    for (final e in elements) {
-      result = newValue.remove(e) || result;
-      if (proxiedListFields != null) {
-        for (final proxiedList in proxiedListFields!(this, dao)) {
-          result = proxiedList.removeRow(e) || result;
-        }
-      }
-    }
-    if (result) {
-      value = newValue;
-    }
-    return result;
-  }
-
-  void focusObject(T object) {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      try {
-        if (tableCellsEditable) {
-          object.props.values.firstOrNullWhere((e) => !e.hiddenInForm)?.focusNode.requestFocus();
-        } else {
-          _builtRows[object]?.focusNode.requestFocus();
-        }
-      } catch (_) {}
-    });
-  }
-
-  Future<List<T>?> maybeAddRow(
-    BuildContext context, {
-    int? insertIndex,
-    bool replaceAllRows = false,
-  }) async {
-    focusNode.requestFocus();
-    T objectTemplate = this.objectTemplate;
-    T emptyDAO = (objectTemplate.copyWith() as T)..id = null;
-    if (emptyDAO is LazyDAO) (emptyDAO as LazyDAO).ensureInitialized();
-    emptyDAO.contextForValidation = dao.contextForValidation;
-    assert(!replaceAllRows || hasAvailableObjectsPool, "Can't replace all rows without an availableObjects pool");
-    if (hasAvailableObjectsPool) {
-      dynamic selected;
-      if (showObjectsFromAvailablePoolAsTable || replaceAllRows) {
-        final allowAddMultipleFromAvailablePool = this.allowAddMultipleFromAvailablePool || replaceAllRows;
-        final ValueNotifier<Map<T, bool>> selectedObjects = ValueNotifier({});
-        ValueNotifier<List<T>?> availableData = ValueNotifier(null);
-        emptyDAO.onDidSave = (BuildContext context, U? model, DAO<U> dao) {
-          objectTemplate.onDidSave?.call(context, model, dao);
-          try {
-            if ((model as dynamic).id != -1) dao.id = (model as dynamic).id;
-          } catch (_) {
-            try {
-              if (dao.id != -1) dao.id = model;
-            } catch (_) {}
-          }
-          selectedObjects.value[dao as T] = true;
-          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-            Navigator.of(context).pop(dao);
-          });
-        };
-        Widget content = AnimatedBuilder(
-          animation: this,
-          builder: (context, child) {
-            return Stack(
-              children: [
-                availableObjectsPoolProvider == null
-                    ? FutureBuilderFromZero<List<T>>(
-                        future: availableObjectsPoolGetter!(context, this, dao),
-                        loadingBuilder: _availablePoolLoadingBuilder,
-                        errorBuilder: (context, error, stackTrace) =>
-                            _availablePoolErrorBuilder(context, error, stackTrace is StackTrace ? stackTrace : null),
-                        successBuilder: (context, data) {
-                          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                            availableData.value = data;
-                          });
-                          return _availablePoolTableDataBuilder(
-                            context,
-                            data,
-                            emptyDAO,
-                            selectedObjects: selectedObjects,
-                            replaceAllRows: replaceAllRows,
-                          );
-                        },
-                      )
-                    : ApiProviderBuilder<List<T>>(
-                        provider: availableObjectsPoolProvider!(context, this, dao),
-                        loadingBuilder: _availablePoolLoadingBuilder,
-                        errorBuilder: _availablePoolErrorBuilder,
-                        dataBuilder: (context, data) {
-                          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                            availableData.value = data;
-                          });
-                          return _availablePoolTableDataBuilder(
-                            context,
-                            data,
-                            emptyDAO,
-                            selectedObjects: selectedObjects,
-                            replaceAllRows: replaceAllRows,
-                          );
-                        },
-                      ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        height: 16,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Theme.of(context).cardColor.withValues(alpha: 0),
-                              Theme.of(context).cardColor,
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(
-                          bottom: 8,
-                          right: 16,
-                        ),
-                        color: Theme.of(context).cardColor,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            const DialogButton.cancel(),
-                            if (allowAddMultipleFromAvailablePool)
-                              MultiValueListenableBuilder(
-                                valueListenables: [
-                                  availableData,
-                                  selectedObjects,
-                                ],
-                                builder: (context, values, child) {
-                                  List<T>? availableData = values[0];
-                                  Map<T, bool> selectedObjects = values[1];
-                                  final selected = availableData == null
-                                      ? <T>[]
-                                      : availableData.where((e) {
-                                          return selectedObjects[e] ?? selectionDefault;
-                                        }).toList();
-                                  return DialogButton.accept(
-                                    onPressed: selected.isEmpty
-                                        ? null
-                                        : () {
-                                            Navigator.of(context).pop(selected);
-                                          },
-                                  );
-                                },
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-        selected = await showPopupFromZero(
-          context: context,
-          anchorKey: headerGlobalKey,
-          width: maxWidth == double.infinity ? null : maxWidth,
-          builder: (modalContext) {
-            return content;
-          },
-        );
-      } else {
-        selected = await showPopupFromZero(
-          context: context,
-          anchorKey: headerGlobalKey,
-          builder: (context) {
-            return Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 16 + 42,
-                  ),
-                  child: availableObjectsPoolProvider == null
-                      ? FutureBuilderFromZero<List<T>>(
-                          future: availableObjectsPoolGetter!(context, this, dao),
-                          loadingBuilder: _availablePoolLoadingBuilder,
-                          errorBuilder: (context, error, stackTrace) =>
-                              _availablePoolErrorBuilder(context, error, stackTrace is StackTrace ? stackTrace : null),
-                          successBuilder: (context, data) {
-                            return _availablePoolComboDataBuilder(context, data, emptyDAO);
-                          },
-                        )
-                      : ApiProviderBuilder<List<T>>(
-                          provider: availableObjectsPoolProvider!(context, this, dao),
-                          loadingBuilder: _availablePoolLoadingBuilder,
-                          errorBuilder: _availablePoolErrorBuilder,
-                          dataBuilder: (context, data) {
-                            return _availablePoolComboDataBuilder(context, data, emptyDAO);
-                          },
-                        ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        height: 16,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Theme.of(context).cardColor.withValues(alpha: 0),
-                              Theme.of(context).cardColor,
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(
-                          bottom: 8,
-                          right: 16,
-                        ),
-                        color: Theme.of(context).cardColor,
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            DialogButton.cancel(),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      }
-      if (selected != null) {
-        if (selected is T) {
-          selected = [selected];
-        }
-        selected as List<T>;
-        if (transformSelectedFromAvailablePool != null) {
-          selected = selected.map((e) => transformSelectedFromAvailablePool!(e)).toList();
-        }
-        if (replaceAllRows) {
-          final toRemove = <T>[];
-          for (final e in objects) {
-            if (!selected.contains(e)) toRemove.add(e);
-          }
-          removeRows(toRemove);
-          final toAdd = <T>[];
-          for (final e in selected) {
-            if (!objects.contains(e)) toAdd.add(e);
-          }
-          addRows(toAdd, insertIndex: insertIndex);
-        } else {
-          addRows(selected, insertIndex: insertIndex);
-        }
-        return selected;
-      }
-    } else {
-      dynamic result;
-      if (showEditDialogOnAdd) {
-        result = await emptyDAO.maybeEdit(
-          dao.contextForValidation ?? context,
-          showDefaultSnackBars: showDefaultSnackBars,
-        );
-        if (result != null) {
-          addRow(emptyDAO, insertIndex: insertIndex);
-          return [emptyDAO];
-        }
-      } else {
-        addRow(emptyDAO, insertIndex: insertIndex);
-        return [emptyDAO];
-      }
-    }
-  }
-
-  Widget _availablePoolErrorBuilder(
-    BuildContext context,
-    Object? error,
-    StackTrace? stackTrace, [
-    VoidCallback? onRetry,
-  ]) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 42),
-      child: IntrinsicHeight(
-        child: ApiProviderBuilder.defaultErrorBuilder(context, error, stackTrace, onRetry),
-      ),
-    );
-  }
-
-  Widget _availablePoolLoadingBuilder(BuildContext context, [ValueListenable<double?>? progress]) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 42),
-      child: SizedBox(
-        height: 128,
-        child: ApiProviderBuilder.defaultLoadingBuilder(context, progress),
-      ),
-    );
-  }
-
-  Widget _availablePoolTableDataBuilder(
-    BuildContext context,
-    List<T> data,
-    T emptyDAO, {
-    ValueNotifier<Map<T, bool>>? selectedObjects,
-    bool replaceAllRows = false,
-  }) {
-    T objectTemplate = emptyDAO;
-    if (transformSelectedFromAvailablePool != null) {
-      objectTemplate = transformSelectedFromAvailablePool!(objectTemplate);
-      objectTemplate.parentDAO = dao;
-    }
-    final allowAddMultipleFromAvailablePool = this.allowAddMultipleFromAvailablePool || replaceAllRows;
-    ScrollController scrollController = ScrollController();
-    if (!allowDuplicateObjectsFromAvailablePool && !replaceAllRows) {
-      data = data.where((e) => !objects.contains(e)).toList();
-    }
-    if (replaceAllRows) {
-      selectedObjects ??= ValueNotifier({});
-      for (final e in objects) {
-        selectedObjects.value[e] = true;
-      }
-    }
-    final listField = ListField<T, U>(
-      uiNameGetter: (field, dao) => objectTemplate.classUiName,
-      objectTemplateGetter: (field, dao) => emptyDAO,
-      tableCellsEditable: false,
-      collapsible: false,
-      actionDeleteBreakpoints: {0: ActionState.none},
-      actionViewBreakpoints: actionViewBreakpoints,
-      actionEditBreakpoints: actionEditBreakpoints,
-      objects: data,
-      actionsGetter: availablePoolTableActions,
-      allowAddNew: allowAddNew && emptyDAO.canSave,
-      tableSortable: tableSortable,
-      initialSortedColumn: sortObjectsFromAvailablePool ? initialSortedColumn : null,
-      onSort: onSort,
-      tableFilterable: tableFilterable,
-      onFilter: onFilter,
-      sortNullOnTop: sortNullOnTop,
-      tableFooterStickyOffset: 56,
-      addSearchAction: true,
-      allowMultipleSelection: allowAddMultipleFromAvailablePool,
-      selectedObjects: selectedObjects,
-      selectionDefault: selectionDefault,
-      rowTapType: RowTapType.none,
-      ignoreWidthGettersIfEmpty: false,
-      onRowTap: allowAddMultipleFromAvailablePool
-          ? null
-          : (value) {
-              Navigator.of(context).pop(value.id);
-            },
-    );
-    listField.dao = dao;
-    return ScrollbarFromZero(
-      controller: scrollController,
-      applyOpacityGradientToChildren: false,
-      child: CustomScrollView(
-        controller: scrollController,
-        shrinkWrap: true,
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
+        return ColoredBox(
+          color: backgroundColor?.call(context, this, dao) ?? Material.of(context).color ?? Theme.of(context).cardColor,
+          child: TextButton.icon(
+            style: TextButton.styleFrom(
+              backgroundColor: Color.alphaBlend(
+                Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                Theme.of(context).cardColor,
+              ),
+            ),
+            onPressed: !addonEnabled
+                ? null
+                : (onPressed ??
+                      () async {
+                        focusNode.requestFocus();
+                        final result = await maybeAddRow(dao.contextForValidation ?? context);
+                        if (result != null) {
+                          userInteracted = true;
+                        }
+                      }),
+            icon: const Icon(Icons.add),
+            label: Padding(
               padding: const EdgeInsets.only(
-                top: 24,
-                left: 32,
-                right: 32,
-                bottom: 8,
+                top: 10,
+                bottom: 10,
               ),
-              child: Text(
-                '${FromZeroLocalizations.of(context).translate("add_add")} ${emptyDAO.classUiName}',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-          ),
-          ...listField.buildFieldEditorWidgets(
-            context,
-            asSliver: true,
-            addCard: false,
-          ),
-          const SliverToBoxAdapter(
-            child: SizedBox(
-              height: 32 + 16 + 42,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _availablePoolComboDataBuilder(BuildContext context, List<T> data, T emptyDAO) {
-    T objectTemplate = emptyDAO;
-    if (transformSelectedFromAvailablePool != null) {
-      objectTemplate = transformSelectedFromAvailablePool!(objectTemplate);
-      objectTemplate.parentDAO = dao;
-    }
-    if (!allowDuplicateObjectsFromAvailablePool) {
-      data = data.where((e) => !objects.contains(e)).toList();
-    }
-    return ComboFromZeroPopup<T>(
-      possibleValues: data,
-      showSearchBox: true,
-      sort: sortObjectsFromAvailablePool,
-      title: '${FromZeroLocalizations.of(context).translate("add_add")} ${objectTemplate.classUiName}',
-      extraWidget: allowAddNew
-          ? (context, onSelected) {
-              return Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 2,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Text(
+                  '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate!.uiName}',
+                  style: const TextStyle(
+                    fontSize: 16,
                   ),
-                  child: TextButton(
-                    onPressed: () async {
-                      final model = await emptyDAO.maybeEdit(
-                        dao.contextForValidation ?? context,
-                        showDefaultSnackBars: showDefaultSnackBars,
-                      );
-                      if (model != null) {
-                        Navigator.of(context).pop(emptyDAO);
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 6,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const SizedBox(width: 6),
-                          const Icon(Icons.add),
-                          const SizedBox(
-                            width: 6,
-                          ),
-                          Text(
-                            '${FromZeroLocalizations.of(context).translate("add")} ${emptyDAO.classUiName}',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(width: 6),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }
-          : null,
-    );
-  }
-
-  Future<bool> maybeDelete(
-    BuildContext context,
-    List<T> elements,
-  ) async {
-    if (elements.isEmpty) return false;
-    bool? delete =
-        skipDeleteConfirmation ||
-        hasAvailableObjectsPool ||
-        (await showModalFromZero(
-              context: context,
-              builder: (context) {
-                return DialogFromZero(
-                  title: Text(FromZeroLocalizations.of(context).translate('confirm_delete_title')),
-                  content: Text(
-                    '${FromZeroLocalizations.of(context).translate('confirm_delete_desc')} ${elements.length} ${elements.length > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')}?',
-                  ),
-                  // TODO: 2 show more details about elements to be deleted
-                  dialogActions: [
-                    const DialogButton.cancel(),
-                    DialogButton(
-                      color: Colors.red,
-                      onPressed: () {
-                        Navigator.of(context).pop(true); // Dismiss alert dialog
-                      },
-                      child: Text(
-                        FromZeroLocalizations.of(context).translate('delete_caps'),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ) ??
-            false);
-    if (delete) {
-      bool result = false;
-      if (!hasAvailableObjectsPool && objectTemplate.canDelete) {
-        if (elements.length > 1) {
-          throw UnimplementedError('multiple deletion handling not implemented');
-        }
-        result = await elements.first.delete(
-          dao.contextForValidation ?? context,
-          showDefaultSnackBar: showDefaultSnackBars,
-        );
-        if (result) {
-          result = removeRows(elements);
-        }
-      } else {
-        result = removeRows(elements);
-      }
-      return result;
-    }
-    return false;
-  }
-
-  static Future<void> maybeEditMultiple<T extends DAO>(BuildContext context, List<T> elements) async {
-    // TODO: 3 test this well, rework it visually to be like maybeEdit
-
-    final T dao = elements.first.copyWith() as T;
-    // change hints and clear all properties
-    dao.beginUndoTransaction();
-    dao.props.forEach((key, value) {
-      // TODO: 3 should we remove validators / disable validation
-      value.hintGetter = (_, __) => FromZeroLocalizations.of(context).translate('keep_value');
-      value.dbValue = null;
-      value.value = null;
-      value.undoValues = [];
-      value.redoValues = [];
-    });
-    // discard undo stack
-    dao.beginUndoTransaction();
-    dao.commitUndoTransaction();
-    ScrollController scrollController = ScrollController();
-    bool? confirm = await showModalFromZero(
-      context: context,
-      builder: (context) {
-        return WillPopScope(
-          onWillPop: () async {
-            if (!dao.isEdited) return true;
-            bool? pop = await showModalFromZero(
-              context: context,
-              builder: (context) {
-                return DialogFromZero(
-                  title: Text(FromZeroLocalizations.of(context).translate('confirm_close_title')),
-                  content: Text(FromZeroLocalizations.of(context).translate('confirm_close_desc')),
-                  dialogActions: [
-                    const DialogButton.cancel(),
-                    AnimatedBuilder(
-                      animation: dao,
-                      builder: (context, child) {
-                        return DialogButton(
-                          color: Theme.of(context).colorScheme.error,
-                          onPressed: () {
-                            Navigator.of(context).pop(true); // Dismiss alert dialog
-                          },
-                          child: Text(
-                            FromZeroLocalizations.of(context).translate('close_caps'),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-            return pop ?? false;
-          },
-          child: Center(
-            child: SizedBox(
-              width: 512 + 128,
-              child: ResponsiveInsetsDialog(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        top: 24,
-                        left: 32,
-                        right: 32,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            FromZeroLocalizations.of(context).translate('edit_multiple_title'),
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(
-                            height: 12,
-                          ),
-                          Text(
-                            '${FromZeroLocalizations.of(context).translate('edit_multiple_desc1')} ${elements.length} ${elements.length > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')} ${FromZeroLocalizations.of(context).translate('edit_multiple_desc2')}',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
-                    ),
-                    ScrollbarFromZero(
-                      controller: scrollController,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: CustomScrollView(
-                          controller: scrollController,
-                          shrinkWrap: true,
-                          slivers: dao.buildFormWidgets(
-                            context,
-                            showActionButtons: false,
-                          ), // TODO: 3 why not use maybeEdit to show everything
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12, right: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          DialogButton.cancel(
-                            onPressed: () {
-                              Navigator.of(context).maybePop();
-                            },
-                          ),
-                          AnimatedBuilder(
-                            animation: dao,
-                            builder: (context, child) {
-                              return DialogButton.accept(
-                                onPressed: dao.isEdited
-                                    ? () async {
-                                        bool? edit = await showModalFromZero(
-                                          context: context,
-                                          builder: (context) {
-                                            return DialogFromZero(
-                                              title: Text(
-                                                FromZeroLocalizations.of(context).translate('confirm_save_title'),
-                                              ),
-                                              content: Text(
-                                                '${FromZeroLocalizations.of(context).translate('edit_multiple_confirm')} ${elements.length} ${elements.length > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')}?',
-                                              ),
-                                              // TODO: 3 show all details about each field about to change
-                                              dialogActions: [
-                                                const DialogButton.cancel(),
-                                                DialogButton.accept(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop(true); // Dismiss alert dialog
-                                                  },
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                        if (edit ?? false) {
-                                          Navigator.of(context).pop(true);
-                                        }
-                                      }
-                                    : null,
-                              );
-                            },
-                          ),
-                          const SizedBox(
-                            width: 2,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),
@@ -1554,18 +446,150 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         );
       },
     );
-    if (confirm ?? false) {
-      dao.props.forEach((key, value) {
-        if (value.isEdited) {
-          for (final e in elements) {
-            e.props[key]?.value = value.value;
-          }
-        }
-      });
-    }
   }
 
-  GlobalKey headerGlobalKey = GlobalKey();
+  @override
+  List<ActionFromZero> buildDefaultActions(
+    BuildContext context, {
+    FocusNode? focusNode,
+    T? objectTemplate,
+  }) {
+    focusNode ??= this.focusNode;
+    objectTemplate ??= this.objectTemplate;
+    final allowAddNew = this.allowAddNew;
+    List<T> currentSelected = [];
+    // TODO: 3 re-implement multiple edition, test well. Enabling this might break current uses of selection (when selecion is used for external purposes, like in PageSend EntidadContacto selection)
+    // try {
+    //   currentSelected = tableController.filtered.where((element) => selectedObjects.value[element]??selectionDefault).map((e) => e.id).toList();
+    // } catch (_) {}
+    return [
+      if (!collapsed && currentSelected.isNotEmpty)
+        ActionFromZero(
+          icon: const Icon(Icons.edit_outlined),
+          title:
+              '${FromZeroLocalizations.of(context).translate('edit')} ${FromZeroLocalizations.of(context).translate('selected_plur')}',
+          onTap: (context) {
+            userInteracted = true;
+            focusNode?.requestFocus();
+            maybeEditMultiple(context, currentSelected);
+          },
+          breakpoints: actionEditBreakpoints[0] == ActionState.none ? actionEditBreakpoints : null,
+        ),
+      if (!collapsed && currentSelected.isNotEmpty)
+        ActionFromZero(
+          icon: const Icon(
+            MaterialCommunityIcons.content_duplicate,
+            size: 21,
+          ),
+          title:
+              '${FromZeroLocalizations.of(context).translate('duplicate')} ${FromZeroLocalizations.of(context).translate('selected_plur')}',
+          onTap: (context) {
+            userInteracted = true;
+            focusNode?.requestFocus();
+            duplicateRows(currentSelected);
+          },
+          breakpoints: actionDuplicateBreakpoints[0] == ActionState.none ? actionDuplicateBreakpoints : null,
+        ),
+      if (!collapsed && currentSelected.isNotEmpty && (objectTemplate.canDelete || hasAvailableObjectsPool))
+        ActionFromZero(
+          icon: Icon(!hasAvailableObjectsPool ? Icons.delete_forever_outlined : Icons.clear),
+          title:
+              '${FromZeroLocalizations.of(context).translate('delete')} ${FromZeroLocalizations.of(context).translate('selected_plur')}',
+          onTap: (context) async {
+            focusNode?.requestFocus();
+            if (await maybeDelete(context, currentSelected)) {
+              userInteracted = true;
+              focusNode?.requestFocus();
+            }
+          },
+          breakpoints: actionDeleteBreakpoints[0] == ActionState.none ? actionDeleteBreakpoints : null,
+        ),
+      if (!collapsed && currentSelected.isNotEmpty)
+        ActionFromZero(
+          icon: const Icon(Icons.cancel_outlined),
+          title: FromZeroLocalizations.of(context).translate('cancel_selection'),
+          onTap: (context) {
+            focusNode?.requestFocus();
+            selectedObjects.value = {};
+            notifyListeners();
+          },
+        ),
+      if ((allowAddNew || hasAvailableObjectsPool) && !collapsed && currentSelected.isEmpty)
+        ActionFromZero(
+          title: '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate.uiName}',
+          icon: Icon(Icons.add, color: Theme.of(context).colorScheme.secondary),
+          breakpoints: actionAddBreakpoints,
+          onTap: (context) async {
+            focusNode?.requestFocus();
+            final result = await maybeAddRow(dao.contextForValidation ?? context);
+            if (result != null) {
+              userInteracted = true;
+              pageNotifier?.value = objects.length - 1;
+            }
+          },
+        ),
+      if (dao.enableUndoRedoMechanism)
+        ActionFromZero.divider(
+          breakpoints: {
+            0: ActionState.popup,
+          },
+        ),
+      if (dao.enableUndoRedoMechanism)
+        AnimatedActionFromZero(
+          animation: this,
+          builder: () => ActionFromZero(
+            title: 'Deshacer', // TODO: 3 internationalize
+            icon: const Icon(MaterialCommunityIcons.undo_variant),
+            onTap: (context) {
+              userInteracted = true;
+              focusNode?.requestFocus();
+              undo(removeEntryFromDAO: true);
+            },
+            disablingError: undoValues.isNotEmpty ? null : '',
+            breakpoints: {
+              0: ActionState.popup,
+            },
+          ),
+        ),
+      if (dao.enableUndoRedoMechanism)
+        AnimatedActionFromZero(
+          animation: this,
+          builder: () => ActionFromZero(
+            title: 'Rehacer', // TODO: 3 internationalize
+            icon: const Icon(MaterialCommunityIcons.redo_variant),
+            onTap: (context) {
+              userInteracted = true;
+              focusNode?.requestFocus();
+              redo(removeEntryFromDAO: true);
+            },
+            disablingError: redoValues.isNotEmpty ? null : '',
+            breakpoints: {
+              0: ActionState.popup,
+            },
+          ),
+        ),
+      if (availableObjectsPoolProvider != null)
+        ActionFromZero.divider(
+          breakpoints: {0: ActionState.popup},
+        ),
+      if (availableObjectsPoolProvider != null)
+        ActionFromZero(
+          title: 'Refrescar Datos', // TODO: 3 internationalize
+          icon: const Icon(
+            Icons.refresh,
+          ),
+          breakpoints: {0: ActionState.popup},
+          onTap: (context) {
+            focusNode?.requestFocus();
+            final ref = dao.contextForValidation! as WidgetRef;
+            final provider = availableObjectsPoolProvider!(context, this, dao);
+            final stateNotifier = ref.read(provider.notifier);
+            stateNotifier.refresh(ref);
+          },
+        ),
+    ];
+  }
+
   @override
   List<Widget> buildFieldEditorWidgets(
     BuildContext context, {
@@ -1633,596 +657,6 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         useGlobalKeys: useGlobalKeys,
       ),
     };
-  }
-
-  List<Widget> builWidgetsAsPopupButton(
-    BuildContext context, {
-    bool addCard = true,
-    bool asSliver = true,
-    bool expandToFillContainer = true,
-    bool dense = false,
-    FocusNode? focusNode,
-    bool useGlobalKeys = true,
-  }) {
-    focusNode ??= this.focusNode;
-    Widget result;
-    if (expandToFillContainer) {
-      result = LayoutBuilder(
-        builder: (context, constraints) {
-          return _builWidgetsAsPopupButton(
-            context,
-            addCard: addCard,
-            asSliver: asSliver,
-            expandToFillContainer: expandToFillContainer,
-            largeHorizontally: constraints.maxWidth >= ScaffoldFromZero.screenSizeMedium,
-            dense: dense,
-            focusNode: focusNode!,
-            useGlobalKeys: useGlobalKeys,
-          );
-        },
-      );
-    } else {
-      result = _builWidgetsAsPopupButton(
-        context,
-        addCard: addCard,
-        asSliver: asSliver,
-        expandToFillContainer: expandToFillContainer,
-        dense: dense,
-        focusNode: focusNode,
-        useGlobalKeys: useGlobalKeys,
-      );
-    }
-    if (asSliver) {
-      result = SliverToBoxAdapter(
-        child: result,
-      );
-    }
-    return [result];
-  }
-
-  Widget _builWidgetsAsPopupButton(
-    BuildContext context, {
-    required FocusNode focusNode,
-    bool addCard = false,
-    bool asSliver = true,
-    bool expandToFillContainer = true,
-    bool largeHorizontally = false,
-    bool dense = false,
-    bool useGlobalKeys = true,
-  }) {
-    Widget result = AnimatedBuilder(
-      animation: this,
-      builder: (context, child) {
-        Widget result = ComboField.buttonContentBuilder(
-          context,
-          uiName,
-          hint ?? uiName,
-          toString(),
-          enabled,
-          false,
-          showDropdownIcon: false,
-          dense: dense,
-        );
-        if (addCard || dense) {
-          result = InkWell(
-            focusNode: focusNode,
-            onTap: () => showTableAsPopup(context),
-            child: result,
-          );
-        } else {
-          result = TextButton(
-            focusNode: focusNode,
-            // style: TextButton.styleFrom(
-            //   padding: dense ? EdgeInsets.zero : null, // not needed since dense now uses InkWell
-            // ),
-            onPressed: () => showTableAsPopup(context),
-            child: result,
-          );
-        }
-        final visibleListFieldValidationErrors = passedFirstEdit
-            ? listFieldValidationErrors
-            : listFieldValidationErrors.where((e) => e.isBeforeEditing);
-        result = AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          color: dense && visibleListFieldValidationErrors.isNotEmpty
-              ? ValidationMessage
-                    .severityColors[Theme.of(
-                      context,
-                    ).brightness.inverse]![visibleListFieldValidationErrors.first.severity]!
-                    .withValues(alpha: 0.2)
-              : backgroundColor?.call(context, this, dao),
-          curve: Curves.easeOut,
-          child: result,
-        );
-        result = TooltipFromZero(
-          message:
-              (dense
-                      ? visibleListFieldValidationErrors
-                      : visibleListFieldValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
-                  .fold('', (a, b) {
-                    return a.toString().trim().isEmpty
-                        ? b.toString()
-                        : b.toString().trim().isEmpty
-                        ? a.toString()
-                        : '$a\n$b';
-                  }),
-          waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
-          child: result,
-        );
-        final actions = buildActions(dao.contextForValidation ?? context, focusNode);
-        final defaultActions = buildDefaultActions(context);
-        result = ContextMenuFromZero(
-          enabled: enabled,
-          addGestureDetector: !dense,
-          onShowMenu: () => focusNode.requestFocus(),
-          actions: [
-            ...actions,
-            if (actions.isNotEmpty && defaultActions.isNotEmpty) ActionFromZero.divider(),
-            ...defaultActions,
-          ],
-          child: result,
-        );
-        return result;
-      },
-    );
-    if (addCard) {
-      result = Card(
-        clipBehavior: Clip.hardEdge,
-        color: enabled ? null : Theme.of(context).canvasColor,
-        child: result,
-      );
-    }
-    result = EnsureVisibleWhenFocused(
-      focusNode: focusNode,
-      key: useGlobalKeys ? fieldGlobalKey : null,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
-        child: SizedBox(
-          width: maxWidth,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 64,
-                child: result,
-              ),
-              if (!dense)
-                ValidationMessage(
-                  errors: listFieldValidationErrors,
-                  passedFirstEdit: passedFirstEdit,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-    return result;
-  }
-
-  Future<void> showTableAsPopup(
-    BuildContext context, {
-    double? width,
-  }) async {
-    focusNode.requestFocus();
-    final scrollController = ScrollController();
-    final previousTableControllerState = tableController.currentState;
-    final newFieldGlobalKey = GlobalKey();
-    final newHeaderGlobalKey = GlobalKey();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (value!.isEmpty) maybeAddRow(context);
-    });
-    await showPopupFromZero<bool>(
-      context: context,
-      anchorKey: fieldGlobalKey,
-      width: width,
-      anchorAlignment: Alignment.center,
-      popupAlignment: Alignment.center,
-      builder: (context) {
-        return AnimatedBuilder(
-          animation: dao,
-          builder: (context, child) {
-            return ScrollbarFromZero(
-              controller: scrollController,
-              child: SingleChildScrollView(
-                controller: scrollController,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    ...buildWidgetsAsTable(
-                      context,
-                      addCard: false,
-                      asSliver: false, // PERF: 3 build as slivers, everything is supported in sliver form
-                      expandToFillContainer: false,
-                      dense: false,
-                      focusNode: FocusNode(),
-                      collapsed: false,
-                      collapsible: false,
-                      isMaximizedInForm: true,
-                      useGlobalKeys: false,
-                      fieldGlobalKey: newFieldGlobalKey,
-                      headerGlobalKey: newHeaderGlobalKey,
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-    // hack to allow the same TableController to be used in several tables
-    tableController.currentState = previousTableControllerState;
-    tableController.reInit();
-    // hack to reset textfields so the textEditingControllers don't get stuck
-    for (final obj in objects) {
-      for (final e in obj.props.values) {
-        e.fieldGlobalKey = GlobalKey();
-      }
-    }
-    notifyListeners();
-  }
-
-  ValueNotifier<int>? pageNotifier;
-  int? lastPage;
-  List<Widget> builWidgetsAsTabbedForm(
-    BuildContext context, {
-    bool addCard = true,
-    bool asSliver = true,
-    bool expandToFillContainer = true,
-    bool dense = false,
-    FocusNode? focusNode,
-    bool useGlobalKeys = true,
-  }) {
-    T objectTemplate = this.objectTemplate;
-    if (transformSelectedFromAvailablePool != null) {
-      objectTemplate = transformSelectedFromAvailablePool!(objectTemplate);
-      objectTemplate.parentDAO = dao;
-    }
-    focusNode ??= this.focusNode;
-    Widget result;
-    pageNotifier ??= ValueNotifier(0);
-    result = AnimatedBuilder(
-      animation: this,
-      builder: (context, child) {
-        final tabBarScrollController = ScrollController();
-        final userActions = buildActions(dao.contextForValidation ?? context, focusNode);
-        final defaultActions = buildDefaultActions(context, objectTemplate: objectTemplate);
-        final allActions = [
-          ...userActions,
-          if (userActions.isNotEmpty && defaultActions.isNotEmpty) ActionFromZero.divider(),
-          ...defaultActions,
-        ];
-        final visibleListFieldValidationErrors = passedFirstEdit
-            ? listFieldValidationErrors
-            : listFieldValidationErrors.where((e) => e.isBeforeEditing);
-        Widget result = Column(
-          children: [
-            ExcludeFocus(
-              child: TooltipFromZero(
-                message:
-                    (dense
-                            ? visibleListFieldValidationErrors
-                            : visibleListFieldValidationErrors.where(
-                                (e) => e.severity == ValidationErrorSeverity.disabling,
-                              ))
-                        .fold('', (a, b) {
-                          return a.toString().trim().isEmpty
-                              ? b.toString()
-                              : b.toString().trim().isEmpty
-                              ? a.toString()
-                              : '$a\n$b';
-                        }),
-                waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
-                child: Card(
-                  clipBehavior: Clip.hardEdge,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppbarFromZero(
-                        titleSpacing: 0,
-                        contextMenuEnabled: enabled,
-                        backgroundColor: Theme.of(context).cardColor,
-                        onShowContextMenu: () => focusNode!.requestFocus(),
-                        title: Row(
-                          children: [
-                            const SizedBox(
-                              width: 24,
-                            ),
-                            Expanded(
-                              child: OverflowScroll(
-                                autoscrollSpeed: null,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      uiName,
-                                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                                        fontSize: Theme.of(context).textTheme.titleLarge!.fontSize! * 0.85,
-                                      ),
-                                    ),
-                                    Text(
-                                      objects.isEmpty
-                                          ? FromZeroLocalizations.of(context).translate('no_elements')
-                                          : '${objects.length} ${objects.length > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')}',
-                                      style: Theme.of(context).textTheme.bodySmall,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        elevation: 0,
-                        actions: allActions,
-                      ),
-                      ScrollbarFromZero(
-                        controller: tabBarScrollController,
-                        opacityGradientDirection: OpacityGradient.horizontal,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          controller: tabBarScrollController,
-                          child: IntrinsicWidth(
-                            child: TabBar(
-                              // TODO: 3 replace this with an actual widget: PageIndicatorFromzero. Allow to have an indicator + building children dinamically according to selected
-                              isScrollable: false,
-                              indicatorWeight: 4,
-                              tabs: objects.mapIndexed((i, e) {
-                                String name = e.toString();
-                                if (name.isBlank) {
-                                  name = 'Pág. ${i + 1}'; // TODO: 3 internationalize
-                                }
-                                return ContextMenuFromZero(
-                                  enabled: enabled,
-                                  addOnTapDown: false,
-                                  onShowMenu: () => focusNode!.requestFocus(),
-                                  actions: [
-                                    if ((allowAddNew || hasAvailableObjectsPool))
-                                      ActionFromZero(
-                                        title:
-                                            '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate.uiName}',
-                                        icon: Icon(Icons.add, color: Theme.of(context).colorScheme.secondary),
-                                        breakpoints: {
-                                          0: ActionState.popup,
-                                        },
-                                        onTap: (context) async {
-                                          final result = await maybeAddRow(
-                                            dao.contextForValidation ?? context,
-                                            insertIndex: i,
-                                          );
-                                          if (result != null) {
-                                            userInteracted = true;
-                                          }
-                                          pageNotifier!.value = i + 1;
-                                        },
-                                      ),
-                                    if ((allowAddNew || hasAvailableObjectsPool)) ActionFromZero.divider(),
-                                    ActionFromZero(
-                                      icon: const Icon(Icons.edit_outlined),
-                                      title: FromZeroLocalizations.of(context).translate('edit'),
-                                      breakpoints: actionEditBreakpoints,
-                                      onTap: (context) async {
-                                        final copy = e.copyWith() as T;
-                                        copy.parentDAO = null;
-                                        copy.contextForValidation = dao.contextForValidation;
-                                        final result = await copy.maybeEdit(
-                                          dao.contextForValidation ?? context,
-                                          showDefaultSnackBars: showDefaultSnackBars,
-                                        );
-                                        if (result != null) {
-                                          replaceRow(e, copy);
-                                          userInteracted = true;
-                                          notifyListeners();
-                                        }
-                                      },
-                                    ),
-                                    ActionFromZero(
-                                      icon: const Icon(
-                                        MaterialCommunityIcons.content_duplicate,
-                                        size: 21,
-                                      ),
-                                      title: FromZeroLocalizations.of(context).translate('duplicate'),
-                                      breakpoints: actionDuplicateBreakpoints,
-                                      onTap: (context) async {
-                                        userInteracted = true;
-                                        duplicateRows([e]);
-                                      },
-                                    ),
-                                    if (objectTemplate.canDelete || hasAvailableObjectsPool)
-                                      ActionFromZero(
-                                        icon: Icon(
-                                          !hasAvailableObjectsPool ? Icons.delete_forever_outlined : Icons.clear,
-                                        ),
-                                        title: FromZeroLocalizations.of(context).translate('delete'),
-                                        breakpoints: actionDeleteBreakpoints,
-                                        onTap: (context) async {
-                                          if (await maybeDelete(
-                                            context,
-                                            [e],
-                                          )) {
-                                            focusNode!.requestFocus();
-                                            userInteracted = true;
-                                            passedFirstEdit = true;
-                                            notifyListeners();
-                                          }
-                                        },
-                                      ),
-                                  ],
-                                  child: Container(
-                                    height: 38,
-                                    padding: const EdgeInsets.only(bottom: 6),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      name,
-                                      style: Theme.of(context).textTheme.titleMedium,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onTap: (value) {
-                                pageNotifier!.value = value;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 0,
-              child: TabBarView(
-                children: List.filled(objects.length, Container()),
-              ),
-            ),
-            ValueListenableBuilder<int>(
-              valueListenable: pageNotifier!,
-              builder: (context, page, child) {
-                final tabController = DefaultTabController.of(context);
-                if (page < 0 || page > objects.length - 1) {
-                  if (objects.isNotEmpty) {
-                    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                      if (page < 0 || page > objects.length - 1) {
-                        pageNotifier!.value = objects.length - 1;
-                      }
-                    });
-                  }
-                  return const SizedBox.shrink();
-                }
-                if (page != tabController.index) {
-                  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                    if (page != tabController.index) {
-                      tabController.animateTo(page);
-                    }
-                  });
-                }
-                final e = objects[page];
-                String name = e.toString();
-                if (name.isBlank) {
-                  name = 'Pág. ${page + 1}'; // TODO: 3 internationalize
-                }
-                Widget result = PageTransitionSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  reverse: lastPage != null && lastPage! > page,
-                  layoutBuilder: (List<Widget> entries) {
-                    entries.sort(
-                      (a, b) {
-                        return ((b as KeyedSubtree).key! as ValueKey).value.compareTo(
-                          ((a as KeyedSubtree).key! as ValueKey).value,
-                        );
-                      },
-                    );
-                    return Stack(
-                      alignment: Alignment.topCenter,
-                      children: entries.sublist(0, min(2, entries.length)),
-                    );
-                  },
-                  transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
-                    return SharedAxisTransition(
-                      animation: primaryAnimation,
-                      secondaryAnimation: secondaryAnimation,
-                      transitionType: SharedAxisTransitionType.horizontal,
-                      fillColor: Colors.transparent,
-                      child: child,
-                    );
-                  },
-                  child: Container(
-                    key: ValueKey(page),
-                    padding: const EdgeInsets.only(
-                      top: 2,
-                      bottom: 10,
-                      left: 8,
-                      right: 8,
-                    ),
-                    child: Column(
-                      children: e.buildFormWidgets(
-                        context,
-                        asSlivers: false,
-                        showActionButtons: false,
-                      ),
-                    ),
-                  ),
-                );
-                lastPage = page;
-                return result;
-              },
-            ),
-          ],
-        );
-        result = Stack(
-          children: [
-            Positioned(
-              bottom: 8,
-              top: 48,
-              left: 2,
-              right: 2,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  border: Border.all(
-                    width: 2,
-                    color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.3),
-                  ),
-                ),
-              ),
-            ),
-            result,
-          ],
-        );
-        result = DefaultTabController(
-          length: objects.length,
-          child: result,
-        );
-        result = AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          color: dense && visibleListFieldValidationErrors.isNotEmpty
-              ? ValidationMessage
-                    .severityColors[Theme.of(
-                      context,
-                    ).brightness.inverse]![visibleListFieldValidationErrors.first.severity]!
-                    .withValues(alpha: 0.2)
-              : backgroundColor?.call(context, this, dao),
-          curve: Curves.easeOut,
-          child: result,
-        );
-        return result;
-      },
-    );
-    result = EnsureVisibleWhenFocused(
-      focusNode: focusNode,
-      key: useGlobalKeys ? fieldGlobalKey : null,
-      child: SizedBox(
-        width: maxWidth,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            result,
-            if (!dense)
-              ValidationMessage(
-                errors: listFieldValidationErrors,
-                passedFirstEdit: passedFirstEdit,
-              ),
-          ],
-        ),
-      ),
-    );
-    if (asSliver) {
-      result = SliverToBoxAdapter(
-        child: result,
-      );
-    }
-    return [result];
   }
 
   List<Widget> buildWidgetsAsCombo(
@@ -2295,233 +729,6 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     return result;
   }
 
-  Widget _buildWidgetsAsCombo(
-    BuildContext context, {
-    required FocusNode focusNode,
-    bool addCard = true,
-    bool asSliver = true,
-    bool expandToFillContainer = true,
-    bool dense = false,
-    bool? collapsible,
-    bool? collapsed,
-    Key? fieldGlobalKey,
-    ScrollController? mainScrollController,
-    bool largeHorizontally = false,
-    bool useGlobalKeys = true,
-  }) {
-    Widget result = AnimatedBuilder(
-      animation: this,
-      builder: (context, child) {
-        final enabled = this.enabled;
-        final visibleValidationErrors = passedFirstEdit
-            ? validationErrors
-            : validationErrors.where((e) => e.isBeforeEditing);
-        final name = ListField.listToStringSmart(
-          objects,
-          context: context,
-          modelNameSingular: objectTemplate.classUiName,
-          modelNamePlural: objectTemplate.classUiNamePlural,
-        );
-        Widget result = Padding(
-          padding: clearable ? const EdgeInsets.only(right: 76) : const EdgeInsets.only(right: 32),
-          child: ComboField.buttonContentBuilder(
-            context,
-            uiName,
-            hint,
-            name,
-            enabled,
-            false,
-            dense: dense,
-          ),
-        );
-        Future<void> onTap() async {
-          await maybeAddRow(
-            context,
-            insertIndex: 0,
-            replaceAllRows: hasAvailableObjectsPool,
-          );
-        }
-
-        if (addCard) {
-          result = InkWell(
-            key: useGlobalKeys ? headerGlobalKey : null,
-            onTap: onTap,
-            child: result,
-          );
-        } else {
-          result = TextButton(
-            key: useGlobalKeys ? headerGlobalKey : null,
-            onPressed: onTap,
-            child: result,
-          );
-        }
-        if (availableObjectsPoolProvider != null) {
-          result = Stack(
-            children: [
-              result,
-              Positioned(
-                left: 3,
-                top: 3,
-                child: ApiProviderBuilder(
-                  provider: availableObjectsPoolProvider!.call(context, this, dao),
-                  animatedSwitcherType: AnimatedSwitcherType.normal,
-                  dataBuilder: (context, data) {
-                    return const SizedBox.shrink();
-                  },
-                  loadingBuilder: (context, progress) {
-                    return SizedBox(
-                      height: 10,
-                      width: 10,
-                      child: LoadingSign(
-                        value: null,
-                        padding: EdgeInsets.zero,
-                        size: 12,
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace, onRetry) {
-                    return const SizedBox(
-                      height: 10,
-                      width: 10,
-                      child: Icon(
-                        Icons.error_outlined,
-                        color: Colors.red,
-                        size: 12,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        }
-        result = AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          color: dense && visibleValidationErrors.isNotEmpty
-              ? ValidationMessage
-                    .severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!
-                    .withValues(alpha: 0.2)
-              : backgroundColor?.call(context, this, dao),
-          curve: Curves.easeOut,
-          child: result,
-        );
-        result = TooltipFromZero(
-          message:
-              (dense
-                      ? visibleValidationErrors
-                      : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
-                  .fold('', (a, b) {
-                    return a.toString().trim().isEmpty
-                        ? b.toString()
-                        : b.toString().trim().isEmpty
-                        ? a.toString()
-                        : '$a\n$b';
-                  }),
-          waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
-          child: result,
-        );
-        if (!dense) {
-          final actions = buildActions(context, focusNode);
-          final defaultActions = buildDefaultActions(context);
-          var allActions = [
-            AnimatedActionFromZero(
-              animation: this,
-              builder: () => ActionFromZero(
-                title: 'Limpiar', // TODO: 3 internationalize
-                icon: const Icon(Icons.clear),
-                onTap: (context) {
-                  userInteracted = true;
-                  value = defaultValue;
-                  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                    focusNode.requestFocus();
-                  });
-                },
-                breakpoints: {0: enabled && value != defaultValue ? ActionState.icon : ActionState.popup},
-                disablingError: clearable && value != defaultValue ? null : '',
-              ),
-            ),
-            ...actions,
-            if (actions.isNotEmpty && defaultActions.isNotEmpty)
-              ActionFromZero.divider(breakpoints: {0: ActionState.popup}),
-            ...defaultActions,
-          ];
-          if (!enabled) {
-            allActions = allActions
-                .map(
-                  (e) => e.copyWith(
-                    disablingError: '',
-                  ),
-                )
-                .toList();
-          }
-          result = AppbarFromZero(
-            contextMenuEnabled: enabled,
-            onShowContextMenu: () => focusNode.requestFocus(),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            useFlutterAppbar: false,
-            extendTitleBehindActions: true,
-            toolbarHeight: 56,
-            paddingRight: 6,
-            actionPadding: 0,
-            skipTraversalForActions: true,
-            actions: allActions,
-            title: SizedBox(height: 56, child: result),
-          );
-        }
-        result = ValidationRequiredOverlay(
-          isRequired: isRequired,
-          isEmpty: enabled && (value == null || value!.isEmpty),
-          errors: validationErrors,
-          dense: dense,
-          child: result,
-        );
-        return result;
-      },
-    );
-    if (addCard) {
-      result = Card(
-        clipBehavior: Clip.hardEdge,
-        color: enabled ? null : Theme.of(context).canvasColor,
-        child: result,
-      );
-    }
-    result = EnsureVisibleWhenFocused(
-      focusNode: focusNode,
-      child: Padding(
-        key: useGlobalKeys ? fieldGlobalKey : null,
-        padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
-        child: SizedBox(
-          width: maxWidth,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 64,
-                child: result,
-              ),
-              if (!dense)
-                ValidationMessage(
-                  errors: validationErrors,
-                  passedFirstEdit: passedFirstEdit,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-    if (asSliver) {
-      result = SliverToBoxAdapter(
-        child: result,
-      );
-    }
-    return result;
-  }
-
-  late final _errorWidgetFocusNode = FocusNode();
-  late Map<T, RowModel<T>> _builtRows;
   List<Widget> buildWidgetsAsTable(
     BuildContext context, {
     bool addCard = true,
@@ -2564,8 +771,8 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     }
     actions.addAll(defaultActions);
     double rowHeight = this.rowHeight ?? (tableCellsEditable ? 48 : 36);
-    Map<String, ColModel> columns = {};
-    double getMinWidth(Iterable currentColumnKeys) {
+    Map<String, ColModel<dynamic>> columns = {};
+    double getMinWidth(Iterable<dynamic> currentColumnKeys) {
       double width = 0;
       for (final key in currentColumnKeys) {
         final value = columns[key];
@@ -2580,7 +787,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
       return width;
     }
 
-    double getMaxWidth(Iterable currentColumnKeys) {
+    double getMaxWidth(Iterable<dynamic> currentColumnKeys) {
       return max(minWidth, 1.4 * getMinWidth(currentColumnKeys));
     }
 
@@ -2625,7 +832,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
           if (this.onRowTap != null) {
             onRowTap = this.onRowTap;
           } else {
-            switch (this.rowTapType) {
+            switch (rowTapType) {
               case RowTapType.view:
                 onRowTap = (row) {
                   e.pushViewDialog(
@@ -2775,7 +982,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
         }
         final extraRowActions = extraRowActionsBuilder?.call(dao.contextForValidation ?? context, this, dao) ?? [];
         final defaultCellBuilder = tableCellsEditable
-            ? (BuildContext context, RowModel<T> row, dynamic colKey, ColModel? col) {
+            ? (BuildContext context, RowModel<T> row, dynamic colKey, ColModel<dynamic>? col) {
                 final widgets = (row.values[colKey] as Field).buildFieldEditorWidgets(
                   context,
                   expandToFillContainer: false,
@@ -2798,7 +1005,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                   ),
                 );
               }
-            : (BuildContext context, RowModel<T> row, dynamic colKey, ColModel? col) {
+            : (BuildContext context, RowModel<T> row, dynamic colKey, ColModel<dynamic>? col) {
                 return (row.values[colKey] as Field).buildViewWidget(
                   context,
                   linkToInnerDAOs: false,
@@ -2832,7 +1039,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
           emptyWidgetPadding: showBigAddButtonIfEmpty ? const EdgeInsets.only(top: 4) : EdgeInsets.zero,
           rowDisabledValidator:
               rowDisabledValidator ??
-              (this.onRowTap == null && rowTapType == RowTapType.edit ? (row) => row.id.canSave ? null : '' : null),
+              (onRowTap == null && rowTapType == RowTapType.edit ? (row) => row.id.canSave ? null : '' : null),
           rowTooltipGetter: rowTooltipGetter,
           cellBuilder: tableCellBuilder == null
               ? defaultCellBuilder
@@ -3131,174 +1338,1457 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     return resultList;
   }
 
-  Widget buildAddAddon({
-    required BuildContext context,
-    required bool? collapsed,
-    T? objectTemplate,
-    VoidCallback? onPressed,
-    bool addonEnabled = true,
+  List<Widget> builWidgetsAsPopupButton(
+    BuildContext context, {
+    bool addCard = true,
+    bool asSliver = true,
+    bool expandToFillContainer = true,
+    bool dense = false,
+    FocusNode? focusNode,
+    bool useGlobalKeys = true,
   }) {
-    objectTemplate ??= this.objectTemplate;
-    collapsed ??= this.collapsed;
-    return AnimatedBuilder(
+    focusNode ??= this.focusNode;
+    Widget result;
+    if (expandToFillContainer) {
+      result = LayoutBuilder(
+        builder: (context, constraints) {
+          return _builWidgetsAsPopupButton(
+            context,
+            addCard: addCard,
+            asSliver: asSliver,
+            expandToFillContainer: expandToFillContainer,
+            largeHorizontally: constraints.maxWidth >= ScaffoldFromZero.screenSizeMedium,
+            dense: dense,
+            focusNode: focusNode!,
+            useGlobalKeys: useGlobalKeys,
+          );
+        },
+      );
+    } else {
+      result = _builWidgetsAsPopupButton(
+        context,
+        addCard: addCard,
+        asSliver: asSliver,
+        expandToFillContainer: expandToFillContainer,
+        dense: dense,
+        focusNode: focusNode,
+        useGlobalKeys: useGlobalKeys,
+      );
+    }
+    if (asSliver) {
+      result = SliverToBoxAdapter(
+        child: result,
+      );
+    }
+    return [result];
+  }
+
+  List<Widget> builWidgetsAsTabbedForm(
+    BuildContext context, {
+    bool addCard = true,
+    bool asSliver = true,
+    bool expandToFillContainer = true,
+    bool dense = false,
+    FocusNode? focusNode,
+    bool useGlobalKeys = true,
+  }) {
+    T objectTemplate = this.objectTemplate;
+    if (transformSelectedFromAvailablePool != null) {
+      objectTemplate = transformSelectedFromAvailablePool!(objectTemplate);
+      objectTemplate.parentDAO = dao;
+    }
+    focusNode ??= this.focusNode;
+    Widget result;
+    pageNotifier ??= ValueNotifier(0);
+    result = AnimatedBuilder(
       animation: this,
       builder: (context, child) {
-        if (collapsed! || !enabled) {
-          return const SizedBox.shrink();
-        }
-        return ColoredBox(
-          color: backgroundColor?.call(context, this, dao) ?? Material.of(context).color ?? Theme.of(context).cardColor,
-          child: TextButton.icon(
-            style: TextButton.styleFrom(
-              backgroundColor: Color.alphaBlend(
-                Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
-                Theme.of(context).cardColor,
-              ),
-            ),
-            onPressed: !addonEnabled
-                ? null
-                : (onPressed ??
-                      () async {
-                        focusNode.requestFocus();
-                        final result = await maybeAddRow(dao.contextForValidation ?? context);
-                        if (result != null) {
-                          userInteracted = true;
-                        }
-                      }),
-            icon: const Icon(Icons.add),
-            label: Padding(
-              padding: const EdgeInsets.only(
-                top: 10,
-                bottom: 10,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 2),
-                child: Text(
-                  '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate!.uiName}',
-                  style: const TextStyle(
-                    fontSize: 16,
+        final tabBarScrollController = ScrollController();
+        final userActions = buildActions(dao.contextForValidation ?? context, focusNode);
+        final defaultActions = buildDefaultActions(context, objectTemplate: objectTemplate);
+        final allActions = [
+          ...userActions,
+          if (userActions.isNotEmpty && defaultActions.isNotEmpty) ActionFromZero.divider(),
+          ...defaultActions,
+        ];
+        final visibleListFieldValidationErrors = passedFirstEdit
+            ? listFieldValidationErrors
+            : listFieldValidationErrors.where((e) => e.isBeforeEditing);
+        Widget result = Column(
+          children: [
+            ExcludeFocus(
+              child: TooltipFromZero(
+                message:
+                    (dense
+                            ? visibleListFieldValidationErrors
+                            : visibleListFieldValidationErrors.where(
+                                (e) => e.severity == ValidationErrorSeverity.disabling,
+                              ))
+                        .fold('', (a, b) {
+                          return a.toString().trim().isEmpty
+                              ? b.toString()
+                              : b.toString().trim().isEmpty
+                              ? a.toString()
+                              : '$a\n$b';
+                        }),
+                waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
+                child: Card(
+                  clipBehavior: Clip.hardEdge,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppbarFromZero(
+                        titleSpacing: 0,
+                        contextMenuEnabled: enabled,
+                        backgroundColor: Theme.of(context).cardColor,
+                        onShowContextMenu: () => focusNode!.requestFocus(),
+                        title: Row(
+                          children: [
+                            const SizedBox(
+                              width: 24,
+                            ),
+                            Expanded(
+                              child: OverflowScroll(
+                                autoscrollSpeed: null,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      uiName,
+                                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                                        fontSize: Theme.of(context).textTheme.titleLarge!.fontSize! * 0.85,
+                                      ),
+                                    ),
+                                    Text(
+                                      objects.isEmpty
+                                          ? FromZeroLocalizations.of(context).translate('no_elements')
+                                          : '${objects.length} ${objects.length > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')}',
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        elevation: 0,
+                        actions: allActions,
+                      ),
+                      ScrollbarFromZero(
+                        controller: tabBarScrollController,
+                        opacityGradientDirection: OpacityGradient.horizontal,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          controller: tabBarScrollController,
+                          child: IntrinsicWidth(
+                            child: TabBar(
+                              // TODO: 3 replace this with an actual widget: PageIndicatorFromzero. Allow to have an indicator + building children dinamically according to selected
+                              isScrollable: false,
+                              indicatorWeight: 4,
+                              tabs: objects.mapIndexed((i, e) {
+                                String name = e.toString();
+                                if (name.isBlank) {
+                                  name = 'Pág. ${i + 1}'; // TODO: 3 internationalize
+                                }
+                                return ContextMenuFromZero(
+                                  enabled: enabled,
+                                  addOnTapDown: false,
+                                  onShowMenu: () => focusNode!.requestFocus(),
+                                  actions: [
+                                    if ((allowAddNew || hasAvailableObjectsPool))
+                                      ActionFromZero(
+                                        title:
+                                            '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate.uiName}',
+                                        icon: Icon(Icons.add, color: Theme.of(context).colorScheme.secondary),
+                                        breakpoints: {
+                                          0: ActionState.popup,
+                                        },
+                                        onTap: (context) async {
+                                          final result = await maybeAddRow(
+                                            dao.contextForValidation ?? context,
+                                            insertIndex: i,
+                                          );
+                                          if (result != null) {
+                                            userInteracted = true;
+                                          }
+                                          pageNotifier!.value = i + 1;
+                                        },
+                                      ),
+                                    if ((allowAddNew || hasAvailableObjectsPool)) ActionFromZero.divider(),
+                                    ActionFromZero(
+                                      icon: const Icon(Icons.edit_outlined),
+                                      title: FromZeroLocalizations.of(context).translate('edit'),
+                                      breakpoints: actionEditBreakpoints,
+                                      onTap: (context) async {
+                                        final copy = e.copyWith() as T;
+                                        copy.parentDAO = null;
+                                        copy.contextForValidation = dao.contextForValidation;
+                                        final result = await copy.maybeEdit(
+                                          dao.contextForValidation ?? context,
+                                          showDefaultSnackBars: showDefaultSnackBars,
+                                        );
+                                        if (result != null) {
+                                          replaceRow(e, copy);
+                                          userInteracted = true;
+                                          notifyListeners();
+                                        }
+                                      },
+                                    ),
+                                    ActionFromZero(
+                                      icon: const Icon(
+                                        MaterialCommunityIcons.content_duplicate,
+                                        size: 21,
+                                      ),
+                                      title: FromZeroLocalizations.of(context).translate('duplicate'),
+                                      breakpoints: actionDuplicateBreakpoints,
+                                      onTap: (context) async {
+                                        userInteracted = true;
+                                        duplicateRows([e]);
+                                      },
+                                    ),
+                                    if (objectTemplate.canDelete || hasAvailableObjectsPool)
+                                      ActionFromZero(
+                                        icon: Icon(
+                                          !hasAvailableObjectsPool ? Icons.delete_forever_outlined : Icons.clear,
+                                        ),
+                                        title: FromZeroLocalizations.of(context).translate('delete'),
+                                        breakpoints: actionDeleteBreakpoints,
+                                        onTap: (context) async {
+                                          if (await maybeDelete(
+                                            context,
+                                            [e],
+                                          )) {
+                                            focusNode!.requestFocus();
+                                            userInteracted = true;
+                                            passedFirstEdit = true;
+                                            notifyListeners();
+                                          }
+                                        },
+                                      ),
+                                  ],
+                                  child: Container(
+                                    height: 38,
+                                    padding: const EdgeInsets.only(bottom: 6),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      name,
+                                      style: Theme.of(context).textTheme.titleMedium,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              onTap: (value) {
+                                pageNotifier!.value = value;
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          ),
+            SizedBox(
+              height: 0,
+              child: TabBarView(
+                children: List.filled(objects.length, Container()),
+              ),
+            ),
+            ValueListenableBuilder<int>(
+              valueListenable: pageNotifier!,
+              builder: (context, page, child) {
+                final tabController = DefaultTabController.of(context);
+                if (page < 0 || page > objects.length - 1) {
+                  if (objects.isNotEmpty) {
+                    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                      if (page < 0 || page > objects.length - 1) {
+                        pageNotifier!.value = objects.length - 1;
+                      }
+                    });
+                  }
+                  return const SizedBox.shrink();
+                }
+                if (page != tabController.index) {
+                  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                    if (page != tabController.index) {
+                      tabController.animateTo(page);
+                    }
+                  });
+                }
+                final e = objects[page];
+                String name = e.toString();
+                if (name.isBlank) {
+                  name = 'Pág. ${page + 1}'; // TODO: 3 internationalize
+                }
+                Widget result = PageTransitionSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  reverse: lastPage != null && lastPage! > page,
+                  layoutBuilder: (List<Widget> entries) {
+                    entries.sort(
+                      (a, b) {
+                        return (((b as KeyedSubtree).key! as ValueKey).value as Comparable).compareTo(
+                          (((a as KeyedSubtree).key! as ValueKey).value as Comparable),
+                        );
+                      },
+                    );
+                    return Stack(
+                      alignment: Alignment.topCenter,
+                      children: entries.sublist(0, min(2, entries.length)),
+                    );
+                  },
+                  transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
+                    return SharedAxisTransition(
+                      animation: primaryAnimation,
+                      secondaryAnimation: secondaryAnimation,
+                      transitionType: SharedAxisTransitionType.horizontal,
+                      fillColor: Colors.transparent,
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    key: ValueKey(page),
+                    padding: const EdgeInsets.only(
+                      top: 2,
+                      bottom: 10,
+                      left: 8,
+                      right: 8,
+                    ),
+                    child: Column(
+                      children: e.buildFormWidgets(
+                        context,
+                        asSlivers: false,
+                        showActionButtons: false,
+                      ),
+                    ),
+                  ),
+                );
+                lastPage = page;
+                return result;
+              },
+            ),
+          ],
         );
+        result = Stack(
+          children: [
+            Positioned(
+              bottom: 8,
+              top: 48,
+              left: 2,
+              right: 2,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  border: Border.all(
+                    width: 2,
+                    color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: 0.3),
+                  ),
+                ),
+              ),
+            ),
+            result,
+          ],
+        );
+        result = DefaultTabController(
+          length: objects.length,
+          child: result,
+        );
+        result = AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          color: dense && visibleListFieldValidationErrors.isNotEmpty
+              ? ValidationMessage
+                    .severityColors[Theme.of(
+                      context,
+                    ).brightness.inverse]![visibleListFieldValidationErrors.first.severity]!
+                    .withValues(alpha: 0.2)
+              : backgroundColor?.call(context, this, dao),
+          curve: Curves.easeOut,
+          child: result,
+        );
+        return result;
       },
     );
-  }
-
-  static Widget defaultViewWidgetBuilder<T extends DAO>(
-    BuildContext context,
-    Field<ComparableList<DAO>> fieldParam, {
-    bool linkToInnerDAOs = true,
-    bool showViewButtons = false,
-    bool dense = false,
-    bool? hidden,
-    int autoSizeTextMaxLines = 1,
-  }) {
-    if (dense) {
-      return Field.defaultViewWidgetBuilder(
-        context,
-        fieldParam,
-        showViewButtons: showViewButtons,
-        linkToInnerDAOs: linkToInnerDAOs,
-        dense: dense,
-      );
-    }
-    if (hidden ?? fieldParam.hiddenInView) {
-      return const SizedBox.shrink();
-    }
-    final field = fieldParam as ListField;
-    final List<DAO> sortedObjects = List.from(field.objects);
-    if (field.initialSortedColumn != null) {
-      sortedObjects.sort();
-    }
-    if (field.separateScrollableBreakpoint != null && field.objects.length > field.separateScrollableBreakpoint!) {
-      final scrollController = ScrollController();
-      return Container(
-        height:
-            MediaQuery.sizeOf(context).height -
-            MediaQuery.viewPaddingOf(context).vertical -
-            MediaQuery.viewInsetsOf(context).vertical -
-            256,
-        padding: const EdgeInsets.only(right: 24),
-        child: ScrollbarFromZero(
-          controller: scrollController,
-          child: ListView.builder(
-            controller: scrollController,
-            itemCount: sortedObjects.length,
-            padding: dense ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: 3),
-            itemBuilder: (context, index) {
-              return defaultViewWidgetBuilderElement(
-                context,
-                sortedObjects[index],
-                linkToInnerDAOs: linkToInnerDAOs,
-                showViewButtons: showViewButtons,
-                dense: dense,
-              );
-            },
-          ),
-        ),
-      );
-    } else {
-      return Padding(
-        padding: dense ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: 3),
+    result = EnsureVisibleWhenFocused(
+      focusNode: focusNode,
+      key: useGlobalKeys ? fieldGlobalKey : null,
+      child: SizedBox(
+        width: maxWidth,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: sortedObjects.map((e) {
-            return defaultViewWidgetBuilderElement(
-              context,
-              e,
-              linkToInnerDAOs: linkToInnerDAOs,
-              showViewButtons: showViewButtons,
-              dense: dense,
-            );
-          }).toList(),
-        ),
-      );
-    }
-  }
-
-  static Widget defaultViewWidgetBuilderElement(
-    BuildContext context,
-    DAO e, {
-    bool linkToInnerDAOs = true,
-    bool showViewButtons = false,
-    bool dense = false,
-  }) {
-    final objectLinkToInnerDAOs = linkToInnerDAOs && e.wantsLinkToSelfFromOtherDAOs;
-    final onTap = objectLinkToInnerDAOs ? () => e.pushViewDialog(context) : null;
-    final uiName = dense ? e.uiNameDense : e.toString();
-    return InkWellTranslucent(
-      onTap: onTap,
-      child: Padding(
-        padding: dense ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Expanded(
-              child: dense
-                  ? Text(
-                      uiName,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    )
-                  : SelectableText(
-                      uiName,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-            ),
-            if (showViewButtons && onTap != null)
-              Padding(
-                padding: const EdgeInsets.only(left: 12),
-                child: IconButton(
-                  icon: const Icon(Icons.info_outline),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(maxHeight: 32),
-                  onPressed: onTap,
-                ),
+            result,
+            if (!dense)
+              ValidationMessage(
+                errors: listFieldValidationErrors,
+                passedFirstEdit: passedFirstEdit,
               ),
           ],
         ),
+      ),
+    );
+    if (asSliver) {
+      result = SliverToBoxAdapter(
+        child: result,
+      );
+    }
+    return [result];
+  }
+
+  @override
+  void commitRedo(
+    ComparableList<T>? currentValue, {
+    bool removeEntryFromDAO = false,
+    bool requestFocus = true,
+  }) {
+    super.commitRedo(
+      currentValue,
+      removeEntryFromDAO: removeEntryFromDAO,
+      requestFocus: requestFocus,
+    );
+    tableController.reInit();
+  }
+
+  @override
+  void commitUndo(
+    ComparableList<T>? currentValue, {
+    bool removeEntryFromDAO = false,
+    bool requestFocus = true,
+  }) {
+    super.commitUndo(
+      currentValue,
+      removeEntryFromDAO: removeEntryFromDAO,
+      requestFocus: requestFocus,
+    );
+    tableController.reInit();
+  }
+
+  @override
+  ListField<T, U> copyWith({
+    FieldValueGetter<String, Field>? uiNameGetter,
+    ComparableList<T>? value,
+    ComparableList<T>? dbValue,
+    FieldValueGetter<String?, Field>? hintGetter,
+    FieldValueGetter<String?, Field>? tooltipGetter,
+    FieldValueGetter<bool, Field>? clearableGetter,
+    double? maxWidth,
+    double? minWidth,
+    double? flex,
+    FieldValueGetter<T, ListField<T, U>>? objectTemplateGetter,
+    Future<List<T>>? futureObjects,
+    List<T>? objects,
+    List<T>? dbObjects,
+    double? tableColumnWidth,
+    FieldValueGetter<bool, Field>? hiddenGetter,
+    FieldValueGetter<bool, Field>? hiddenInTableGetter,
+    FieldValueGetter<bool, Field>? hiddenInViewGetter,
+    FieldValueGetter<bool, Field>? hiddenInFormGetter,
+    bool? collapsible,
+    Map<double, ActionState>? actionAddBreakpoints,
+    Map<double, ActionState>? actionViewBreakpoints,
+    Map<double, ActionState>? actionEditBreakpoints,
+    Map<double, ActionState>? actionDuplicateBreakpoints,
+    Map<double, ActionState>? actionDeleteBreakpoints,
+    Map<String, ColModel<dynamic>> Function(DAO<dynamic> dao, ListField<T, U> listField, T objectTemplate)?
+    tableColumnsBuilder,
+    RowModel<T> Function(
+      T element,
+      BuildContext context,
+      ListField<T, U> field,
+      DAO<dynamic> dao,
+      Map<String, ColModel<dynamic>> columns,
+      ValueChanged<RowModel<T>>? onRowTap,
+      Widget? rowAddonWidget,
+    )?
+    tableRowBuilder,
+    Widget? Function(
+      BuildContext context,
+      RowModel<T> row,
+      int index,
+      double? minWidth,
+      Widget Function(BuildContext context, RowModel<T> row, int index, double? minWidth) defaultRowBuilder,
+    )?
+    tableRowWidgetBuilder,
+    Widget? Function(
+      BuildContext context,
+      RowModel<T> row,
+      dynamic colKey,
+      ColModel<dynamic>? col,
+      CellBuilder<T> defaultBuilder,
+    )?
+    tableCellBuilder,
+    bool? skipDeleteConfirmation,
+    bool? showTableHeaders,
+    bool? showTableHeaderAddon,
+    bool? showElementCount,
+    double? rowHeight,
+    ContextFulFieldValueGetter<Future<List<T>>, ListField<T, U>>? availableObjectsPoolGetter,
+    ContextFulFieldValueGetter<ApiProvider<List<T>>, ListField<T, U>>? availableObjectsPoolProvider,
+    bool? allowDuplicateObjectsFromAvailablePool,
+    bool? showObjectsFromAvailablePoolAsTable,
+    bool? sortObjectsFromAvailablePool,
+    AvailablePoolTransformerFunction<T>? transformSelectedFromAvailablePool,
+    ContextFulFieldValueGetter<List<ActionFromZero>, Field>? availablePoolTableActions,
+    bool? allowAddNew,
+    ListFieldDisplayType? displayType,
+    String Function(ListField<DAO<dynamic>, dynamic> field)? toStringGetter,
+    ContextFulFieldValueGetter<List<RowAction<T>>, ListField<T, U>>? extraRowActionBuilders,
+    int? initialSortColumn,
+    bool? sortNullOnTop,
+    bool? tableCellsEditable,
+    bool? allowTableCustomization,
+    bool? ignoreWidthGettersIfEmpty,
+    bool? allowMultipleSelection,
+    bool? selectionDefault,
+    ValueChanged<RowModel<dynamic>>? onRowTap,
+    bool? showAddButtonAtEndOfTable,
+    bool? showEditDialogOnAdd,
+    TableErrorWidgetBuilder<Widget, ListField<T, U>>? tableErrorWidget,
+    bool? showDefaultSnackBars,
+    FieldValueGetter<List<FieldValidator<ComparableList<T>>>, Field>? validatorsGetter,
+    bool? validateOnlyOnConfirm,
+    TableController<T>? tableController,
+    bool? tableSortable,
+    bool? tableFilterable,
+    FieldValueGetter<SimpleColModel<dynamic>, Field>? colModelBuilder,
+    List<ComparableList<T>?>? undoValues,
+    List<ComparableList<T>?>? redoValues,
+    bool? invalidateNonEmptyValuesIfHiddenInForm,
+    bool? invalidateValuesNotInAvailablePool,
+    ComparableList<T>? defaultValue,
+    bool? expandHorizontally,
+    ContextFulFieldValueGetter<Color?, Field>? backgroundColor,
+    ContextFulFieldValueGetter<List<ActionFromZero>, Field>? actionsGetter,
+    ViewWidgetBuilder<ComparableList<T>>? viewWidgetBuilder,
+    Widget? icon,
+    List<RowModel<T>> Function(List<RowModel<T>>)? onFilter,
+    FutureOr<String>? exportPathForExcel,
+    bool? buildViewWidgetAsTable,
+    bool? addSearchAction,
+    OnFieldValueChanged<ComparableList<T>?>? onValueChanged,
+    RowTapType? rowTapType,
+    double? tableFooterStickyOffset,
+    double? tableHorizontalPadding,
+    String? rowAddonField,
+    bool? allowAddMultipleFromAvailablePool,
+    ValueNotifier<int>? pageNotifier,
+    double? separateScrollableBreakpoint,
+    FieldValueGetter<List<ListField<T, U>>, ListField<T, U>>? proxiedListFields,
+    String? Function(RowModel<T> row)? rowDisabledValidator,
+    String? Function(RowModel<T> row)? rowTooltipGetter,
+    void Function(List<RowModel<T>> rows)? onSort,
+    bool? showBigAddButtonIfEmpty,
+    bool? enableMaximizeActionInForm,
+  }) {
+    return ListField<T, U>(
+      uiNameGetter: uiNameGetter ?? this.uiNameGetter,
+      clearableGetter: clearableGetter ?? this.clearableGetter,
+      maxWidth: maxWidth ?? this.maxWidth,
+      minWidth: minWidth ?? this.minWidth,
+      flex: flex ?? this.flex,
+      objectTemplateGetter: objectTemplateGetter ?? this.objectTemplateGetter,
+      objects: objects ?? this.objects.map((e) => e.copyWith() as T).toList(),
+      dbObjects: dbObjects ?? objects ?? this.dbObjects.map((e) => e.copyWith() as T).toList(),
+      hintGetter: hintGetter ?? this.hintGetter,
+      tooltipGetter: tooltipGetter ?? this.tooltipGetter,
+      tableColumnWidth: tableColumnWidth ?? this.tableColumnWidth,
+      hiddenInTableGetter: hiddenInTableGetter ?? hiddenGetter ?? this.hiddenInTableGetter,
+      hiddenInViewGetter: hiddenInViewGetter ?? hiddenGetter ?? this.hiddenInViewGetter,
+      hiddenInFormGetter: hiddenInFormGetter ?? hiddenGetter ?? this.hiddenInFormGetter,
+      collapsible: collapsible ?? this.collapsible,
+      actionAddBreakpoints: actionAddBreakpoints ?? this.actionAddBreakpoints,
+      actionViewBreakpoints: actionViewBreakpoints ?? this.actionViewBreakpoints,
+      actionEditBreakpoints: actionEditBreakpoints ?? this.actionEditBreakpoints,
+      actionDuplicateBreakpoints: actionDuplicateBreakpoints ?? this.actionDuplicateBreakpoints,
+      actionDeleteBreakpoints: actionDeleteBreakpoints ?? this.actionDeleteBreakpoints,
+      availableObjectsPoolGetter: availableObjectsPoolGetter ?? this.availableObjectsPoolGetter,
+      availableObjectsPoolProvider: availableObjectsPoolProvider ?? this.availableObjectsPoolProvider,
+      allowDuplicateObjectsFromAvailablePool:
+          allowDuplicateObjectsFromAvailablePool ?? this.allowDuplicateObjectsFromAvailablePool,
+      availablePoolTableActions: availablePoolTableActions ?? this.availablePoolTableActions,
+      allowAddNew: allowAddNew ?? _allowAddNew,
+      displayType: displayType ?? this.displayType,
+      toStringGetter: toStringGetter ?? this.toStringGetter,
+      extraRowActionsBuilder: extraRowActionBuilders ?? extraRowActionsBuilder,
+      skipDeleteConfirmation: skipDeleteConfirmation ?? _skipDeleteConfirmation,
+      showTableHeaders: showTableHeaders ?? this.showTableHeaders,
+      showTableHeaderAddon: showTableHeaderAddon ?? this.showTableHeaderAddon,
+      showElementCount: showElementCount ?? this.showElementCount,
+      rowHeight: rowHeight ?? this.rowHeight,
+      initialSortedColumn: initialSortColumn ?? initialSortedColumn,
+      sortNullOnTop: sortNullOnTop ?? this.sortNullOnTop,
+      tableCellsEditable: tableCellsEditable ?? this.tableCellsEditable,
+      allowTableCustomization: allowTableCustomization ?? this.allowTableCustomization,
+      ignoreWidthGettersIfEmpty: ignoreWidthGettersIfEmpty ?? this.ignoreWidthGettersIfEmpty,
+      allowMultipleSelection: allowMultipleSelection ?? this.allowMultipleSelection,
+      selectionDefault: selectionDefault ?? this.selectionDefault,
+      onRowTap: onRowTap ?? this.onRowTap,
+      showAddButtonAtEndOfTable: showAddButtonAtEndOfTable ?? this.showAddButtonAtEndOfTable,
+      showEditDialogOnAdd: showEditDialogOnAdd ?? this.showEditDialogOnAdd,
+      tableErrorWidget: tableErrorWidget ?? this.tableErrorWidget,
+      showDefaultSnackBars: showDefaultSnackBars ?? _showDefaultSnackBars,
+      validatorsGetter: validatorsGetter ?? this.validatorsGetter,
+      validateOnlyOnConfirm: validateOnlyOnConfirm ?? this.validateOnlyOnConfirm,
+      showObjectsFromAvailablePoolAsTable:
+          showObjectsFromAvailablePoolAsTable ?? this.showObjectsFromAvailablePoolAsTable,
+      sortObjectsFromAvailablePool: sortObjectsFromAvailablePool ?? this.sortObjectsFromAvailablePool,
+      transformSelectedFromAvailablePool: transformSelectedFromAvailablePool ?? this.transformSelectedFromAvailablePool,
+      tableController: tableController ?? this.tableController,
+      tableSortable: tableSortable ?? this.tableSortable,
+      tableFilterable: tableFilterable ?? this.tableFilterable,
+      colModelBuilder: colModelBuilder ?? this.colModelBuilder,
+      undoValues: undoValues ?? List.from(this.undoValues),
+      redoValues: redoValues ?? List.from(this.redoValues),
+      invalidateNonEmptyValuesIfHiddenInForm:
+          invalidateNonEmptyValuesIfHiddenInForm ?? this.invalidateNonEmptyValuesIfHiddenInForm,
+      invalidateValuesNotInAvailablePool: invalidateValuesNotInAvailablePool ?? this.invalidateValuesNotInAvailablePool,
+      defaultValue: defaultValue ?? this.defaultValue,
+      expandHorizontally: expandHorizontally ?? this.expandHorizontally,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      actionsGetter: actionsGetter ?? this.actionsGetter,
+      viewWidgetBuilder: viewWidgetBuilder ?? this.viewWidgetBuilder,
+      icon: icon ?? this.icon,
+      onFilter: onFilter ?? this.onFilter,
+      exportPathForExcel: exportPathForExcel ?? this.exportPathForExcel,
+      buildViewWidgetAsTable: buildViewWidgetAsTable ?? this.buildViewWidgetAsTable,
+      addSearchAction: addSearchAction ?? this.addSearchAction,
+      onValueChanged: onValueChanged ?? this.onValueChanged,
+      rowTapType: rowTapType ?? this.rowTapType,
+      tableColumnsBuilder: tableColumnsBuilder ?? this.tableColumnsBuilder,
+      tableRowBuilder: tableRowBuilder ?? this.tableRowBuilder,
+      tableRowWidgetBuilder: tableRowWidgetBuilder ?? this.tableRowWidgetBuilder,
+      tableCellBuilder: tableCellBuilder ?? this.tableCellBuilder,
+      tableFooterStickyOffset: tableFooterStickyOffset ?? this.tableFooterStickyOffset,
+      tableHorizontalPadding: tableHorizontalPadding ?? this.tableHorizontalPadding,
+      rowAddonField: rowAddonField ?? this.rowAddonField,
+      allowAddMultipleFromAvailablePool: allowAddMultipleFromAvailablePool ?? this.allowAddMultipleFromAvailablePool,
+      pageNotifier: pageNotifier ?? this.pageNotifier,
+      separateScrollableBreakpoint: separateScrollableBreakpoint ?? this.separateScrollableBreakpoint,
+      proxiedListFields: proxiedListFields ?? this.proxiedListFields,
+      rowDisabledValidator: rowDisabledValidator ?? this.rowDisabledValidator,
+      rowTooltipGetter: rowTooltipGetter ?? this.rowTooltipGetter,
+      onSort: onSort ?? this.onSort,
+      showBigAddButtonIfEmpty: showBigAddButtonIfEmpty ?? this.showBigAddButtonIfEmpty,
+      enableMaximizeActionInForm: enableMaximizeActionInForm ?? this.enableMaximizeActionInForm,
+    );
+  }
+
+  void duplicateRow(
+    T element, {
+    bool focusAdded = true,
+  }) => duplicateRows(
+    [element],
+    focusAdded: focusAdded,
+  );
+
+  void duplicateRows(
+    Iterable<T> elements, {
+    bool focusAdded = true,
+  }) {
+    if (elements.isEmpty) return;
+    final newValue = value!.copyWith();
+    for (final e in elements) {
+      int index = newValue.indexOf(e);
+      final newItem = e.copyWith() as T;
+      if (e is LazyDAO) (e as LazyDAO).ensureInitialized();
+      newItem.id = null;
+      newItem.parentDAO = dao;
+      if (index < 0) {
+        newValue.add(newItem);
+      } else {
+        newValue.insert(index + 1, newItem);
+      }
+    }
+    value = newValue;
+    if (focusAdded) {
+      focusObject(elements.first);
+    }
+  }
+
+  void focusObject(T object) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      try {
+        if (tableCellsEditable) {
+          object.props.values.firstOrNullWhere((e) => !e.hiddenInForm)?.focusNode.requestFocus();
+        } else {
+          _builtRows[object]?.focusNode.requestFocus();
+        }
+      } catch (_) {}
+    });
+  }
+
+  Future<List<T>?> maybeAddRow(
+    BuildContext context, {
+    int? insertIndex,
+    bool replaceAllRows = false,
+  }) async {
+    focusNode.requestFocus();
+    T objectTemplate = this.objectTemplate;
+    T emptyDAO = (objectTemplate.copyWith() as T)..id = null;
+    if (emptyDAO is LazyDAO) (emptyDAO as LazyDAO).ensureInitialized();
+    emptyDAO.contextForValidation = dao.contextForValidation;
+    assert(!replaceAllRows || hasAvailableObjectsPool, "Can't replace all rows without an availableObjects pool");
+    if (hasAvailableObjectsPool) {
+      dynamic selected;
+      if (showObjectsFromAvailablePoolAsTable || replaceAllRows) {
+        final allowAddMultipleFromAvailablePool = this.allowAddMultipleFromAvailablePool || replaceAllRows;
+        final ValueNotifier<Map<T, bool>> selectedObjects = ValueNotifier({});
+        ValueNotifier<List<T>?> availableData = ValueNotifier(null);
+        emptyDAO.onDidSave = (BuildContext context, U? model, DAO<U> dao) {
+          objectTemplate.onDidSave?.call(context, model, dao);
+          try {
+            if ((model as dynamic).id != -1) dao.id = (model as dynamic).id;
+          } catch (_) {
+            try {
+              if (dao.id != -1) dao.id = model;
+            } catch (_) {}
+          }
+          selectedObjects.value[dao as T] = true;
+          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+            Navigator.of(context).pop(dao);
+          });
+        };
+        Widget content = AnimatedBuilder(
+          animation: this,
+          builder: (context, child) {
+            return Stack(
+              children: [
+                availableObjectsPoolProvider == null
+                    ? FutureBuilderFromZero<List<T>>(
+                        future: availableObjectsPoolGetter!(context, this, dao),
+                        loadingBuilder: _availablePoolLoadingBuilder,
+                        errorBuilder: (context, error, stackTrace) =>
+                            _availablePoolErrorBuilder(context, error, stackTrace is StackTrace ? stackTrace : null),
+                        successBuilder: (context, data) {
+                          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                            availableData.value = data;
+                          });
+                          return _availablePoolTableDataBuilder(
+                            context,
+                            data,
+                            emptyDAO,
+                            selectedObjects: selectedObjects,
+                            replaceAllRows: replaceAllRows,
+                          );
+                        },
+                      )
+                    : ApiProviderBuilder<List<T>>(
+                        provider: availableObjectsPoolProvider!(context, this, dao),
+                        loadingBuilder: _availablePoolLoadingBuilder,
+                        errorBuilder: _availablePoolErrorBuilder,
+                        dataBuilder: (context, data) {
+                          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                            availableData.value = data;
+                          });
+                          return _availablePoolTableDataBuilder(
+                            context,
+                            data,
+                            emptyDAO,
+                            selectedObjects: selectedObjects,
+                            replaceAllRows: replaceAllRows,
+                          );
+                        },
+                      ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        height: 16,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Theme.of(context).cardColor.withValues(alpha: 0),
+                              Theme.of(context).cardColor,
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(
+                          bottom: 8,
+                          right: 16,
+                        ),
+                        color: Theme.of(context).cardColor,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const DialogButton.cancel(),
+                            if (allowAddMultipleFromAvailablePool)
+                              MultiValueListenableBuilder(
+                                valueListenables: [
+                                  availableData,
+                                  selectedObjects,
+                                ],
+                                builder: (context, values, child) {
+                                  List<T>? availableData = values[0];
+                                  Map<T, bool> selectedObjects = values[1];
+                                  final selected = availableData == null
+                                      ? <T>[]
+                                      : availableData.where((e) {
+                                          return selectedObjects[e] ?? selectionDefault;
+                                        }).toList();
+                                  return DialogButton.accept(
+                                    onPressed: selected.isEmpty
+                                        ? null
+                                        : () {
+                                            Navigator.of(context).pop(selected);
+                                          },
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+        selected = await showPopupFromZero<dynamic>(
+          context: context,
+          anchorKey: headerGlobalKey,
+          width: maxWidth == double.infinity ? null : maxWidth,
+          builder: (modalContext) {
+            return content;
+          },
+        );
+      } else {
+        selected = await showPopupFromZero<dynamic>(
+          context: context,
+          anchorKey: headerGlobalKey,
+          builder: (context) {
+            return Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 16 + 42,
+                  ),
+                  child: availableObjectsPoolProvider == null
+                      ? FutureBuilderFromZero<List<T>>(
+                          future: availableObjectsPoolGetter!(context, this, dao),
+                          loadingBuilder: _availablePoolLoadingBuilder,
+                          errorBuilder: (context, error, stackTrace) =>
+                              _availablePoolErrorBuilder(context, error, stackTrace is StackTrace ? stackTrace : null),
+                          successBuilder: (context, data) {
+                            return _availablePoolComboDataBuilder(context, data, emptyDAO);
+                          },
+                        )
+                      : ApiProviderBuilder<List<T>>(
+                          provider: availableObjectsPoolProvider!(context, this, dao),
+                          loadingBuilder: _availablePoolLoadingBuilder,
+                          errorBuilder: _availablePoolErrorBuilder,
+                          dataBuilder: (context, data) {
+                            return _availablePoolComboDataBuilder(context, data, emptyDAO);
+                          },
+                        ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        height: 16,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Theme.of(context).cardColor.withValues(alpha: 0),
+                              Theme.of(context).cardColor,
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(
+                          bottom: 8,
+                          right: 16,
+                        ),
+                        color: Theme.of(context).cardColor,
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            DialogButton.cancel(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }
+      if (selected != null) {
+        if (selected is T) {
+          selected = [selected];
+        }
+        selected as List<T>;
+        if (transformSelectedFromAvailablePool != null) {
+          selected = selected.map((e) => transformSelectedFromAvailablePool!(e)).toList();
+        }
+        if (replaceAllRows) {
+          final toRemove = <T>[];
+          for (final e in objects) {
+            if (!selected.contains(e)) toRemove.add(e);
+          }
+          removeRows(toRemove);
+          final toAdd = <T>[];
+          for (final e in selected) {
+            if (!objects.contains(e)) toAdd.add(e);
+          }
+          addRows(toAdd, insertIndex: insertIndex);
+        } else {
+          addRows(selected, insertIndex: insertIndex);
+        }
+        return selected;
+      }
+    } else {
+      dynamic result;
+      if (showEditDialogOnAdd) {
+        result = await emptyDAO.maybeEdit(
+          dao.contextForValidation ?? context,
+          showDefaultSnackBars: showDefaultSnackBars,
+        );
+        if (result != null) {
+          addRow(emptyDAO, insertIndex: insertIndex);
+          return [emptyDAO];
+        }
+      } else {
+        addRow(emptyDAO, insertIndex: insertIndex);
+        return [emptyDAO];
+      }
+    }
+  }
+
+  Future<bool> maybeDelete(
+    BuildContext context,
+    List<T> elements,
+  ) async {
+    if (elements.isEmpty) return false;
+    bool? delete =
+        skipDeleteConfirmation ||
+        hasAvailableObjectsPool ||
+        (await showModalFromZero(
+              context: context,
+              builder: (context) {
+                return DialogFromZero(
+                  title: Text(FromZeroLocalizations.of(context).translate('confirm_delete_title')),
+                  content: Text(
+                    '${FromZeroLocalizations.of(context).translate('confirm_delete_desc')} ${elements.length} ${elements.length > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')}?',
+                  ),
+                  // TODO: 2 show more details about elements to be deleted
+                  dialogActions: [
+                    const DialogButton.cancel(),
+                    DialogButton(
+                      color: Colors.red,
+                      onPressed: () {
+                        Navigator.of(context).pop(true); // Dismiss alert dialog
+                      },
+                      child: Text(
+                        FromZeroLocalizations.of(context).translate('delete_caps'),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ) ??
+            false);
+    if (delete) {
+      bool result = false;
+      if (!hasAvailableObjectsPool && objectTemplate.canDelete) {
+        if (elements.length > 1) {
+          throw UnimplementedError('multiple deletion handling not implemented');
+        }
+        result = await elements.first.delete(
+          dao.contextForValidation ?? context,
+          showDefaultSnackBar: showDefaultSnackBars,
+        );
+        if (result) {
+          result = removeRows(elements);
+        }
+      } else {
+        result = removeRows(elements);
+      }
+      return result;
+    }
+    return false;
+  }
+
+  void notifyListenersAndReinitTable() {
+    tableController.reInit();
+    notifyListeners();
+  }
+
+  bool removeRow(T element) => removeRows([element]);
+
+  bool removeRows(Iterable<T> elements) {
+    if (elements.isEmpty) return false;
+    bool result = false;
+    final newValue = value!.copyWith();
+    for (final e in elements) {
+      result = newValue.remove(e) || result;
+      if (proxiedListFields != null) {
+        for (final proxiedList in proxiedListFields!(this, dao)) {
+          result = proxiedList.removeRow(e) || result;
+        }
+      }
+    }
+    if (result) {
+      value = newValue;
+    }
+    return result;
+  }
+
+  bool replaceRow(
+    T oldRow,
+    T newRow, {
+    bool focusAdded = true,
+  }) => replaceRows(
+    {oldRow: newRow},
+    focusAdded: focusAdded,
+  );
+
+  bool replaceRows(
+    Map<T, T> elements, {
+    bool focusAdded = true,
+  }) {
+    if (elements.isEmpty) return false;
+    bool result = true;
+    final newValue = value!.copyWith();
+    elements.forEach((key, value) {
+      value.parentDAO = dao;
+      int index = newValue.indexOf(key);
+      bool foundInProxy = false;
+      if (index < 0 && proxiedListFields != null) {
+        for (final proxiedList in proxiedListFields!(this, dao)) {
+          if (proxiedList.value!.contains(key)) {
+            foundInProxy = true;
+            proxiedList.replaceRow(key, value);
+          }
+        }
+      }
+      if (!foundInProxy) {
+        if (index >= 0) {
+          newValue.removeAt(index);
+        } else {
+          result = false;
+        }
+        if (index >= 0) {
+          newValue.insert(index, value);
+        } else {
+          newValue.add(value);
+        }
+      }
+    });
+    value = newValue;
+    if (focusAdded) {
+      focusObject(elements.values.first);
+    }
+    return result;
+  }
+
+  @override
+  void revertChanges() {
+    super.revertChanges();
+    tableController.reInit();
+  }
+
+  Future<void> showTableAsPopup(
+    BuildContext context, {
+    double? width,
+  }) async {
+    focusNode.requestFocus();
+    final scrollController = ScrollController();
+    final previousTableControllerState = tableController.currentState;
+    final newFieldGlobalKey = GlobalKey();
+    final newHeaderGlobalKey = GlobalKey();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (value!.isEmpty) maybeAddRow(context);
+    });
+    await showPopupFromZero<bool>(
+      context: context,
+      anchorKey: fieldGlobalKey,
+      width: width,
+      anchorAlignment: Alignment.center,
+      popupAlignment: Alignment.center,
+      builder: (context) {
+        return AnimatedBuilder(
+          animation: dao,
+          builder: (context, child) {
+            return ScrollbarFromZero(
+              controller: scrollController,
+              child: SingleChildScrollView(
+                controller: scrollController,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    ...buildWidgetsAsTable(
+                      context,
+                      addCard: false,
+                      asSliver: false, // PERF: 3 build as slivers, everything is supported in sliver form
+                      expandToFillContainer: false,
+                      dense: false,
+                      focusNode: FocusNode(),
+                      collapsed: false,
+                      collapsible: false,
+                      isMaximizedInForm: true,
+                      useGlobalKeys: false,
+                      fieldGlobalKey: newFieldGlobalKey,
+                      headerGlobalKey: newHeaderGlobalKey,
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+    // hack to allow the same TableController to be used in several tables
+    tableController.currentState = previousTableControllerState;
+    tableController.reInit();
+    // hack to reset textfields so the textEditingControllers don't get stuck
+    for (final obj in objects) {
+      for (final e in obj.props.values) {
+        e.fieldGlobalKey = GlobalKey();
+      }
+    }
+    notifyListeners();
+  }
+
+  @override
+  String toString() {
+    return toStringGetter(this);
+  }
+
+  @override
+  Future<bool> validate(
+    BuildContext context,
+    DAO<dynamic> dao,
+    int currentValidationId, {
+    bool validateIfNotEdited = false,
+    bool validateIfHidden = false,
+  }) async {
+    final objects = this.objects;
+    final superResult = super.validate(
+      context,
+      dao,
+      currentValidationId,
+      validateIfNotEdited: validateIfNotEdited,
+      validateIfHidden: validateIfHidden,
+    );
+    if (currentValidationId != dao.validationCallCount) return false;
+    if (!validateChildren && !invalidateValuesNotInAvailablePool) {
+      bool success = await superResult;
+      listFieldValidationErrors = List.from(validationErrors);
+      return success;
+    }
+    List<Future<bool>> results = [];
+    final templateProps = transformSelectedFromAvailablePool == null
+        ? objectTemplate.props
+        : transformSelectedFromAvailablePool!(objectTemplate).props;
+    List<T>? possibleValues;
+    List<T>? confirmedValidValues;
+    if (invalidateValuesNotInAvailablePool) {
+      confirmedValidValues = [];
+      final provider = availableObjectsPoolProvider?.call(context, this, dao);
+      if (provider != null) {
+        possibleValues = await (context as WidgetRef).watch(provider.notifier).future;
+      } else {
+        possibleValues = await availableObjectsPoolGetter?.call(context, this, dao);
+      }
+      if (currentValidationId != dao.validationCallCount) return false;
+    }
+    if (!context.mounted) {
+      log(
+        LgLvl.warning,
+        'DAO context unmounted while running validation.'
+        ' this is probably fine because it will return false and not be used.',
+      );
+      return false; // whole form popped, this is probably not needed anymore
+    }
+    for (final e in objects) {
+      final objectProps = e.props;
+      if (invalidateValuesNotInAvailablePool && possibleValues != null && !possibleValues.contains(e)) {
+        // don't add to confirmed, so it will be removed by the invalidatingError
+      } else {
+        confirmedValidValues?.add(e);
+        if (validateChildren) {
+          for (final key in templateProps.keys) {
+            final field = objectProps[key];
+            if (field != null) {
+              if (currentValidationId != dao.validationCallCount) return false;
+              results.add(
+                field.validate(
+                  context,
+                  e,
+                  currentValidationId,
+                  validateIfNotEdited: validateIfNotEdited,
+                ),
+              );
+            }
+          }
+        }
+      }
+    }
+    bool success = await superResult;
+    if (currentValidationId != dao.validationCallCount) return false;
+    listFieldValidationErrors = List.from(validationErrors);
+    for (final e in results) {
+      success = success && await e;
+      if (currentValidationId != dao.validationCallCount) return false;
+    }
+    if (!context.mounted) {
+      log(
+        LgLvl.warning,
+        'DAO context unmounted while running validation.'
+        ' this is probably fine because it will return false and not be used.',
+      );
+      return false; // whole form popped, this is probably not needed anymore
+    }
+    if (invalidateValuesNotInAvailablePool &&
+        confirmedValidValues != null &&
+        confirmedValidValues.length != objects.length) {
+      validationErrors.add(
+        InvalidatingError<ComparableList<T>>(
+          field: this,
+          error: FromZeroLocalizations.of(context).translate("validation_combo_not_possible"),
+          defaultValue: ComparableList(list: confirmedValidValues),
+        ),
+      );
+    }
+    for (final e in objects) {
+      final objectProps = e.props;
+      for (final key in templateProps.keys) {
+        final field = objectProps[key];
+        if (field != null) {
+          validationErrors.addAll(
+            field.validationErrors.map(
+              (err) => err.copyWith(
+                error: err.error.isNullOrBlank ? '' : '${e.classUiName} - ${err.error}',
+              ),
+            ),
+          );
+        }
+      }
+    }
+    validationErrors.sort((a, b) => a.severity.weight.compareTo(b.severity.weight));
+    return validationErrors.where((e) => e.isBlocking).isEmpty;
+  }
+
+  @override
+  Future<bool> validateRequired(
+    BuildContext context,
+    DAO<dynamic> dao, {
+    required int currentValidationId,
+    required bool normalValidationResult,
+    ComparableList<T>? emptyValue,
+  }) async => super.validateRequired(
+    context,
+    dao,
+    currentValidationId: currentValidationId,
+    normalValidationResult: normalValidationResult,
+    emptyValue: emptyValue ?? ComparableList<T>(),
+  );
+
+  Widget _availablePoolComboDataBuilder(BuildContext context, List<T> data, T emptyDAO) {
+    T objectTemplate = emptyDAO;
+    if (transformSelectedFromAvailablePool != null) {
+      objectTemplate = transformSelectedFromAvailablePool!(objectTemplate);
+      objectTemplate.parentDAO = dao;
+    }
+    if (!allowDuplicateObjectsFromAvailablePool) {
+      data = data.where((e) => !objects.contains(e)).toList();
+    }
+    return ComboFromZeroPopup<T>(
+      possibleValues: data,
+      showSearchBox: true,
+      sort: sortObjectsFromAvailablePool,
+      title: '${FromZeroLocalizations.of(context).translate("add_add")} ${objectTemplate.classUiName}',
+      extraWidget: allowAddNew
+          ? (context, onSelected) {
+              return Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 2,
+                  ),
+                  child: TextButton(
+                    onPressed: () async {
+                      final model = await emptyDAO.maybeEdit(
+                        dao.contextForValidation ?? context,
+                        showDefaultSnackBars: showDefaultSnackBars,
+                      );
+                      if (model != null) {
+                        if (!context.mounted) {
+                          return; // already popped, probably
+                        }
+                        Navigator.of(context).pop(emptyDAO);
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 6,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(width: 6),
+                          const Icon(Icons.add),
+                          const SizedBox(
+                            width: 6,
+                          ),
+                          Text(
+                            '${FromZeroLocalizations.of(context).translate("add")} ${emptyDAO.classUiName}',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(width: 6),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+          : null,
+    );
+  }
+
+  Widget _availablePoolErrorBuilder(
+    BuildContext context,
+    Object? error,
+    StackTrace? stackTrace, [
+    VoidCallback? onRetry,
+  ]) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 42),
+      child: IntrinsicHeight(
+        child: ApiProviderBuilder.defaultErrorBuilder(context, error, stackTrace, onRetry),
+      ),
+    );
+  }
+
+  Widget _availablePoolLoadingBuilder(BuildContext context, [ValueListenable<double?>? progress]) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 42),
+      child: SizedBox(
+        height: 128,
+        child: ApiProviderBuilder.defaultLoadingBuilder(context, progress),
+      ),
+    );
+  }
+
+  Widget _availablePoolTableDataBuilder(
+    BuildContext context,
+    List<T> data,
+    T emptyDAO, {
+    ValueNotifier<Map<T, bool>>? selectedObjects,
+    bool replaceAllRows = false,
+  }) {
+    T objectTemplate = emptyDAO;
+    if (transformSelectedFromAvailablePool != null) {
+      objectTemplate = transformSelectedFromAvailablePool!(objectTemplate);
+      objectTemplate.parentDAO = dao;
+    }
+    final allowAddMultipleFromAvailablePool = this.allowAddMultipleFromAvailablePool || replaceAllRows;
+    ScrollController scrollController = ScrollController();
+    if (!allowDuplicateObjectsFromAvailablePool && !replaceAllRows) {
+      data = data.where((e) => !objects.contains(e)).toList();
+    }
+    if (replaceAllRows) {
+      selectedObjects ??= ValueNotifier({});
+      for (final e in objects) {
+        selectedObjects.value[e] = true;
+      }
+    }
+    final listField = ListField<T, U>(
+      uiNameGetter: (field, dao) => objectTemplate.classUiName,
+      objectTemplateGetter: (field, dao) => emptyDAO,
+      tableCellsEditable: false,
+      collapsible: false,
+      actionDeleteBreakpoints: {0: ActionState.none},
+      actionViewBreakpoints: actionViewBreakpoints,
+      actionEditBreakpoints: actionEditBreakpoints,
+      objects: data,
+      actionsGetter: availablePoolTableActions,
+      allowAddNew: allowAddNew && emptyDAO.canSave,
+      tableSortable: tableSortable,
+      initialSortedColumn: sortObjectsFromAvailablePool ? initialSortedColumn : null,
+      onSort: onSort,
+      tableFilterable: tableFilterable,
+      onFilter: onFilter,
+      sortNullOnTop: sortNullOnTop,
+      tableFooterStickyOffset: 56,
+      addSearchAction: true,
+      allowMultipleSelection: allowAddMultipleFromAvailablePool,
+      selectedObjects: selectedObjects,
+      selectionDefault: selectionDefault,
+      rowTapType: RowTapType.none,
+      ignoreWidthGettersIfEmpty: false,
+      onRowTap: allowAddMultipleFromAvailablePool
+          ? null
+          : (value) {
+              Navigator.of(context).pop(value.id);
+            },
+    );
+    listField.dao = dao;
+    return ScrollbarFromZero(
+      controller: scrollController,
+      applyOpacityGradientToChildren: false,
+      child: CustomScrollView(
+        controller: scrollController,
+        shrinkWrap: true,
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 24,
+                left: 32,
+                right: 32,
+                bottom: 8,
+              ),
+              child: Text(
+                '${FromZeroLocalizations.of(context).translate("add_add")} ${emptyDAO.classUiName}',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+          ),
+          ...listField.buildFieldEditorWidgets(
+            context,
+            asSliver: true,
+            addCard: false,
+          ),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 32 + 16 + 42,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -3396,150 +2886,353 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     );
   }
 
-  @override
-  List<ActionFromZero> buildDefaultActions(
+  Widget _buildWidgetsAsCombo(
     BuildContext context, {
-    FocusNode? focusNode,
-    T? objectTemplate,
+    required FocusNode focusNode,
+    bool addCard = true,
+    bool asSliver = true,
+    bool expandToFillContainer = true,
+    bool dense = false,
+    bool? collapsible,
+    bool? collapsed,
+    Key? fieldGlobalKey,
+    ScrollController? mainScrollController,
+    bool largeHorizontally = false,
+    bool useGlobalKeys = true,
   }) {
-    focusNode ??= this.focusNode;
-    objectTemplate ??= this.objectTemplate;
-    final allowAddNew = this.allowAddNew;
-    List<T> currentSelected = [];
-    // TODO: 3 re-implement multiple edition, test well. Enabling this might break current uses of selection (when selecion is used for external purposes, like in PageSend EntidadContacto selection)
-    // try {
-    //   currentSelected = tableController.filtered.where((element) => selectedObjects.value[element]??selectionDefault).map((e) => e.id).toList();
-    // } catch (_) {}
-    return [
-      if (!collapsed && currentSelected.isNotEmpty)
-        ActionFromZero(
-          icon: const Icon(Icons.edit_outlined),
-          title:
-              '${FromZeroLocalizations.of(context).translate('edit')} ${FromZeroLocalizations.of(context).translate('selected_plur')}',
-          onTap: (context) {
-            userInteracted = true;
-            focusNode?.requestFocus();
-            maybeEditMultiple(context, currentSelected);
-          },
-          breakpoints: actionEditBreakpoints[0] == ActionState.none ? actionEditBreakpoints : null,
-        ),
-      if (!collapsed && currentSelected.isNotEmpty)
-        ActionFromZero(
-          icon: const Icon(
-            MaterialCommunityIcons.content_duplicate,
-            size: 21,
+    Widget result = AnimatedBuilder(
+      animation: this,
+      builder: (context, child) {
+        final enabled = this.enabled;
+        final visibleValidationErrors = passedFirstEdit
+            ? validationErrors
+            : validationErrors.where((e) => e.isBeforeEditing);
+        final name = ListField.listToStringSmart(
+          objects,
+          context: context,
+          modelNameSingular: objectTemplate.classUiName,
+          modelNamePlural: objectTemplate.classUiNamePlural,
+        );
+        Widget result = Padding(
+          padding: clearable ? const EdgeInsets.only(right: 76) : const EdgeInsets.only(right: 32),
+          child: ComboField.buttonContentBuilder(
+            context,
+            title: uiName,
+            hint: hint,
+            value: name,
+            enabled: enabled,
+            clearable: false,
+            dense: dense,
           ),
-          title:
-              '${FromZeroLocalizations.of(context).translate('duplicate')} ${FromZeroLocalizations.of(context).translate('selected_plur')}',
-          onTap: (context) {
-            userInteracted = true;
-            focusNode?.requestFocus();
-            duplicateRows(currentSelected);
-          },
-          breakpoints: actionDuplicateBreakpoints[0] == ActionState.none ? actionDuplicateBreakpoints : null,
-        ),
-      if (!collapsed && currentSelected.isNotEmpty && (objectTemplate.canDelete || hasAvailableObjectsPool))
-        ActionFromZero(
-          icon: Icon(!hasAvailableObjectsPool ? Icons.delete_forever_outlined : Icons.clear),
-          title:
-              '${FromZeroLocalizations.of(context).translate('delete')} ${FromZeroLocalizations.of(context).translate('selected_plur')}',
-          onTap: (context) async {
-            focusNode?.requestFocus();
-            if (await maybeDelete(context, currentSelected)) {
-              userInteracted = true;
-              focusNode?.requestFocus();
-            }
-          },
-          breakpoints: actionDeleteBreakpoints[0] == ActionState.none ? actionDeleteBreakpoints : null,
-        ),
-      if (!collapsed && currentSelected.isNotEmpty)
-        ActionFromZero(
-          icon: const Icon(Icons.cancel_outlined),
-          title: FromZeroLocalizations.of(context).translate('cancel_selection'),
-          onTap: (context) {
-            focusNode?.requestFocus();
-            selectedObjects.value = {};
-            notifyListeners();
-          },
-        ),
-      if ((allowAddNew || hasAvailableObjectsPool) && !collapsed && currentSelected.isEmpty)
-        ActionFromZero(
-          title: '${FromZeroLocalizations.of(context).translate('add')} ${objectTemplate.uiName}',
-          icon: Icon(Icons.add, color: Theme.of(context).colorScheme.secondary),
-          breakpoints: actionAddBreakpoints,
-          onTap: (context) async {
-            focusNode?.requestFocus();
-            final result = await maybeAddRow(dao.contextForValidation ?? context);
-            if (result != null) {
-              userInteracted = true;
-              pageNotifier?.value = objects.length - 1;
-            }
-          },
-        ),
-      if (dao.enableUndoRedoMechanism)
-        ActionFromZero.divider(
-          breakpoints: {
-            0: ActionState.popup,
-          },
-        ),
-      if (dao.enableUndoRedoMechanism)
-        AnimatedActionFromZero(
-          animation: this,
-          builder: () => ActionFromZero(
-            title: 'Deshacer', // TODO: 3 internationalize
-            icon: const Icon(MaterialCommunityIcons.undo_variant),
-            onTap: (context) {
-              userInteracted = true;
-              focusNode?.requestFocus();
-              undo(removeEntryFromDAO: true);
-            },
-            disablingError: undoValues.isNotEmpty ? null : '',
-            breakpoints: {
-              0: ActionState.popup,
-            },
+        );
+        Future<void> onTap() async {
+          await maybeAddRow(
+            context,
+            insertIndex: 0,
+            replaceAllRows: hasAvailableObjectsPool,
+          );
+        }
+
+        if (addCard) {
+          result = InkWell(
+            key: useGlobalKeys ? headerGlobalKey : null,
+            onTap: onTap,
+            child: result,
+          );
+        } else {
+          result = TextButton(
+            key: useGlobalKeys ? headerGlobalKey : null,
+            onPressed: onTap,
+            child: result,
+          );
+        }
+        if (availableObjectsPoolProvider != null) {
+          result = Stack(
+            children: [
+              result,
+              Positioned(
+                left: 3,
+                top: 3,
+                child: ApiProviderBuilder(
+                  provider: availableObjectsPoolProvider!.call(context, this, dao),
+                  animatedSwitcherType: AnimatedSwitcherType.normal,
+                  dataBuilder: (context, data) {
+                    return const SizedBox.shrink();
+                  },
+                  loadingBuilder: (context, progress) {
+                    return SizedBox(
+                      height: 10,
+                      width: 10,
+                      child: LoadingSign(
+                        value: null,
+                        padding: EdgeInsets.zero,
+                        size: 12,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace, onRetry) {
+                    return const SizedBox(
+                      height: 10,
+                      width: 10,
+                      child: Icon(
+                        Icons.error_outlined,
+                        color: Colors.red,
+                        size: 12,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        }
+        result = AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          color: dense && visibleValidationErrors.isNotEmpty
+              ? ValidationMessage
+                    .severityColors[Theme.of(context).brightness.inverse]![visibleValidationErrors.first.severity]!
+                    .withValues(alpha: 0.2)
+              : backgroundColor?.call(context, this, dao),
+          curve: Curves.easeOut,
+          child: result,
+        );
+        result = TooltipFromZero(
+          message:
+              (dense
+                      ? visibleValidationErrors
+                      : visibleValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
+                  .fold('', (a, b) {
+                    return a.toString().trim().isEmpty
+                        ? b.toString()
+                        : b.toString().trim().isEmpty
+                        ? a.toString()
+                        : '$a\n$b';
+                  }),
+          waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
+          child: result,
+        );
+        if (!dense) {
+          final actions = buildActions(context, focusNode);
+          final defaultActions = buildDefaultActions(context);
+          var allActions = [
+            AnimatedActionFromZero(
+              animation: this,
+              builder: () => ActionFromZero(
+                title: 'Limpiar', // TODO: 3 internationalize
+                icon: const Icon(Icons.clear),
+                onTap: (context) {
+                  userInteracted = true;
+                  value = defaultValue;
+                  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                    focusNode.requestFocus();
+                  });
+                },
+                breakpoints: {0: enabled && value != defaultValue ? ActionState.icon : ActionState.popup},
+                disablingError: clearable && value != defaultValue ? null : '',
+              ),
+            ),
+            ...actions,
+            if (actions.isNotEmpty && defaultActions.isNotEmpty)
+              ActionFromZero.divider(breakpoints: {0: ActionState.popup}),
+            ...defaultActions,
+          ];
+          if (!enabled) {
+            allActions = allActions
+                .map(
+                  (e) => e.copyWith(
+                    disablingError: '',
+                  ),
+                )
+                .toList();
+          }
+          result = AppbarFromZero(
+            contextMenuEnabled: enabled,
+            onShowContextMenu: () => focusNode.requestFocus(),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            useFlutterAppbar: false,
+            extendTitleBehindActions: true,
+            toolbarHeight: 56,
+            paddingRight: 6,
+            actionPadding: 0,
+            skipTraversalForActions: true,
+            actions: allActions,
+            title: SizedBox(height: 56, child: result),
+          );
+        }
+        result = ValidationRequiredOverlay(
+          isRequired: isRequired,
+          isEmpty: enabled && (value == null || value!.isEmpty),
+          errors: validationErrors,
+          dense: dense,
+          child: result,
+        );
+        return result;
+      },
+    );
+    if (addCard) {
+      result = Card(
+        clipBehavior: Clip.hardEdge,
+        color: enabled ? null : Theme.of(context).canvasColor,
+        child: result,
+      );
+    }
+    result = EnsureVisibleWhenFocused(
+      focusNode: focusNode,
+      child: Padding(
+        key: useGlobalKeys ? fieldGlobalKey : null,
+        padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
+        child: SizedBox(
+          width: maxWidth,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 64,
+                child: result,
+              ),
+              if (!dense)
+                ValidationMessage(
+                  errors: validationErrors,
+                  passedFirstEdit: passedFirstEdit,
+                ),
+            ],
           ),
         ),
-      if (dao.enableUndoRedoMechanism)
-        AnimatedActionFromZero(
-          animation: this,
-          builder: () => ActionFromZero(
-            title: 'Rehacer', // TODO: 3 internationalize
-            icon: const Icon(MaterialCommunityIcons.redo_variant),
-            onTap: (context) {
-              userInteracted = true;
-              focusNode?.requestFocus();
-              redo(removeEntryFromDAO: true);
-            },
-            disablingError: redoValues.isNotEmpty ? null : '',
-            breakpoints: {
-              0: ActionState.popup,
-            },
-          ),
-        ),
-      if (availableObjectsPoolProvider != null)
-        ActionFromZero.divider(
-          breakpoints: {0: ActionState.popup},
-        ),
-      if (availableObjectsPoolProvider != null)
-        ActionFromZero(
-          title: 'Refrescar Datos', // TODO: 3 internationalize
-          icon: const Icon(
-            Icons.refresh,
-          ),
-          breakpoints: {0: ActionState.popup},
-          onTap: (context) {
-            focusNode?.requestFocus();
-            final ref = dao.contextForValidation! as WidgetRef;
-            final provider = availableObjectsPoolProvider!(context, this, dao);
-            final stateNotifier = ref.read(provider.notifier);
-            stateNotifier.refresh(ref);
-          },
-        ),
-    ];
+      ),
+    );
+    if (asSliver) {
+      result = SliverToBoxAdapter(
+        child: result,
+      );
+    }
+    return result;
   }
 
-  static Map<String, ColModel> defaultTableColumnsBuilder<T extends DAO<U>, U>(
-    DAO dao,
+  Widget _builWidgetsAsPopupButton(
+    BuildContext context, {
+    required FocusNode focusNode,
+    bool addCard = false,
+    bool asSliver = true,
+    bool expandToFillContainer = true,
+    bool largeHorizontally = false,
+    bool dense = false,
+    bool useGlobalKeys = true,
+  }) {
+    Widget result = AnimatedBuilder(
+      animation: this,
+      builder: (context, child) {
+        Widget result = ComboField.buttonContentBuilder(
+          context,
+          title: uiName,
+          hint: hint ?? uiName,
+          value: toString(),
+          enabled: enabled,
+          clearable: false,
+          showDropdownIcon: false,
+          dense: dense,
+        );
+        if (addCard || dense) {
+          result = InkWell(
+            focusNode: focusNode,
+            onTap: () => showTableAsPopup(context),
+            child: result,
+          );
+        } else {
+          result = TextButton(
+            focusNode: focusNode,
+            // style: TextButton.styleFrom(
+            //   padding: dense ? EdgeInsets.zero : null, // not needed since dense now uses InkWell
+            // ),
+            onPressed: () => showTableAsPopup(context),
+            child: result,
+          );
+        }
+        final visibleListFieldValidationErrors = passedFirstEdit
+            ? listFieldValidationErrors
+            : listFieldValidationErrors.where((e) => e.isBeforeEditing);
+        result = AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          color: dense && visibleListFieldValidationErrors.isNotEmpty
+              ? ValidationMessage
+                    .severityColors[Theme.of(
+                      context,
+                    ).brightness.inverse]![visibleListFieldValidationErrors.first.severity]!
+                    .withValues(alpha: 0.2)
+              : backgroundColor?.call(context, this, dao),
+          curve: Curves.easeOut,
+          child: result,
+        );
+        result = TooltipFromZero(
+          message:
+              (dense
+                      ? visibleListFieldValidationErrors
+                      : visibleListFieldValidationErrors.where((e) => e.severity == ValidationErrorSeverity.disabling))
+                  .fold('', (a, b) {
+                    return a.toString().trim().isEmpty
+                        ? b.toString()
+                        : b.toString().trim().isEmpty
+                        ? a.toString()
+                        : '$a\n$b';
+                  }),
+          waitDuration: enabled ? const Duration(seconds: 1) : Duration.zero,
+          child: result,
+        );
+        final actions = buildActions(dao.contextForValidation ?? context, focusNode);
+        final defaultActions = buildDefaultActions(context);
+        result = ContextMenuFromZero(
+          enabled: enabled,
+          addGestureDetector: !dense,
+          onShowMenu: () => focusNode.requestFocus(),
+          actions: [
+            ...actions,
+            if (actions.isNotEmpty && defaultActions.isNotEmpty) ActionFromZero.divider(),
+            ...defaultActions,
+          ],
+          child: result,
+        );
+        return result;
+      },
+    );
+    if (addCard) {
+      result = Card(
+        clipBehavior: Clip.hardEdge,
+        color: enabled ? null : Theme.of(context).canvasColor,
+        child: result,
+      );
+    }
+    result = EnsureVisibleWhenFocused(
+      focusNode: focusNode,
+      key: useGlobalKeys ? fieldGlobalKey : null,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: !dense && largeHorizontally ? 12 : 0),
+        child: SizedBox(
+          width: maxWidth,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 64,
+                child: result,
+              ),
+              if (!dense)
+                ValidationMessage(
+                  errors: listFieldValidationErrors,
+                  passedFirstEdit: passedFirstEdit,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+    return result;
+  }
+
+  static Map<String, ColModel<dynamic>> defaultTableColumnsBuilder<T extends DAO<U>, U>(
+    DAO<dynamic> dao,
     ListField<T, U> listField,
     T objectTemplate,
   ) {
@@ -3552,7 +3245,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     // TODO: 1 this is awful: it's inefficient and assumes usage of SimpleColModel
     // just implement a param in TableFromzero for filterable and sortable that overrides all columns
     final columns = propsShownOnTable.map((key, value) {
-      SimpleColModel result = value.getColModel();
+      SimpleColModel<dynamic> result = value.getColModel();
       if (listField.tableFilterable != null) {
         result = result.copyWith(filterEnabled: listField.tableFilterable);
       }
@@ -3564,7 +3257,351 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     return columns;
   }
 
-  static Widget tableAsViewBuilder(DAO dao, ListField e, BuildContext context, ScrollController? mainScrollController) {
+  static String defaultToString(ListField<DAO<dynamic>, dynamic> field) {
+    return listToStringSmart(
+      field.objects,
+      modelNameSingular: field.objectTemplate.classUiName,
+      modelNamePlural: field.objectTemplate.classUiNamePlural,
+    );
+  }
+
+  static Widget defaultViewWidgetBuilder<T extends DAO<dynamic>>(
+    BuildContext context,
+    Field<ComparableList<DAO<dynamic>>> fieldParam, {
+    bool linkToInnerDAOs = true,
+    bool showViewButtons = false,
+    bool dense = false,
+    bool? hidden,
+    int autoSizeTextMaxLines = 1,
+  }) {
+    if (dense) {
+      return Field.defaultViewWidgetBuilder(
+        context,
+        fieldParam,
+        showViewButtons: showViewButtons,
+        linkToInnerDAOs: linkToInnerDAOs,
+        dense: dense,
+      );
+    }
+    if (hidden ?? fieldParam.hiddenInView) {
+      return const SizedBox.shrink();
+    }
+    final field = fieldParam as ListField;
+    final List<DAO<dynamic>> sortedObjects = List.from(field.objects);
+    if (field.initialSortedColumn != null) {
+      sortedObjects.sort();
+    }
+    if (field.separateScrollableBreakpoint != null && field.objects.length > field.separateScrollableBreakpoint!) {
+      final scrollController = ScrollController();
+      return Container(
+        height:
+            MediaQuery.sizeOf(context).height -
+            MediaQuery.viewPaddingOf(context).vertical -
+            MediaQuery.viewInsetsOf(context).vertical -
+            256,
+        padding: const EdgeInsets.only(right: 24),
+        child: ScrollbarFromZero(
+          controller: scrollController,
+          child: ListView.builder(
+            controller: scrollController,
+            itemCount: sortedObjects.length,
+            padding: dense ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: 3),
+            itemBuilder: (context, index) {
+              return defaultViewWidgetBuilderElement(
+                context,
+                sortedObjects[index],
+                linkToInnerDAOs: linkToInnerDAOs,
+                showViewButtons: showViewButtons,
+                dense: dense,
+              );
+            },
+          ),
+        ),
+      );
+    } else {
+      return Padding(
+        padding: dense ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: 3),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: sortedObjects.map((e) {
+            return defaultViewWidgetBuilderElement(
+              context,
+              e,
+              linkToInnerDAOs: linkToInnerDAOs,
+              showViewButtons: showViewButtons,
+              dense: dense,
+            );
+          }).toList(),
+        ),
+      );
+    }
+  }
+
+  static Widget defaultViewWidgetBuilderElement(
+    BuildContext context,
+    DAO<dynamic> e, {
+    bool linkToInnerDAOs = true,
+    bool showViewButtons = false,
+    bool dense = false,
+  }) {
+    final objectLinkToInnerDAOs = linkToInnerDAOs && e.wantsLinkToSelfFromOtherDAOs;
+    final onTap = objectLinkToInnerDAOs ? () => e.pushViewDialog(context) : null;
+    final uiName = dense ? e.uiNameDense : e.toString();
+    return InkWellTranslucent(
+      onTap: onTap,
+      child: Padding(
+        padding: dense ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: 3, horizontal: 12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+              child: dense
+                  ? Text(
+                      uiName,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    )
+                  : SelectableText(
+                      uiName,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+            ),
+            if (showViewButtons && onTap != null)
+              Padding(
+                padding: const EdgeInsets.only(left: 12),
+                child: IconButton(
+                  icon: const Icon(Icons.info_outline),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(maxHeight: 32),
+                  onPressed: onTap,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String listToStringAll<T>(
+    Iterable<T> list, {
+    String Function(T value)? converter,
+  }) {
+    final result = StringBuffer();
+    for (final e in list) {
+      if (result.isNotEmpty) {
+        result.write(', ');
+      }
+      result.write(converter?.call(e) ?? e.toString());
+    }
+    return result.toString();
+  }
+
+  static String listToStringCount(
+    Iterable<dynamic> list, {
+    String? modelNameSingular,
+    String? modelNamePlural,
+    BuildContext? context, // for localization
+  }) {
+    final name = list.length == 1
+        ? (modelNameSingular.isNotNullOrBlank
+              ? modelNameSingular
+              : (context == null ? '' : FromZeroLocalizations.of(context).translate('element_sing')))
+        : (modelNamePlural.isNotNullOrBlank
+              ? modelNamePlural
+              : (context == null ? '' : FromZeroLocalizations.of(context).translate('element_plur')));
+    return '${list.length} $name';
+  }
+
+  static String listToStringSmart(
+    List<dynamic> list, {
+    String? modelNameSingular,
+    String? modelNamePlural,
+    BuildContext? context, // for localization
+  }) {
+    return list.length > 5
+        ? listToStringCount(list, modelNameSingular: modelNameSingular, modelNamePlural: modelNamePlural)
+        : listToStringAll(list);
+  }
+
+  static Future<void> maybeEditMultiple<T extends DAO<dynamic>>(BuildContext context, List<T> elements) async {
+    // TODO: 3 test this well, rework it visually to be like maybeEdit
+
+    final T dao = elements.first.copyWith() as T;
+    // change hints and clear all properties
+    dao.beginUndoTransaction();
+    dao.props.forEach((key, value) {
+      // TODO: 3 should we remove validators / disable validation
+      value.hintGetter = (_, __) => FromZeroLocalizations.of(context).translate('keep_value');
+      value.dbValue = null;
+      value.value = null;
+      value.undoValues = [];
+      value.redoValues = [];
+    });
+    // discard undo stack
+    dao.beginUndoTransaction();
+    dao.commitUndoTransaction();
+    ScrollController scrollController = ScrollController();
+    bool? confirm = await showModalFromZero(
+      context: context,
+      builder: (context) {
+        // WillPopScope may not end up being deprecated at all https://github.com/flutter/flutter/issues/138614.
+        // If it does, we can do a workaround like https://github.com/flutter/flutter/issues/163052#issuecomment-2764601658
+        // ignore: deprecated_member_use
+        return WillPopScope(
+          onWillPop: () async {
+            if (!dao.isEdited) return true;
+            bool? pop = await showModalFromZero(
+              context: context,
+              builder: (context) {
+                return DialogFromZero(
+                  title: Text(FromZeroLocalizations.of(context).translate('confirm_close_title')),
+                  content: Text(FromZeroLocalizations.of(context).translate('confirm_close_desc')),
+                  dialogActions: [
+                    const DialogButton.cancel(),
+                    AnimatedBuilder(
+                      animation: dao,
+                      builder: (context, child) {
+                        return DialogButton(
+                          color: Theme.of(context).colorScheme.error,
+                          onPressed: () {
+                            Navigator.of(context).pop(true); // Dismiss alert dialog
+                          },
+                          child: Text(
+                            FromZeroLocalizations.of(context).translate('close_caps'),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+            return pop ?? false;
+          },
+          child: Center(
+            child: SizedBox(
+              width: 512 + 128,
+              child: ResponsiveInsetsDialog(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 24,
+                        left: 32,
+                        right: 32,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            FromZeroLocalizations.of(context).translate('edit_multiple_title'),
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          Text(
+                            '${FromZeroLocalizations.of(context).translate('edit_multiple_desc1')} ${elements.length} ${elements.length > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')} ${FromZeroLocalizations.of(context).translate('edit_multiple_desc2')}',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ],
+                      ),
+                    ),
+                    ScrollbarFromZero(
+                      controller: scrollController,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: CustomScrollView(
+                          controller: scrollController,
+                          shrinkWrap: true,
+                          slivers: dao.buildFormWidgets(
+                            context,
+                            showActionButtons: false,
+                          ), // TODO: 3 why not use maybeEdit to show everything
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12, right: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          DialogButton.cancel(
+                            onPressed: () {
+                              Navigator.of(context).maybePop();
+                            },
+                          ),
+                          AnimatedBuilder(
+                            animation: dao,
+                            builder: (context, child) {
+                              return DialogButton.accept(
+                                onPressed: dao.isEdited
+                                    ? () async {
+                                        bool? edit = await showModalFromZero(
+                                          context: context,
+                                          builder: (context) {
+                                            return DialogFromZero(
+                                              title: Text(
+                                                FromZeroLocalizations.of(context).translate('confirm_save_title'),
+                                              ),
+                                              content: Text(
+                                                '${FromZeroLocalizations.of(context).translate('edit_multiple_confirm')} ${elements.length} ${elements.length > 1 ? FromZeroLocalizations.of(context).translate('element_plur') : FromZeroLocalizations.of(context).translate('element_sing')}?',
+                                              ),
+                                              // TODO: 3 show all details about each field about to change
+                                              dialogActions: [
+                                                const DialogButton.cancel(),
+                                                DialogButton.accept(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop(true); // Dismiss alert dialog
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                        if (edit ?? false) {
+                                          if (!context.mounted) {
+                                            return; // already popped, probably
+                                          }
+                                          Navigator.of(context).pop(true);
+                                        }
+                                      }
+                                    : null,
+                              );
+                            },
+                          ),
+                          const SizedBox(
+                            width: 2,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    if (confirm ?? false) {
+      dao.props.forEach((key, value) {
+        if (value.isEdited) {
+          for (final e in elements) {
+            e.props[key]?.value = value.value;
+          }
+        }
+      });
+    }
+  }
+
+  static Widget tableAsViewBuilder(
+    DAO<dynamic> dao,
+    ListField<DAO<dynamic>, dynamic> e,
+    BuildContext context,
+    ScrollController? mainScrollController,
+  ) {
     const ViewWidgetBuilder<ComparableList<DAO<dynamic>>> temp =
         ListField.defaultViewWidgetBuilder; // hack to allow correct equality with static function
     if (e.viewWidgetBuilder != temp) {
@@ -3614,3 +3651,12 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     );
   }
 }
+
+enum ListFieldDisplayType {
+  table,
+  combo,
+  popupButton,
+  tabbedForm,
+}
+
+enum RowTapType { view, edit, none }

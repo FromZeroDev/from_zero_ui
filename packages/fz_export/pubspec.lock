@@ -320,6 +320,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.7"
+  flutter_lints:
+    dependency: "direct dev"
+    description:
+      name: flutter_lints
+      sha256: "5398f14efa795ffb7a33e9b6a08798b26a180edac4ad7db3f231e40f82ce11e1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -411,13 +419,6 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
-  fz_copy_tooltip:
-    dependency: transitive
-    description:
-      path: "../fz_copy_tooltip"
-      relative: true
-    source: path
-    version: "0.1.0"
   fz_dao:
     dependency: "direct main"
     description:
@@ -446,17 +447,17 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_focus_traversal:
+    dependency: transitive
+    description:
+      path: "../fz_focus_traversal"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_future_handling:
     dependency: transitive
     description:
       path: "../fz_future_handling"
-      relative: true
-    source: path
-    version: "0.1.0"
-  fz_hack_focus_traversal:
-    dependency: transitive
-    description:
-      path: "../fz_hack_focus_traversal"
       relative: true
     source: path
     version: "0.1.0"
@@ -467,10 +468,24 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_log:
+    dependency: transitive
+    description:
+      path: "../fz_log"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_logo:
     dependency: transitive
     description:
       path: "../fz_logo"
+      relative: true
+    source: path
+    version: "0.1.0"
+  fz_notification_relayer:
+    dependency: transitive
+    description:
+      path: "../fz_notification_relayer"
       relative: true
     source: path
     version: "0.1.0"
@@ -516,6 +531,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_selectable_icon:
+    dependency: transitive
+    description:
+      path: "../fz_selectable_icon"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_simple_shadow:
     dependency: transitive
     description:
@@ -541,6 +563,13 @@ packages:
     dependency: "direct main"
     description:
       path: "../fz_theme"
+      relative: true
+    source: path
+    version: "0.1.0"
+  fz_tooltip:
+    dependency: transitive
+    description:
+      path: "../fz_tooltip"
       relative: true
     source: path
     version: "0.1.0"
@@ -669,6 +698,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.11.0"
+  lints:
+    dependency: transitive
+    description:
+      name: lints
+      sha256: c35bb79562d980e9a453fc715854e1ed39e24e7d0297a880ef54e17f9874a9d7
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.1.1"
   logging:
     dependency: transitive
     description:

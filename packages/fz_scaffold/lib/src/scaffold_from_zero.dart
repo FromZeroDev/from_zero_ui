@@ -6,19 +6,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_scaffold/src/app_content_wrapper.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_appbar/fz_appbar.dart';
-import 'package:fz_tooltip/fz_tooltip.dart';
-import 'package:fz_localizations/fz_localizations.dart';
-import 'package:fz_simple_shadow/fz_simple_shadow.dart';
-import 'package:fz_platform/fz_platform.dart';
-import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_dialog/fz_dialog.dart';
-import 'package:fz_router/fz_router.dart';
-import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_animations/fz_animations.dart'
     as no_fading_shared_axis_transition;
+import 'package:fz_animations/fz_animations.dart';
+import 'package:fz_appbar/fz_appbar.dart';
+import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_platform/fz_platform.dart';
+import 'package:fz_router/fz_router.dart';
+import 'package:fz_scaffold/src/app_content_wrapper.dart';
+import 'package:fz_scrollbar/fz_scrollbar.dart';
+import 'package:fz_simple_shadow/fz_simple_shadow.dart';
+import 'package:fz_tooltip/fz_tooltip.dart';
 
 typedef DrawerContentBuilder =
     Widget Function(BuildContext context, bool compact);
@@ -300,8 +300,9 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
           animation: secondaryAnimation,
           child: child,
           builder: (context, child) {
-            if (secondaryAnimation.value > 0.9)
+            if (secondaryAnimation.value > 0.9) {
               return Opacity(opacity: 0, child: child);
+            }
             if (scaffoldChangeNotifier.sharedAnim) {
               var sharedSecondaryAnimation = secondaryAnimation;
               var sharedAnimation = animation;
