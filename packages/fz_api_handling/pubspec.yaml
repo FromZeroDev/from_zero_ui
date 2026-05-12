@@ -9,6 +9,7 @@ dependencies:
     sdk: flutter
   flutter_riverpod: 2.0.0-dev.9
   flutter_font_icons: ^2.2.5
+  dio: ^5.8.0+1
 
   fz_animations:
     path: ../fz_animations
@@ -20,11 +21,12 @@ dependencies:
     path: ../fz_localizations
   fz_snackbar:
     path: ../fz_snackbar
+
+
   fz_log:
     path: ../fz_log
   fz_animated_switcher_image:
     path: ../fz_animated_switcher_image
-
 dependency_overrides:
   intl: ^0.20.2
   archive: ^4.0.7
