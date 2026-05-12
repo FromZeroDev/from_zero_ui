@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:animations/animations.dart' hide FadeThroughTransition;
+import 'package:animations/animations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dartx/dartx.dart';
 import 'package:dio/dio.dart';
@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_animations/fz_animations.dart';
 import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_comparable_list/fz_comparable_list.dart';

@@ -7,8 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_animations/fz_animations.dart' as no_fading_shared_axis_transition;
-import 'package:fz_animations/fz_animations.dart';
+import 'package:fz_animations/no_fading_transitions.dart' as no_fading_transitions;
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_localizations/fz_localizations.dart';
@@ -250,7 +249,7 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
                       end: -1.5,
                     ).animate(secondaryAnimation)
                   : kAlwaysCompleteAnimation,
-              child: FadeUpwardsSlideTransition(
+              child: no_fading_transitions.FadeUpwardsSlideTransition(
                 routeAnimation: scaffoldChangeNotifier.sharedAnim ? animation : kAlwaysCompleteAnimation,
                 child: child!,
               ),
@@ -285,7 +284,7 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
                 sharedSecondaryAnimation = ReverseAnimation(animation);
                 sharedAnimation = ReverseAnimation(secondaryAnimation);
               }
-              return no_fading_shared_axis_transition.SharedAxisTransition(
+              return no_fading_transitions.SharedAxisTransition(
                 animation: scaffoldChangeNotifier.animationType == ScaffoldTypeAnimation.outer
                     ? ReverseAnimation(sharedSecondaryAnimation)
                     : sharedAnimation,
@@ -296,7 +295,7 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
                     : sharedSecondaryAnimation.isCompleted
                     ? kAlwaysDismissedAnimation
                     : sharedSecondaryAnimation,
-                transitionType: no_fading_shared_axis_transition.SharedAxisTransitionType.scaled,
+                transitionType: no_fading_transitions.SharedAxisTransitionType.scaled,
                 fillColor: Colors.transparent,
                 child: child!,
               );
@@ -306,7 +305,7 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
                   parent: ReverseAnimation(secondaryAnimation),
                   curve: const Interval(0.33, 1, curve: Curves.easeInCubic),
                 ),
-                child: FadeUpwardsSlideTransition(
+                child: no_fading_transitions.FadeUpwardsSlideTransition(
                   routeAnimation: animation,
                   upwards: upwards,
                   child: child!,
@@ -451,9 +450,9 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
             }),
           ),
         ],
-        child: FadeUpwardsFadeTransition(
+        child: no_fading_transitions.FadeUpwardsFadeTransition(
           routeAnimation: ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation,
-          child: FadeUpwardsSlideTransition(
+          child: no_fading_transitions.FadeUpwardsSlideTransition(
             routeAnimation:
                 ref.read(fromZeroScaffoldChangeNotifierProvider).animationType == ScaffoldTypeAnimation.other
                 ? (ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation)
