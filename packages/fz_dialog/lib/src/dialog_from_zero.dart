@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fz_animations/fz_animations.dart';
+import 'package:fz_animations/no_fading_transitions.dart' as no_fading_transitions;
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
@@ -134,7 +135,7 @@ class FromZeroModalConfiguration extends FadeScaleTransitionConfiguration {
         ],
       );
     }
-    result = FadeUpwardsFadeTransition(
+    result = no_fading_transitions.FadeUpwardsFadeTransition(
       routeAnimation: animation,
       child: result,
     );
