@@ -23,7 +23,7 @@ class FromZeroLocalizations {
     // Load the language JSON file from the "lang" folder
     String jsonString;
     try {
-      jsonString = await rootBundle.loadString('packages/from_zero_ui/assets/i18n/${locale.languageCode}.json');
+      jsonString = await rootBundle.loadString('packages/fz_localizations/assets/i18n/${locale.languageCode}.json');
     } catch (_) {
       jsonString = await rootBundle.loadString('assets/i18n/${locale.languageCode}.json');
     }
