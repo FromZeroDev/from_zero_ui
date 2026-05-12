@@ -2,11 +2,14 @@ name: fz_api_handling
 description: API state management with Riverpod and Dio.
 publish_to: 'none'
 version: 0.1.0
+
 environment:
   sdk: "^3.9.0"
+
 dependencies:
   flutter:
     sdk: flutter
+
   flutter_riverpod: 2.0.0-dev.9
   flutter_font_icons: ^2.2.5
 
