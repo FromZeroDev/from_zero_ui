@@ -26,3 +26,7 @@ All sub-packages use the `fz_` prefix. Each has:
 - **Update the root README** when adding/removing packages or when dependencies between packages change
 - **Update the dependency graph section** in root README when deps change
 - **Run `flutter analyze` on changed packages** to verify no errors
+- **Update `lib/packages/`** when a sub-package's root export files (in `lib/`, not `src/`) change:
+  - Each sub-package's main export gets one file: `lib/packages/<package_name>.dart` containing `export 'package:<package_name>/<package_name>.dart';`
+  - If a sub-package has additional root-level export files (e.g. `fz_animations` has `no_fading_transitions.dart`), create a file named `<package_name>_<extra_filename_without_dart>.dart`
+  - When adding a new sub-package, create all corresponding files here
