@@ -356,6 +356,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_animated_switcher_image:
+    dependency: transitive
+    description:
+      path: "../fz_animated_switcher_image"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_animations:
     dependency: transitive
     description:
@@ -412,10 +419,24 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  fz_copy_time_picker:
+    dependency: transitive
+    description:
+      path: "../fz_copy_time_picker"
+      relative: true
+    source: path
+    version: "0.1.0"
   fz_dao:
     dependency: "direct main"
     description:
       path: "../fz_dao"
+      relative: true
+    source: path
+    version: "0.1.0"
+  fz_date_picker:
+    dependency: transitive
+    description:
+      path: "../fz_date_picker"
       relative: true
     source: path
     version: "0.1.0"
@@ -726,10 +747,10 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: "23f08335362185a5ea2ad3a4e597f1375e78bce8a040df5c600c8d3552ef2394"
+      sha256: e3641ec5d63ebf0d9b41bd43201a66e3fc79a65db5f61fc181f04cd27aab950c
       url: "https://pub.dev"
     source: hosted
-    version: "1.17.0"
+    version: "1.16.0"
   mime:
     dependency: transitive
     description:
@@ -1125,10 +1146,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_ios
-      sha256: "580fe5dfb51671ae38191d316e027f6b76272b026370708c2d898799750a02b0"
+      sha256: cfde38aa257dae62ffe79c87fab20165dfdf6988c1d31b58ebf59b9106062aad
       url: "https://pub.dev"
     source: hosted
-    version: "6.4.1"
+    version: "6.3.6"
   url_launcher_linux:
     dependency: transitive
     description:
@@ -1157,10 +1178,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_web
-      sha256: "85c81589622fbc87c1c683aaea164d3604a7777495a79d91e39ffcdec39ddb34"
+      sha256: "4bd2b7b4dc4d4d0b94e5babfffbca8eac1a126c7f3d6ecbc1a11013faa3abba2"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.3"
+    version: "2.4.1"
   url_launcher_windows:
     dependency: transitive
     description:
@@ -1242,5 +1263,5 @@ packages:
     source: hosted
     version: "6.6.1"
 sdks:
-  dart: ">=3.10.0 <4.0.0"
-  flutter: ">=3.38.0"
+  dart: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.6"

@@ -1,0 +1,15 @@
+version: '3'
+
+tasks:
+  get:
+    cmds:
+      - flutter pub get
+  get-all:
+    cmds:
+      - for d in packages/*/; do (cd "$d" && flutter pub get); done
+  upgrade:
+    cmds:
+      - flutter pub upgrade
+  upgrade-all:
+    cmds:
+      - for d in packages/*/; do (cd "$d" && flutter pub upgrade); done
