@@ -18,6 +18,15 @@ All sub-packages use the `fz_` prefix. Each has:
 - `lib/src/` — source files
 - `README.md` — description + usage examples
 
+## Pubspec format
+
+- **`resolution: workspace`** — all sub-packages use Dart workspace resolution (insert after `version:`, followed by a blank line before `environment:`)
+- **Blank line before `environment:`**
+- **Blank line between `environment:` and `dependencies:`**
+- **Dependencies ordering**: `flutter` SDK dep first, then a blank line, then external deps alphabetically, then a blank line, then `fz_*` path deps alphabetically
+- **No `dependency_overrides` in sub-packages** — overrides live in the root pubspec only
+- **Blank line before `dev_dependencies:`**
+
 ## When making changes
 
 - **No `package:from_zero_ui/` imports** in sub-packages — use sibling package imports

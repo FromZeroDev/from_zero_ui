@@ -2,15 +2,21 @@ name: fz_api_handling
 description: API state management with Riverpod and Dio.
 publish_to: 'none'
 version: 0.1.0
+resolution: workspace
+
 environment:
   sdk: "^3.9.0"
+
 dependencies:
   flutter:
     sdk: flutter
+
   flutter_riverpod: 2.0.0-dev.9
   flutter_font_icons: ^2.2.5
   dio: ^5.8.0+1
 
+  fz_animated_switcher_image:
+    path: ../fz_animated_switcher_image
   fz_animations:
     path: ../fz_animations
   fz_dialog:
@@ -19,17 +25,11 @@ dependencies:
     path: ../fz_future_handling
   fz_localizations:
     path: ../fz_localizations
+  fz_log:
+    path: ../fz_log
   fz_snackbar:
     path: ../fz_snackbar
 
-
-  fz_log:
-    path: ../fz_log
-  fz_animated_switcher_image:
-    path: ../fz_animated_switcher_image
-dependency_overrides:
-  intl: ^0.20.2
-  archive: ^4.0.7
 
 dev_dependencies:
   flutter_lints: ^5.0.0

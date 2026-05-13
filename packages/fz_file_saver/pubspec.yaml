@@ -2,11 +2,15 @@ name: fz_file_saver
 description: File saver utility for FromZero UI.
 publish_to: 'none'
 version: 0.1.0
+resolution: workspace
+
 environment:
   sdk: "^3.9.0"
+
 dependencies:
   flutter:
     sdk: flutter
+
   dartx: ^1.2.0
   device_info_plus: ^11.4.0
   dio: ^5.8.0+1
@@ -24,17 +28,13 @@ dependencies:
     path: ../fz_api_handling
   fz_localizations:
     path: ../fz_localizations
+  fz_log:
+    path: ../fz_log
   fz_platform:
     path: ../fz_platform
   fz_snackbar:
     path: ../fz_snackbar
 
-
-  fz_log:
-    path: ../fz_log
-dependency_overrides:
-  intl: ^0.20.2
-  archive: ^4.0.7
 
 dev_dependencies:
   flutter_lints: ^5.0.0

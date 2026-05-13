@@ -2,11 +2,15 @@ name: fz_expansion_tile
 description: Expansion tile widget (copied and customized from Flutter).
 publish_to: 'none'
 version: 0.1.0
+resolution: workspace
+
 environment:
   sdk: "^3.9.0"
+
 dependencies:
   flutter:
     sdk: flutter
+
   flutter_font_icons: ^2.2.5
 
   fz_actions:
@@ -22,9 +26,6 @@ dependencies:
   fz_ui_utility:
     path: ../fz_ui_utility
 
-dependency_overrides:
-  intl: ^0.20.2
-  archive: ^4.0.7
 
 dev_dependencies:
   flutter_lints: ^5.0.0

@@ -2,33 +2,33 @@ name: fz_image
 description: Image widget with fullscreen support for FromZero UI.
 publish_to: 'none'
 version: 0.1.0
+resolution: workspace
+
 environment:
   sdk: "^3.9.0"
+
 dependencies:
   flutter:
     sdk: flutter
+
   extended_image: ^8.1.0
   url_launcher: 6.3.1
 
   fz_api_handling:
     path: ../fz_api_handling
-  fz_tooltip:
-    path: ../fz_tooltip
   fz_future_handling:
     path: ../fz_future_handling
   fz_localizations:
     path: ../fz_localizations
+  fz_log:
+    path: ../fz_log
+  fz_tooltip:
+    path: ../fz_tooltip
   fz_ui_utility:
     path: ../fz_ui_utility
   fz_web_compile_file:
     path: ../fz_web_compile_file
 
-
-  fz_log:
-    path: ../fz_log
-dependency_overrides:
-  intl: ^0.20.2
-  archive: ^4.0.7
 
 dev_dependencies:
   flutter_lints: ^5.0.0

@@ -2,11 +2,15 @@ name: fz_actions
 description: Action system for FromZero UI (toolbar actions, context menus, API actions).
 publish_to: 'none'
 version: 0.1.0
+resolution: workspace
+
 environment:
   sdk: "^3.9.0"
+
 dependencies:
   flutter:
     sdk: flutter
+
   multi_value_listenable_builder: ^0.0.2
 
   fz_api_handling:
@@ -18,9 +22,6 @@ dependencies:
   fz_scaffold:
     path: ../fz_scaffold
 
-dependency_overrides:
-  intl: ^0.20.2
-  archive: ^4.0.7
 
 dev_dependencies:
   flutter_lints: ^5.0.0

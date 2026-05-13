@@ -2,11 +2,15 @@ name: fz_export
 description: PDF/PNG/Excel export system for FromZero UI.
 publish_to: 'none'
 version: 0.1.0
+resolution: workspace
+
 environment:
   sdk: "^3.9.0"
+
 dependencies:
   flutter:
     sdk: flutter
+
   flutter_font_icons: ^2.2.5
   animations: ^2.0.11
   dartx: ^1.2.0
@@ -48,9 +52,6 @@ dependencies:
   fz_value_string:
     path: ../fz_value_string
 
-dependency_overrides:
-  intl: ^0.20.2
-  archive: ^4.0.7
 
 dev_dependencies:
   flutter_lints: ^5.0.0

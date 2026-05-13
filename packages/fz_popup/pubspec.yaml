@@ -2,11 +2,15 @@ name: fz_popup
 description: Popup and context menu widgets for FromZero UI.
 publish_to: 'none'
 version: 0.1.0
+resolution: workspace
+
 environment:
   sdk: "^3.9.0"
+
 dependencies:
   flutter:
     sdk: flutter
+
   flutter_riverpod: 2.0.0-dev.9
   dartx: ^1.2.0
 
@@ -21,9 +25,6 @@ dependencies:
   fz_snackbar:
     path: ../fz_snackbar
 
-dependency_overrides:
-  intl: ^0.20.2
-  archive: ^4.0.7
 
 dev_dependencies:
   flutter_lints: ^5.0.0

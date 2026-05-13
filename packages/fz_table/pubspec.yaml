@@ -2,11 +2,15 @@ name: fz_table
 description: Data table system for FromZero UI.
 publish_to: 'none'
 version: 0.1.0
+resolution: workspace
+
 environment:
   sdk: "^3.9.0"
+
 dependencies:
   flutter:
     sdk: flutter
+
   flutter_riverpod: 2.0.0-dev.9
   flutter_font_icons: ^2.2.5
   auto_size_text: ^3.0.0
@@ -19,62 +23,59 @@ dependencies:
   intl: ^0.20.2
   sliver_tools: ^0.2.12
 
+  fz_actions:
+    path: ../fz_actions
   fz_animations:
     path: ../fz_animations
   fz_api_handling:
     path: ../fz_api_handling
+  fz_appbar:
+    path: ../fz_appbar
   fz_comparable_list:
     path: ../fz_comparable_list
   fz_copy_ensure_visible:
     path: ../fz_copy_ensure_visible
   fz_copy_sticky_header:
     path: ../fz_copy_sticky_header
-  fz_tooltip:
-    path: ../fz_tooltip
   fz_dao:
     path: ../fz_dao
+  fz_date_picker:
+    path: ../fz_date_picker
+  fz_dialog:
+    path: ../fz_dialog
   fz_export:
     path: ../fz_export
   fz_future_handling:
     path: ../fz_future_handling
   fz_localizations:
     path: ../fz_localizations
+  fz_log:
+    path: ../fz_log
+  fz_notification_relayer:
+    path: ../fz_notification_relayer
+  fz_opacity_gradient:
+    path: ../fz_opacity_gradient
   fz_platform:
     path: ../fz_platform
   fz_popup:
     path: ../fz_popup
+  fz_router:
+    path: ../fz_router
+  fz_scaffold:
+    path: ../fz_scaffold
   fz_scrollbar:
     path: ../fz_scrollbar
+  fz_selectable_icon:
+    path: ../fz_selectable_icon
   fz_simple_shadow:
     path: ../fz_simple_shadow
+  fz_tooltip:
+    path: ../fz_tooltip
   fz_ui_utility:
     path: ../fz_ui_utility
   fz_value_string:
     path: ../fz_value_string
-  fz_actions:
-    path: ../fz_actions
-  fz_appbar:
-    path: ../fz_appbar
-  fz_dialog:
-    path: ../fz_dialog
-  fz_notification_relayer:
-    path: ../fz_notification_relayer
-  fz_scaffold:
-    path: ../fz_scaffold
-  fz_selectable_icon:
-    path: ../fz_selectable_icon
-  fz_log:
-    path: ../fz_log
-  fz_date_picker:
-    path: ../fz_date_picker
-  fz_router:
-    path: ../fz_router
-  fz_opacity_gradient:
-    path: ../fz_opacity_gradient
 
-dependency_overrides:
-  intl: ^0.20.2
-  archive: ^4.0.7
 
 dev_dependencies:
   flutter_lints: ^5.0.0

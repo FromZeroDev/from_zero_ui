@@ -2,16 +2,24 @@ name: fz_future_handling
 description: Future handling widgets and utilities for FromZero UI.
 publish_to: 'none'
 version: 0.1.0
+resolution: workspace
+
 environment:
   sdk: "^3.9.0"
+
 dependencies:
   flutter:
     sdk: flutter
+
   flutter_riverpod: 2.0.0-dev.9
   dartx: ^1.2.0
 
+  fz_animated_switcher_image:
+    path: ../fz_animated_switcher_image
   fz_animations:
     path: ../fz_animations
+  fz_api_handling:
+    path: ../fz_api_handling
   fz_dialog:
     path: ../fz_dialog
   fz_export:
@@ -25,13 +33,6 @@ dependencies:
   fz_ui_utility:
     path: ../fz_ui_utility
 
-  fz_animated_switcher_image:
-    path: ../fz_animated_switcher_image
-  fz_api_handling:
-    path: ../fz_api_handling
-dependency_overrides:
-  intl: ^0.20.2
-  archive: ^4.0.7
 
 dev_dependencies:
   flutter_lints: ^5.0.0

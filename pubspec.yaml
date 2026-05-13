@@ -2,8 +2,59 @@ name: from_zero_ui
 description: UI generalizations and utility classes for working with flutter. Root compatibility package that re-exports all sub-packages.
 publish_to: 'none'
 version: 0.1.0
+
 environment:
   sdk: "^3.9.0"
+
+workspace:
+  - packages/fz_actions
+  - packages/fz_animated_switcher_image
+  - packages/fz_animations
+  - packages/fz_api_handling
+  - packages/fz_app_update
+  - packages/fz_appbar
+  - packages/fz_combo
+  - packages/fz_comparable_list
+  - packages/fz_copy_ensure_visible
+  - packages/fz_copy_page_indicator
+  - packages/fz_copy_sticky_header
+  - packages/fz_copy_time_picker
+  - packages/fz_tooltip
+  - packages/fz_dao
+  - packages/fz_date_picker
+  - packages/fz_dialog
+  - packages/fz_drawer_menu
+  - packages/fz_expansion_tile
+  - packages/fz_export
+  - packages/fz_file_picker
+  - packages/fz_log
+  - packages/fz_file_saver
+  - packages/fz_future_handling
+  - packages/fz_gesture_relayer
+  - packages/fz_focus_traversal
+  - packages/fz_image
+  - packages/fz_localizations
+  - packages/fz_logo
+  - packages/fz_notification_relayer
+  - packages/fz_number_format
+  - packages/fz_opacity_gradient
+  - packages/fz_platform
+  - packages/fz_popup
+  - packages/fz_router
+  - packages/fz_scaffold
+  - packages/fz_scrollbar
+  - packages/fz_selectable_icon
+  - packages/fz_simple_shadow
+  - packages/fz_snackbar
+  - packages/fz_table
+  - packages/fz_theme
+  - packages/fz_translucent_ink_well
+  - packages/fz_ui_scale
+  - packages/fz_ui_utility
+  - packages/fz_value_string
+  - packages/fz_web_compile_file
+  - packages/fz_web_initial_config
+  - packages/fz_web_platform_impl
 
 dependencies:
   flutter:
@@ -108,12 +159,12 @@ dependencies:
   fz_web_platform_impl:
     path: packages/fz_web_platform_impl
 
-dev_dependencies:
-  flutter_lints: ^5.0.0
-
 dependency_overrides:
   intl: ^0.20.2
   archive: ^4.0.7
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
