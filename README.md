@@ -111,6 +111,7 @@ dependencies:
 ## Changes planned
 ### New Packages
 ### Package Separations
+- fz_api_handling should be separated int fz_provider_handling (has riverpod dependency stuff) and gz_api_handling (has dio stuff), so we can not import dio if we don't want to.
 ### Package Deletion / Merging
 - fz_copy_sticky_header should be deleted in favor of using sliver_tools. This requires code changes in the packages that use it and a lot of testing.
 - Consider merging some of the packages that are only depended on by one package into that package. Especially for those that aren't meant for direct consumption.
