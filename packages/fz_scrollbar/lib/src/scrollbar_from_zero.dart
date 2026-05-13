@@ -44,6 +44,7 @@ class ScrollbarFromZero extends StatefulWidget {
   // final bool addPaddingOnDesktop;
   /// is main window scaffold scrollbar
   final bool mainScrollbar;
+  final bool blockScrollNotifications;
 
   const ScrollbarFromZero({
     required this.child,
@@ -55,6 +56,7 @@ class ScrollbarFromZero extends StatefulWidget {
     this.isAlwaysShown,
     this.ignoreDevicePadding = true,
     this.mainScrollbar = false,
+    this.blockScrollNotifications = true,
     // this.addPaddingOnDesktop = false,
     super.key,
   });
@@ -175,9 +177,9 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
         if (notification is ScrollMetricsNotification) {
           // ignore: invalid_use_of_protected_member
           widget.controller?.notifyListeners();
-          return true;
+          return widget.blockScrollNotifications;
         }
-        return notification is ScrollNotification;
+        return widget.blockScrollNotifications && notification is ScrollNotification;
       },
       child: result,
     );
