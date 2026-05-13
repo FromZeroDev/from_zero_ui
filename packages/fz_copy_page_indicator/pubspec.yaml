@@ -13,6 +13,5 @@ dependencies:
 
   page_view_indicators: ^2.0.0
 
-
 dev_dependencies:
   flutter_lints: ^5.0.0

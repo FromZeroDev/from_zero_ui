@@ -26,6 +26,5 @@ dependencies:
   fz_ui_utility:
     path: ../fz_ui_utility
 
-
 dev_dependencies:
   flutter_lints: ^5.0.0

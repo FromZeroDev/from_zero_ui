@@ -77,6 +77,5 @@ dependencies:
   fz_log:
     path: ../fz_log
 
-
 dev_dependencies:
   flutter_lints: ^5.0.0

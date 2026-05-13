@@ -16,6 +16,5 @@ dependencies:
   fz_opacity_gradient:
     path: ../fz_opacity_gradient
 
-
 dev_dependencies:
   flutter_lints: ^5.0.0

@@ -52,6 +52,5 @@ dependencies:
   fz_value_string:
     path: ../fz_value_string
 
-
 dev_dependencies:
   flutter_lints: ^5.0.0

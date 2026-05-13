@@ -18,6 +18,5 @@ dependencies:
       url: https://github.com/ross96D/mlog
       tag_pattern: "{{version}}"
 
-
 dev_dependencies:
   flutter_lints: ^5.0.0
