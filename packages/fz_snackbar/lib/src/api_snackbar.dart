@@ -70,33 +70,35 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
   @override
   void initState() {
     super.initState();
-    widget.stateNotifier.addListener((state) {
-      if (mounted) {
-        widget.updateBlockUI(state);
-        state.whenOrNull(
-          data: (data) {
-            if (!widget.blockUI.value) {
-              initAnimationController();
-            } else {
-              try {
-                animationController?.dispose();
-              } catch (_) {}
-              animationController = null;
-            }
-          },
-          loading: () {
-            if (!widget.blockUI.value) {
-              initAnimationController();
-            } else {
-              try {
-                animationController?.dispose();
-              } catch (_) {}
-              animationController = null;
-            }
-          },
-        );
-      }
-    });
+    widget.stateNotifier.addListener(onNotify);
+  }
+
+  void onNotify() {
+    if (!mounted) return;
+    final state = widget.stateNotifier.state;
+    widget.updateBlockUI(state);
+    state.whenOrNull(
+      data: (data) {
+        if (!widget.blockUI.value) {
+          initAnimationController();
+        } else {
+          try {
+            animationController?.dispose();
+          } catch (_) {}
+          animationController = null;
+        }
+      },
+      loading: () {
+        if (!widget.blockUI.value) {
+          initAnimationController();
+        } else {
+          try {
+            animationController?.dispose();
+          } catch (_) {}
+          animationController = null;
+        }
+      },
+    );
   }
 
   void initAnimationController() {
@@ -121,7 +123,17 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
   }
 
   @override
+  void didUpdateWidget(covariant APISnackBar<T> oldWidget) {
+    if (widget.stateNotifier != oldWidget.stateNotifier) {
+      oldWidget.stateNotifier.removeListener(onNotify);
+      widget.stateNotifier.addListener(onNotify);
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void dispose() {
+    widget.stateNotifier.removeListener(onNotify);
     animationController?.dispose();
     super.dispose();
   }

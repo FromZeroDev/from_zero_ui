@@ -37,12 +37,11 @@ class ComboFromZero<T> extends StatefulWidget {
   final List<T>? possibleValues;
   final AsyncValue<List<T>>? possibleValuesAsync;
   final Future<List<T>>? possibleValuesFuture;
-  final AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>? possibleValuesProvider;
+  final NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>? possibleValuesProvider;
   final List<T> Function(String query)? filteredValues;
   final AsyncValue<List<T>> Function(String query)? filteredValuesAsync;
   final Future<List<T>> Function(String query)? filteredValuesFuture;
-  final AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>> Function(String query)?
-  filteredValuesProvider;
+  final NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>> Function(String query)? filteredValuesProvider;
   final VoidCallback? onCanceled;
   final OnPopupItemSelected<T>? onSelected;
   final bool? showSearchBox;
@@ -507,8 +506,7 @@ class ComboFromZeroPopup<T> extends StatefulWidget {
   final List<T> Function(String query)? filteredValues;
   final AsyncValue<List<T>> Function(String query)? filteredValuesAsync;
   final Future<List<T>> Function(String query)? filteredValuesFuture;
-  final AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>> Function(String query)?
-  filteredValuesProvider;
+  final NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>> Function(String query)? filteredValuesProvider;
   final VoidCallback? onCanceled;
   final OnPopupItemSelected<T>? onSelected;
   final bool? showSearchBox;

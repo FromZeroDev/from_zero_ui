@@ -788,8 +788,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
     if (onSaveAPI != null) {
       final stateNotifier = onSaveAPI!.call(contextForValidation ?? context, this);
       final completer = Completer<dynamic>();
-      final removeListener = stateNotifier.addListener((state) {
-        state.mapOrNull(
+      final listener = () {
+        stateNotifier.state.mapOrNull(
           data: (data) {
             model = data.value;
             completer.complete(data.value);
@@ -805,7 +805,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
             }
           },
         );
-      });
+      };
+      stateNotifier.addListener(listener);
       final controller = APISnackBar(
         context: context,
         stateNotifier: stateNotifier,
@@ -820,7 +821,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
         log(LgLvl.error, 'Error while saving $classUiName: $uiName', e: e, st: st, type: FzLgType.dao);
       }
       success = model != null;
-      removeListener();
+      stateNotifier.removeListener(listener);
     } else if (onSave == null) {
       success = true;
     } else {
@@ -935,8 +936,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
     if (onDeleteAPI != null) {
       final stateNotifier = onDeleteAPI!.call(contextForValidation ?? context, this);
       final Completer<dynamic> completer = Completer<dynamic>();
-      final removeListener = stateNotifier.addListener((state) {
-        state.mapOrNull(
+      final listener = () {
+        stateNotifier.state.mapOrNull(
           data: (data) {
             completer.complete(true);
             return success = true;
@@ -944,7 +945,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
           loading: (loading) => success = false,
           error: (error) => success = false,
         );
-      });
+      };
+      stateNotifier.addListener(listener);
       final controller = APISnackBar(
         context: context,
         stateNotifier: stateNotifier,
@@ -956,7 +958,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
       } catch (e, st) {
         log(LgLvl.error, 'Error while deleting $classUiName: $uiName', e: e, st: st, type: FzLgType.dao);
       }
-      removeListener();
+      stateNotifier.removeListener(listener);
     } else {
       try {
         errorString = await onDelete?.call(contextForValidation ?? context, this);

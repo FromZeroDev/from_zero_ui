@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart' show ChangeNotifierProvider;
 import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_log/fz_log.dart';
 import 'package:fz_platform/fz_platform.dart';

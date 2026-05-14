@@ -262,7 +262,7 @@ class SliverAsyncValueMultiBuilder<T> extends AsyncValueMultiBuilder<T> {
 }
 
 class FutureProviderBuilder<T> extends ConsumerWidget {
-  final ProviderBase<AsyncValue<T>> provider;
+  final Provider<AsyncValue<T>> provider;
   final DataBuilder<T> dataBuilder;
   final LoadingBuilder loadingBuilder;
   final ErrorBuilder errorBuilder;

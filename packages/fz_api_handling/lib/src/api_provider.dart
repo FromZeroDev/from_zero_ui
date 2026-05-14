@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
 import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
@@ -12,14 +13,14 @@ import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_log/fz_log.dart';
 import 'package:fz_snackbar/fz_snackbar.dart';
 
-typedef ApiProvider<T> = AutoDisposeStateNotifierProvider<ApiState<T>, AsyncValue<T>>;
-typedef ApiProviderFamily<T, P> = AutoDisposeStateNotifierProviderFamily<ApiState<T>, AsyncValue<T>, P>;
+typedef ApiProvider<T> = NotifierProvider<ApiState<T>, AsyncValue<T>>;
+typedef ApiProviderFamily<T, P> = NotifierProviderFamily<ApiState<T>, AsyncValue<T>, P>;
 
-class ApiState<T> extends StateNotifier<AsyncValue<T>> {
-  // StateNotifierProviderRef<ApiState<State>, AsyncValue<State>> _ref;
-  AutoDisposeRef<dynamic>? _ref;
+class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
+  Ref? _ref;
   final Future<T> Function(ApiState<T>) _create;
   late Future<T> future;
+  // TODO: 1 test if it's fine that we still set state after being disposed
   bool _running = true;
   late final ValueNotifier<double?> selfTotalNotifier;
   late final ValueNotifier<double?> selfProgressNotifier;
@@ -33,21 +34,33 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
   }
 
   ApiState(
-    AutoDisposeRef<dynamic> ref,
+    Ref ref,
     this._create,
   ) : _ref = ref,
-      super(AsyncValue.loading()) {
-    // ignore: prefer_const_constructors
-    // declaring const here breaks at runtime for some reason, at least on riverpod 2.0.0-dev.9
+      super() {
     init();
   }
 
   ApiState.noProvider(
     this._create,
-  ) : super(AsyncValue.loading()) {
-    // ignore: prefer_const_constructors
-    // declaring const here breaks at runtime for some reason, at least on riverpod 2.0.0-dev.9
+  ) : super() {
     init();
+  }
+
+  @override
+  AsyncValue<T> build() => AsyncValue.loading();
+
+  // remove protected warning
+  @override
+  AsyncValue<T> get state => super.state;
+
+  // keep compatibility with code that used this as a StateNotifier
+  @override
+  set state(AsyncValue<T> state) {
+    if (state != this.state) {
+      notifyListeners();
+      super.state = state;
+    }
   }
 
   void init() {
@@ -124,13 +137,6 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
     }
   }
 
-  @override
-  void dispose() {
-    _running = false;
-    cancel();
-    super.dispose();
-  }
-
   Future<void> _runFuture() async {
     cancel();
     selfTotalNotifier.value = null;
@@ -145,8 +151,8 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
         if (_running) {
           state = AsyncValue<T>.data(event);
         }
-      } catch (err, stack) {
-        if (err is DioException) {
+      } catch (e, st) {
+        if (e is DioException) {
           // // this logging should be done in DIO interceptors. That is the only way to ensure it is logged only once for each call.
           // if (err.response==null) {
           //   log (LgLvl.info, 'Dio Connection Error caught in ApiState<$State>',
@@ -163,23 +169,23 @@ class ApiState<T> extends StateNotifier<AsyncValue<T>> {
           log(
             LgLvl.error,
             'Error caught in ApiState<$T> future',
-            e: err,
-            st: stack,
+            e: e,
+            st: st,
           );
         }
-        if (_running) {
-          state = AsyncValue<T>.error(err, stackTrace: stack);
-        }
+        // if (_running) {
+        state = AsyncValue<T>.error(e, st);
+        // }
         cancel();
       }
-    } catch (err, stack) {
+    } catch (e, st) {
       log(
         LgLvl.error,
         'Error caught before running ApiState<$T> future. This should never happen',
-        e: err,
-        st: stack,
+        e: e,
+        st: st,
       );
-      state = AsyncValue.error(err, stackTrace: stack);
+      state = AsyncValue.error(e, st);
     }
   }
 
@@ -294,7 +300,7 @@ typedef ApiErrorBuilder =
     Widget Function(BuildContext context, Object error, StackTrace? stackTrace, VoidCallback? onRetry);
 
 class ApiProviderBuilder<T> extends ConsumerWidget {
-  final AutoDisposeStateNotifierProvider<ApiState<T>, AsyncValue<T>> provider;
+  final NotifierProvider<ApiState<T>, AsyncValue<T>> provider;
   final DataBuilder<T> dataBuilder;
   final ApiLoadingBuilder loadingBuilder;
   final ApiErrorBuilder errorBuilder;
@@ -616,7 +622,7 @@ class SliverApiProviderBuilder<T> extends ApiProviderBuilder<T> {
 }
 
 class ApiProviderMultiBuilder<T> extends ConsumerWidget {
-  final List<AutoDisposeStateNotifierProvider<ApiState<T>, AsyncValue<T>>> providers;
+  final List<NotifierProvider<ApiState<T>, AsyncValue<T>>> providers;
   final DataMultiBuilder<T> dataBuilder;
   final ApiLoadingBuilder loadingBuilder;
   final ApiErrorBuilder errorBuilder;
@@ -799,18 +805,30 @@ class ApiStateBuilderState<T> extends ConsumerState<ApiStateBuilder<T>> {
   @override
   void initState() {
     super.initState();
-    // ignore: invalid_use_of_protected_member
     value = widget.stateNotifier.state;
-    widget.stateNotifier.addListener(
-      (state) {
-        if (mounted) {
-          setState(() {
-            value = state;
-          });
-        }
-      },
-      fireImmediately: false,
-    );
+    widget.stateNotifier.addListener(onNotify);
+  }
+
+  void onNotify() {
+    if (!mounted) return;
+    setState(() {
+      value = widget.stateNotifier.state;
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant ApiStateBuilder<T> oldWidget) {
+    if (widget.stateNotifier != oldWidget.stateNotifier) {
+      oldWidget.stateNotifier.removeListener(onNotify);
+      widget.stateNotifier.addListener(onNotify);
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    widget.stateNotifier.removeListener(onNotify);
+    super.dispose();
   }
 
   @override

@@ -19,11 +19,11 @@ typedef FilteredValuesGetter<T, R extends Field> =
 class ComboField<T extends DAO<dynamic>> extends Field<T> {
   ContextFulFieldValueGetter<List<T>?, ComboField<T>>? possibleValuesGetter;
   ContextFulFieldValueGetter<Future<List<T>>?, ComboField<T>>? possibleValuesFutureGetter;
-  ContextFulFieldValueGetter<AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>?, ComboField<T>>?
+  ContextFulFieldValueGetter<NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>?, ComboField<T>>?
   possibleValuesProviderGetter;
   FilteredValuesGetter<List<T>, ComboField<T>>? filteredValuesGetter;
   FilteredValuesGetter<Future<List<T>>, ComboField<T>>? filteredValuesFutureGetter;
-  FilteredValuesGetter<AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>, ComboField<T>>?
+  FilteredValuesGetter<NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>, ComboField<T>>?
   filteredValuesProviderGetter;
   bool? showSearchBox;
   ExtraWidgetBuilder<T>? extraWidget;
@@ -124,7 +124,7 @@ class ComboField<T extends DAO<dynamic>> extends Field<T> {
     ContextFulFieldValueGetter<ApiProvider<List<T>>?, ComboField<T>>? possibleValuesProviderGetter,
     FilteredValuesGetter<List<T>, ComboField<T>>? filteredValuesGetter,
     FilteredValuesGetter<Future<List<T>>, ComboField<T>>? filteredValuesFutureGetter,
-    FilteredValuesGetter<AutoDisposeStateNotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>, ComboField<T>>?
+    FilteredValuesGetter<NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>, ComboField<T>>?
     filteredValuesProviderGetter,
     FieldValueGetter<String?, Field>? hintGetter,
     FieldValueGetter<String?, Field>? tooltipGetter,

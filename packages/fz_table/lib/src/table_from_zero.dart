@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart' show StateProvider, StateController;
 import 'package:fz_actions/fz_actions.dart';
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_comparable_list/fz_comparable_list.dart';

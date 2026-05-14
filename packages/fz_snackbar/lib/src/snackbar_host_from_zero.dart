@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart' show ChangeNotifierProvider;
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_snackbar/src/api_snackbar.dart';
 import 'package:fz_snackbar/src/snackbar_from_zero.dart';

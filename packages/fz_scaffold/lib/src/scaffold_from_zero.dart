@@ -444,11 +444,9 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
       data: mediaQuery.copyWith(padding: mediaQuery.padding.copyWith(top: 0)),
       child: ProviderScope(
         overrides: [
-          fromZeroAppbarChangeNotifierProvider.overrideWithProvider(
-            ChangeNotifierProvider<AppbarChangeNotifier>((ref) {
-              return appbarChangeNotifier!;
-            }),
-          ),
+          fromZeroAppbarChangeNotifierProvider.overrideWith((ref) {
+            return appbarChangeNotifier!;
+          }),
         ],
         child: no_fading_transitions.FadeUpwardsFadeTransition(
           routeAnimation: ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation,
