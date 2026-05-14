@@ -121,7 +121,7 @@ class ComboField<T extends DAO<dynamic>> extends Field<T> {
     double? flex,
     ContextFulFieldValueGetter<List<T>?, ComboField<T>>? possibleValuesGetter,
     ContextFulFieldValueGetter<Future<List<T>>?, ComboField<T>>? possibleValuesFutureGetter,
-    ContextFulFieldValueGetter<ApiProvider<List<T>>?, ComboField<T>>? possibleValuesProviderGetter,
+    ContextFulFieldValueGetter<ApiProviderInstance<List<T>>?, ComboField<T>>? possibleValuesProviderGetter,
     FilteredValuesGetter<List<T>, ComboField<T>>? filteredValuesGetter,
     FilteredValuesGetter<Future<List<T>>, ComboField<T>>? filteredValuesFutureGetter,
     FilteredValuesGetter<NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>, ComboField<T>>?

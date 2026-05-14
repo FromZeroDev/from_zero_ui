@@ -7,6 +7,7 @@ import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
+import 'package:fz_api_handling/src/riverpod_caching.dart';
 import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
@@ -50,16 +51,24 @@ ApiProviderFamilyInstance<T, P> ApiProviderFamily<T, P>(
 }
 
 class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
+  // TODO: 2 maybe this should be a separate class, so in this one we can safely assume we have a ref
   final bool isNoProvider;
+
   final Future<T> Function(ApiState<T>) _create;
+  final Duration? disposeDelay;
+  final Duration? maxTimeToLive;
   late Future<T> future;
+
   // TODO: 1 test if it's fine that we still set state after being disposed
   bool _running = true;
+
+  // TODO: 2 these should probably be part of the LoadingState?
   late final ValueNotifier<double?> selfTotalNotifier;
   late final ValueNotifier<double?> selfProgressNotifier;
   late final ValueNotifier<double?> wholeTotalNotifier;
   late final ValueNotifier<double?> wholeProgressNotifier;
   late final ValueNotifier<double?> wholePercentageNotifier;
+
   final List<ApiProviderInstance<dynamic>> _watching = [];
   final List<CancelToken> _cancelTokens = [];
   void addCancelToken(CancelToken ct) {
@@ -68,6 +77,8 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
 
   ApiState(
     this._create,
+    this.disposeDelay,
+    this.maxTimeToLive,
   ) : isNoProvider = false,
       super() {
     init();
@@ -76,6 +87,8 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   ApiState.noProvider(
     this._create,
   ) : isNoProvider = true,
+      disposeDelay = null,
+      maxTimeToLive = null,
       super() {
     init();
   }
@@ -86,6 +99,8 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   // remove protected warning
   @override
   AsyncValue<T> get state => super.state;
+
+  bool get mounted => !isNoProvider && ref.mounted;
 
   // remove protected warning
   @override
@@ -186,6 +201,12 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
         final event = await future;
         if (_running) {
           state = AsyncValue<T>.data(event);
+          if (disposeDelay case final disposeDelay?) {
+            ref.addDisposeDelay(disposeDelay);
+          }
+          if (maxTimeToLive case final maxTimeToLive?) {
+            ref.addMaxTimeToLive(maxTimeToLive);
+          }
         }
       } catch (e, st) {
         if (e is DioException) {

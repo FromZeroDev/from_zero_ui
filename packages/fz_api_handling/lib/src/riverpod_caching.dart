@@ -1,0 +1,48 @@
+// References:
+// https://github.com/rrousselGit/riverpod/issues/1664
+// https://codeberg.org/lucavenir/riverpod_suite/src/commit/b7c64202f71e301962c517998c41c789a4938f18/packages/riverpod_swiss_knife/lib/src/ref/add_dispose_delay.dart
+
+import "dart:async";
+
+import "package:riverpod/riverpod.dart";
+
+/// Extension on [Ref] to add a dispose delay.
+extension AddDisposeDelayRef on Ref {
+  /// Adds a delay before disposing the provider when all listeners are removed.
+  ///
+  /// This results in the provider being kept alive for at least the specified
+  /// [delay] duration after the last listener is removed.
+  void addDisposeDelay(Duration delay) {
+    final link = keepAlive();
+
+    Timer? timer;
+
+    onCancel(() {
+      timer = Timer(delay, link.close);
+    });
+    onResume(() {
+      timer?.cancel();
+    });
+    onDispose(() {
+      timer?.cancel();
+    });
+  }
+}
+
+/// Extension on [Ref] to add a max time to live.
+extension AddMaxTimeToLiveRef on Ref {
+  /// Adds a max ttl for the data in the provider.
+  ///
+  /// When a listener is added after the max ttl has been has been exceeded, the
+  /// provider will be refreshed. The provider won't be refreshed until a new
+  /// listener is added, even if ttl has been exceeded.
+  void addMaxTimeToLive(Duration ttl) {
+    final timestamp = DateTime.timestamp();
+
+    onAddListener(() {
+      if (DateTime.timestamp().difference(timestamp) > ttl) {
+        invalidateSelf();
+      }
+    });
+  }
+}

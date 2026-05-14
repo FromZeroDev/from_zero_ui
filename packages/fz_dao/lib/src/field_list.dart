@@ -40,7 +40,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   TableController<T>? _tableController;
   ContextFulFieldValueGetter<Future<List<T>>, ListField<T, U>>? availableObjectsPoolGetter;
 
-  ContextFulFieldValueGetter<ApiProvider<List<T>>, ListField<T, U>>? availableObjectsPoolProvider;
+  ContextFulFieldValueGetter<ApiProviderInstance<List<T>>, ListField<T, U>>? availableObjectsPoolProvider;
   bool invalidateValuesNotInAvailablePool;
   bool allowDuplicateObjectsFromAvailablePool;
   bool allowAddMultipleFromAvailablePool;
@@ -1825,7 +1825,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     bool? showElementCount,
     double? rowHeight,
     ContextFulFieldValueGetter<Future<List<T>>, ListField<T, U>>? availableObjectsPoolGetter,
-    ContextFulFieldValueGetter<ApiProvider<List<T>>, ListField<T, U>>? availableObjectsPoolProvider,
+    ContextFulFieldValueGetter<ApiProviderInstance<List<T>>, ListField<T, U>>? availableObjectsPoolProvider,
     bool? allowDuplicateObjectsFromAvailablePool,
     bool? showObjectsFromAvailablePoolAsTable,
     bool? sortObjectsFromAvailablePool,
