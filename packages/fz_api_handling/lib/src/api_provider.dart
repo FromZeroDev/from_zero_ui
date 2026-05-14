@@ -76,11 +76,11 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   }
 
   ApiState(
-    this._create,
+    this._create, {
     this.disposeDelay,
     this.maxTimeToLive,
-  ) : isNoProvider = false,
-      super() {
+  }) : isNoProvider = false,
+       super() {
     init();
   }
 
