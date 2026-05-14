@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_riverpod: 2.0.0-dev.9
+  flutter_riverpod: ^3.3.1
 
   fz_api_handling:
     path: ../fz_api_handling
