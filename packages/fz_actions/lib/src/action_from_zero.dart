@@ -531,7 +531,7 @@ typedef ApiActionCallback<T, R> = R Function(BuildContext context, List<T> data)
 
 class APIActionFromZero<T> extends ActionFromZero {
   final List<ValueListenable<dynamic>> dependedNotifiers;
-  final List<ApiProvider<T>> Function(List<dynamic> values) providersBuilder;
+  final List<ApiProviderInstance<T>> Function(List<dynamic> values) providersBuilder;
   final ApiActionCallback<T, void>? onTapApi;
   final ApiActionCallback<T, String?>? disablingErrorBuilder;
   final ApiActionCallback<T, String?>? titleApiBuilder;

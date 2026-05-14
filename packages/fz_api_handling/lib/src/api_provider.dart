@@ -12,12 +12,45 @@ import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_log/fz_log.dart';
 import 'package:fz_snackbar/fz_snackbar.dart';
+// ignore: depend_on_referenced_packages, implementation_imports
+import 'package:riverpod/src/builder.dart';
 
-typedef ApiProvider<T> = NotifierProvider<ApiState<T>, AsyncValue<T>>;
-typedef ApiProviderFamily<T, P> = NotifierProviderFamily<ApiState<T>, AsyncValue<T>, P>;
+typedef ApiProviderInstance<T> = NotifierProvider<ApiState<T>, AsyncValue<T>>;
+
+typedef ApiProviderFamilyInstance<T, P> = NotifierProviderFamily<ApiState<T>, AsyncValue<T>, P>;
+
+// ignore: non_constant_identifier_names
+ApiProviderInstance<T> ApiProvider<T>(
+  ApiState<T> Function() create, {
+  String? name,
+  Iterable<ProviderOrFamily>? dependencies,
+  Retry? retry,
+}) {
+  return const AutoDisposeNotifierProviderBuilder()<ApiState<T>, AsyncValue<T>>(
+    create,
+    name: name,
+    dependencies: dependencies,
+    retry: retry,
+  );
+}
+
+// ignore: non_constant_identifier_names
+ApiProviderFamilyInstance<T, P> ApiProviderFamily<T, P>(
+  ApiState<T> Function(P param) create, {
+  String? name,
+  Iterable<ProviderOrFamily>? dependencies,
+  Retry? retry,
+}) {
+  return const AutoDisposeNotifierProviderFamilyBuilder()<ApiState<T>, AsyncValue<T>, P>(
+    create,
+    name: name,
+    dependencies: dependencies,
+    retry: retry,
+  );
+}
 
 class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
-  Ref? _ref;
+  final bool isNoProvider;
   final Future<T> Function(ApiState<T>) _create;
   late Future<T> future;
   // TODO: 1 test if it's fine that we still set state after being disposed
@@ -27,23 +60,23 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   late final ValueNotifier<double?> wholeTotalNotifier;
   late final ValueNotifier<double?> wholeProgressNotifier;
   late final ValueNotifier<double?> wholePercentageNotifier;
-  final List<ApiProvider<dynamic>> _watching = [];
+  final List<ApiProviderInstance<dynamic>> _watching = [];
   final List<CancelToken> _cancelTokens = [];
   void addCancelToken(CancelToken ct) {
     _cancelTokens.add(ct);
   }
 
   ApiState(
-    Ref ref,
     this._create,
-  ) : _ref = ref,
+  ) : isNoProvider = false,
       super() {
     init();
   }
 
   ApiState.noProvider(
     this._create,
-  ) : super() {
+  ) : isNoProvider = true,
+      super() {
     init();
   }
 
@@ -53,6 +86,10 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   // remove protected warning
   @override
   AsyncValue<T> get state => super.state;
+
+  // remove protected warning
+  @override
+  Ref get ref => super.ref;
 
   // keep compatibility with code that used this as a StateNotifier
   @override
@@ -76,11 +113,10 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     _runFuture();
   }
 
-  Future<WatchedT> watch<WatchedT>(ApiProvider<WatchedT> watchProvider) async {
-    assert(_ref != null);
+  Future<WatchedT> watch<WatchedT>(ApiProviderInstance<WatchedT> watchProvider) async {
     if (!_watching.contains(watchProvider)) {
       _watching.add(watchProvider);
-      final newApiState = _ref!.read(watchProvider.notifier);
+      final newApiState = ref.read(watchProvider.notifier);
       _computeTotal();
       _computeProgress();
       _computePercentage();
@@ -88,16 +124,16 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
       newApiState.wholeProgressNotifier.addListener(_computeProgress);
       newApiState.wholePercentageNotifier.addListener(_computePercentage);
     }
-    return _ref!.watch(watchProvider.notifier).future;
+    return ref.watch(watchProvider.notifier).future;
   }
 
   // a new ref needs to be passed to read the watching notifiers. watch() won't be called on it.
   bool retry(WidgetRef? widgetRef, [ProviderBase<dynamic>? providerForInvalidationInsteadOfRefresh]) {
     bool refreshed = false;
-    if ((widgetRef ?? _ref) != null) {
+    if (!isNoProvider) {
       try {
         final watchingNotifiers = {
-          for (final e in _watching) e: widgetRef == null ? _ref!.read(e.notifier) : widgetRef.read(e.notifier),
+          for (final e in _watching) e: widgetRef == null ? ref.read(e.notifier) : widgetRef.read(e.notifier),
         };
         for (final e in watchingNotifiers.keys) {
           refreshed = refreshed || watchingNotifiers[e]!.retry(widgetRef, e);
@@ -117,9 +153,9 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
 
   void refresh(WidgetRef? widgetRef, [ProviderBase<dynamic>? providerForInvalidationInsteadOfRefresh]) {
     bool refreshed = false;
-    if ((widgetRef ?? _ref) != null) {
+    if (!isNoProvider) {
       final watchingNotifiers = {
-        for (final e in _watching) e: widgetRef == null ? _ref!.read(e.notifier) : widgetRef.read(e.notifier),
+        for (final e in _watching) e: widgetRef == null ? ref.read(e.notifier) : widgetRef.read(e.notifier),
       };
       for (final e in watchingNotifiers.keys) {
         try {
@@ -200,11 +236,11 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
 
   void _computeTotal() {
     double? result = selfTotalNotifier.value;
-    if (result != null && _ref != null) {
+    if (result != null && !isNoProvider) {
       for (final e in _watching) {
         final partial =
-            _ref!.read(e.notifier).wholeTotalNotifier.value ??
-            _ref!
+            ref.read(e.notifier).wholeTotalNotifier.value ??
+            ref
                 .read(e)
                 .maybeWhen<double?>(
                   data: (_) => 0,
@@ -223,11 +259,11 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
 
   void _computeProgress() {
     double? result = selfProgressNotifier.value;
-    if (result != null && _ref != null) {
+    if (result != null && !isNoProvider) {
       for (final e in _watching) {
         final partial =
-            _ref!.read(e.notifier).wholeProgressNotifier.value ??
-            _ref!
+            ref.read(e.notifier).wholeProgressNotifier.value ??
+            ref
                 .read(e)
                 .maybeWhen<double?>(
                   data: (_) => 0,
@@ -249,7 +285,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     double? total = wholeTotalNotifier.value;
     double? progress = wholeProgressNotifier.value;
     double? result = total == null || total == 0 ? null : (progress ?? 0) / total;
-    if (result == null && _ref != null) {
+    if (result == null && !isNoProvider) {
       // Percentage of all dependencies are used, asuming their totals are equal
       total = selfTotalNotifier.value;
       progress = selfProgressNotifier.value;
@@ -258,9 +294,9 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
           : progress == null || total == 0
           ? 0
           : progress / total;
-      final allWatching = List<ApiProvider<dynamic>>.from(_watching);
+      final allWatching = List<ApiProviderInstance<dynamic>>.from(_watching);
       for (int i = 0; i < allWatching.length; i++) {
-        for (final e in _ref!.read(allWatching[i].notifier)._watching) {
+        for (final e in ref.read(allWatching[i].notifier)._watching) {
           if (!allWatching.contains(e)) {
             allWatching.add(e);
           }
@@ -268,7 +304,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
       }
       bool allNull = result == null;
       for (final e in allWatching) {
-        final notifier = _ref!.read(e.notifier);
+        final notifier = ref.read(e.notifier);
         double? partialProgress = notifier.selfProgressNotifier.value;
         double? partialTotal = notifier.selfTotalNotifier.value;
         double? partial = partialTotal == null
@@ -300,7 +336,7 @@ typedef ApiErrorBuilder =
     Widget Function(BuildContext context, Object error, StackTrace? stackTrace, VoidCallback? onRetry);
 
 class ApiProviderBuilder<T> extends ConsumerWidget {
-  final NotifierProvider<ApiState<T>, AsyncValue<T>> provider;
+  final ApiProviderInstance<T> provider;
   final DataBuilder<T> dataBuilder;
   final ApiLoadingBuilder loadingBuilder;
   final ApiErrorBuilder errorBuilder;
@@ -622,7 +658,7 @@ class SliverApiProviderBuilder<T> extends ApiProviderBuilder<T> {
 }
 
 class ApiProviderMultiBuilder<T> extends ConsumerWidget {
-  final List<NotifierProvider<ApiState<T>, AsyncValue<T>>> providers;
+  final List<ApiProviderInstance<T>> providers;
   final DataMultiBuilder<T> dataBuilder;
   final ApiLoadingBuilder loadingBuilder;
   final ApiErrorBuilder errorBuilder;
@@ -886,3 +922,6 @@ class PartialSuccessError<T> {
     this.messageOverride = '',
   });
 }
+
+// copied from riverpod because they don't expose it
+typedef Retry = Duration? Function(int retryCount, Object error);
