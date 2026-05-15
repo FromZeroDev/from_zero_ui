@@ -59,9 +59,6 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   final Duration? maxTimeToLive;
   late Future<T> future;
 
-  // TODO: 1 test if it's fine that we still set state after being disposed
-  bool _running = true;
-
   // TODO: 2 these should probably be part of the LoadingState?
   late final ValueNotifier<double?> selfTotalNotifier;
   late final ValueNotifier<double?> selfProgressNotifier;
@@ -80,9 +77,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     this.disposeDelay,
     this.maxTimeToLive,
   }) : isNoProvider = false,
-       super() {
-    init();
-  }
+       super();
 
   ApiState.noProvider(
     this._create,
@@ -94,7 +89,10 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   }
 
   @override
-  AsyncValue<T> build() => AsyncValue.loading();
+  AsyncValue<T> build() {
+    init(immediatelySetState: false);
+    return AsyncValue.loading();
+  }
 
   // remove protected warning
   @override
@@ -115,7 +113,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     }
   }
 
-  void init() {
+  void init({bool immediatelySetState = true}) {
     selfTotalNotifier = ValueNotifier(null);
     selfTotalNotifier.addListener(_computeTotal);
     selfProgressNotifier = ValueNotifier(null);
@@ -125,7 +123,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     wholeProgressNotifier = ValueNotifier(null);
     wholeProgressNotifier.addListener(_computePercentage);
     wholePercentageNotifier = ValueNotifier(null);
-    _runFuture();
+    _runFuture(immediatelySetState: immediatelySetState);
   }
 
   Future<WatchedT> watch<WatchedT>(ApiProviderInstance<WatchedT> watchProvider) async {
@@ -188,25 +186,27 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     }
   }
 
-  Future<void> _runFuture() async {
+  Future<void> _runFuture({bool immediatelySetState = true}) async {
     cancel();
+    ref.onDispose(cancel);
     selfTotalNotifier.value = null;
     selfProgressNotifier.value = null;
     wholePercentageNotifier.value = null;
-    state = AsyncValue.loading(); // ignore: prefer_const_constructors
+    if (immediatelySetState) {
+      state = AsyncValue.loading();
+    }
     // declaring const here breaks at runtime for some reason, at least on riverpod 2.0.0-dev.9
     try {
       future = _create(this);
       try {
         final event = await future;
-        if (_running) {
-          state = AsyncValue<T>.data(event);
-          if (disposeDelay case final disposeDelay?) {
-            ref.addDisposeDelay(disposeDelay);
-          }
-          if (maxTimeToLive case final maxTimeToLive?) {
-            ref.addMaxTimeToLive(maxTimeToLive);
-          }
+        if (!mounted) return;
+        state = AsyncValue<T>.data(event);
+        if (disposeDelay case final disposeDelay?) {
+          ref.addDisposeDelay(disposeDelay);
+        }
+        if (maxTimeToLive case final maxTimeToLive?) {
+          ref.addMaxTimeToLive(maxTimeToLive);
         }
       } catch (e, st) {
         if (e is DioException) {
@@ -230,10 +230,9 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
             st: st,
           );
         }
-        // if (_running) {
-        state = AsyncValue<T>.error(e, st);
-        // }
         cancel();
+        if (!mounted) return;
+        state = AsyncValue<T>.error(e, st);
       }
     } catch (e, st) {
       log(
@@ -242,6 +241,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
         e: e,
         st: st,
       );
+      if (!mounted) return;
       state = AsyncValue.error(e, st);
     }
   }
