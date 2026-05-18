@@ -60,11 +60,11 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   late Future<T> future;
 
   // TODO: 2 these should probably be part of the LoadingState?
-  late final ValueNotifier<double?> selfTotalNotifier;
-  late final ValueNotifier<double?> selfProgressNotifier;
-  late final ValueNotifier<double?> wholeTotalNotifier;
-  late final ValueNotifier<double?> wholeProgressNotifier;
-  late final ValueNotifier<double?> wholePercentageNotifier;
+  late final selfTotalNotifier = ValueNotifier<double?>(null)..addListener(_computeTotal);
+  late final selfProgressNotifier = ValueNotifier<double?>(null)..addListener(_computeProgress);
+  late final wholeTotalNotifier = ValueNotifier<double?>(null)..addListener(_computePercentage);
+  late final wholeProgressNotifier = ValueNotifier<double?>(null)..addListener(_computePercentage);
+  late final wholePercentageNotifier = ValueNotifier<double?>(null);
 
   final List<ApiProviderInstance<dynamic>> _watching = [];
   final List<CancelToken> _cancelTokens = [];
@@ -85,12 +85,12 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
       disposeDelay = null,
       maxTimeToLive = null,
       super() {
-    init();
+    _runFuture();
   }
 
   @override
   AsyncValue<T> build() {
-    init(immediatelySetState: false);
+    _runFuture(immediatelySetState: false);
     return AsyncValue.loading();
   }
 
@@ -111,19 +111,6 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
       notifyListeners();
       super.state = state;
     }
-  }
-
-  void init({bool immediatelySetState = true}) {
-    selfTotalNotifier = ValueNotifier(null);
-    selfTotalNotifier.addListener(_computeTotal);
-    selfProgressNotifier = ValueNotifier(null);
-    selfProgressNotifier.addListener(_computeProgress);
-    wholeTotalNotifier = ValueNotifier(null);
-    wholeTotalNotifier.addListener(_computePercentage);
-    wholeProgressNotifier = ValueNotifier(null);
-    wholeProgressNotifier.addListener(_computePercentage);
-    wholePercentageNotifier = ValueNotifier(null);
-    _runFuture(immediatelySetState: immediatelySetState);
   }
 
   Future<WatchedT> watch<WatchedT>(ApiProviderInstance<WatchedT> watchProvider) async {
