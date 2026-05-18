@@ -90,7 +90,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
 
   @override
   AsyncValue<T> build() {
-    _runFuture(immediatelySetState: false);
+    _runFuture();
     return AsyncValue.loading();
   }
 
@@ -173,16 +173,19 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     }
   }
 
-  Future<void> _runFuture({bool immediatelySetState = true}) async {
+  Future<void> _runFuture() async {
     cancel();
     ref.onDispose(cancel);
     selfTotalNotifier.value = null;
     selfProgressNotifier.value = null;
     wholePercentageNotifier.value = null;
-    if (immediatelySetState) {
+    if (!ref.isFirstBuild) {
       state = AsyncValue.loading();
     }
-    // declaring const here breaks at runtime for some reason, at least on riverpod 2.0.0-dev.9
+    // if (ref.isPaused) { // this doesn't seem to be necessary, I don't thing this is ever called with isPaused=true
+    //   ref.onResume(_runFuture);
+    //   return;
+    // }
     try {
       future = _create(this);
       try {
@@ -243,6 +246,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   }
 
   void _computeTotal() {
+    if (!mounted) return;
     double? result = selfTotalNotifier.value;
     if (result != null && !isNoProvider) {
       for (final e in _watching) {
@@ -266,6 +270,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   }
 
   void _computeProgress() {
+    if (!mounted) return;
     double? result = selfProgressNotifier.value;
     if (result != null && !isNoProvider) {
       for (final e in _watching) {
@@ -289,6 +294,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   }
 
   void _computePercentage() {
+    if (!mounted) return;
     // Percentage calculated only from wholeNotifiers
     double? total = wholeTotalNotifier.value;
     double? progress = wholeProgressNotifier.value;
@@ -334,6 +340,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
 
   /// utility to use with dio request onReceiveProgress callback
   void onReceiveProgress(int count, int total) {
+    if (!mounted) return;
     selfTotalNotifier.value = total.toDouble();
     selfProgressNotifier.value = count.toDouble();
   }

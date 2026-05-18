@@ -4,6 +4,7 @@
 
 import "dart:async";
 
+import "package:flutter/widgets.dart";
 import "package:riverpod/riverpod.dart";
 
 /// Extension on [Ref] to add a dispose delay.
@@ -41,8 +42,29 @@ extension AddMaxTimeToLiveRef on Ref {
 
     onAddListener(() {
       if (DateTime.timestamp().difference(timestamp) > ttl) {
-        invalidateSelf();
+        // TODO: 1 calling invalidateSelf sync causes an error, find a clever way to do this on the same frame, instead of wasting a frame
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          invalidateSelfWhenUnpaused();
+        });
       }
+    });
+  }
+}
+
+extension InvalidateWhenUnpaused on Ref {
+  void invalidateSelfWhenUnpaused() {
+    if (mounted && !isPaused) {
+      invalidateSelf();
+      return;
+    }
+
+    onAddListener(() {
+      if (!mounted || isPaused) return;
+      // TODO: 1 calling invalidateSelf sync causes an error, find a clever way to do this on the same frame, instead of wasting a frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || isPaused) return;
+        invalidateSelf();
+      });
     });
   }
 }
