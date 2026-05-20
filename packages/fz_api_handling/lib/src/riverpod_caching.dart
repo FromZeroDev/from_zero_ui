@@ -7,6 +7,7 @@ import "dart:async";
 import "package:flutter/widgets.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:fz_api_handling/src/api_provider.dart";
+// ignore: implementation_imports, invalid_use_of_internal_member
 
 /// Extension on [Ref] to add a dispose delay.
 extension AddDisposeDelayRef on Ref {
@@ -40,15 +41,17 @@ extension AddMaxTimeToLiveRef on Ref {
   /// listener is added, even if ttl has been exceeded.
   void addMaxTimeToLive(Duration ttl) {
     final timestamp = DateTime.timestamp();
-
-    onAddListener(() {
-      if (DateTime.timestamp().difference(timestamp) > ttl) {
-        // TODO: 1 calling invalidateSelf sync causes an error, find a clever way to do this on the same frame, instead of wasting a frame
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          invalidateSelfWhenUnpaused();
-        });
-      }
-    });
+    var scheduled = false;
+    final scheduleInvalidation = () {
+      if (scheduled || DateTime.timestamp().difference(timestamp) < ttl) return;
+      scheduled = true;
+      // TODO: 1 calling invalidateSelf sync causes an error, find a clever way to do this on the same frame, instead of wasting a frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        invalidateSelfWhenUnpaused();
+      });
+    };
+    onAddListener(scheduleInvalidation);
+    onResume(scheduleInvalidation);
   }
 }
 
@@ -58,15 +61,19 @@ extension InvalidateWhenUnpausedRef on Ref {
       invalidateSelf();
       return;
     }
-
-    onAddListener(() {
-      if (!mounted || isPaused) return;
+    var scheduled = false;
+    final scheduleInvalidation = () {
+      if (scheduled || !mounted || isPaused) return;
+      scheduled = true;
       // TODO: 1 calling invalidateSelf sync causes an error, find a clever way to do this on the same frame, instead of wasting a frame
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        scheduled = false;
         if (!mounted || isPaused) return;
         invalidateSelf();
       });
-    });
+    };
+    onAddListener(scheduleInvalidation);
+    onResume(scheduleInvalidation);
   }
 }
 
