@@ -468,7 +468,7 @@ class OnlyOnActiveBuilderState extends ConsumerState<OnlyOnActiveBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    print("BUILD ROUTE ${widget.state.name}: $built ${isActiveRoute(context)}}");
+    // print("BUILD ROUTE ${widget.state.name}: $built ${isActiveRoute(context)}}");
     if (!isActiveRoute(context)) {
       return previousBuild ??
           ColoredBox(
