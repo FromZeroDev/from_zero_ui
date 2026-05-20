@@ -75,3 +75,39 @@ You can override any part via static setters on `ApiProviderBuilder`:
 ApiProviderBuilder.getErrorIcon = (context, error, stack) => myErrorIcon;
 ApiProviderBuilder.getErrorTitle = (context, error, stack) => 'Oops';
 ```
+
+## Provider caching with disposeDelay and maxTTL
+
+Two extensions on `Ref` cover all provider caching needs:
+
+- **`addDisposeDelay`** — Keeps the provider alive for a specified duration after the last listener is removed. This prevents needlessly tearing down and re-fetching data when the user navigates briefly away and back (e.g. switching tabs).
+
+- **`addMaxTimeToLive`** — Sets a maximum age for the provider's data. When a new listener is added after the TTL has elapsed, the provider is automatically invalidated and refreshed. This ensures data doesn't go stale without requiring the user to manually refresh.
+
+Used together, these two mechanisms eliminate the need for separate `cacheTime`, `staleTime`, `refetchInterval`, or similar concepts:
+
+```dart
+// recommended way, this adds them at recommended time (after data is received)
+final myListProvider = ApiProvider<List<MyModel>>(
+  () => ApiState(
+    (state) => fetchData();
+    disposeDelay: const Duration(minutes: 5),
+    maxTimeToLive: const Duration(minutes: 60),
+  ),
+);
+
+// or you can do it manually to a ref, even when not using ApiProvider
+final myListProvider = ApiProvider<List<MyModel>>(
+  () => ApiState((apiState) async {
+    final data = await fetchData();
+    ref.addDisposeDelay(const Duration(minutes: 5));
+    ref.addMaxTimeToLive(const Duration(minutes: 60));
+    return data;
+  }),
+);
+```
+
+With this configuration:
+- Navigating away for less than 5 minutes? The data is still there — no refetch.
+- Gone longer than 5 minutes? The provider disposes, freeing memory.
+- Leave the page open and come back after 60 minutes? The provider auto-invalidates and refetches fresh data on first widget rebuild.

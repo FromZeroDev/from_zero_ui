@@ -55,7 +55,13 @@ extension AddMaxTimeToLiveRef on Ref {
   }
 }
 
+/// Extension on [Ref] to safely invalidate a provider, deferring invalidation
+/// if the provider is paused.
 extension InvalidateWhenUnpausedRef on Ref {
+  /// Invalidates the provider immediately if it is mounted and not paused.
+  ///
+  /// If the provider is paused, the invalidation is deferred until the next
+  /// listener is added or the provider is resumed.
   void invalidateSelfWhenUnpaused() {
     if (mounted && !isPaused) {
       invalidateSelf();
@@ -77,7 +83,10 @@ extension InvalidateWhenUnpausedRef on Ref {
   }
 }
 
+/// Extension on [Ref] to read the future from an [ApiProviderInstance].
 extension ReadFutureRef on Ref {
+  /// Reads the future from the given [provider], ensuring the provider is
+  /// listened to while the future is awaited, so it is not disposed prematurely.
   Future<T> readFuture<T>(ApiProviderInstance<T> provider) async {
     final subscription = listen(provider.notifier, (_, _) {});
     try {
@@ -88,7 +97,10 @@ extension ReadFutureRef on Ref {
   }
 }
 
+/// Extension on [WidgetRef] to read the future from an [ApiProviderInstance].
 extension ReadFutureWidgetRef on WidgetRef {
+  /// Reads the future from the given [provider], ensuring the provider is
+  /// listened to while the future is awaited, so it is not disposed prematurely.
   Future<T> readFuture<T>(ApiProviderInstance<T> provider) async {
     final subscription = listenManual(provider.notifier, (_, _) {});
     try {
@@ -99,7 +111,10 @@ extension ReadFutureWidgetRef on WidgetRef {
   }
 }
 
+/// Extension on [ProviderContainer] to read the future from an [ApiProviderInstance].
 extension ReadFutureWidgetProviderContainer on ProviderContainer {
+  /// Reads the future from the given [provider], ensuring the provider is
+  /// listened to while the future is awaited, so it is not disposed prematurely.
   Future<T> readFuture<T>(ApiProviderInstance<T> provider) async {
     final subscription = listen(provider.notifier, (_, _) {});
     try {
