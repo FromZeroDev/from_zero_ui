@@ -50,8 +50,49 @@ ApiProviderFamilyInstance<T, P> ApiProviderFamily<T, P>(
   );
 }
 
+// class ApiMutationExecutor<T, P> {
+//   final Mutation<T> mutation;
+//   final P param;
+//   final Future<T> Function(MutationTransaction tsx, P param) executor;
+//
+//   ApiMutationExecutor(this.mutation, this.param, this.executor);
+//
+//   Future<T> run(MutationTarget target) {
+//     return mutation.run(target, (tsx) {
+//       return executor(tsx, param);
+//     });
+//   }
+// }
+//
+// class ApiMutation<T, P> {
+//   final Mutation<T> mutation = Mutation<T>();
+//   final Future<T> Function(MutationTransaction tsx, P param) executor;
+//
+//   ApiMutation(this.executor);
+//
+//   ApiMutationExecutor<T, P> call(P param) {
+//     return ApiMutationExecutor(mutation(param), param, executor);
+//   }
+// }
+
+//  TODO: 1 implement a better solution using mutations and delete this
+class ApiStateNoProvider<T> extends ApiState<T> {
+  ApiStateNoProvider(super._create) : super._noProvider();
+
+  AsyncValue<T> _state = AsyncValue.loading();
+
+  @override
+  AsyncValue<T> get state => _state;
+
+  @override
+  set state(AsyncValue<T> state) {
+    if (state == _state) return;
+    _state = state;
+    notifyListeners();
+  }
+}
+
 class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
-  // TODO: 2 maybe this should be a separate class, so in this one we can safely assume we have a ref
   final bool isNoProvider;
 
   final Future<T> Function(ApiState<T>) _create;
@@ -79,7 +120,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   }) : isNoProvider = false,
        super();
 
-  ApiState.noProvider(
+  ApiState._noProvider(
     this._create,
   ) : isNoProvider = true,
       disposeDelay = null,
@@ -98,12 +139,6 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   @override
   AsyncValue<T> get state => super.state;
 
-  bool get mounted => !isNoProvider && ref.mounted;
-
-  // remove protected warning
-  @override
-  Ref get ref => super.ref;
-
   // keep compatibility with code that used this as a StateNotifier
   @override
   set state(AsyncValue<T> state) {
@@ -112,6 +147,12 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
       super.state = state;
     }
   }
+
+  bool get mounted => isNoProvider || ref.mounted;
+
+  // remove protected warning
+  @override
+  Ref get ref => super.ref;
 
   Future<WatchedT> watch<WatchedT>(ApiProviderInstance<WatchedT> watchProvider) async {
     if (!_watching.contains(watchProvider)) {
@@ -175,11 +216,13 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
 
   Future<void> _runFuture() async {
     cancel();
-    ref.onDispose(cancel);
+    if (!isNoProvider) {
+      ref.onDispose(cancel);
+    }
     selfTotalNotifier.value = null;
     selfProgressNotifier.value = null;
     wholePercentageNotifier.value = null;
-    if (!ref.isFirstBuild) {
+    if (!isNoProvider && !ref.isFirstBuild) {
       state = AsyncValue.loading();
     }
     // if (ref.isPaused) { // this doesn't seem to be necessary, I don't thing this is ever called with isPaused=true
@@ -189,14 +232,16 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     try {
       future = _create(this);
       try {
-        final event = await future;
+        final data = await future;
         if (!mounted) return;
-        state = AsyncValue<T>.data(event);
-        if (disposeDelay case final disposeDelay?) {
-          ref.addDisposeDelay(disposeDelay);
-        }
-        if (maxTimeToLive case final maxTimeToLive?) {
-          ref.addMaxTimeToLive(maxTimeToLive);
+        state = AsyncValue<T>.data(data);
+        if (!isNoProvider) {
+          if (disposeDelay case final disposeDelay?) {
+            ref.addDisposeDelay(disposeDelay);
+          }
+          if (maxTimeToLive case final maxTimeToLive?) {
+            ref.addMaxTimeToLive(maxTimeToLive);
+          }
         }
       } catch (e, st) {
         if (e is DioException) {
