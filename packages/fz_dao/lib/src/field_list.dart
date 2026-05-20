@@ -2516,7 +2516,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
       confirmedValidValues = [];
       final provider = availableObjectsPoolProvider?.call(context, this, dao);
       if (provider != null) {
-        possibleValues = await (context as WidgetRef).watch(provider.notifier).future;
+        possibleValues = await (context as WidgetRef).readFuture(provider);
       } else {
         possibleValues = await availableObjectsPoolGetter?.call(context, this, dao);
       }

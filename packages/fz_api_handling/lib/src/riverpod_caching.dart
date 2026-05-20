@@ -5,7 +5,8 @@
 import "dart:async";
 
 import "package:flutter/widgets.dart";
-import "package:riverpod/riverpod.dart";
+import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:fz_api_handling/src/api_provider.dart";
 
 /// Extension on [Ref] to add a dispose delay.
 extension AddDisposeDelayRef on Ref {
@@ -51,7 +52,7 @@ extension AddMaxTimeToLiveRef on Ref {
   }
 }
 
-extension InvalidateWhenUnpaused on Ref {
+extension InvalidateWhenUnpausedRef on Ref {
   void invalidateSelfWhenUnpaused() {
     if (mounted && !isPaused) {
       invalidateSelf();
@@ -66,5 +67,38 @@ extension InvalidateWhenUnpaused on Ref {
         invalidateSelf();
       });
     });
+  }
+}
+
+extension ReadFutureRef on Ref {
+  Future<T> readFuture<T>(ApiProviderInstance<T> provider) async {
+    final subscription = listen(provider.notifier, (_, _) {});
+    try {
+      return await read(provider.notifier).future;
+    } finally {
+      subscription.close();
+    }
+  }
+}
+
+extension ReadFutureWidgetRef on WidgetRef {
+  Future<T> readFuture<T>(ApiProviderInstance<T> provider) async {
+    final subscription = listenManual(provider.notifier, (_, _) {});
+    try {
+      return await read(provider.notifier).future;
+    } finally {
+      subscription.close();
+    }
+  }
+}
+
+extension ReadFutureWidgetProviderContainer on ProviderContainer {
+  Future<T> readFuture<T>(ApiProviderInstance<T> provider) async {
+    final subscription = listen(provider.notifier, (_, _) {});
+    try {
+      return await read(provider.notifier).future;
+    } finally {
+      subscription.close();
+    }
   }
 }

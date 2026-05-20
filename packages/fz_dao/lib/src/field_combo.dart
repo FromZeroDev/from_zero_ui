@@ -232,7 +232,7 @@ class ComboField<T extends DAO<dynamic>> extends Field<T> {
         // ignore: use_build_context_synchronously
         final provider = possibleValuesProviderGetter!.call(context, this, dao);
         if (provider != null) {
-          possibleValues = await (context as WidgetRef).watch(provider.notifier).future;
+          possibleValues = await (context as WidgetRef).readFuture(provider);
           if (currentValidationId != dao.validationCallCount || !context.mounted) return false;
         }
       }
