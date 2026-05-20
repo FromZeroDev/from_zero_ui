@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:go_router/go_router.dart';
-
-bool skipFirstRenderWhenPushing =
-    false; // disabled because it breaks heroes, and the actual performance gain is doubtful
+// ignore: implementation_imports
+import 'package:go_router/src/state.dart';
 
 extension Replace on GoRouter {
   void removeLast() {
@@ -156,6 +155,7 @@ class GoRouteFromZero extends GoRoute {
              (context, state) {
                return CustomTransitionPage<void>(
                  key: state.pageKey,
+                 // maintainState: false,
                  // key: (pageKeyGetter?.call(context, state)) ?? ValueKey(state.uri.toString()),
                  child: OnlyOnActiveBuilder(
                    builder: builder!,
@@ -412,10 +412,13 @@ class OnlyOnActiveBuilder extends ConsumerStatefulWidget {
 }
 
 class OnlyOnActiveBuilderState extends ConsumerState<OnlyOnActiveBuilder> {
+  Widget? previousBuild;
   bool built = false;
   GoRouterStateFromZero? state;
   GoRouterStateFromZero? previousState;
   late final ScaffoldFromZeroChangeNotifier scaffoldChangeNotifier;
+  // disabled because it breaks heroes, and the actual performance gain is doubtful
+  static const skipFirstRenderWhenPushing = false;
 
   @override
   void initState() {
@@ -465,30 +468,44 @@ class OnlyOnActiveBuilderState extends ConsumerState<OnlyOnActiveBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    if (built || isActiveRoute(context)) {
-      if (isActiveRoute(context) && scaffoldChangeNotifier.currentRouteState != state!) {
-        previousState = scaffoldChangeNotifier.currentRouteState;
-        scaffoldChangeNotifier.setCurrentRouteState(state!);
-      }
-
-      if (built || !skipFirstRenderWhenPushing) {
-        built = true;
-        return widget.builder(context, state!);
-      } else {
-        built = true;
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          setState(() {});
-        });
-        return Container(
-          color: Theme.of(context).canvasColor,
-        );
-      }
-    } else {
-      return Container();
+    // print("BUILD ROUTE ${widget.state.uri}: $built ${isActiveRoute(context)}}");
+    if (!isActiveRoute(context)) {
+      return previousBuild ??
+          ColoredBox(
+            color: Theme.of(context).canvasColor,
+          );
     }
+    if (scaffoldChangeNotifier.currentRouteState != state!) {
+      previousState = scaffoldChangeNotifier.currentRouteState;
+      // TODO: 1 maybe everyone should just use getActiveRouteStates() so we don't need our own notifier
+      scaffoldChangeNotifier.setCurrentRouteState(state!);
+    }
+
+    if (skipFirstRenderWhenPushing && !built) {
+      built = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {});
+      });
+      return ColoredBox(
+        color: Theme.of(context).canvasColor,
+      );
+    }
+
+    built = true;
+    final result = widget.builder(context, state!);
+    previousBuild = result;
+    return result;
   }
 
-  bool isActiveRoute(BuildContext context) => widget.state.pageKey.value == GoRouterState.of(context).pageKey.value;
+  bool isActiveRoute(BuildContext context) => widget.state.pageKey == getActiveRouteStates(context).first.pageKey;
+
+  // TODO: 1 maybe
+  Iterable<GoRouterState> getActiveRouteStates(BuildContext context) {
+    // ignore: invalid_use_of_internal_member
+    final goRouterScope = context.dependOnInheritedWidgetOfExactType<GoRouterStateRegistryScope>()!.notifier!;
+    // print("STATE: ${goRouterScope.registry.values.map((e) => "${e.uri}(${e.pageKey.value})")}");
+    return goRouterScope.registry.values;
+  }
 }
 
 class DefaultInitChangeNotifier extends ChangeNotifier {
