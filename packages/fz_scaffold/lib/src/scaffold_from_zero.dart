@@ -405,9 +405,12 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
   @override
   void didUpdateWidget(ScaffoldFromZero oldWidget) {
     super.didUpdateWidget(oldWidget);
-    appbarChangeNotifier.appbarHeight = widget.appbarHeight;
-    appbarChangeNotifier.backgroundHeight = widget.collapsibleBackgroundHeight;
-    appbarChangeNotifier.appbarType = widget.appbarType;
+    // TODO: 2 find a way to do this without skipping a frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      appbarChangeNotifier.appbarHeight = widget.appbarHeight;
+      appbarChangeNotifier.backgroundHeight = widget.collapsibleBackgroundHeight;
+      appbarChangeNotifier.appbarType = widget.appbarType;
+    });
     if (widget.mainScrollController != oldWidget.mainScrollController) {
       oldWidget.mainScrollController?.removeListener(_handleScroll);
       if (widget.mainScrollController != null) {
