@@ -637,34 +637,38 @@ class BoolField extends Field<BoolComparable> {
               ),
             );
           case BoolFieldDisplayType.compactSwitch:
-            result = Stack(
-              children: [
-                Material(
-                  type: MaterialType.card,
-                  elevation: 0,
-                  color: dense && visibleValidationErrors.isNotEmpty
-                      ? ValidationMessage
-                            .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
-                            .withValues(alpha: 0.2)
-                      : backgroundColor?.call(context, this, dao),
-                  child: InkWell(
-                    focusNode: focusNode,
-                    onTap: !enabled
-                        ? null
-                        : () {
-                            focusNode.requestFocus();
-                            userInteracted = true;
-                            value = (!(value?.value ?? false)).comparable;
-                          },
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: ExcludeFocusTraversal(
-                        child: FractionalTranslation(
-                          translation: const Offset(0, 0.2),
-                          child: Transform.scale(
-                            scaleY: 0.7,
-                            scaleX: 0.8,
-                            filterQuality: FilterQuality.low,
+            result = RepaintBoundary(
+              child: Stack(
+                children: [
+                  Material(
+                    type: MaterialType.card,
+                    elevation: 0,
+                    color: dense && visibleValidationErrors.isNotEmpty
+                        ? ValidationMessage
+                              .severityColors[theme.brightness.inverse]![visibleValidationErrors.first.severity]!
+                              .withValues(alpha: 0.2)
+                        : backgroundColor?.call(context, this, dao),
+                    child: InkWell(
+                      focusNode: focusNode,
+                      onTap: !enabled
+                          ? null
+                          : () {
+                              focusNode.requestFocus();
+                              userInteracted = true;
+                              value = (!(value?.value ?? false)).comparable;
+                            },
+                      child: SizedBox.expand(),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: ExcludeFocusTraversal(
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: SizedBox(
+                          width: 44,
+                          height: 26,
+                          child: FittedBox(
+                            fit: BoxFit.fill,
                             child: Switch(
                               value: value!.value,
                               activeThumbColor: selectedColor?.call(context, this, dao),
@@ -682,36 +686,36 @@ class BoolField extends Field<BoolComparable> {
                       ),
                     ),
                   ),
-                ),
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 2, right: 2, top: 0, bottom: dense ? 30 : 22),
-                      child: Center(
-                        child: AutoSizeText(
-                          uiNameValue,
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          softWrap: false,
-                          style: TextStyle(
-                            height: 1,
-                            color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
-                          ),
-                          overflowReplacement: AutoSizeText(
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 2, right: 2, top: 0, bottom: dense ? 30 : 22),
+                        child: Center(
+                          child: AutoSizeText(
                             uiNameValue,
                             textAlign: TextAlign.center,
-                            maxLines: 2,
+                            maxLines: 1,
+                            softWrap: false,
                             style: TextStyle(
                               height: 1,
                               color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
+                            ),
+                            overflowReplacement: AutoSizeText(
+                              uiNameValue,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              style: TextStyle(
+                                height: 1,
+                                color: theme.textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           case BoolFieldDisplayType.combo:
             result = ComboFromZero<DAO<dynamic>>(
