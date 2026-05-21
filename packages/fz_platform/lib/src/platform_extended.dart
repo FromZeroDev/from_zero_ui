@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 bool windowsDesktopBitsdojoWorking = true;
 
 class PlatformExtended {
-  static final _appWindow = kIsWeb || isMobile ? null : bitsdojo.appWindow;
+  static final _appWindow = kIsWeb || !PlatformExtended.isWindows ? null : bitsdojo.appWindow;
   static bitsdojo_window.DesktopWindow? get appWindow => !windowsDesktopBitsdojoWorking ? null : _appWindow;
 
   static bool get isWindows {

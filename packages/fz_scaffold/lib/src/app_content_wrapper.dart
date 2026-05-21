@@ -31,7 +31,7 @@ var fromZeroScaffoldChangeNotifierProvider = ChangeNotifierProvider<ScaffoldFrom
 });
 
 var fromZeroAppbarChangeNotifierProvider = ChangeNotifierProvider<AppbarChangeNotifier>((ref) {
-  return AppbarChangeNotifier(0, 0, 0, AppbarType.none, null);
+  return AppbarChangeNotifier(appbarHeight: 0, backgroundHeight: 0, appbarType: AppbarType.none);
 });
 
 var fromZeroThemeParametersProvider = ChangeNotifierProvider<ThemeParametersFromZero>((ref) {

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' show min;
 
 import 'package:dartx/dartx.dart';
 import 'package:flutter/foundation.dart';
@@ -329,9 +330,8 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
 }
 
 class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
-  AppbarChangeNotifier? appbarChangeNotifier;
   late ScrollController drawerContentScrollController;
-  late bool canPop;
+  late bool canPop = ModalRoute.of(context)?.canPop ?? Navigator.of(context).canPop();
   final GlobalKey bodyGlobalKey = GlobalKey();
   final GlobalKey drawerGlobalKey = GlobalKey();
   final GlobalKey appbarGlobalKey = GlobalKey();
@@ -340,6 +340,13 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
   GoRouterStateFromZero? route;
   late ScaffoldFromZeroChangeNotifier _changeNotifier;
   late ScreenFromZero _screenChangeNotifier;
+
+  late final appbarChangeNotifier = AppbarChangeNotifier(
+    appbarHeight: widget.appbarHeight,
+    backgroundHeight: widget.collapsibleBackgroundHeight,
+    appbarType: widget.appbarType,
+  );
+
   @override
   void initState() {
     super.initState();
@@ -398,6 +405,9 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
   @override
   void didUpdateWidget(ScaffoldFromZero oldWidget) {
     super.didUpdateWidget(oldWidget);
+    appbarChangeNotifier.appbarHeight = widget.appbarHeight;
+    appbarChangeNotifier.backgroundHeight = widget.collapsibleBackgroundHeight;
+    appbarChangeNotifier.appbarType = widget.appbarType;
     if (widget.mainScrollController != oldWidget.mainScrollController) {
       oldWidget.mainScrollController?.removeListener(_handleScroll);
       if (widget.mainScrollController != null) {
@@ -422,30 +432,30 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
   }
 
   void _handleScroll() {
-    appbarChangeNotifier!.handleMainScrollerControllerCall(
+    appbarChangeNotifier.handleMainScrollerControllerCall(
       widget.mainScrollController!,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (appbarChangeNotifier == null) {
-      appbarChangeNotifier = AppbarChangeNotifier(
-        widget.appbarHeight,
-        MediaQuery.paddingOf(context).top,
-        widget.collapsibleBackgroundHeight,
-        widget.appbarType,
-        null,
-      );
-      canPop = ModalRoute.of(context)?.canPop ?? Navigator.of(context).canPop();
-    }
+    // TODO: 2 find a way to do this without skipping a frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      appbarChangeNotifier.safeAreaOffset = MediaQuery.paddingOf(context).top;
+      // TODO: 2 expose both the breakponint and the collapsedHeight (or maybe even a list of breakpoint->height)
+      appbarChangeNotifier.appbarHeight = MediaQuery.sizeOf(context).height < 384
+          ? min(widget.appbarHeight, 34 + (PlatformExtended.appWindow?.titleBarHeight ?? 8))
+          : MediaQuery.sizeOf(context).height < 512
+          ? min(widget.appbarHeight, 40 + (PlatformExtended.appWindow?.titleBarHeight ?? 8))
+          : widget.appbarHeight;
+    });
     final mediaQuery = MediaQuery.of(context);
     return MediaQuery(
       data: mediaQuery.copyWith(padding: mediaQuery.padding.copyWith(top: 0)),
       child: ProviderScope(
         overrides: [
           fromZeroAppbarChangeNotifierProvider.overrideWith((ref) {
-            return appbarChangeNotifier!;
+            return appbarChangeNotifier;
           }),
         ],
         child: no_fading_transitions.FadeUpwardsFadeTransition(
@@ -884,7 +894,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                             centerTitle: widget.centerTitle,
                             actions: widget.actions,
                             initialExpandedAction: widget.initialExpandedAction,
-                            toolbarHeight: widget.appbarHeight,
+                            toolbarHeight: appbarChangeNotifier.appbarHeight,
                             topSafePadding: appbarChangeNotifier.safeAreaOffset,
                             addContextMenu: widget.appbarAddContextMenu,
                             paddingRight: widget.scrollbarType != ScrollBarType.overAppbar
@@ -1002,7 +1012,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                 if (widget.useCompactDrawerInsteadOfClose) {
                                   result = Container(
                                     width: 48 + widget.titleSpacing,
-                                    height: widget.appbarHeight,
+                                    height: appbarChangeNotifier.appbarHeight,
                                     alignment: Alignment.centerLeft,
                                     child: result,
                                   );
@@ -1032,7 +1042,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                                                 width: currentWidth > breakSpace
                                                     ? 4 + widget.titleSpacing
                                                     : 56 - currentWidth,
-                                                height: widget.appbarHeight,
+                                                height: appbarChangeNotifier.appbarHeight,
                                                 duration: widget.drawerAnimationDuration,
                                                 curve: Curves.easeOutCubic,
                                                 alignment: Alignment.centerLeft,
@@ -1055,7 +1065,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                               ? const SizedBox.shrink()
                               : Expanded(
                                   child: Container(
-                                    height: widget.appbarHeight,
+                                    height: appbarChangeNotifier.appbarHeight,
                                     alignment: Alignment.centerLeft,
                                     child: widget.titleTransitionBuilder(
                                       child: widget.title!,
@@ -1163,7 +1173,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
           ),
           child: AppbarFromZero(
             elevation: 0,
-            toolbarHeight: widget.appbarHeight,
+            toolbarHeight: appbarChangeNotifier.appbarHeight,
             backgroundColor: Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).primaryColor,
             mainAppbar: true,
             mainAppbarShowButtons: false,
@@ -1547,21 +1557,21 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
 }
 
 class AppbarChangeNotifier extends ChangeNotifier {
-  final double appbarHeight;
-  final double safeAreaOffset;
-  final double backgroundHeight;
-  final AppbarType appbarType;
   final double appbarScrollMultiplier = 0.5; //TODO: 3 expose scroll appbar effect multipliers
   final double backgroundScrollMultiplier = 1.5;
   final double unaffectedScrollLength; //TODO: 3 expose this as well in Scaffold
 
-  AppbarChangeNotifier(
-    this.appbarHeight,
-    this.safeAreaOffset,
-    this.backgroundHeight,
-    this.appbarType,
+  AppbarChangeNotifier({
+    required double appbarHeight,
+    required double backgroundHeight,
+    required AppbarType appbarType,
+    double safeAreaOffset = 0,
     double? unaffectedScrollLength,
-  ) : unaffectedScrollLength = unaffectedScrollLength ?? appbarHeight;
+  }) : _appbarHeight = appbarHeight,
+       _backgroundHeight = backgroundHeight,
+       _appbarType = appbarType,
+       _safeAreaOffset = safeAreaOffset,
+       unaffectedScrollLength = unaffectedScrollLength ?? appbarHeight;
 
   bool disposed = false;
   @override
@@ -1570,11 +1580,44 @@ class AppbarChangeNotifier extends ChangeNotifier {
     super.dispose();
   }
 
+  double _appbarHeight;
+  double get appbarHeight => _appbarHeight;
+  set appbarHeight(double value) {
+    if (_appbarHeight == value) return;
+    _appbarHeight = value;
+    notifyListeners();
+  }
+
+  double _safeAreaOffset;
+  double get safeAreaOffset => _safeAreaOffset;
+  set safeAreaOffset(double value) {
+    if (_safeAreaOffset == value) return;
+    _safeAreaOffset = value;
+    notifyListeners();
+  }
+
+  double _backgroundHeight;
+  double get backgroundHeight => _backgroundHeight;
+  set backgroundHeight(double value) {
+    if (_backgroundHeight == value) return;
+    _backgroundHeight = value;
+    notifyListeners();
+  }
+
+  AppbarType _appbarType;
+  AppbarType get appbarType => _appbarType;
+  set appbarType(AppbarType value) {
+    if (_appbarType == value) return;
+    _appbarType = value;
+    notifyListeners();
+  }
+
   double get currentAppbarHeight => appbarHeight + safeAreaOffset + currentAppbarOffset;
 
   double _currentAppbarOffset = 0;
   double get currentAppbarOffset => _currentAppbarOffset;
   set currentAppbarOffset(double value) {
+    if (_currentAppbarOffset == value) return;
     _currentAppbarOffset = value;
     notifyListeners();
   }
@@ -1582,6 +1625,7 @@ class AppbarChangeNotifier extends ChangeNotifier {
   double _currentBackgroundOffset = 0;
   double get currentBackgroundOffset => _currentBackgroundOffset;
   set currentBackgroundOffset(double value) {
+    if (_currentBackgroundOffset == value) return;
     _currentBackgroundOffset = value;
     notifyListeners();
   }
