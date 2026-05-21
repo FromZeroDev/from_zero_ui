@@ -354,10 +354,7 @@ class ComboField<T extends DAO<dynamic>> extends Field<T> {
             Align(
               alignment: Alignment.centerRight,
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                 child: TextButton(
                   onPressed: () async {
                     final res = await emptyDAO.maybeEdit(dao.contextForValidation ?? context);
@@ -378,9 +375,7 @@ class ComboField<T extends DAO<dynamic>> extends Field<T> {
                       children: [
                         const SizedBox(width: 6),
                         const Icon(Icons.add),
-                        const SizedBox(
-                          width: 6,
-                        ),
+                        const SizedBox(width: 6),
                         Text(
                           '${FromZeroLocalizations.of(context).translate("add")} ${emptyDAO.classUiName}',
                           style: const TextStyle(fontSize: 16),
@@ -433,7 +428,6 @@ class ComboField<T extends DAO<dynamic>> extends Field<T> {
                 required enabled,
                 required clearable,
                 showDropdownIcon = false,
-                dense = false,
               }) {
                 return Padding(
                   padding: EdgeInsets.only(

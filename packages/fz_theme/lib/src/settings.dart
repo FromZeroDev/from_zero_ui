@@ -143,7 +143,6 @@ class ThemeSwitcher extends StatelessWidget {
             required enabled,
             required clearable,
             showDropdownIcon = false,
-            dense = false,
           }) {
             return IconTheme(
               data: Theme.of(context).iconTheme,

@@ -21,7 +21,6 @@ typedef ButtonChildBuilder<T> =
       required bool enabled,
       required bool clearable,
       bool showDropdownIcon,
-      bool dense,
     });
 
 /// returns true if navigator should pop after (default true)
