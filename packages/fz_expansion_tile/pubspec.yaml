@@ -25,6 +25,8 @@ dependencies:
     path: ../fz_translucent_ink_well
   fz_ui_utility:
     path: ../fz_ui_utility
+  fz_popup:
+    path: ../fz_popup
 
 dev_dependencies:
   flutter_lints: ^5.0.0

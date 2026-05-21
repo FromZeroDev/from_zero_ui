@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:fz_actions/fz_actions.dart';
 import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 import 'package:fz_drawer_menu/fz_drawer_menu.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
+import 'package:fz_popup/fz_popup.dart';
 import 'package:fz_translucent_ink_well/fz_translucent_ink_well.dart';
 import 'package:fz_ui_utility/fz_ui_utility.dart';
 
@@ -360,63 +362,66 @@ class ExpansionTileFromZeroState extends State<ExpansionTileFromZero> with Singl
           onNextFrame();
         }
       });
+      final prevTitle = title;
+      title = StatefulBuilder(
+        builder: (context, setState) {
+          onNextFrame = () {
+            setState(() {});
+          };
+          bool expandChildren =
+              widget.childrenKeysForExpandCollapse != null &&
+              widget.childrenKeysForExpandCollapse!.where((e) => !(e.currentState?.isExpanded ?? false)).isNotEmpty;
+          return ContextMenuFromZero(
+            actions: [
+              ...widget.contextMenuActions,
+              if (((widget.enabled && widget.addExpandCollapseContextMenuAction && widget.trailing is! SizedBox) ||
+                      (_isExpanded &&
+                          widget.childrenKeysForExpandCollapse != null &&
+                          widget.childrenKeysForExpandCollapse!.isNotEmpty)) &&
+                  widget.contextMenuActions.isNotEmpty &&
+                  widget.children.isNotEmpty)
+                ActionFromZero.divider(),
+              if (widget.enabled &&
+                  widget.children.isNotEmpty &&
+                  widget.addExpandCollapseContextMenuAction &&
+                  widget.trailing is! SizedBox)
+                ActionFromZero(
+                  icon: Icon(
+                    _isExpanded ? MaterialCommunityIcons.arrow_collapse_up : MaterialCommunityIcons.arrow_expand_down,
+                  ),
+                  title: _isExpanded ? 'Colapsar' : 'Expandir', // TODO: 3 internationalize
+                  onTap: (context) {
+                    setExpanded(!_isExpanded);
+                  },
+                ),
+              if (_isExpanded &&
+                  widget.childrenKeysForExpandCollapse != null &&
+                  widget.childrenKeysForExpandCollapse!.isNotEmpty)
+                ActionFromZero(
+                  icon: Icon(
+                    expandChildren
+                        ? MaterialCommunityIcons.arrow_expand_down
+                        : MaterialCommunityIcons.arrow_collapse_up,
+                  ),
+                  title: expandChildren
+                      ? 'Expandir Descendientes'
+                      : 'Colapsar Descendientes', // TODO: 3 internationalize
+                  onTap: (context) {
+                    bool expand = widget.childrenKeysForExpandCollapse!
+                        .where((e) => !(e.currentState?.isExpanded ?? false))
+                        .isNotEmpty;
+                    for (final e in widget.childrenKeysForExpandCollapse!) {
+                      e.currentState!.setExpanded(expand);
+                    }
+                    setState(() {});
+                  },
+                ),
+            ],
+            child: prevTitle,
+          );
+        },
+      );
     }
-    // final prevTitle = title;
-    // title = StatefulBuilder(
-    //   builder: (context, setState) {
-    //     onNextFrame = () {
-    //       setState(() {});
-    //     };
-    //     bool expandChildren =
-    //         widget.childrenKeysForExpandCollapse != null &&
-    //         widget.childrenKeysForExpandCollapse!.where((e) => !(e.currentState?.isExpanded ?? false)).isNotEmpty;
-    //     return ContextMenuFromZero(
-    //       actions: [
-    //         ...widget.contextMenuActions,
-    //         if (((widget.enabled && widget.addExpandCollapseContextMenuAction && widget.trailing is! SizedBox) ||
-    //                 (_isExpanded &&
-    //                     widget.childrenKeysForExpandCollapse != null &&
-    //                     widget.childrenKeysForExpandCollapse!.isNotEmpty)) &&
-    //             widget.contextMenuActions.isNotEmpty &&
-    //             widget.children.isNotEmpty)
-    //           ActionFromZero.divider(),
-    //         if (widget.enabled &&
-    //             widget.children.isNotEmpty &&
-    //             widget.addExpandCollapseContextMenuAction &&
-    //             widget.trailing is! SizedBox)
-    //           ActionFromZero(
-    //             icon: Icon(
-    //               _isExpanded ? MaterialCommunityIcons.arrow_collapse_up : MaterialCommunityIcons.arrow_expand_down,
-    //             ),
-    //             title: _isExpanded ? 'Colapsar' : 'Expandir', // TODO: 3 internationalize
-    //             onTap: (context) {
-    //               setExpanded(!_isExpanded);
-    //             },
-    //           ),
-    //         if (_isExpanded &&
-    //             widget.childrenKeysForExpandCollapse != null &&
-    //             widget.childrenKeysForExpandCollapse!.isNotEmpty)
-    //           ActionFromZero(
-    //             icon: Icon(
-    //               expandChildren ? MaterialCommunityIcons.arrow_expand_down : MaterialCommunityIcons.arrow_collapse_up,
-    //             ),
-    //             title: expandChildren ? 'Expandir Descendientes' : 'Colapsar Descendientes', // TODO: 3 internationalize
-    //             onTap: (context) {
-    //               bool expand = widget.childrenKeysForExpandCollapse!
-    //                   .where((e) => !(e.currentState?.isExpanded ?? false))
-    //                   .isNotEmpty;
-    //               for (final e in widget.childrenKeysForExpandCollapse!) {
-    //                 e.currentState!.setExpanded(expand);
-    //               }
-    //               setState(() {});
-    //             },
-    //           ),
-    //       ],
-    //       child: prevTitle,
-    //     );
-    //   },
-    // );
-    // }
     return Material(
       type: MaterialType.transparency,
       color: Material.maybeOf(context)?.color ?? Colors.transparent,
