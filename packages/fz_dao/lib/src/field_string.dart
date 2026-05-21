@@ -521,7 +521,7 @@ class StringField extends Field<String> {
       style: Theme.of(context).textTheme.titleMedium!.copyWith(
         height: largeVertically ? 1.2 : 1.05,
         color: Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha: enabled ? 1 : 0.75),
-        fontWeight: largeVertically ? FontWeight.w500 : FontWeight.w600,
+        fontWeight: largeVertically || dense ? FontWeight.w500 : FontWeight.w600,
       ),
       decoration:
           inputDecoration ??
@@ -594,19 +594,14 @@ class StringField extends Field<String> {
                 ? FloatingLabelBehavior.always
                 : FloatingLabelBehavior.auto,
             contentPadding: EdgeInsets.only(
-              // left: dense ? textAlign==TextAlign.right ? 8 : 0 : 16, // TODO: 1 test in next flutter version if there is an assert thrown here when left=0
               left: dense ? 0 : 16,
               right: dense ? 0 : (16 + (context.findAncestorStateOfType<AppbarFromZeroState>()!.actions.length * 40)),
-              bottom: largeVertically
-                  ? 16
-                  : dense
-                  ? 10
-                  : 0,
               top: largeVertically
                   ? 16
                   : dense
-                  ? 8
+                  ? -9
                   : 6,
+              bottom: largeVertically ? 16 : 0,
             ),
           ),
       contextMenuBuilder: (context, editableTextState) {
