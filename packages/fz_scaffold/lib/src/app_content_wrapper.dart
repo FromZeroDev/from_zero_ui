@@ -732,6 +732,7 @@ class ScaffoldFromZeroChangeNotifier extends ChangeNotifier {
   bool titleAnimation = false;
   bool _isSetCurrentRouteStateLocked = false;
   void setCurrentRouteState(GoRouterStateFromZero route) {
+    if (route == _currentRouteState) return;
     if (!_isSetCurrentRouteStateLocked) {
       _isSetCurrentRouteStateLocked = true;
       _previousRouteState = currentRouteState;

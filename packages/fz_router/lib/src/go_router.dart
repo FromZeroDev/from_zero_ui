@@ -461,20 +461,20 @@ class OnlyOnActiveBuilderState extends ConsumerState<OnlyOnActiveBuilder> {
   @override
   void dispose() {
     super.dispose();
-    if (previousState != null && scaffoldChangeNotifier.currentRouteState != state!) {
+    if (previousState != null && scaffoldChangeNotifier.currentRouteState == state!) {
       scaffoldChangeNotifier.setCurrentRouteState(previousState!);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // print("BUILD ROUTE ${widget.state.name}: $built ${isActiveRoute(context)}}");
     if (!isActiveRoute(context)) {
       return previousBuild ??
           ColoredBox(
             color: Theme.of(context).canvasColor,
           );
     }
+    // print("BUILD ROUTE ${widget.state.name}: $built ${isActiveRoute(context)}");
     if (scaffoldChangeNotifier.currentRouteState != state!) {
       previousState = scaffoldChangeNotifier.currentRouteState;
       // TODO: 1 maybe everyone should just use getActiveRouteStates() so we don't need our own notifier
