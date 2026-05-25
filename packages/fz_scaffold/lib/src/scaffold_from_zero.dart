@@ -901,7 +901,7 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                             topSafePadding: appbarChangeNotifier.safeAreaOffset,
                             addContextMenu: widget.appbarAddContextMenu,
                             paddingRight: widget.scrollbarType != ScrollBarType.overAppbar
-                                ? 0
+                                ? 8
                                 : (Theme.of(context).scrollbarTheme.thickness?.resolve({}) ?? 8) +
                                       (Theme.of(context).scrollbarTheme.crossAxisMargin ?? 0).clamp(
                                         (PlatformExtended.appWindow?.isMaximized ?? true) ? 0 : 6,
