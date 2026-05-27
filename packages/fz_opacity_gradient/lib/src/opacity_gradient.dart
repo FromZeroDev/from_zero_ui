@@ -127,6 +127,12 @@ class ScrollOpacityGradientState extends State<ScrollOpacityGradient> {
             0,
             widget.maxSize,
           );
+          if (widget.scrollController.position.axisDirection == AxisDirection.up ||
+              widget.scrollController.position.axisDirection == AxisDirection.left) {
+            final temp = newSize1;
+            newSize1 = newSize2;
+            newSize2 = temp;
+          }
         } catch (e) {
           newSize1 = 0;
           newSize2 = 0;
