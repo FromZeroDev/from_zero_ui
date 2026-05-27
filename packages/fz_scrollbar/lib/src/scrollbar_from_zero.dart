@@ -188,10 +188,8 @@ class ScrollbarFromZeroState extends State<ScrollbarFromZero> {
   Widget buildScrollbar({
     required BuildContext context,
     required Widget child,
-    Key? key,
   }) {
     return Scrollbar(
-      key: key,
       controller: widget.controller == null ? null : alwaysAttachedScrollController,
       notificationPredicate: widget.notificationPredicate,
       child: child,
