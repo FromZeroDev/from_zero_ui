@@ -340,58 +340,59 @@ class AppbarFromZeroState extends State<AppbarFromZero> {
         child: actionsContent,
       );
     }
-    final expandedContent = AppBar(
-      excludeHeaderSemantics: true,
-      automaticallyImplyLeading: false,
-      centerTitle: true,
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-      titleSpacing: 8,
-      toolbarHeight: toolbarHeight,
-      title: AnimatedSwitcher(
-        duration: widget.transitionsDuration,
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
-        transitionBuilder: (child, animation) => FadeTransition(
-          opacity: animation,
-          child: ScaleTransition(
-            scale: animation,
-            alignment: Alignment.bottomCenter,
-            child: child,
-          ),
+    Widget expandedContent = AnimatedSwitcher(
+      duration: widget.transitionsDuration,
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation,
+        child: ScaleTransition(
+          scale: animation,
+          alignment: Alignment.bottomCenter,
+          child: child,
         ),
-        child: SizedBox(
-          key: ValueKey(forceExpanded ?? expanded.isEmpty),
-          height: toolbarHeight,
-          child: Padding(
-            padding: EdgeInsets.only(top: showWindowButtons ? titleBarHeight * 0.7 : 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: forceExpanded == null
-                  ? expanded
-                  : [
-                      Expanded(
-                        child: forceExpanded!.buildExpanded(context, color: actionsColor),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          setState(() {
-                            forceExpanded = null;
-                            widget.onUnexpanded?.call();
-                          });
-                        },
-                      ),
-                    ],
-            ),
+      ),
+      child: SizedBox(
+        key: ValueKey(forceExpanded ?? expanded.isEmpty),
+        height: toolbarHeight,
+        child: Padding(
+          padding: EdgeInsets.only(top: showWindowButtons ? titleBarHeight * 0.7 : 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: forceExpanded == null
+                ? expanded
+                : [
+                    Expanded(
+                      child: forceExpanded!.buildExpanded(context, color: actionsColor),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        setState(() {
+                          forceExpanded = null;
+                          widget.onUnexpanded?.call();
+                        });
+                      },
+                    ),
+                  ],
           ),
         ),
       ),
     );
     Widget result;
     if (widget.useFlutterAppbar) {
+      expandedContent = AppBar(
+        excludeHeaderSemantics: true,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        titleSpacing: 8,
+        toolbarHeight: toolbarHeight,
+        title: expandedContent,
+      );
       final statusBarColor =
           widget.backgroundColor ?? Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).primaryColor;
       Brightness statusBarBrightness = ThemeData.estimateBrightnessForColor(statusBarColor);
@@ -461,27 +462,21 @@ class AppbarFromZeroState extends State<AppbarFromZero> {
           ],
         );
       }
-      content = SizedBox(
+      result = Container(
         height: toolbarHeight,
-        child: content,
-      );
-      result = Column(
-        children: [
-          SizedBox(
-            height: widget.topSafePadding,
-          ),
-          Stack(
-            children: [
-              content,
-              Positioned.fill(
-                child: IgnorePointer(
-                  ignoring: forceExpanded == null,
-                  child: expandedContent,
-                ),
+        padding: EdgeInsets.only(top: widget.topSafePadding),
+        color: widget.backgroundColor,
+        child: Stack(
+          children: [
+            content,
+            Positioned.fill(
+              child: IgnorePointer(
+                ignoring: forceExpanded == null,
+                child: expandedContent,
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       );
     }
     // if (showWindowButtons) { // now always built in ScaffoldFromZero, so it takes full width
