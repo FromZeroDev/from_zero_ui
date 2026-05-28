@@ -7,7 +7,7 @@ Flutter widgets for `FzNotifier` providers. Provides reactive builders that auto
 - `FzProviderBuilder<T>` — Widget that binds an `FzProviderInstance` to UI with sensible loading/error defaults
 - `SliverFzProviderBuilder<T>` — Sliver variant of `FzProviderBuilder`
 - `FzProviderMultiBuilder<T>` — Binds multiple providers to UI
-- `FzNotifierBuilder<T>` — Widget that binds an `FzNotifier` directly (not through a provider)
+- `FzNotifierAsyncBuilder<T>` — Widget that binds an `FzNotifier` directly (not through a provider)
 
 ## Usage
 

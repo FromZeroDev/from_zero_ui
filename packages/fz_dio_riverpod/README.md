@@ -12,7 +12,7 @@ Dio integration with Riverpod. Extends `FzFutureNotifier` with Dio-specific feat
 ```dart
 import 'package:fz_dio_riverpod/fz_dio_riverpod.dart';
 
-final myProvider = ApiProvider<MyData?>(
+final myProvider = FzProvider<MyData?>(
   () => FzDioFutureNotifier((notifier) async {
     final cancelToken = CancelToken();
     notifier.addCancelToken(cancelToken);

@@ -46,7 +46,7 @@ SnackBarFromZero(
 
 ### `APISnackBar` — API-bound auto-snackbar
 
-Extends `SnackBarFromZero` and binds to an `ApiState<T>`. It watches the state and automatically:
+Extends `SnackBarFromZero` and binds to an `FzNotifier<T>`. It watches the state and automatically:
 
 - Shows a **loading** snackbar when the state is `AsyncLoading`
 - Shows an **error** snackbar when the state is `AsyncError` (with details)
@@ -56,7 +56,7 @@ Extends `SnackBarFromZero` and binds to an `ApiState<T>`. It watches the state a
 ```dart
 APISnackBar<MyData>(
   context: context,
-  stateNotifier: myApiState,
+  stateNotifier: myFzNotifier,
   successTitle: 'Saved',
   successMessage: 'Changes saved successfully',
   cancelable: true,                // user can dismiss

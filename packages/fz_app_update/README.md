@@ -62,7 +62,7 @@ If you need to block the UI while checking (e.g. on app startup), wrap the flow 
 final dao = DAO<CheckUpdateResults>(
   uiNameGetter: (_) => '',
   classUiNameGetter: (_) => '',
-  onSaveAPI: (context, _) => ApiState.noProvider((state) {
+  onSaveAPI: (context, _) => FzNotifier.noProvider((state) {
     // ... checkForUpdates logic ...
   }),
 );
@@ -72,7 +72,7 @@ if (results != null && results.updateExecution != null) {
 }
 ```
 
-This lets the `ApiProviderBuilder` show a loading indicator while the version check runs.
+This lets the `FzProviderBuilder` show a loading indicator while the version check runs.
 
 
 > **Requires** `FromZeroAppContentWrapper` at the app root for `fromZeroScreenProvider` and related providers. See [fz_scaffold](../fz_scaffold/#fromzeroappcontentwrapper----the-app-root) for setup.

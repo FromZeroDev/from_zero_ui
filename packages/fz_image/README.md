@@ -10,7 +10,7 @@ An image widget with fullscreen zoom, pinch/double-tap gestures, hero transition
 | Fullscreen zoom | Pinch-zoom and double-tap with `ExtendedImageGesture` |
 | Slide to dismiss | Fullscreen image swipes away with `SlideAxis.both` |
 | Hero animation | Smooth hero transition between thumbnail and fullscreen view |
-| Retryable loading | `retryable: true` wraps in `ApiProviderBuilder` with error+retry UI |
+| Retryable loading | `retryable: true` wraps in `FzProviderBuilder` with error+retry UI |
 | Web CORS workaround | `renderAsHtmlOnWebToAvoidCors` renders as an `<img>` tag instead of a canvas |
 | Web fullscreen | `fullscreenAsNewTabOnWeb` opens the image in a browser tab on web |
 | Actions | `actions` rendered as a toolbar overlay, with `applySafeAreaToActions: true` |

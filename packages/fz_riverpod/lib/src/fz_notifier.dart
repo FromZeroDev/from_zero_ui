@@ -17,7 +17,7 @@ typedef FzProviderInstance<T> = NotifierProvider<FzNotifier<T>, T>;
 typedef FzProviderFamilyInstance<T, P> = NotifierProviderFamily<FzNotifier<T>, T, P>;
 
 // ignore: non_constant_identifier_names
-FzProviderInstance<T> ApiProvider<T>(
+FzProviderInstance<T> FzProvider<T>(
   FzNotifier<T> Function() create, {
   String? name,
   Iterable<ProviderOrFamily>? dependencies,
@@ -32,7 +32,7 @@ FzProviderInstance<T> ApiProvider<T>(
 }
 
 // ignore: non_constant_identifier_names
-FzProviderFamilyInstance<T, P> ApiProviderFamily<T, P>(
+FzProviderFamilyInstance<T, P> FzProviderFamily<T, P>(
   FzNotifier<T> Function(P param) create, {
   String? name,
   Iterable<ProviderOrFamily>? dependencies,
