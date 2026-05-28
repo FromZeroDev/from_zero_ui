@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_combo/fz_combo.dart';
 import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 import 'package:fz_dao/fz_dao.dart';
+import 'package:fz_flutter_riverpod/fz_flutter_riverpod.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_riverpod/fz_riverpod.dart';
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_table/fz_table.dart';
 import 'package:fz_tooltip/fz_tooltip.dart';
@@ -19,12 +20,10 @@ typedef FilteredValuesGetter<T, R extends Field> =
 class ComboField<T extends DAO<dynamic>> extends Field<T> {
   ContextFulFieldValueGetter<List<T>?, ComboField<T>>? possibleValuesGetter;
   ContextFulFieldValueGetter<Future<List<T>>?, ComboField<T>>? possibleValuesFutureGetter;
-  ContextFulFieldValueGetter<NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>?, ComboField<T>>?
-  possibleValuesProviderGetter;
+  ContextFulFieldValueGetter<FzProviderInstance<List<T>>?, ComboField<T>>? possibleValuesProviderGetter;
   FilteredValuesGetter<List<T>, ComboField<T>>? filteredValuesGetter;
   FilteredValuesGetter<Future<List<T>>, ComboField<T>>? filteredValuesFutureGetter;
-  FilteredValuesGetter<NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>, ComboField<T>>?
-  filteredValuesProviderGetter;
+  FilteredValuesGetter<FzProviderInstance<List<T>>, ComboField<T>>? filteredValuesProviderGetter;
   bool? showSearchBox;
   ExtraWidgetBuilder<T>? extraWidget;
   FieldValueGetter<DAO<dynamic>?, ComboField<T>>? newObjectTemplateGetter;
@@ -121,11 +120,10 @@ class ComboField<T extends DAO<dynamic>> extends Field<T> {
     double? flex,
     ContextFulFieldValueGetter<List<T>?, ComboField<T>>? possibleValuesGetter,
     ContextFulFieldValueGetter<Future<List<T>>?, ComboField<T>>? possibleValuesFutureGetter,
-    ContextFulFieldValueGetter<ApiProviderInstance<List<T>>?, ComboField<T>>? possibleValuesProviderGetter,
+    ContextFulFieldValueGetter<FzProviderInstance<List<T>>?, ComboField<T>>? possibleValuesProviderGetter,
     FilteredValuesGetter<List<T>, ComboField<T>>? filteredValuesGetter,
     FilteredValuesGetter<Future<List<T>>, ComboField<T>>? filteredValuesFutureGetter,
-    FilteredValuesGetter<NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>, ComboField<T>>?
-    filteredValuesProviderGetter,
+    FilteredValuesGetter<FzProviderInstance<List<T>>, ComboField<T>>? filteredValuesProviderGetter,
     FieldValueGetter<String?, Field>? hintGetter,
     FieldValueGetter<String?, Field>? tooltipGetter,
     bool? sort,
@@ -232,7 +230,9 @@ class ComboField<T extends DAO<dynamic>> extends Field<T> {
         // ignore: use_build_context_synchronously
         final provider = possibleValuesProviderGetter!.call(context, this, dao);
         if (provider != null) {
-          possibleValues = await (context as WidgetRef).readFuture(provider);
+          possibleValues = provider is FzAsyncProviderInstance<List<T>>
+              ? await (context as WidgetRef).readFuture(provider as FzAsyncProviderInstance<List<T>>)
+              : (context as WidgetRef).read(provider);
           if (currentValidationId != dao.validationCallCount || !context.mounted) return false;
         }
       }
@@ -459,13 +459,13 @@ class ComboField<T extends DAO<dynamic>> extends Field<T> {
               Positioned(
                 left: 3,
                 top: 3,
-                child: ApiProviderBuilder(
+                child: FzProviderBuilder(
                   provider: provider,
                   animatedSwitcherType: AnimatedSwitcherType.normal,
                   dataBuilder: (context, data) {
                     return const SizedBox.shrink();
                   },
-                  loadingBuilder: (context, progress) {
+                  loadingBuilder: (context, progress, _, _) {
                     return SizedBox(
                       height: 10,
                       width: 10,
@@ -713,7 +713,7 @@ class ComboField<T extends DAO<dynamic>> extends Field<T> {
             final ref = dao.contextForValidation! as WidgetRef;
             final provider = possibleValuesProviderGetter!(context, this, dao);
             final stateNotifier = ref.read(provider!.notifier);
-            stateNotifier.refresh(ref);
+            stateNotifier.fullRefresh();
           },
         ),
     ];

@@ -1,15 +1,16 @@
 import 'package:flutter_riverpod/misc.dart' show ProviderOrFamily;
-import 'package:fz_api_handling/src/new/fz_future_notifier.dart';
-import 'package:fz_api_handling/src/new/fz_notifier_error.dart';
-import 'package:fz_api_handling/src/new/fz_stream_notifier.dart';
-import 'package:fz_api_handling/src/new/riverpod_util.dart';
-import 'package:fz_api_handling/src/riverpod_caching.dart';
+import 'package:fz_log/fz_log.dart';
+import 'package:fz_riverpod/src/riverpod_caching.dart';
+import 'package:fz_riverpod/src/riverpod_util.dart';
 import 'package:riverpod/misc.dart' show NotifierProviderFamily;
 import 'package:riverpod/riverpod.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/builder.dart';
 
 part 'fz_notifier_progress.dart';
+part 'fz_notifier_error.dart';
+part 'fz_future_notifier.dart';
+part 'fz_stream_notifier.dart';
 
 typedef FzProviderInstance<T> = NotifierProvider<FzNotifier<T>, T>;
 
@@ -125,6 +126,10 @@ class FzNotifierBuilder<T> extends FzNotifier<T> {
   Ref get ref => super.ref;
 }
 
-abstract class FzAsyncNotifer<T> extends FzNotifier<T?> {
+sealed class FzAsyncNotifier<T> extends FzNotifier<T?> {
   NotifierProvider<ErrorNotifier, ErrorData?> get error => fzErrorProvider.call(this);
 }
+
+typedef FzAsyncProviderInstance<T> = NotifierProvider<FzAsyncNotifier<T>, T?>;
+typedef FzFutureProviderInstance<T> = NotifierProvider<FzFutureNotifier<T>, T?>;
+typedef FzStreamProviderInstance<T> = NotifierProvider<FzStreamNotifier<T>, T?>;

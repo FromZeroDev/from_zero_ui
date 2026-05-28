@@ -26,8 +26,6 @@ dependencies:
 
   fz_animations:
     path: ../fz_animations
-  fz_api_handling:
-    path: ../fz_api_handling
   fz_combo:
     path: ../fz_combo
   fz_comparable_list:
@@ -38,12 +36,18 @@ dependencies:
     path: ../fz_tooltip
   fz_dialog:
     path: ../fz_dialog
+  fz_dio_flutter_riverpod:
+    path: ../fz_dio_flutter_riverpod
   fz_file_picker:
     path: ../fz_file_picker
-  fz_future_handling:
-    path: ../fz_future_handling
   fz_focus_traversal:
     path: ../fz_focus_traversal
+  fz_riverpod:
+    path: ../fz_riverpod
+  fz_flutter_riverpod:
+    path: ../fz_flutter_riverpod
+  fz_future_handling:
+    path: ../fz_future_handling
   fz_localizations:
     path: ../fz_localizations
   fz_platform:

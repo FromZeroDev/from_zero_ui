@@ -24,8 +24,8 @@ dependencies:
   universal_html: ^2.2.3
   url_launcher: 6.3.1
 
-  fz_api_handling:
-    path: ../fz_api_handling
+  fz_flutter_riverpod:
+    path: ../fz_flutter_riverpod
   fz_localizations:
     path: ../fz_localizations
   fz_log:

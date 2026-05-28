@@ -4,7 +4,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
+import 'package:fz_flutter_riverpod/fz_flutter_riverpod.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_log/fz_log.dart';
@@ -256,10 +256,10 @@ class ImageFromZeroState extends State<ImageFromZero> with TickerProviderStateMi
           animate = true;
           _controller.reset();
         }
-        final progress = state.loadingProgress?.expectedTotalBytes == null
-            ? null
-            : state.loadingProgress!.cumulativeBytesLoaded / state.loadingProgress!.expectedTotalBytes!;
-        return ApiProviderBuilder.defaultLoadingBuilder(context, ValueNotifier(progress));
+        final count = state.loadingProgress?.cumulativeBytesLoaded;
+        final total = state.loadingProgress?.expectedTotalBytes;
+        final progress = count == null || total == null ? null : count / total;
+        return FzProviderBuilder.defaultLoadingBuilder(context, progress, count, total);
 
       ///if you don't want override completed widget
       ///please return null or state.completedWidget

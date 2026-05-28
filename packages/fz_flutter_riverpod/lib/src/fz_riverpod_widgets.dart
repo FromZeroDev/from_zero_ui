@@ -2,10 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
-import 'package:fz_api_handling/src/new/fz_notifier.dart';
 import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_riverpod/fz_riverpod.dart';
 
 typedef FzLoadingBuilder = Widget Function(BuildContext context, double? progress, double? count, double? total);
 typedef FzErrorBuilder =
@@ -20,7 +20,7 @@ extension FzProviderAsyncValue<T> on FzNotifier<T> {
       return AsyncValue.data(state);
     }
     if (isError) {
-      if (this case final FzAsyncNotifer<T> asyncNotifer) {
+      if (this case final FzAsyncNotifier<T> asyncNotifer) {
         // ignore: invalid_use_of_protected_member
         final err = ref.read(asyncNotifer.error)!;
         return AsyncValue.error(err.error, err.stackTrace);
@@ -397,7 +397,7 @@ class UnitedValueListenable<T> extends ChangeNotifier implements ValueListenable
   T get value => _unificator(_listenables.map((e) => e.value));
 }
 
-class FzNotifierBuilder<T> extends ConsumerStatefulWidget {
+class FzNotifierAsyncBuilder<T> extends ConsumerStatefulWidget {
   final FzNotifier<T> stateNotifier;
   final DataBuilder<T> dataBuilder;
   final FzLoadingBuilder loadingBuilder;
@@ -413,7 +413,7 @@ class FzNotifierBuilder<T> extends ConsumerStatefulWidget {
   final AnimatedSwitcherType animatedSwitcherType;
   final bool addLoadingStateAsValueKeys;
 
-  const FzNotifierBuilder({
+  const FzNotifierAsyncBuilder({
     required this.stateNotifier,
     required this.dataBuilder,
     this.loadingBuilder = FzProviderBuilder.defaultLoadingBuilder,
@@ -435,7 +435,7 @@ class FzNotifierBuilder<T> extends ConsumerStatefulWidget {
   ApiStateBuilderState<T> createState() => ApiStateBuilderState<T>();
 }
 
-class ApiStateBuilderState<T> extends ConsumerState<FzNotifierBuilder<T>> {
+class ApiStateBuilderState<T> extends ConsumerState<FzNotifierAsyncBuilder<T>> {
   late VoidCallback closeSubscription;
 
   @override
@@ -446,7 +446,7 @@ class ApiStateBuilderState<T> extends ConsumerState<FzNotifierBuilder<T>> {
   }
 
   @override
-  void didUpdateWidget(covariant FzNotifierBuilder<T> oldWidget) {
+  void didUpdateWidget(covariant FzNotifierAsyncBuilder<T> oldWidget) {
     if (widget.stateNotifier != oldWidget.stateNotifier) {
       closeSubscription();
       // ignore: invalid_use_of_protected_member
@@ -492,7 +492,7 @@ class ApiStateBuilderState<T> extends ConsumerState<FzNotifierBuilder<T>> {
   }
 }
 
-class SliverApiStateBuilder<T> extends FzNotifierBuilder<T> {
+class SliverApiStateBuilder<T> extends FzNotifierAsyncBuilder<T> {
   const SliverApiStateBuilder({
     required super.stateNotifier,
     required super.dataBuilder,

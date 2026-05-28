@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:fz_api_handling/src/new/fz_future_notifier.dart';
 import 'package:fz_log/fz_log.dart';
+import 'package:fz_riverpod/fz_riverpod.dart';
 import 'package:riverpod/riverpod.dart';
 
 abstract class FzDioFutureNotifierBase<T> extends FzFutureNotifier<T> {

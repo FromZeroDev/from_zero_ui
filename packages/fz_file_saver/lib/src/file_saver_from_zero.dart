@@ -6,7 +6,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
+import 'package:fz_flutter_riverpod/fz_flutter_riverpod.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_log/fz_log.dart';
 import 'package:fz_platform/fz_platform.dart';
@@ -301,7 +301,7 @@ Future<bool> saveFileFromZero({
     } else if (!success) {
       // we're trusting that the parent SnackbarHost won't be disposed while waiting. SnackbarHost should live at the root of the widget tree for as long as the app lives.
       // ignore: use_build_context_synchronously
-      final errorSubtitle = ApiProviderBuilder.getErrorSubtitle(snackbarHostContext, error, stackTrace);
+      final errorSubtitle = FzProviderBuilder.getErrorSubtitle(snackbarHostContext, error, stackTrace);
       await SnackBarFromZero(
         key: snackBarKey ?? ValueKey(data.hashCode),
         // ignore: use_build_context_synchronously
@@ -309,7 +309,7 @@ Future<bool> saveFileFromZero({
         type: SnackBarFromZero.error,
         icon: downloadSuccess
             ? null
-            : ApiProviderBuilder.getErrorIcon(
+            : FzProviderBuilder.getErrorIcon(
                 // ignore: use_build_context_synchronously
                 snackbarHostContext,
                 error,
@@ -321,7 +321,7 @@ Future<bool> saveFileFromZero({
           downloadSuccess
               ? localizations.translate('error_file')
               // ignore: use_build_context_synchronously
-              : ('${ApiProviderBuilder.getErrorTitle(snackbarHostContext, error, stackTrace)}${errorSubtitle == null ? '' : '\n$errorSubtitle'}'),
+              : ('${FzProviderBuilder.getErrorTitle(snackbarHostContext, error, stackTrace)}${errorSubtitle == null ? '' : '\n$errorSubtitle'}'),
         ),
         actions: [
           if (onRetry != null)

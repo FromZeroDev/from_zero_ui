@@ -6,8 +6,7 @@ import "dart:async";
 
 import "package:flutter/widgets.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
-import "package:fz_api_handling/src/api_provider.dart";
-// ignore: implementation_imports, invalid_use_of_internal_member
+import "package:fz_riverpod/src/fz_notifier.dart";
 
 /// Extension on [Ref] to add a dispose delay.
 extension AddDisposeDelayRef on Ref {
@@ -83,42 +82,54 @@ extension InvalidateWhenUnpausedRef on Ref {
   }
 }
 
-/// Extension on [Ref] to read the future from an [ApiProviderInstance].
+/// Extension on [Ref] to read the future from an [FzProviderInstance].
 extension ReadFutureRef on Ref {
   /// Reads the future from the given [provider], ensuring the provider is
   /// listened to while the future is awaited, so it is not disposed prematurely.
-  Future<T> readFuture<T>(ApiProviderInstance<T> provider) async {
+  Future<T> readFuture<T>(NotifierProvider<FzAsyncNotifier<T>, T?> provider) async {
     final subscription = listen(provider.notifier, (_, _) {});
     try {
-      return await read(provider.notifier).future;
+      return switch (provider) {
+        NotifierProvider<FzFutureNotifier<T>, T?>() => read(provider.notifier).future,
+        NotifierProvider<FzStreamNotifier<T>, T?>() => read(provider.notifier).stream.last,
+        _ => throw Exception('Subtype of FzAsyncNotifier not handled: $runtimeType'),
+      };
     } finally {
       subscription.close();
     }
   }
 }
 
-/// Extension on [WidgetRef] to read the future from an [ApiProviderInstance].
+/// Extension on [WidgetRef] to read the future from an [FzProviderInstance].
 extension ReadFutureWidgetRef on WidgetRef {
   /// Reads the future from the given [provider], ensuring the provider is
   /// listened to while the future is awaited, so it is not disposed prematurely.
-  Future<T> readFuture<T>(ApiProviderInstance<T> provider) async {
+  Future<T> readFuture<T>(NotifierProvider<FzAsyncNotifier<T>, T?> provider) async {
     final subscription = listenManual(provider.notifier, (_, _) {});
     try {
-      return await read(provider.notifier).future;
+      return switch (provider) {
+        NotifierProvider<FzFutureNotifier<T>, T?>() => read(provider.notifier).future,
+        NotifierProvider<FzStreamNotifier<T>, T?>() => read(provider.notifier).stream.last,
+        _ => throw Exception('Subtype of FzAsyncNotifier not handled: $runtimeType'),
+      };
     } finally {
       subscription.close();
     }
   }
 }
 
-/// Extension on [ProviderContainer] to read the future from an [ApiProviderInstance].
+/// Extension on [ProviderContainer] to read the future from an [FzProviderInstance].
 extension ReadFutureWidgetProviderContainer on ProviderContainer {
   /// Reads the future from the given [provider], ensuring the provider is
   /// listened to while the future is awaited, so it is not disposed prematurely.
-  Future<T> readFuture<T>(ApiProviderInstance<T> provider) async {
+  Future<T> readFuture<T>(NotifierProvider<FzAsyncNotifier<T>, T?> provider) async {
     final subscription = listen(provider.notifier, (_, _) {});
     try {
-      return await read(provider.notifier).future;
+      return switch (provider) {
+        NotifierProvider<FzFutureNotifier<T>, T?>() => read(provider.notifier).future,
+        NotifierProvider<FzStreamNotifier<T>, T?>() => read(provider.notifier).stream.last,
+        _ => throw Exception('Subtype of FzAsyncNotifier not handled: $runtimeType'),
+      };
     } finally {
       subscription.close();
     }

@@ -18,8 +18,6 @@ dependencies:
     path: ../fz_animated_switcher_image
   fz_animations:
     path: ../fz_animations
-  fz_api_handling:
-    path: ../fz_api_handling
   fz_dialog:
     path: ../fz_dialog
   fz_export:

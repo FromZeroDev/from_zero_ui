@@ -24,7 +24,10 @@ This is the root compatibility package — importing `from_zero_ui` gives you ev
 | [fz_dao](packages/fz_dao/) | Data Access Objects: CRUD, form fields, validation |
 | [fz_table](packages/fz_table/) | Customizable data table: sorting, multi-type filtering, column management, isolate computation |
 | [fz_export](packages/fz_export/) | Auto-export or dialog-choose: PDF, PNG, Excel from tables |
-| [fz_api_handling](packages/fz_api_handling/) | Riverpod-based API state management with Dio |
+| [fz_riverpod](packages/fz_riverpod/) | Core Riverpod abstractions: notifiers, progress tracking, error handling, caching |
+| [fz_flutter_riverpod](packages/fz_flutter_riverpod/) | Flutter widgets for FzNotifier providers (loading/error/data builders) |
+| [fz_dio_riverpod](packages/fz_dio_riverpod/) | Dio integration with Riverpod — cancel tokens, progress tracking |
+| [fz_dio_flutter_riverpod](packages/fz_dio_flutter_riverpod/) | Flutter widgets for Dio error handling and PartialSuccessError |
 | [fz_future_handling](packages/fz_future_handling/) | Async UI widgets (loading, error, data states) |
 
 ### Widgets
@@ -110,8 +113,6 @@ dependencies:
 
 ## Changes planned
 ### New Packages
-### Package Separations
-- fz_api_handling should be separated int fz_provider_handling (has riverpod dependency stuff) and gz_api_handling (has dio stuff), so we can not import dio if we don't want to.
 ### Package Deletion / Merging
 - fz_copy_sticky_header should be deleted in favor of using sliver_tools. This requires code changes in the packages that use it and a lot of testing.
 - Consider merging some of the packages that are only depended on by one package into that package. Especially for those that aren't meant for direct consumption.
@@ -161,7 +162,6 @@ fz_localizations
 
 fz_log
  ├── fz_scaffold
- ├── fz_api_handling
  ├── fz_dao
  ├── fz_file_saver
  ├── fz_app_update
@@ -190,28 +190,31 @@ fz_dao ←→ fz_table (mutual dependency)
 
 | Package | Depends on |
 |---------|-----------|
-| fz_actions | fz_api_handling, fz_tooltip, fz_future_handling, fz_scaffold |
-| fz_api_handling | fz_animated_switcher_image, fz_animations, fz_dialog, fz_future_handling, fz_localizations, fz_log, fz_snackbar |
+| fz_actions | fz_tooltip, fz_flutter_riverpod, fz_future_handling, fz_riverpod, fz_scaffold |
 | fz_appbar | fz_actions, fz_platform, fz_popup, fz_scaffold |
 | fz_app_update | fz_dialog, fz_file_saver, fz_localizations, fz_log, fz_platform, fz_scaffold |
-| fz_combo | fz_api_handling, fz_tooltip, fz_dao, fz_future_handling, fz_localizations, fz_popup, fz_scrollbar, fz_table, fz_ui_utility |
+| fz_combo | fz_tooltip, fz_dao, fz_flutter_riverpod, fz_future_handling, fz_localizations, fz_popup, fz_riverpod, fz_scrollbar, fz_table, fz_ui_utility |
 | fz_comparable_list | fz_value_string |
 | fz_tooltip | fz_platform, fz_scrollbar |
-| fz_dao | fz_actions, fz_animations, fz_api_handling, fz_appbar, fz_combo, fz_comparable_list, fz_copy_ensure_visible, fz_tooltip, fz_date_picker, fz_dialog, fz_file_picker, fz_focus_traversal, fz_future_handling, fz_localizations, fz_log, fz_platform, fz_popup, fz_scaffold, fz_scrollbar, fz_selectable_icon, fz_snackbar, fz_table, fz_translucent_ink_well, fz_ui_utility, fz_value_string |
+| fz_dao | fz_actions, fz_animations, fz_appbar, fz_combo, fz_comparable_list, fz_copy_ensure_visible, fz_tooltip, fz_date_picker, fz_dialog, fz_dio_flutter_riverpod, fz_file_picker, fz_flutter_riverpod, fz_focus_traversal, fz_future_handling, fz_localizations, fz_log, fz_platform, fz_popup, fz_riverpod, fz_scaffold, fz_scrollbar, fz_selectable_icon, fz_snackbar, fz_table, fz_translucent_ink_well, fz_ui_utility, fz_value_string |
 | fz_date_picker | fz_copy_time_picker, fz_tooltip, fz_localizations, fz_popup, fz_ui_utility |
 | fz_dialog | fz_animations, fz_appbar, fz_tooltip, fz_future_handling, fz_localizations, fz_platform, fz_scaffold, fz_scrollbar, fz_ui_utility |
+| fz_dio_flutter_riverpod | fz_flutter_riverpod, fz_localizations, fz_snackbar |
+| fz_dio_riverpod | fz_log, fz_riverpod |
 | fz_drawer_menu | fz_actions, fz_tooltip, fz_expansion_tile, fz_popup, fz_router, fz_scaffold, fz_scrollbar, fz_ui_utility |
 | fz_expansion_tile | fz_actions, fz_copy_ensure_visible, fz_drawer_menu, fz_future_handling, fz_translucent_ink_well, fz_ui_utility |
 | fz_export | fz_copy_page_indicator, fz_dao, fz_dialog, fz_file_saver, fz_platform, fz_scaffold, fz_table, fz_theme, fz_ui_utility, fz_value_string |
-| fz_file_saver | fz_api_handling, fz_localizations, fz_log, fz_platform, fz_snackbar |
+| fz_file_saver | fz_flutter_riverpod, fz_localizations, fz_log, fz_platform, fz_snackbar |
+| fz_flutter_riverpod | fz_animated_switcher_image, fz_dialog, fz_future_handling, fz_localizations, fz_riverpod |
 | fz_future_handling | fz_animated_switcher_image, fz_animations, fz_dialog, fz_export, fz_localizations, fz_opacity_gradient, fz_scrollbar, fz_ui_utility |
-| fz_image | fz_api_handling, fz_tooltip, fz_future_handling, fz_localizations, fz_log, fz_ui_utility, fz_web_compile_file |
+| fz_image | fz_tooltip, fz_flutter_riverpod, fz_future_handling, fz_localizations, fz_log, fz_ui_utility, fz_web_compile_file |
 | fz_popup | fz_actions, fz_platform, fz_scaffold, fz_scrollbar, fz_snackbar |
+| fz_riverpod | fz_log |
 | fz_router | fz_scaffold |
 | fz_scaffold | fz_actions, fz_animations, fz_appbar, fz_tooltip, fz_dialog, fz_localizations, fz_log, fz_platform, fz_router, fz_scrollbar, fz_simple_shadow, fz_snackbar, fz_theme, fz_ui_utility |
 | fz_scrollbar | fz_platform, fz_opacity_gradient |
-| fz_snackbar | fz_api_handling, fz_tooltip, fz_dialog, fz_future_handling, fz_localizations, fz_scaffold |
-| fz_table | fz_actions, fz_animations, fz_api_handling, fz_appbar, fz_comparable_list, fz_copy_ensure_visible, fz_copy_sticky_header, fz_tooltip, fz_dao, fz_date_picker, fz_dialog, fz_export, fz_future_handling, fz_localizations, fz_log, fz_notification_relayer, fz_platform, fz_popup, fz_router, fz_scaffold, fz_scrollbar, fz_selectable_icon, fz_simple_shadow, fz_ui_utility, fz_value_string |
+| fz_snackbar | fz_tooltip, fz_dialog, fz_dio_flutter_riverpod, fz_flutter_riverpod, fz_future_handling, fz_localizations, fz_opacity_gradient, fz_riverpod, fz_scaffold |
+| fz_table | fz_actions, fz_animations, fz_appbar, fz_comparable_list, fz_copy_ensure_visible, fz_copy_sticky_header, fz_tooltip, fz_dao, fz_date_picker, fz_dialog, fz_export, fz_flutter_riverpod, fz_future_handling, fz_localizations, fz_log, fz_notification_relayer, fz_platform, fz_popup, fz_router, fz_scaffold, fz_scrollbar, fz_selectable_icon, fz_simple_shadow, fz_ui_utility, fz_value_string |
 | fz_theme | fz_app_update, fz_combo, fz_tooltip, fz_localizations, fz_scaffold, fz_ui_utility |
 | fz_ui_scale | fz_theme |
 | fz_ui_utility | fz_animations, fz_tooltip, fz_dialog, fz_future_handling, fz_localizations, fz_logo, fz_scaffold, fz_scrollbar, fz_simple_shadow, fz_translucent_ink_well, fz_value_string |

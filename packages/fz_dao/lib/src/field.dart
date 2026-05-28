@@ -436,8 +436,8 @@ class Field<T extends Comparable<dynamic>> extends ChangeNotifier implements Com
         }
         final message =
             'Error al ejecutar validación: '
-            '${ApiProviderBuilder.getErrorTitle(context, e, st)}'
-            '\n${ApiProviderBuilder.getErrorSubtitle(context, e, st)}';
+            '${FzProviderBuilder.getErrorTitle(context, e, st)}'
+            '\n${FzProviderBuilder.getErrorSubtitle(context, e, st)}';
         if (e is! DioException) {
           // we trust DioExceptions are logged in interceptors
           log(LgLvl.error, message, e: e, st: st, type: FzLgType.dao);

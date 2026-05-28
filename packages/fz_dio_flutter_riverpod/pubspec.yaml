@@ -1,0 +1,25 @@
+name: fz_dio_flutter_riverpod
+description: Flutter widgets for Dio error handling — Dio-aware error builders and PartialSuccessError.
+publish_to: 'none'
+version: 0.1.0
+resolution: workspace
+
+environment:
+  sdk: "^3.9.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  dio: ^5.8.0+1
+  flutter_font_icons: ^2.2.5
+
+  fz_flutter_riverpod:
+    path: ../fz_flutter_riverpod
+  fz_localizations:
+    path: ../fz_localizations
+  fz_snackbar:
+    path: ../fz_snackbar
+
+dev_dependencies:
+  flutter_lints: ^5.0.0

@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
+import 'package:fz_flutter_riverpod/fz_flutter_riverpod.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
+import 'package:fz_riverpod/fz_riverpod.dart' hide FzNotifierBuilder;
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_tooltip/fz_tooltip.dart';
 import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';
@@ -531,7 +532,7 @@ typedef ApiActionCallback<T, R> = R Function(BuildContext context, List<T> data)
 
 class APIActionFromZero<T> extends ActionFromZero {
   final List<ValueListenable<dynamic>> dependedNotifiers;
-  final List<ApiProviderInstance<T>> Function(List<dynamic> values) providersBuilder;
+  final List<FzProviderInstance<T>> Function(List<dynamic> values) providersBuilder;
   final ApiActionCallback<T, void>? onTapApi;
   final ApiActionCallback<T, String?>? disablingErrorBuilder;
   final ApiActionCallback<T, String?>? titleApiBuilder;
@@ -587,7 +588,7 @@ class APIActionFromZero<T> extends ActionFromZero {
       context,
       valueListenables: dependedNotifiers,
       builder: (context, values, child) {
-        return ApiProviderMultiBuilder(
+        return FzProviderMultiBuilder(
           providers: providersBuilder(values),
           animatedSwitcherType: AnimatedSwitcherType.normal,
           transitionBuilder: (context, child, animation) => FadeTransition(opacity: animation, child: child),
@@ -606,7 +607,7 @@ class APIActionFromZero<T> extends ActionFromZero {
               color: color,
             );
           },
-          loadingBuilder: (context, progress) {
+          loadingBuilder: (context, progress, count, total) {
             onTap = null;
             return Stack(
               children: [
@@ -620,7 +621,7 @@ class APIActionFromZero<T> extends ActionFromZero {
                 ),
                 Positioned.fill(
                   child: IgnorePointer(
-                    child: ApiProviderBuilder.defaultLoadingBuilder(context, progress, size: 32),
+                    child: FzProviderBuilder.defaultLoadingBuilder(context, progress, count, total, size: 32),
                   ),
                 ),
               ],
@@ -634,8 +635,8 @@ class APIActionFromZero<T> extends ActionFromZero {
               icon: icon,
               onTap: null,
               disablingError:
-                  '${ApiProviderBuilder.getErrorTitle(context, e, st)}'
-                  '\n${ApiProviderBuilder.getErrorSubtitle(context, e, st)}',
+                  '${FzProviderBuilder.getErrorTitle(context, e, st)}'
+                  '\n${FzProviderBuilder.getErrorSubtitle(context, e, st)}',
               color: color,
             );
           },
@@ -656,7 +657,7 @@ class APIActionFromZero<T> extends ActionFromZero {
       context,
       valueListenables: dependedNotifiers,
       builder: (context, values, child) {
-        return ApiProviderMultiBuilder(
+        return FzProviderMultiBuilder(
           providers: providersBuilder(values),
           animatedSwitcherType: AnimatedSwitcherType.normal,
           transitionBuilder: (context, child, animation) => FadeTransition(opacity: animation, child: child),
@@ -675,7 +676,7 @@ class APIActionFromZero<T> extends ActionFromZero {
               color: color,
             );
           },
-          loadingBuilder: (context, progress) {
+          loadingBuilder: (context, progress, count, total) {
             onTap = null;
             return Stack(
               children: [
@@ -689,7 +690,7 @@ class APIActionFromZero<T> extends ActionFromZero {
                 ),
                 Positioned.fill(
                   child: IgnorePointer(
-                    child: ApiProviderBuilder.defaultLoadingBuilder(context, progress, size: 34),
+                    child: FzProviderBuilder.defaultLoadingBuilder(context, progress, count, total, size: 34),
                   ),
                 ),
               ],
@@ -724,7 +725,7 @@ class APIActionFromZero<T> extends ActionFromZero {
       context,
       valueListenables: dependedNotifiers,
       builder: (context, values, child) {
-        return ApiProviderMultiBuilder(
+        return FzProviderMultiBuilder(
           providers: providersBuilder(values),
           animatedSwitcherType: AnimatedSwitcherType.normal,
           transitionBuilder: (context, child, animation) => FadeTransition(opacity: animation, child: child),
@@ -743,7 +744,7 @@ class APIActionFromZero<T> extends ActionFromZero {
               forceIconSpace: forceIconSpace,
             );
           },
-          loadingBuilder: (context, progress) {
+          loadingBuilder: (context, progress, count, total) {
             onTap = null;
             return Stack(
               children: [
@@ -757,7 +758,7 @@ class APIActionFromZero<T> extends ActionFromZero {
                 ),
                 Positioned.fill(
                   child: IgnorePointer(
-                    child: ApiProviderBuilder.defaultLoadingBuilder(context, progress, size: 32),
+                    child: FzProviderBuilder.defaultLoadingBuilder(context, progress, count, total, size: 32),
                   ),
                 ),
               ],

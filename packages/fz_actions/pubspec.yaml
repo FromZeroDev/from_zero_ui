@@ -13,14 +13,16 @@ dependencies:
 
   multi_value_listenable_builder: ^0.0.2
 
-  fz_api_handling:
-    path: ../fz_api_handling
-  fz_tooltip:
-    path: ../fz_tooltip
+  fz_flutter_riverpod:
+    path: ../fz_flutter_riverpod
   fz_future_handling:
     path: ../fz_future_handling
+  fz_riverpod:
+    path: ../fz_riverpod
   fz_scaffold:
     path: ../fz_scaffold
+  fz_tooltip:
+    path: ../fz_tooltip
 
 dev_dependencies:
   flutter_lints: ^5.0.0

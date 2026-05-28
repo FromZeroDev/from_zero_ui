@@ -1,15 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
+import 'package:fz_dio_flutter_riverpod/fz_dio_flutter_riverpod.dart';
+import 'package:fz_flutter_riverpod/fz_flutter_riverpod.dart';
 import 'package:fz_localizations/fz_localizations.dart';
+import 'package:fz_riverpod/fz_riverpod.dart' hide FzNotifierBuilder;
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_snackbar/src/snackbar_from_zero.dart';
 
 enum APISnackBarBlockUIType { never, always, whileLoading, whileLoadingOrError }
 
 class APISnackBar<T> extends SnackBarFromZero {
-  final ApiState<T> stateNotifier;
+  // TODO: 1 this should probably take a Mutation
+  final FzNotifier<T> stateNotifier;
   final String? successTitle;
   final String? successMessage;
   final bool? cancelable;
@@ -66,39 +69,45 @@ class APISnackBar<T> extends SnackBarFromZero {
 
 class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProviderStateMixin {
   AnimationController? animationController;
+  late VoidCallback closeSubscription;
 
   @override
   void initState() {
     super.initState();
-    widget.stateNotifier.addListener(onNotify);
+    // ignore: invalid_use_of_protected_member
+    closeSubscription = widget.stateNotifier.listenSelf(onNotify);
   }
 
-  void onNotify() {
+  @override
+  void didUpdateWidget(covariant APISnackBar<T> oldWidget) {
+    if (widget.stateNotifier != oldWidget.stateNotifier) {
+      closeSubscription();
+      // ignore: invalid_use_of_protected_member
+      closeSubscription = widget.stateNotifier.listenSelf(onNotify);
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    closeSubscription();
+    animationController?.dispose();
+    super.dispose();
+  }
+
+  void onNotify(_, _) {
     if (!mounted) return;
-    final state = widget.stateNotifier.state;
-    widget.updateBlockUI(state);
-    state.whenOrNull(
-      data: (data) {
-        if (!widget.blockUI.value) {
-          initAnimationController();
-        } else {
-          try {
-            animationController?.dispose();
-          } catch (_) {}
-          animationController = null;
-        }
-      },
-      loading: () {
-        if (!widget.blockUI.value) {
-          initAnimationController();
-        } else {
-          try {
-            animationController?.dispose();
-          } catch (_) {}
-          animationController = null;
-        }
-      },
-    );
+    widget.updateBlockUI(widget.stateNotifier.asAsyncValue());
+    if (!widget.stateNotifier.isError) {
+      if (!widget.blockUI.value) {
+        initAnimationController();
+      } else {
+        try {
+          animationController?.dispose();
+        } catch (_) {}
+        animationController = null;
+      }
+    }
   }
 
   void initAnimationController() {
@@ -123,24 +132,8 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
   }
 
   @override
-  void didUpdateWidget(covariant APISnackBar<T> oldWidget) {
-    if (widget.stateNotifier != oldWidget.stateNotifier) {
-      oldWidget.stateNotifier.removeListener(onNotify);
-      widget.stateNotifier.addListener(onNotify);
-    }
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void dispose() {
-    widget.stateNotifier.removeListener(onNotify);
-    animationController?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    Widget result = ApiStateBuilder<T>(
+    Widget result = FzNotifierAsyncBuilder(
       stateNotifier: widget.stateNotifier,
       applyAnimatedContainerFromChildSize: true,
       alignment: Alignment.bottomCenter,
@@ -158,10 +151,7 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
     return result;
   }
 
-  Widget loadingBuilder(
-    BuildContext context,
-    ValueListenable<double?>? progress,
-  ) {
+  Widget loadingBuilder(BuildContext context, double? progress, double? count, double? total) {
     const type = SnackBarFromZero.loading;
     final icon = SnackBarFromZero.icons[type];
     final actionColor = SnackBarFromZero.colors[type];
@@ -210,7 +200,8 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
                   Expanded(
                     child: TextButton(
                       onPressed: () {
-                        widget.stateNotifier.cancel();
+                        // TODO: 1 implement cancel on a mutation
+                        // widget.stateNotifier.cancel();
                         widget.onCancel?.call();
                         widget.dismiss();
                       },
@@ -240,21 +231,11 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
         const SizedBox(width: 16),
       ],
     );
-    Widget progressIndicator = progress == null
-        ? LinearProgressIndicator(
-            valueColor: AlwaysStoppedAnimation(actionColor),
-            backgroundColor: SnackBarFromZero.softColors[type],
-          )
-        : ValueListenableBuilder<double?>(
-            valueListenable: progress,
-            builder: (context, progress, child) {
-              return LinearProgressIndicator(
-                value: progress,
-                valueColor: AlwaysStoppedAnimation(actionColor),
-                backgroundColor: SnackBarFromZero.softColors[type],
-              );
-            },
-          );
+    Widget progressIndicator = LinearProgressIndicator(
+      value: progress,
+      valueColor: AlwaysStoppedAnimation(actionColor),
+      backgroundColor: SnackBarFromZero.softColors[type],
+    );
     result = IntrinsicHeight(
       child: Container(
         color: Color.alphaBlend(
@@ -305,16 +286,16 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
         showRetry = false;
         showErrorDetails = false;
       } else {
-        final isRetryable = ApiProviderBuilder.isErrorRetryable(
+        final isRetryable = FzProviderBuilder.isErrorRetryable(
           error,
           stackTrace,
         );
         showRetry = !kReleaseMode || isRetryable;
         showErrorDetails =
-            !kReleaseMode || (!isRetryable && ApiProviderBuilder.shouldShowErrorDetails(error, stackTrace));
-        icon = ApiProviderBuilder.getErrorIcon(context, error, stackTrace);
-        title = ApiProviderBuilder.getErrorTitle(context, error, stackTrace);
-        message = ApiProviderBuilder.getErrorSubtitle(
+            !kReleaseMode || (!isRetryable && FzProviderBuilder.shouldShowErrorDetails(error, stackTrace));
+        icon = FzProviderBuilder.getErrorIcon(context, error, stackTrace);
+        title = FzProviderBuilder.getErrorTitle(context, error, stackTrace);
+        message = FzProviderBuilder.getErrorSubtitle(
           context,
           error,
           stackTrace,
@@ -352,7 +333,7 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
         Expanded(
           child: TextButton(
             onPressed: () {
-              widget.stateNotifier.refresh(null);
+              widget.stateNotifier.fullRefresh();
             },
             style: TextButton.styleFrom(
               foregroundColor: splashColor,
@@ -379,7 +360,7 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
               final navigatorContext = Navigator.of(widget.context).context;
               widget.dismiss();
               WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                ApiProviderBuilder.showErrorDetailsDialog(
+                FzProviderBuilder.showErrorDetailsDialog(
                   navigatorContext,
                   error,
                   stackTrace,

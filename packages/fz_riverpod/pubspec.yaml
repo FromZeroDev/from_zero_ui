@@ -1,0 +1,21 @@
+name: fz_riverpod
+description: Core Riverpod abstractions — notifiers, progress tracking, error handling, and caching.
+publish_to: 'none'
+version: 0.1.0
+resolution: workspace
+
+environment:
+  sdk: "^3.9.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  riverpod: ^3.2.1
+  flutter_riverpod: ^3.3.1
+
+  fz_log:
+    path: ../fz_log
+
+dev_dependencies:
+  flutter_lints: ^5.0.0

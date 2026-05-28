@@ -1,9 +1,8 @@
-import 'package:fz_api_handling/src/new/fz_notifier.dart';
-import 'package:riverpod/riverpod.dart';
+part of 'fz_notifier.dart';
 
 final fzErrorProvider = NotifierProvider
     .autoDispose //
-    .family<ErrorNotifier, ErrorData?, FzAsyncNotifer<dynamic>>(
+    .family<ErrorNotifier, ErrorData?, FzAsyncNotifier<dynamic>>(
       ErrorNotifier.new,
     );
 

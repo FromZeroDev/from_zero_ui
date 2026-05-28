@@ -1,5 +1,5 @@
-name: fz_api_handling
-description: API state management with Riverpod and Dio.
+name: fz_flutter_riverpod
+description: Flutter widgets for FzNotifier providers — reactive builders with loading/error/data states.
 publish_to: 'none'
 version: 0.1.0
 resolution: workspace
@@ -11,25 +11,18 @@ dependencies:
   flutter:
     sdk: flutter
 
-  riverpod: ^3.2.1
   flutter_riverpod: ^3.3.1
-  flutter_font_icons: ^2.2.5
-  dio: ^5.8.0+1
 
   fz_animated_switcher_image:
     path: ../fz_animated_switcher_image
-  fz_animations:
-    path: ../fz_animations
   fz_dialog:
     path: ../fz_dialog
   fz_future_handling:
     path: ../fz_future_handling
   fz_localizations:
     path: ../fz_localizations
-  fz_log:
-    path: ../fz_log
-  fz_snackbar:
-    path: ../fz_snackbar
+  fz_riverpod:
+    path: ../fz_riverpod
 
 dev_dependencies:
   flutter_lints: ^5.0.0

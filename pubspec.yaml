@@ -10,7 +10,6 @@ workspace:
   - packages/fz_actions
   - packages/fz_animated_switcher_image
   - packages/fz_animations
-  - packages/fz_api_handling
   - packages/fz_app_update
   - packages/fz_appbar
   - packages/fz_combo
@@ -23,23 +22,27 @@ workspace:
   - packages/fz_dao
   - packages/fz_date_picker
   - packages/fz_dialog
+  - packages/fz_dio_flutter_riverpod
+  - packages/fz_dio_riverpod
   - packages/fz_drawer_menu
   - packages/fz_expansion_tile
   - packages/fz_export
   - packages/fz_file_picker
-  - packages/fz_log
   - packages/fz_file_saver
+  - packages/fz_flutter_riverpod
+  - packages/fz_focus_traversal
   - packages/fz_future_handling
   - packages/fz_gesture_relayer
-  - packages/fz_focus_traversal
   - packages/fz_image
   - packages/fz_localizations
+  - packages/fz_log
   - packages/fz_logo
   - packages/fz_notification_relayer
   - packages/fz_number_format
   - packages/fz_opacity_gradient
   - packages/fz_platform
   - packages/fz_popup
+  - packages/fz_riverpod
   - packages/fz_router
   - packages/fz_scaffold
   - packages/fz_scrollbar
@@ -68,8 +71,6 @@ dependencies:
     path: packages/fz_animated_switcher_image
   fz_animations:
     path: packages/fz_animations
-  fz_api_handling:
-    path: packages/fz_api_handling
   fz_app_update:
     path: packages/fz_app_update
   fz_appbar:
@@ -94,6 +95,10 @@ dependencies:
     path: packages/fz_date_picker
   fz_dialog:
     path: packages/fz_dialog
+  fz_dio_flutter_riverpod:
+    path: packages/fz_dio_flutter_riverpod
+  fz_dio_riverpod:
+    path: packages/fz_dio_riverpod
   fz_drawer_menu:
     path: packages/fz_drawer_menu
   fz_expansion_tile:
@@ -106,6 +111,8 @@ dependencies:
     path: packages/fz_log
   fz_file_saver:
     path: packages/fz_file_saver
+  fz_flutter_riverpod:
+    path: packages/fz_flutter_riverpod
   fz_future_handling:
     path: packages/fz_future_handling
   fz_gesture_relayer:
@@ -128,6 +135,8 @@ dependencies:
     path: packages/fz_platform
   fz_popup:
     path: packages/fz_popup
+  fz_riverpod:
+    path: packages/fz_riverpod
   fz_router:
     path: packages/fz_router
   fz_scaffold:

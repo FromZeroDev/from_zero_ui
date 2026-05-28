@@ -10,17 +10,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_comparable_list/fz_comparable_list.dart';
 import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 import 'package:fz_dao/fz_dao.dart';
 import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_dio_flutter_riverpod/fz_dio_flutter_riverpod.dart';
+import 'package:fz_flutter_riverpod/fz_flutter_riverpod.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_log/fz_log.dart';
 import 'package:fz_opacity_gradient/fz_opacity_gradient.dart';
 import 'package:fz_platform/fz_platform.dart';
+import 'package:fz_riverpod/fz_riverpod.dart' hide FzNotifierBuilder;
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_snackbar/fz_snackbar.dart';
@@ -35,10 +37,10 @@ part 'field.dart';
 part 'lazy_dao.dart';
 
 typedef OnSaveCallback<ModelType> = FutureOr<ModelType?> Function(BuildContext context, DAO<ModelType> e);
-typedef OnSaveAPICallback<ModelType> = ApiState<ModelType?> Function(BuildContext context, DAO<ModelType> e);
+typedef OnSaveAPICallback<ModelType> = FzNotifier<ModelType?> Function(BuildContext context, DAO<ModelType> e);
 typedef OnDidSaveCallback<ModelType> = void Function(BuildContext context, ModelType? model, DAO<ModelType> dao);
 typedef OnDeleteCallback<ModelType> = FutureOr<String?> Function(BuildContext context, DAO<ModelType> e);
-typedef OnDeleteAPICallback<ModelType> = ApiState<dynamic> Function(BuildContext context, DAO<ModelType> e);
+typedef OnDeleteAPICallback<ModelType> = FzNotifier<dynamic> Function(BuildContext context, DAO<ModelType> e);
 typedef OnDidDeleteCallback<ModelType> = void Function(BuildContext context, DAO<ModelType> dao);
 typedef DAOWidgetBuilder<ModelType> = Widget Function(BuildContext context, DAO<ModelType> dao);
 typedef DAOValueGetter<T, ModelType> = T Function(DAO<ModelType> dao);
@@ -576,7 +578,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
                         Expanded(
                           child: SizedBox(
                             height: 200,
-                            child: ApiProviderBuilder.defaultLoadingBuilder(context, null),
+                            child: FzProviderBuilder.defaultLoadingBuilder(context, null, null, null),
                           ),
                         ),
                       ],
@@ -595,7 +597,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
                       const SizedBox(
                         height: 18,
                       ),
-                      ApiProviderBuilder.defaultErrorBuilder(context, error, stackTrace as StackTrace?, null),
+                      FzProviderBuilder.defaultErrorBuilder(context, error, stackTrace as StackTrace?, null),
                       const SizedBox(
                         height: 12,
                       ),
@@ -788,8 +790,9 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
     if (onSaveAPI != null) {
       final stateNotifier = onSaveAPI!.call(contextForValidation ?? context, this);
       final completer = Completer<dynamic>();
-      final listener = () {
-        stateNotifier.state.mapOrNull(
+      final listener = (_, _) {
+        // TODO: 1 this should probably work with Mutation and instead switch on the mutation state
+        stateNotifier.asAsyncValue().mapOrNull(
           data: (data) {
             model = data.value;
             completer.complete(data.value);
@@ -806,7 +809,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
           },
         );
       };
-      stateNotifier.addListener(listener);
+      // ignore: invalid_use_of_protected_member
+      final closeSubscription = stateNotifier.listenSelf(listener);
       final controller = APISnackBar(
         context: context,
         stateNotifier: stateNotifier,
@@ -821,7 +825,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
         log(LgLvl.error, 'Error while saving $classUiName: $uiName', e: e, st: st, type: FzLgType.dao);
       }
       success = model != null;
-      stateNotifier.removeListener(listener);
+      closeSubscription();
     } else if (onSave == null) {
       success = true;
     } else {
@@ -936,8 +940,9 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
     if (onDeleteAPI != null) {
       final stateNotifier = onDeleteAPI!.call(contextForValidation ?? context, this);
       final Completer<dynamic> completer = Completer<dynamic>();
-      final listener = () {
-        stateNotifier.state.mapOrNull(
+      final listener = (_, _) {
+        // TODO: 1 this should probably work with Mutation and instead switch on the mutation state
+        stateNotifier.asAsyncValue().mapOrNull(
           data: (data) {
             completer.complete(true);
             return success = true;
@@ -946,7 +951,8 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
           error: (error) => success = false,
         );
       };
-      stateNotifier.addListener(listener);
+      // ignore: invalid_use_of_protected_member
+      final closeSubscription = stateNotifier.listenSelf(listener);
       final controller = APISnackBar(
         context: context,
         stateNotifier: stateNotifier,
@@ -958,7 +964,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
       } catch (e, st) {
         log(LgLvl.error, 'Error while deleting $classUiName: $uiName', e: e, st: st, type: FzLgType.dao);
       }
-      stateNotifier.removeListener(listener);
+      closeSubscription();
     } else {
       try {
         errorString = await onDelete?.call(contextForValidation ?? context, this);
@@ -1621,7 +1627,7 @@ class DAO<ModelType> extends ChangeNotifier implements Comparable<dynamic> {
             child: SizedBox(
               width: formDialogWidth,
               height: 256,
-              child: ApiProviderBuilder.defaultLoadingBuilder(context, null),
+              child: FzProviderBuilder.defaultLoadingBuilder(context, null, null, null),
             ),
           ),
         );

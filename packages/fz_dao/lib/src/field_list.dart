@@ -3,24 +3,24 @@ import 'dart:math';
 
 import 'package:animations/animations.dart';
 import 'package:dartx/dartx.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fz_actions/fz_actions.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_combo/fz_combo.dart';
 import 'package:fz_comparable_list/fz_comparable_list.dart';
 import 'package:fz_copy_ensure_visible/fz_copy_ensure_visible.dart';
 import 'package:fz_dao/fz_dao.dart';
 import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_flutter_riverpod/fz_flutter_riverpod.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_log/fz_log.dart';
 import 'package:fz_opacity_gradient/fz_opacity_gradient.dart';
 import 'package:fz_popup/fz_popup.dart';
+import 'package:fz_riverpod/fz_riverpod.dart' hide FzNotifierBuilder;
 import 'package:fz_scaffold/fz_scaffold.dart';
 import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_table/fz_table.dart';
@@ -40,7 +40,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
   TableController<T>? _tableController;
   ContextFulFieldValueGetter<Future<List<T>>, ListField<T, U>>? availableObjectsPoolGetter;
 
-  ContextFulFieldValueGetter<ApiProviderInstance<List<T>>, ListField<T, U>>? availableObjectsPoolProvider;
+  ContextFulFieldValueGetter<FzProviderInstance<List<T>>, ListField<T, U>>? availableObjectsPoolProvider;
   bool invalidateValuesNotInAvailablePool;
   bool allowDuplicateObjectsFromAvailablePool;
   bool allowAddMultipleFromAvailablePool;
@@ -584,7 +584,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
             final ref = dao.contextForValidation! as WidgetRef;
             final provider = availableObjectsPoolProvider!(context, this, dao);
             final stateNotifier = ref.read(provider.notifier);
-            stateNotifier.refresh(ref);
+            stateNotifier.fullRefresh();
           },
         ),
     ];
@@ -1825,7 +1825,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     bool? showElementCount,
     double? rowHeight,
     ContextFulFieldValueGetter<Future<List<T>>, ListField<T, U>>? availableObjectsPoolGetter,
-    ContextFulFieldValueGetter<ApiProviderInstance<List<T>>, ListField<T, U>>? availableObjectsPoolProvider,
+    ContextFulFieldValueGetter<FzProviderInstance<List<T>>, ListField<T, U>>? availableObjectsPoolProvider,
     bool? allowDuplicateObjectsFromAvailablePool,
     bool? showObjectsFromAvailablePoolAsTable,
     bool? sortObjectsFromAvailablePool,
@@ -2074,7 +2074,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                           );
                         },
                       )
-                    : ApiProviderBuilder<List<T>>(
+                    : FzProviderBuilder<List<T>>(
                         provider: availableObjectsPoolProvider!(context, this, dao),
                         loadingBuilder: _availablePoolLoadingBuilder,
                         errorBuilder: _availablePoolErrorBuilder,
@@ -2184,7 +2184,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                             return _availablePoolComboDataBuilder(context, data, emptyDAO);
                           },
                         )
-                      : ApiProviderBuilder<List<T>>(
+                      : FzProviderBuilder<List<T>>(
                           provider: availableObjectsPoolProvider!(context, this, dao),
                           loadingBuilder: _availablePoolLoadingBuilder,
                           errorBuilder: _availablePoolErrorBuilder,
@@ -2516,7 +2516,9 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
       confirmedValidValues = [];
       final provider = availableObjectsPoolProvider?.call(context, this, dao);
       if (provider != null) {
-        possibleValues = await (context as WidgetRef).readFuture(provider);
+        possibleValues = provider is FzAsyncProviderInstance<List<T>>
+            ? await (context as WidgetRef).readFuture(provider as FzAsyncProviderInstance<List<T>>)
+            : (context as WidgetRef).read(provider);
       } else {
         possibleValues = await availableObjectsPoolGetter?.call(context, this, dao);
       }
@@ -2688,17 +2690,17 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 42),
       child: IntrinsicHeight(
-        child: ApiProviderBuilder.defaultErrorBuilder(context, error, stackTrace, onRetry),
+        child: FzProviderBuilder.defaultErrorBuilder(context, error, stackTrace, onRetry),
       ),
     );
   }
 
-  Widget _availablePoolLoadingBuilder(BuildContext context, [ValueListenable<double?>? progress]) {
+  Widget _availablePoolLoadingBuilder(BuildContext context, [double? progress, double? count, double? total]) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 42),
       child: SizedBox(
         height: 128,
-        child: ApiProviderBuilder.defaultLoadingBuilder(context, progress),
+        child: FzProviderBuilder.defaultLoadingBuilder(context, progress, count, total),
       ),
     );
   }
@@ -2847,13 +2849,13 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
                   Positioned(
                     left: 3,
                     top: 3,
-                    child: ApiProviderBuilder(
+                    child: FzProviderBuilder(
                       provider: availableObjectsPoolProvider!.call(context, this, dao),
                       animatedSwitcherType: AnimatedSwitcherType.normal,
                       dataBuilder: (context, data) {
                         return const SizedBox.shrink();
                       },
-                      loadingBuilder: (context, progress) {
+                      loadingBuilder: (context, progress, _, _) {
                         return SizedBox(
                           height: 10,
                           width: 10,
@@ -2953,13 +2955,13 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
               Positioned(
                 left: 3,
                 top: 3,
-                child: ApiProviderBuilder(
+                child: FzProviderBuilder(
                   provider: availableObjectsPoolProvider!.call(context, this, dao),
                   animatedSwitcherType: AnimatedSwitcherType.normal,
                   dataBuilder: (context, data) {
                     return const SizedBox.shrink();
                   },
-                  loadingBuilder: (context, progress) {
+                  loadingBuilder: (context, progress, _, _) {
                     return SizedBox(
                       height: 10,
                       width: 10,

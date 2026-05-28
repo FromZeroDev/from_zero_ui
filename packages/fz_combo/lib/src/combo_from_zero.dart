@@ -1,12 +1,12 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_dao/fz_dao.dart';
+import 'package:fz_flutter_riverpod/fz_flutter_riverpod.dart';
 import 'package:fz_future_handling/fz_future_handling.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_popup/fz_popup.dart';
+import 'package:fz_riverpod/fz_riverpod.dart' hide FzNotifierBuilder;
 import 'package:fz_scrollbar/fz_scrollbar.dart';
 import 'package:fz_table/fz_table.dart';
 import 'package:fz_tooltip/fz_tooltip.dart';
@@ -36,11 +36,11 @@ class ComboFromZero<T> extends StatefulWidget {
   final List<T>? possibleValues;
   final AsyncValue<List<T>>? possibleValuesAsync;
   final Future<List<T>>? possibleValuesFuture;
-  final NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>>? possibleValuesProvider;
+  final FzProviderInstance<List<T>>? possibleValuesProvider;
   final List<T> Function(String query)? filteredValues;
   final AsyncValue<List<T>> Function(String query)? filteredValuesAsync;
   final Future<List<T>> Function(String query)? filteredValuesFuture;
-  final NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>> Function(String query)? filteredValuesProvider;
+  final FzProviderInstance<List<T>> Function(String query)? filteredValuesProvider;
   final VoidCallback? onCanceled;
   final OnPopupItemSelected<T>? onSelected;
   final bool? showSearchBox;
@@ -226,7 +226,7 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
     Widget result;
     if (widget.blockComboWhilePossibleValuesLoad) {
       if (widget.possibleValuesProvider != null) {
-        result = ApiProviderBuilder<List<T>>(
+        result = FzProviderBuilder<List<T>>(
           provider: widget.possibleValuesProvider!,
           dataBuilder: _buildCombo,
           loadingBuilder: _buildComboLoading,
@@ -260,11 +260,11 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
     return LimitedBox(
       maxWidth: 256,
       maxHeight: 64,
-      child: ApiProviderBuilder.defaultErrorBuilder(context, error, stackTrace, onRetry),
+      child: FzProviderBuilder.defaultErrorBuilder(context, error, stackTrace, onRetry),
     );
   }
 
-  Widget _buildComboLoading(BuildContext context, [ValueListenable<double?>? progress]) {
+  Widget _buildComboLoading(BuildContext context, [double? progress, double? count, double? total]) {
     Widget result;
     if (widget.buttonChildBuilder == null) {
       result = ComboFromZero.defaultButtonChildBuilder(
@@ -297,7 +297,7 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
             child: Container(
               alignment: Alignment.center,
               color: Theme.of(context).disabledColor,
-              child: ApiProviderBuilder.defaultLoadingBuilder(context, progress),
+              child: FzProviderBuilder.defaultLoadingBuilder(context, progress, count, total),
             ),
           ),
         ],
@@ -345,7 +345,7 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
                   result = _buildPopup(context, possibleValues);
                 } else {
                   if (widget.possibleValuesProvider != null) {
-                    result = ApiProviderBuilder<List<T>>(
+                    result = FzProviderBuilder<List<T>>(
                       provider: widget.possibleValuesProvider!,
                       dataBuilder: _buildPopup,
                       loadingBuilder: _buildPopupLoading,
@@ -487,14 +487,14 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
 
   Widget _buildPopupError(BuildContext context, Object? error, StackTrace? stackTrace, [VoidCallback? onRetry]) {
     return IntrinsicHeight(
-      child: ApiProviderBuilder.defaultErrorBuilder(context, error, stackTrace, onRetry),
+      child: FzProviderBuilder.defaultErrorBuilder(context, error, stackTrace, onRetry),
     );
   }
 
-  Widget _buildPopupLoading(BuildContext context, [ValueListenable<double?>? progress]) {
+  Widget _buildPopupLoading(BuildContext context, [double? progress, double? count, double? total]) {
     return SizedBox(
       height: 128,
-      child: ApiProviderBuilder.defaultLoadingBuilder(context, progress),
+      child: FzProviderBuilder.defaultLoadingBuilder(context, progress, count, total),
     );
   }
 }
@@ -505,7 +505,7 @@ class ComboFromZeroPopup<T> extends StatefulWidget {
   final List<T> Function(String query)? filteredValues;
   final AsyncValue<List<T>> Function(String query)? filteredValuesAsync;
   final Future<List<T>> Function(String query)? filteredValuesFuture;
-  final NotifierProvider<ApiState<List<T>>, AsyncValue<List<T>>> Function(String query)? filteredValuesProvider;
+  final FzProviderInstance<List<T>> Function(String query)? filteredValuesProvider;
   final VoidCallback? onCanceled;
   final OnPopupItemSelected<T>? onSelected;
   final bool? showSearchBox;
@@ -598,10 +598,10 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
     } else if (widget.filteredValues case final filter?) {
       table = buildTable(context, filter(searchQuery ?? ''));
     } else if (widget.filteredValuesProvider case final filter?) {
-      table = ApiProviderBuilder<List<T>>(
+      table = FzProviderBuilder<List<T>>(
         provider: filter(searchQuery ?? ''),
         dataBuilder: buildTable,
-        loadingBuilder: (context, _) => buildTable(context, [], showLoading: true),
+        loadingBuilder: (context, _, _, _) => buildTable(context, [], showLoading: true),
         errorBuilder: _buildError,
         transitionBuilder: (context, child, animation) => FadeTransition(opacity: animation, child: child),
       );
@@ -631,7 +631,7 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
 
   Widget _buildError(BuildContext context, Object? error, StackTrace? stackTrace, [VoidCallback? onRetry]) {
     return IntrinsicHeight(
-      child: ApiProviderBuilder.defaultErrorBuilder(context, error, stackTrace, onRetry),
+      child: FzProviderBuilder.defaultErrorBuilder(context, error, stackTrace, onRetry),
     );
   }
 

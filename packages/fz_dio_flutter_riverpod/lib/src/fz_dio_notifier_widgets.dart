@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
-import 'package:fz_api_handling/src/new/fz_riverpod_widgets.dart';
+import 'package:fz_flutter_riverpod/fz_flutter_riverpod.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_snackbar/fz_snackbar.dart';
 

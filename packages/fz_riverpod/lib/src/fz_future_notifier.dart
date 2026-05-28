@@ -1,10 +1,8 @@
-import 'package:fz_api_handling/src/new/fz_notifier.dart';
-import 'package:fz_log/fz_log.dart';
-import 'package:riverpod/riverpod.dart';
+part of 'fz_notifier.dart';
 
 enum FutureNotifierStatus { loading, done, error }
 
-abstract class FzFutureNotifier<T> extends FzAsyncNotifer<T> {
+abstract class FzFutureNotifier<T> extends FzAsyncNotifier<T> {
   late Future<T> future;
   FutureNotifierStatus status = FutureNotifierStatus.loading;
 

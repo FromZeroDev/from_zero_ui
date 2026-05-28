@@ -4,7 +4,6 @@ import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:fz_animated_switcher_image/fz_animated_switcher_image.dart';
 import 'package:fz_animations/fz_animations.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_dialog/fz_dialog.dart';
 import 'package:fz_export/fz_export.dart';
 import 'package:fz_future_handling/src/async_value_builder.dart';
@@ -382,7 +381,7 @@ class FutureBuilderFromZero<T> extends StatefulWidget {
   FutureBuilderFromZeroState<T> createState() => FutureBuilderFromZeroState<T>();
 
   static Widget defaultLoadingBuilder(BuildContext context) {
-    return ApiProviderBuilder.defaultLoadingBuilder(context, null);
+    return const LoadingSign(size: 48);
   }
 
   static Widget defaultErrorBuilder(
@@ -390,12 +389,11 @@ class FutureBuilderFromZero<T> extends StatefulWidget {
     dynamic error,
     dynamic stackTrace,
   ) {
-    // log(error, stackTrace: stackTrace);
-    return ApiProviderBuilder.defaultErrorBuilder(
-      context,
-      error,
-      stackTrace,
-      null,
+    return ErrorSign(
+      key: ValueKey(error),
+      icon: const Icon(Icons.report_problem_outlined),
+      title: 'Error Inesperado',
+      subtitle: 'Por favor, notifique a su administrador de sistema',
     );
   }
 

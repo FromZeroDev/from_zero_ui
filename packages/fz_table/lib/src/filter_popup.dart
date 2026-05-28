@@ -1,8 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
-import 'package:fz_api_handling/fz_api_handling.dart';
 import 'package:fz_dialog/fz_dialog.dart';
+import 'package:fz_flutter_riverpod/fz_flutter_riverpod.dart';
 import 'package:fz_localizations/fz_localizations.dart';
 import 'package:fz_platform/fz_platform.dart';
 import 'package:fz_popup/fz_popup.dart';
@@ -78,7 +78,7 @@ abstract class TableFromZeroFilterPopup {
             if (availableFilters == null) {
               return AspectRatio(
                 aspectRatio: 1,
-                child: ApiProviderBuilder.defaultLoadingBuilder(context, null),
+                child: FzProviderBuilder.defaultLoadingBuilder(context, null, null, null),
               );
             } else {
               return ScrollbarFromZero(

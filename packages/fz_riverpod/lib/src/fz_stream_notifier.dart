@@ -1,10 +1,8 @@
-import 'package:fz_api_handling/src/new/fz_notifier.dart';
-import 'package:fz_log/fz_log.dart';
-import 'package:riverpod/riverpod.dart';
+part of 'fz_notifier.dart';
 
 enum StreamNotifierStatus { loading, partial, done, error }
 
-abstract class FzStreamNotifier<T> extends FzAsyncNotifer<T> {
+abstract class FzStreamNotifier<T> extends FzAsyncNotifier<T> {
   late Stream<T> stream;
   StreamNotifierStatus status = StreamNotifierStatus.loading;
 
