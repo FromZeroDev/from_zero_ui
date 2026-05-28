@@ -7,7 +7,7 @@ import 'package:fz_localizations/fz_localizations.dart';
 typedef DataBuilder<T> = Widget Function(BuildContext context, T data);
 typedef DataMultiBuilder<T> = Widget Function(BuildContext context, List<T> data);
 typedef LoadingBuilder = Widget Function(BuildContext context);
-typedef ErrorBuilder = Widget Function(BuildContext context, Object error, StackTrace? stackTrace);
+typedef ErrorBuilder = Widget Function(BuildContext context, Object error, StackTrace stackTrace);
 typedef FutureTransitionBuilder =
     Widget Function(
       BuildContext context,
@@ -221,7 +221,7 @@ class AsyncValueMultiBuilder<T> extends StatelessWidget {
     String stateString;
     if (error != null) {
       stateString = 'Error-${error.hashCode}';
-      result = errorBuilder(context, error!, stackTrace);
+      result = errorBuilder(context, error!, stackTrace!);
     } else if (data.length == asyncValues.length) {
       stateString = asyncValues.isEmpty ? 'empty' : 'Data-${Object.hashAll(asyncValues)}';
       result = dataBuilder(context, data);
