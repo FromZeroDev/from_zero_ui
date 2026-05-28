@@ -13,8 +13,13 @@ part 'fz_future_notifier.dart';
 part 'fz_stream_notifier.dart';
 
 typedef FzProviderInstance<T> = NotifierProvider<FzNotifier<T>, T>;
-
 typedef FzProviderFamilyInstance<T, P> = NotifierProviderFamily<FzNotifier<T>, T, P>;
+typedef FzAsyncProviderInstance<T> = NotifierProvider<FzAsyncNotifier<T>, T?>;
+typedef FzAsyncFamilyInstance<T, P> = NotifierProviderFamily<FzAsyncNotifier<T>, T?, P>;
+typedef FzFutureProviderInstance<T> = NotifierProvider<FzFutureNotifier<T>, T?>;
+typedef FzFutureProviderFamilyInstance<T, P> = NotifierProviderFamily<FzFutureNotifier<T>, T?, P>;
+typedef FzStreamProviderInstance<T> = NotifierProvider<FzStreamNotifier<T>, T?>;
+typedef FzStreamProviderFamilyInstance<T, P> = NotifierProviderFamily<FzStreamNotifier<T>, T?, P>;
 
 // ignore: non_constant_identifier_names
 FzProviderInstance<T> FzProvider<T>(
@@ -39,6 +44,66 @@ FzProviderFamilyInstance<T, P> FzProviderFamily<T, P>(
   Retry? retry,
 }) {
   return const AutoDisposeNotifierProviderFamilyBuilder()<FzNotifier<T>, T, P>(
+    create,
+    name: name,
+    dependencies: dependencies,
+    retry: retry,
+  );
+}
+
+// ignore: non_constant_identifier_names
+FzFutureProviderInstance<T> FzFutureProvider<T>(
+  FzFutureNotifier<T> Function() create, {
+  String? name,
+  Iterable<ProviderOrFamily>? dependencies,
+  Retry? retry,
+}) {
+  return const AutoDisposeNotifierProviderBuilder()<FzFutureNotifier<T>, T?>(
+    create,
+    name: name,
+    dependencies: dependencies,
+    retry: retry,
+  );
+}
+
+// ignore: non_constant_identifier_names
+FzFutureProviderFamilyInstance<T, P> FzFutureProviderFamily<T, P>(
+  FzFutureNotifier<T> Function(P param) create, {
+  String? name,
+  Iterable<ProviderOrFamily>? dependencies,
+  Retry? retry,
+}) {
+  return const AutoDisposeNotifierProviderFamilyBuilder()<FzFutureNotifier<T>, T?, P>(
+    create,
+    name: name,
+    dependencies: dependencies,
+    retry: retry,
+  );
+}
+
+// ignore: non_constant_identifier_names
+FzStreamProviderInstance<T> FzStreamProvider<T>(
+  FzStreamNotifier<T> Function() create, {
+  String? name,
+  Iterable<ProviderOrFamily>? dependencies,
+  Retry? retry,
+}) {
+  return const AutoDisposeNotifierProviderBuilder()<FzStreamNotifier<T>, T?>(
+    create,
+    name: name,
+    dependencies: dependencies,
+    retry: retry,
+  );
+}
+
+// ignore: non_constant_identifier_names
+FzStreamProviderFamilyInstance<T, P> FzStreamProviderFamily<T, P>(
+  FzStreamNotifier<T> Function(P param) create, {
+  String? name,
+  Iterable<ProviderOrFamily>? dependencies,
+  Retry? retry,
+}) {
+  return const AutoDisposeNotifierProviderFamilyBuilder()<FzStreamNotifier<T>, T?, P>(
     create,
     name: name,
     dependencies: dependencies,
@@ -129,7 +194,3 @@ class FzNotifierBuilder<T> extends FzNotifier<T> {
 sealed class FzAsyncNotifier<T> extends FzNotifier<T?> {
   NotifierProvider<ErrorNotifier, ErrorData?> get error => fzErrorProvider.call(this);
 }
-
-typedef FzAsyncProviderInstance<T> = NotifierProvider<FzAsyncNotifier<T>, T?>;
-typedef FzFutureProviderInstance<T> = NotifierProvider<FzFutureNotifier<T>, T?>;
-typedef FzStreamProviderInstance<T> = NotifierProvider<FzStreamNotifier<T>, T?>;
