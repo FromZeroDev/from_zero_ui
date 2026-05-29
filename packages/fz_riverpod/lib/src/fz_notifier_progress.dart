@@ -18,7 +18,7 @@ abstract class ProgressBase {
 
   const ProgressBase();
 
-  bool get isDeterminate => count == null || total == null;
+  bool get isDeterminate => count != null && total != null;
 
   // PERF: 3 should we cache this?
   double? get progress => total == 0
@@ -32,6 +32,11 @@ abstract class ProgressBase {
 
   @override
   int get hashCode => Object.hash(count, total);
+
+  @override
+  String toString() {
+    return 'Progress($count/$total = $progress)';
+  }
 }
 
 class Progress extends ProgressBase {
@@ -47,13 +52,16 @@ class Progress extends ProgressBase {
 
 class _ProgressMutable extends ProgressBase {
   @override
-  // ignore: overridden_fields
-  double? count, total;
+  double? count;
+  @override
+  double? total;
 
   _ProgressMutable([this.count, this.total]);
 }
 
 abstract class ProgressNotifier<T extends ProgressBase> extends Notifier<T> {
+  T get progress => state;
+
   void setCount(double? count);
   void setTotal(double? count);
   void setValues(double? count, double? total);
@@ -62,8 +70,9 @@ abstract class ProgressNotifier<T extends ProgressBase> extends Notifier<T> {
 
 abstract class DerivedProgressNotifier<T extends ProgressBase> extends Notifier<T> {}
 
-class _ProgressNotifierImpl extends ProgressNotifier<_ProgressMutable> {
+class _ProgressNotifierImpl extends ProgressNotifier<ProgressBase> {
   final FzNotifier<dynamic> notifier;
+  late final _ProgressMutable _progress;
 
   _ProgressNotifierImpl(this.notifier);
 
@@ -76,43 +85,44 @@ class _ProgressNotifierImpl extends ProgressNotifier<_ProgressMutable> {
         setValues(0, 0);
       }
     });
-    return notifier.isDone
+    _progress = notifier.isDone
         ? _ProgressMutable(0, 0) //
         : _ProgressMutable();
+    return _progress;
   }
 
   @override
   void setCount(double? count) {
     if (count == state.count) return;
-    state.count = count;
+    _progress.count = count;
     ref.notifyListeners();
   }
 
   @override
   void setTotal(double? total) {
     if (total == state.total) return;
-    state.total = total;
+    _progress.total = total;
     ref.notifyListeners();
   }
 
   @override
   void setValues(double? count, double? total) {
     if (count == state.count && total == state.total) return;
-    state.count = count;
-    state.total = total;
+    _progress.count = count;
+    _progress.total = total;
     ref.notifyListeners();
   }
 
   @override
   void reset() {
     if (state.count == null && state.total == null) return;
-    state.count = null;
-    state.total = null;
+    _progress.count = null;
+    _progress.total = null;
     ref.notifyListeners();
   }
 }
 
-class _DerivedProgressNotifierImpl extends DerivedProgressNotifier<Progress> {
+class _DerivedProgressNotifierImpl extends DerivedProgressNotifier<ProgressBase> {
   final FzNotifier<dynamic> notifier;
 
   _DerivedProgressNotifierImpl(this.notifier);
