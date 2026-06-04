@@ -8,7 +8,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart' show StateProvider, StateController;
 import 'package:fz_actions/fz_actions.dart';
 import 'package:fz_appbar/fz_appbar.dart';
 import 'package:fz_comparable_list/fz_comparable_list.dart';
@@ -171,27 +170,27 @@ class TableFromZero<T> extends ConsumerStatefulWidget {
   @override
   TableFromZeroState<T> createState() => TableFromZeroState<T>();
 
-  static final syncProvider = StateProvider.family<List<TableController<dynamic>>, String>((ref, syncId) => []);
+  // TODO: 1 this is a memory leak, and it's also weird that it persists forever.
+  // Try a completely different approach: create a SyncingController,
+  // that supports providing that same controller to multiple Tables and syncs them.
+  static final Map<String, List<TableController<dynamic>>> syncProvider = {};
 
   static void addControllerToSync(
     WidgetRef ref,
     TableController<dynamic> controller,
-    String syncId, {
-    StateController<List<TableController<dynamic>>>? notifier,
-  }) {
-    notifier ??= ref.read(syncProvider.call(syncId).notifier);
-    notifier!.state = [...notifier.state, controller];
-    if (notifier.state.length > 1) syncControllersSpecific(notifier.state.first, controller);
+    String syncId,
+  ) {
+    syncProvider[syncId] ??= [];
+    syncProvider[syncId]!.add(controller);
+    syncControllersSpecific(syncProvider[syncId]!.first, controller);
   }
 
   static void removeControllerFromSync(
     WidgetRef ref,
     TableController<dynamic> controller,
-    String syncId, {
-    StateController<List<TableController<dynamic>>>? notifier,
-  }) {
-    notifier ??= ref.read(syncProvider.call(syncId).notifier);
-    notifier!.state = notifier.state.where((e) => e != controller).toList();
+    String syncId,
+  ) {
+    syncProvider[syncId]!.remove(controller);
   }
 
   static void syncControllers(
@@ -199,8 +198,8 @@ class TableFromZero<T> extends ConsumerStatefulWidget {
     String syncId, {
     TableController<dynamic>? original,
   }) {
-    final controllers = ref.read(syncProvider.call(syncId));
-    if (controllers.isNotEmpty) {
+    final controllers = syncProvider[syncId];
+    if (controllers != null && controllers.isNotEmpty) {
       original ??= controllers.first;
       for (int i = 0; i < controllers.length; i++) {
         if (controllers[i] != original) {
@@ -368,13 +367,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
     if (widget.tableController?.currentState == this) {
       widget.tableController!.currentState = null;
     }
-    if (widget.tableController != null && widget.syncId != null && _syncNotifier != null) {
-      TableFromZero.removeControllerFromSync(
-        ref,
-        widget.tableController!,
-        widget.syncId!,
-        notifier: _syncNotifier,
-      );
+    if (widget.tableController != null && widget.syncId != null) {
+      TableFromZero.removeControllerFromSync(ref, widget.tableController!, widget.syncId!);
     }
   }
 
@@ -405,19 +399,13 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
     sortedAscending = widget.columns?[sortedColumn]?.defaultSortAscending ?? true;
     init(notifyListeners: false, isFirstInit: true);
     if (widget.tableController != null && widget.syncId != null) {
-      _syncNotifier = ref.read(
-        TableFromZero.syncProvider.call(widget.syncId!).notifier,
-      );
-      TableFromZero.addControllerToSync(
-        ref,
-        widget.tableController!,
-        widget.syncId!,
-        notifier: _syncNotifier,
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        TableFromZero.addControllerToSync(ref, widget.tableController!, widget.syncId!);
+      });
     }
   }
 
-  StateController<List<TableController<dynamic>>>? _syncNotifier;
   @override
   void didUpdateWidget(TableFromZero<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -428,24 +416,14 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
     }
     if (widget.tableController != oldWidget.tableController || widget.syncId != oldWidget.syncId) {
       if (oldWidget.tableController != null && oldWidget.syncId != null) {
-        TableFromZero.removeControllerFromSync(
-          ref,
-          oldWidget.tableController!,
-          oldWidget.syncId!,
-          notifier: _syncNotifier,
-        );
+        TableFromZero.removeControllerFromSync(ref, oldWidget.tableController!, oldWidget.syncId!);
       }
       if (widget.syncId != null) {
-        _syncNotifier = ref.read(
-          TableFromZero.syncProvider.call(widget.syncId!).notifier,
-        );
         if (widget.tableController != null && widget.syncId != null) {
-          TableFromZero.addControllerToSync(
-            ref,
-            widget.tableController!,
-            widget.syncId!,
-            notifier: _syncNotifier,
-          );
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            TableFromZero.addControllerToSync(ref, widget.tableController!, widget.syncId!);
+          });
         }
       }
     }
