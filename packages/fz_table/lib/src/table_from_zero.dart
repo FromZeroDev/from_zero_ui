@@ -2972,6 +2972,7 @@ class TableController<T> extends ChangeNotifier {
   }
 
   bool get mounted => currentState != null;
+  bool get expandableRowsExist => currentState!._expandableRowsExist ?? false;
   List<RowModel<T>> get filtered => currentState!.filtered;
   List<RowModel<T>> get allFiltered => currentState!.allFiltered;
   Map<dynamic, ColModel<dynamic>>? get columns => currentState?.widget.columns;
