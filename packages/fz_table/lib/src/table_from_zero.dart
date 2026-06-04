@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cancelable_compute/cancelable_compute.dart' as cancelable_compute;
+import 'package:collection/collection.dart' show DeepCollectionEquality;
 import 'package:dartx/dartx.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -178,11 +179,18 @@ class TableFromZero<T> extends ConsumerStatefulWidget {
   static void addControllerToSync(
     WidgetRef ref,
     TableController<dynamic> controller,
-    String syncId,
-  ) {
+    String syncId, {
+    bool delaySetState = false,
+  }) {
     syncProvider[syncId] ??= [];
     syncProvider[syncId]!.add(controller);
-    syncControllersSpecific(syncProvider[syncId]!.first, controller);
+    controller.addListener(() {
+      for (final e in syncProvider[syncId]!) {
+        if (e == controller) continue;
+        syncControllersSpecific(controller, e);
+      }
+    });
+    syncControllersSpecific(syncProvider[syncId]!.first, controller, delaySetState: delaySetState);
   }
 
   static void removeControllerFromSync(
@@ -197,33 +205,59 @@ class TableFromZero<T> extends ConsumerStatefulWidget {
     WidgetRef ref,
     String syncId, {
     TableController<dynamic>? original,
+    bool delaySetState = false,
   }) {
     final controllers = syncProvider[syncId];
     if (controllers != null && controllers.isNotEmpty) {
       original ??= controllers.first;
-      for (int i = 0; i < controllers.length; i++) {
-        if (controllers[i] != original) {
-          syncControllersSpecific(
-            original,
-            controllers[i],
-            relevantColumns: _getRelevantColumns(original),
-          );
-        }
+      for (final e in controllers) {
+        if (e == original) continue;
+        syncControllersSpecific(original, e, delaySetState: delaySetState);
       }
     }
   }
 
-  // for now, only column visibility is synced, but this could be used to sync other properties in the future
   static void syncControllersSpecific(
     TableController<dynamic> original,
     TableController<dynamic> mirror, {
-    Map<dynamic, bool>? relevantColumns,
+    bool delaySetState = false,
   }) {
-    relevantColumns ??= _getRelevantColumns(original);
+    bool needsSort = false;
+    // bool needsFilter = false;
+    bool needsRebuild = false;
+    if (mirror.sortedColumn != original.sortedColumn) {
+      mirror.sortedColumn = original.sortedColumn;
+      needsSort = true;
+    }
+    if (mirror.sortedAscending != original.sortedAscending) {
+      mirror.sortedAscending = original.sortedAscending;
+      needsSort = true;
+    }
+    final initialMirrorColumnKeys = mirror.columnKeys;
+    final relevantColumns = _getRelevantColumns(original);
     mirror.currentColumnKeys = mirror.columnKeys!.where((e) {
-      return relevantColumns!.containsKey(e) ? relevantColumns[e]! : mirror.currentColumnKeys!.contains(e);
+      return relevantColumns.containsKey(e) ? relevantColumns[e]! : mirror.currentColumnKeys!.contains(e);
     }).toList();
-    mirror.filter(); // PERF: 2 do we need to re-filter?
+    final apply = () {
+      if (!DeepCollectionEquality().equals(initialMirrorColumnKeys, mirror.currentColumnKeys)) {
+        needsRebuild = true;
+      }
+      if (needsSort) {
+        mirror.sort(); // we should do notifyListeners=false, but we can't because someone might be listening
+      }
+      // else if (needsFilter) {
+      //   mirror.filter();
+      // }
+      else if (needsRebuild) {
+        // ignore: invalid_use_of_protected_member
+        mirror.currentState?.setState(() {});
+      }
+    };
+    if (delaySetState) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => apply());
+    } else {
+      apply();
+    }
   }
 
   static Map<dynamic, bool> _getRelevantColumns(TableController<dynamic> controller) {
@@ -399,10 +433,12 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
     sortedAscending = widget.columns?[sortedColumn]?.defaultSortAscending ?? true;
     init(notifyListeners: false, isFirstInit: true);
     if (widget.tableController != null && widget.syncId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        TableFromZero.addControllerToSync(ref, widget.tableController!, widget.syncId!);
-      });
+      TableFromZero.addControllerToSync(
+        ref,
+        widget.tableController!,
+        widget.syncId!,
+        delaySetState: true,
+      );
     }
   }
 
@@ -420,10 +456,12 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
       }
       if (widget.syncId != null) {
         if (widget.tableController != null && widget.syncId != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!mounted) return;
-            TableFromZero.addControllerToSync(ref, widget.tableController!, widget.syncId!);
-          });
+          TableFromZero.addControllerToSync(
+            ref,
+            widget.tableController!,
+            widget.syncId!,
+            delaySetState: true,
+          );
         }
       }
     }
@@ -2164,6 +2202,8 @@ class TableFromZeroState<T> extends ConsumerState<TableFromZero<T>> with TickerP
             setState(() {
               currentColumnKeys?.remove(colKey);
             });
+            // ignore: invalid_use_of_protected_member
+            widget.tableController?.notifyListeners();
           },
         ),
     ];
@@ -2957,20 +2997,20 @@ class TableController<T> extends ChangeNotifier {
 
   /// Call this if the rows change, to re-initialize rows
   void reInit() => currentState?.isStateInvalidated = true;
-  void sort() {
+  void sort({bool notifyListeners = true}) {
     if (currentState?.mounted ?? false) {
       // ignore: invalid_use_of_protected_member
       currentState!.setState(() {
-        currentState!.sort();
+        currentState!.sort(notifyListeners: notifyListeners);
       });
     }
   }
 
-  void filter() {
+  void filter({bool notifyListeners = true}) {
     if (currentState?.mounted ?? false) {
       // ignore: invalid_use_of_protected_member
       currentState!.setState(() {
-        currentState!.filter();
+        currentState!.filter(notifyListeners: notifyListeners);
       });
     }
   }
