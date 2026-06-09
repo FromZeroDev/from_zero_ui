@@ -372,11 +372,13 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
             ? 0
             : partialProgress / partialTotal;
         allNull = allNull && partial == null;
-        partial ??= notifier.state.maybeWhen<double>(
-          data: (_) => 1,
-          orElse: () => 0,
-        );
-        result = (result ?? 0) + partial;
+        if (notifier.mounted && !notifier.ref.isFirstBuild) {
+          partial ??= notifier.state.maybeWhen<double>(
+            data: (_) => 1,
+            orElse: () => 0,
+          );
+        }
+        result = (result ?? 0) + (partial ?? 0);
       }
       result = result == null || allNull ? null : (result / (allWatching.length + 1));
     }
