@@ -85,9 +85,21 @@ class _ProgressNotifierImpl extends ProgressNotifier<ProgressBase> {
         setValues(0, 0);
       }
     });
-    _progress = notifier.isDone
-        ? _ProgressMutable(0, 0) //
-        : _ProgressMutable();
+    if (ref.isFirstBuild) {
+      if (notifier.isDone) {
+        _progress = _ProgressMutable(0, 0);
+      } else {
+        _progress = _ProgressMutable();
+      }
+    } else {
+      if (notifier.isDone) {
+        _progress.count = 0;
+        _progress.total = 0;
+      } else {
+        _progress.count = null;
+        _progress.total = null;
+      }
+    }
     return _progress;
   }
 
