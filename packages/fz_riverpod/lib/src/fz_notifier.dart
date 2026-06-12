@@ -139,9 +139,19 @@ abstract class FzNotifier<T> extends Notifier<T> {
     return ref.watch(provider.notifier).future;
   }
 
-  Stream<D> watchStream<D>(NotifierProvider<FzStreamNotifier<D>, D?> provider) {
+  Stream<D> watchStream<D>(NotifierProvider<FzStreamNotifier<D>, D?> provider) async* {
     _addDependency(provider);
-    return ref.watch(provider.notifier).stream;
+    final notifier = ref.watch(provider.notifier);
+    // hack to immediatly emit the last emmited value, if any exists
+    if (notifier.status == StreamNotifierStatus.error) {
+      // we dont need to re-throw the error, it will propagate when anyone listens to the stream
+    } else if (notifier.status != StreamNotifierStatus.loading) {
+      // if we don't do this, when listening to a stream that already finished, we never get the value
+      yield notifier.state as D;
+    }
+    await for (final e in notifier.stream) {
+      yield e;
+    }
   }
 
   void _addDependency(FzProviderInstance<dynamic> provider) {
