@@ -19,9 +19,8 @@ abstract class FzStreamNotifier<T> extends FzAsyncNotifier<T> {
     ref.invalidate(error);
     stream = buildStream().asBroadcastStream();
     () async {
-      await for (final e in stream) {
+      await for (final data in stream) {
         try {
-          final data = e;
           if (!ref.mounted) return;
           status = StreamNotifierStatus.partial;
           state = data;
