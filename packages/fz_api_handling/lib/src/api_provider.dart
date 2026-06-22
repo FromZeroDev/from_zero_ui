@@ -166,7 +166,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
       newApiState.wholePercentageNotifier.addListener(_computePercentage);
     }
     ref.watch(watchProvider);
-    return ref.watch(watchProvider.notifier).future;
+    return ref.read(watchProvider.notifier).future;
   }
 
   // a new ref needs to be passed to read the watching notifiers. watch() won't be called on it.
