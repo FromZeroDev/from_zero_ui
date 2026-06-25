@@ -99,6 +99,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
       disposeDelay = null,
       maxTimeToLive = null,
       super() {
+    _state = AsyncValue.loading();
     _runFuture();
   }
 
