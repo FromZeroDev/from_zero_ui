@@ -352,7 +352,7 @@ class APISnackBarState<T> extends ConsumerState<APISnackBar<T>> with TickerProvi
         Expanded(
           child: TextButton(
             onPressed: () {
-              widget.stateNotifier.refresh(null);
+              widget.stateNotifier.refresh();
             },
             style: TextButton.styleFrom(
               foregroundColor: splashColor,

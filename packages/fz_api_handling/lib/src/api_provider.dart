@@ -50,36 +50,8 @@ ApiProviderFamilyInstance<T, P> ApiProviderFamily<T, P>(
   );
 }
 
-// class ApiMutationExecutor<T, P> {
-//   final Mutation<T> mutation;
-//   final P param;
-//   final Future<T> Function(MutationTransaction tsx, P param) executor;
-//
-//   ApiMutationExecutor(this.mutation, this.param, this.executor);
-//
-//   Future<T> run(MutationTarget target) {
-//     return mutation.run(target, (tsx) {
-//       return executor(tsx, param);
-//     });
-//   }
-// }
-//
-// class ApiMutation<T, P> {
-//   final Mutation<T> mutation = Mutation<T>();
-//   final Future<T> Function(MutationTransaction tsx, P param) executor;
-//
-//   ApiMutation(this.executor);
-//
-//   ApiMutationExecutor<T, P> call(P param) {
-//     return ApiMutationExecutor(mutation(param), param, executor);
-//   }
-// }
-
-//  TODO: 1 implement a better solution using mutations and delete this
 class ApiStateNoProvider<T> extends ApiState<T> {
   ApiStateNoProvider(super._create) : super._noProvider();
-
-  AsyncValue<T> _state = AsyncValue.loading();
 
   @override
   AsyncValue<T> get state => _state;
@@ -108,6 +80,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   late final wholePercentageNotifier = ValueNotifier<double?>(null);
 
   final List<ApiProviderInstance<dynamic>> _watching = [];
+  final List<ApiState<dynamic>> _watchingNotifiers = [];
   final List<CancelToken> _cancelTokens = [];
   void addCancelToken(CancelToken ct) {
     _cancelTokens.add(ct);
@@ -131,7 +104,9 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
 
   @override
   AsyncValue<T> build() {
+    _isRefreshed = false;
     _runFuture();
+    _state = AsyncValue.loading();
     return AsyncValue.loading();
   }
 
@@ -140,12 +115,13 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   AsyncValue<T> get state => super.state;
 
   // keep compatibility with code that used this as a StateNotifier
+  late AsyncValue<T> _state;
   @override
   set state(AsyncValue<T> state) {
-    if (state != this.state) {
-      notifyListeners();
-      super.state = state;
-    }
+    if (state == _state) return;
+    _state = state;
+    notifyListeners();
+    super.state = state;
   }
 
   bool get mounted => isNoProvider || ref.mounted;
@@ -155,8 +131,10 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
   Ref get ref => super.ref;
 
   Future<WatchedT> watch<WatchedT>(ApiProviderInstance<WatchedT> watchProvider) async {
+    final notifier = ref.read(watchProvider.notifier);
     if (!_watching.contains(watchProvider)) {
       _watching.add(watchProvider);
+      _watchingNotifiers.add(notifier);
       final newApiState = ref.read(watchProvider.notifier);
       _computeTotal();
       _computeProgress();
@@ -166,51 +144,39 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
       newApiState.wholePercentageNotifier.addListener(_computePercentage);
     }
     ref.watch(watchProvider);
-    return ref.read(watchProvider.notifier).future;
+    return notifier.future;
   }
 
-  // a new ref needs to be passed to read the watching notifiers. watch() won't be called on it.
-  bool retry(WidgetRef? widgetRef, [ProviderBase<dynamic>? providerForInvalidationInsteadOfRefresh]) {
+  bool _isRefreshed = false;
+  bool retry() {
     bool refreshed = false;
     if (!isNoProvider) {
-      try {
-        final watchingNotifiers = {
-          for (final e in _watching) e: widgetRef == null ? ref.read(e.notifier) : widgetRef.read(e.notifier),
-        };
-        for (final e in watchingNotifiers.keys) {
-          refreshed = refreshed || watchingNotifiers[e]!.retry(widgetRef, e);
-        }
-      } catch (_) {}
+      for (final e in _watchingNotifiers) {
+        refreshed = refreshed || e.retry();
+      }
     }
     if (!refreshed && state is AsyncError) {
-      if (widgetRef != null && providerForInvalidationInsteadOfRefresh != null) {
-        widgetRef.invalidate(providerForInvalidationInsteadOfRefresh);
-      } else {
-        _runFuture();
+      if (!_isRefreshed) {
+        _isRefreshed = true;
+        ref.invalidateSelfWhenUnpaused();
       }
       return true;
     }
     return refreshed;
   }
 
-  void refresh(WidgetRef? widgetRef, [ProviderBase<dynamic>? providerForInvalidationInsteadOfRefresh]) {
+  void refresh() {
     bool refreshed = false;
     if (!isNoProvider) {
-      final watchingNotifiers = {
-        for (final e in _watching) e: widgetRef == null ? ref.read(e.notifier) : widgetRef.read(e.notifier),
-      };
-      for (final e in watchingNotifiers.keys) {
-        try {
-          watchingNotifiers[e]!.refresh(widgetRef, e);
-          refreshed = true;
-        } catch (_) {}
+      for (final e in _watchingNotifiers) {
+        e.refresh();
+        refreshed = true;
       }
     }
     if (!refreshed) {
-      if (widgetRef != null && providerForInvalidationInsteadOfRefresh != null) {
-        widgetRef.invalidate(providerForInvalidationInsteadOfRefresh);
-      } else {
-        _runFuture();
+      if (!_isRefreshed) {
+        _isRefreshed = true;
+        ref.invalidateSelfWhenUnpaused();
       }
     }
   }
@@ -223,10 +189,12 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     selfTotalNotifier.value = null;
     selfProgressNotifier.value = null;
     wholePercentageNotifier.value = null;
+    // this doesn't seem to be necessary, because we only call _runFuture() from build(), which already sets loading state
     if (!isNoProvider && !ref.isFirstBuild) {
       state = AsyncValue.loading();
     }
-    // if (ref.isPaused) { // this doesn't seem to be necessary, I don't thing this is ever called with isPaused=true
+    // // this doesn't seem to be necessary, I don't thing this is ever called with isPaused=true
+    // if (ref.isPaused) {
     //   ref.onResume(_runFuture);
     //   return;
     // }
@@ -258,6 +226,10 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
           //     type: FzLgType.network,
           //   );
           // }
+          if (e.type == DioExceptionType.cancel && e.error.toString() == 'PROVIDER CANCELLED') {
+            // hack to prevent provider being stuck in error state while loading after refreshing
+            return;
+          }
         } else {
           log(
             LgLvl.error,
@@ -295,15 +267,13 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     if (!mounted) return;
     double? result = selfTotalNotifier.value;
     if (result != null && !isNoProvider) {
-      for (final e in _watching) {
+      for (final e in _watchingNotifiers) {
         final partial =
-            ref.read(e.notifier).wholeTotalNotifier.value ??
-            ref
-                .read(e)
-                .maybeWhen<double?>(
-                  data: (_) => 0,
-                  orElse: () => null,
-                );
+            e.wholeTotalNotifier.value ??
+            e._state.maybeWhen<double?>(
+              data: (_) => 0,
+              orElse: () => null,
+            );
         if (partial != null) {
           result = (result ?? 0) + partial;
         } else {
@@ -319,15 +289,13 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     if (!mounted) return;
     double? result = selfProgressNotifier.value;
     if (result != null && !isNoProvider) {
-      for (final e in _watching) {
+      for (final e in _watchingNotifiers) {
         final partial =
-            ref.read(e.notifier).wholeProgressNotifier.value ??
-            ref
-                .read(e)
-                .maybeWhen<double?>(
-                  data: (_) => 0,
-                  orElse: () => null,
-                );
+            e.wholeProgressNotifier.value ??
+            e._state.maybeWhen<double?>(
+              data: (_) => 0,
+              orElse: () => null,
+            );
         if (partial != null) {
           result = (result ?? 0) + partial;
         } else {
@@ -354,17 +322,16 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
           : progress == null || total == 0
           ? 0
           : progress / total;
-      final allWatching = List<ApiProviderInstance<dynamic>>.from(_watching);
+      final allWatching = List<ApiState<dynamic>>.from(_watchingNotifiers);
       for (int i = 0; i < allWatching.length; i++) {
-        for (final e in ref.read(allWatching[i].notifier)._watching) {
+        for (final e in allWatching[i]._watchingNotifiers) {
           if (!allWatching.contains(e)) {
             allWatching.add(e);
           }
         }
       }
       bool allNull = result == null;
-      for (final e in allWatching) {
-        final notifier = ref.read(e.notifier);
+      for (final notifier in allWatching) {
         double? partialProgress = notifier.selfProgressNotifier.value;
         double? partialTotal = notifier.selfTotalNotifier.value;
         double? partial = partialTotal == null
@@ -374,7 +341,7 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
             : partialProgress / partialTotal;
         allNull = allNull && partial == null;
         if (notifier.mounted && !notifier.ref.isFirstBuild) {
-          partial ??= notifier.state.maybeWhen<double>(
+          partial ??= notifier._state.maybeWhen<double>(
             data: (_) => 1,
             orElse: () => 0,
           );
@@ -454,7 +421,7 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
         return loadingBuilder(context, stateNotifier.wholePercentageNotifier);
       },
       errorBuilder: (context, error, stackTrace) {
-        return errorBuilder(context, error, stackTrace, () => stateNotifier.retry(ref));
+        return errorBuilder(context, error, stackTrace, () => stateNotifier.retry());
       },
       transitionBuilder: transitionBuilder,
       transitionDuration: transitionDuration,
@@ -502,9 +469,9 @@ class ApiProviderBuilder<T> extends ConsumerWidget {
       icon: getErrorIcon(context, error, stackTrace),
       title: getErrorTitle(context, error, stackTrace),
       subtitle: getErrorSubtitle(context, error, stackTrace),
-      onRetry: !kReleaseMode || isRetryable ? onRetry : null,
-      retryButton: !kReleaseMode || shouldShowErrorDetails(error, stackTrace)
-          ? buildErrorDetailsButton(context, error, stackTrace, !kReleaseMode || isRetryable ? onRetry : null)
+      onRetry: isRetryable ? onRetry : null,
+      retryButton: shouldShowErrorDetails(error, stackTrace)
+          ? buildErrorDetailsButton(context, error, stackTrace, isRetryable ? onRetry : null)
           : null,
     );
   }
@@ -787,7 +754,7 @@ class ApiProviderMultiBuilder<T> extends ConsumerWidget {
       errorBuilder: (context, error, stackTrace) {
         return errorBuilder(context, error, stackTrace, () {
           for (final e in stateNotifiers) {
-            e.retry(ref);
+            e.retry();
           }
         });
       },
@@ -940,7 +907,7 @@ class ApiStateBuilderState<T> extends ConsumerState<ApiStateBuilder<T>> {
         return widget.loadingBuilder(context, widget.stateNotifier.wholePercentageNotifier);
       },
       errorBuilder: (context, error, stackTrace) {
-        return widget.errorBuilder(context, error, stackTrace, () => widget.stateNotifier.retry(ref));
+        return widget.errorBuilder(context, error, stackTrace, () => widget.stateNotifier.retry());
       },
       transitionBuilder: widget.transitionBuilder,
       transitionDuration: widget.transitionDuration,

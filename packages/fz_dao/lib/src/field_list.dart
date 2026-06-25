@@ -584,7 +584,7 @@ class ListField<T extends DAO<U>, U> extends Field<ComparableList<T>> {
             final ref = dao.contextForValidation! as WidgetRef;
             final provider = availableObjectsPoolProvider!(context, this, dao);
             final stateNotifier = ref.read(provider.notifier);
-            stateNotifier.refresh(ref);
+            stateNotifier.refresh();
           },
         ),
     ];
