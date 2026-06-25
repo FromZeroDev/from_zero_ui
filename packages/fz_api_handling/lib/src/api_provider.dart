@@ -159,7 +159,11 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     if (!refreshed && state is AsyncError) {
       if (!_isRefreshed) {
         _isRefreshed = true;
-        ref.invalidateSelfWhenUnpaused();
+        if (isNoProvider) {
+          _runFuture();
+        } else {
+          ref.invalidateSelfWhenUnpaused();
+        }
       }
       return true;
     }
@@ -177,7 +181,11 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     if (!refreshed) {
       if (!_isRefreshed) {
         _isRefreshed = true;
-        ref.invalidateSelfWhenUnpaused();
+        if (isNoProvider) {
+          _runFuture();
+        } else {
+          ref.invalidateSelfWhenUnpaused();
+        }
       }
     }
   }
