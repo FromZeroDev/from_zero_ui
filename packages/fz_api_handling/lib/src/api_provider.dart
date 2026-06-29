@@ -153,10 +153,10 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
     bool refreshed = false;
     if (!isNoProvider) {
       for (final e in _watchingNotifiers) {
-        refreshed = refreshed || e.retry();
+        refreshed = e.retry() || refreshed;
       }
     }
-    if (!refreshed && state is AsyncError) {
+    if (!refreshed && _state is AsyncError) {
       if (!_isRefreshed) {
         _isRefreshed = true;
         if (isNoProvider) {
