@@ -522,42 +522,35 @@ class ExportState extends State<Export> {
               cellStyle.backgroundColor = ExcelColor.fromHexString(backgroundColor.toHex(includeAlpha: false));
             }
             cellStyle.fontSize = 12;
-            final dynamic cellValue;
-            if (col is DateColModel &&
-                (row.values[key] is DateTime ||
-                    row.values[key] is Date ||
-                    row.values[key] is ContainsValue<DateTime>)) {
-              final DateTime dateTime = row.values[key] is DateTime
-                  ? row.values[key]
-                  : row.values[key] is Date
-                  ? (row.values[key] as Date).toDateTime()
-                  : (row.values[key] as ContainsValue<DateTime>).value;
-              cellValue = (col.formatter ?? dateFormat).format(dateTime);
-            } else if (col is NumColModel &&
-                (row.values[key] is double ||
-                    (row.values[key] is ContainsValue<num> &&
-                        ((row.values[key] as ContainsValue<num>).value is double)))) {
-              cellValue = row.values[key] is double ? row.values[key] : (row.values[key] as ContainsValue<num>).value;
+            var cellValue;
+            if (value.currentState!.widget.columns != null && row.id == value.currentState!.widget.columns) {
+              // header row
+              cellValue = row.values[key];
+            } else {
+              cellValue = col?.getValue(row, key) ?? row.values[key];
+            }
+
+            if (col is DateColModel && (cellValue is DateTime || row.values[key] is ContainsValue<DateTime>)) {
+              final dateTime = cellValue is DateTime ? cellValue : (cellValue as ContainsValue<DateTime>).value;
+              cellValue = (col.formatter ?? dateFormat).format(dateTime!);
+              // cellValue = col.getValueString(row, key); // we enforce a default formatter if null
+            } else if (col is NumColModel && (cellValue is num || cellValue is ContainsValue<num>)) {
+              cellValue = cellValue is num ? cellValue : (cellValue as ContainsValue<num>).value;
               final formatter = col.formatter;
               if (formatter != null) {
                 final pattern = formatter.toString().split(',');
                 pattern.removeAt(0);
                 String formatCode = pattern.join(',').replaceAll(')', '').trim();
                 cellStyle.numberFormat = CustomNumericNumFormat(formatCode: formatCode);
-              } else {
+              } else if (cellValue is double) {
                 cellStyle.numberFormat = NumFormat.standard_4;
               }
-            } else if (col is BoolColModel && (row.values[key] is bool || row.values[key] is ContainsValue<bool>)) {
+            } else if (col is BoolColModel && (cellValue is bool || cellValue is ContainsValue<bool>)) {
               cellValue = col.getValueString(row, key);
-            } else if (row.values[key] is ContainsValue) {
-              cellValue = (row.values[key] as ContainsValue).value == null
-                  ? null
-                  : (row.values[key] as ContainsValue).value is num
-                  ? (row.values[key] as ContainsValue).value
-                  : row.values[key].toString();
-            } else {
-              cellValue = row.values[key];
+            } else if (cellValue is ContainsValue) {
+              cellValue = cellValue.value == null || cellValue.value is num ? cellValue.value : cellValue.toString();
             }
+
             if (cellValue == null) {
               cell.value = null;
             } else if (cellValue is bool) {
