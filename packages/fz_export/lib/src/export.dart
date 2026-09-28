@@ -568,13 +568,13 @@ class ExportState extends State<Export> {
               if (isExpandable && j == 0) {
                 value = '    $value';
               }
-              cell.value = TextCellValue(value);
+              cell.value = TextCellValue(sanitizeForExcel(value));
             } else {
               String value = cellValue.toString();
               if (isExpandable && j == 0) {
                 value = '    $value';
               }
-              cell.value = TextCellValue(value);
+              cell.value = TextCellValue(sanitizeForExcel(value));
             }
             cell.cellStyle = cellStyle;
           } else {
@@ -627,6 +627,15 @@ class ExportState extends State<Export> {
           format,
         ) ??
         1;
+  }
+
+  String sanitizeForExcel(String input) {
+    return input.replaceAll(
+      RegExp(
+        r'[\x00-\x08\x0B\x0C\x0E-\x1F]', // invalid XML 1.0 control chars
+      ),
+      ' ',
+    );
   }
 
   @override
