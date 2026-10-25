@@ -100,7 +100,8 @@ class SymbolIcon extends StatelessWidget {
     final fill = this.fill ?? SymbolIcon.defaultFlutterFill;
     final weight = this.weight ?? SymbolIcon.defaultFlutterWeight;
     var icon = this.icon;
-    if (icon != null) {
+    final isMaterialFont = icon?.fontFamily?.startsWith("MaterialSymbols") ?? false;
+    if (icon != null && isMaterialFont) {
       icon = icon.getVariation(variation ?? SymbolIcon.defaultFlutterVariation);
     }
     final mainIcon = Icon(
