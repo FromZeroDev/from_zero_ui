@@ -522,7 +522,7 @@ class ExportState extends State<Export> {
               cellStyle.backgroundColor = ExcelColor.fromHexString(backgroundColor.toHex(includeAlpha: false));
             }
             cellStyle.fontSize = 12;
-            var cellValue;
+            dynamic cellValue;
             if (value.currentState!.widget.columns != null && row.id == value.currentState!.widget.columns) {
               // header row
               cellValue = row.values[key];
