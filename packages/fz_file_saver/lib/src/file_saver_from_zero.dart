@@ -43,6 +43,11 @@ Future<bool> saveFileFromZero({
   bool showResultSnackBar = true, // TODO: 3 implement output pickers in not web (optional)
   String? successTitle,
   String? successMessage,
+
+  /// Called with the resulting [File] after it has been written to disk.
+  /// Not called on web (the file is downloaded by the browser) or when the
+  /// download is cancelled/fails.
+  void Function(File file)? onFileSaved,
   bool isHostContext = false,
   List<FutureOr<List<int>> Function()>? multipleDownloads,
   List<String>? multipleDownloadsNames,
@@ -208,6 +213,7 @@ Future<bool> saveFileFromZero({
       // write data to file
       await file.create(recursive: true);
       await file.writeAsBytes(bytes);
+      onFileSaved?.call(file);
 
       // get pretty path to show to user
       if (PlatformExtended.customDownloadsDirectory != null) {
@@ -358,6 +364,7 @@ Future<bool> saveFileFromZero({
       successMessage: successMessage,
       successTitle: successTitle,
       autoOpenOnFinish: autoOpenOnFinish,
+      onFileSaved: onFileSaved,
       multipleDownloads: multipleDownloads,
       multipleDownloadsNames: multipleDownloadsNames,
       multipleDownloadsCurrentIndex: multipleDownloadsCurrentIndex,
@@ -385,6 +392,7 @@ Future<bool> saveFileFromZero({
       successMessage: successMessage,
       successTitle: successTitle,
       autoOpenOnFinish: autoOpenOnFinish,
+      onFileSaved: onFileSaved,
       multipleDownloads: multipleDownloads,
       multipleDownloadsNames: multipleDownloadsNames,
       multipleDownloadsCurrentIndex: multipleDownloadsCurrentIndex,

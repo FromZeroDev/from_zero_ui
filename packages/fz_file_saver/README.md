@@ -22,6 +22,7 @@ Cross-platform file saving with progress tracking, download snackbars, automatic
 - **Multiple downloads** — `multipleDownloads` + `multipleDownloadsNames` for batch saves with unified result snackbar
 - **Cancellation** — user can cancel mid-download from the progress snackbar
 - **Custom success messages** — `successTitle` and `successMessage` override defaults
+- **Saved file callback** — `onFileSaved` receives the resulting `File` (after collision suffixes are applied) so callers can reuse it, e.g. as a notification attachment
 
 ## Usage
 
@@ -46,6 +47,16 @@ await saveFileFromZero(
   data: () => downloadFile(currentIndex),
   multipleDownloads: [download1, download2, download3],
   multipleDownloadsNames: ['file_a.pdf', 'file_b.pdf', 'file_c.pdf'],
+);
+
+// Reuse the saved file (e.g. attach it to a notification):
+File? savedFile;
+await saveFileFromZero(
+  context: context,
+  data: () => myBytes,
+  name: 'report.pdf',
+  pathAppend: 'reports',
+  onFileSaved: (file) => savedFile = file,
 );
 
 // Global default:
