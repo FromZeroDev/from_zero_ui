@@ -39,3 +39,17 @@ All sub-packages use the `fz_` prefix. Each has:
   - Each sub-package's main export gets one file: `lib/packages/<package_name>.dart` containing `export 'package:<package_name>/<package_name>.dart';`
   - If a sub-package has additional root-level export files (e.g. `fz_animations` has `no_fading_transitions.dart`), create a file named `<package_name>_<extra_filename_without_dart>.dart`
   - When adding a new sub-package, create all corresponding files here
+
+## UI Component Guidelines
+
+These guidelines apply to `from_zero_ui` itself and to every project that consumes it.
+
+- **Always prefer from_zero_ui components** over default Flutter counterparts:
+  - Use `SnackBarFromZero` instead of `SnackBar` or `ScaffoldMessenger.showSnackBar`
+  - Use `ActionFromZero` instead of `IconButton` or `TextButton` for toolbar actions
+  - Use `DialogFromZero` + `showModalFromZero` instead of `AlertDialog` + `showDialog`
+  - Use `DialogButton` for dialog action buttons
+  - Use `APISnackBar` for async operation feedback (success/error states)
+  - Use `AppbarFromZero` for consistent app bar styling
+  - Use `ContextMenuFromZero` for context menus
+- Before implementing a component or UI pattern, check the existing `packages/fz_*` components for one that does what we need.
