@@ -67,6 +67,10 @@ class ComboFromZero<T> extends StatefulWidget {
   final bool showNullInSelection;
   final bool showHintAsNullInSelection;
 
+  /// ignores dots and commas when filtering by the search text, so that
+  /// typing 'IVA' matches values like 'I.V.A. 21%'
+  final bool ignorePunctuationInSearch;
+
   const ComboFromZero({
     super.key,
     this.value,
@@ -101,6 +105,7 @@ class ComboFromZero<T> extends StatefulWidget {
     this.blockComboWhilePossibleValuesLoad = false,
     this.showNullInSelection = false,
     this.showHintAsNullInSelection = true,
+    this.ignorePunctuationInSearch = true,
     Duration? debounce,
     int? minChars,
   }) : debounce =
@@ -482,6 +487,7 @@ class ComboFromZeroState<T> extends State<ComboFromZero<T>> {
       hint: widget.hint,
       debounce: widget.debounce,
       minChars: widget.minChars,
+      ignorePunctuationInSearch: widget.ignorePunctuationInSearch,
     );
   }
 
@@ -521,6 +527,7 @@ class ComboFromZeroPopup<T> extends StatefulWidget {
   final String? hint;
   final Duration debounce;
   final int minChars;
+  final bool ignorePunctuationInSearch;
 
   const ComboFromZeroPopup({
     this.possibleValues,
@@ -541,6 +548,7 @@ class ComboFromZeroPopup<T> extends StatefulWidget {
     this.useFixedRowHeight = true,
     this.showNullInSelection = false,
     this.showHintAsNullInSelection = true,
+    this.ignorePunctuationInSearch = true,
     this.hint,
     Duration? debounce,
     int? minChars,
@@ -629,6 +637,11 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
     );
   }
 
+  String _normalizeSearchText(String value) {
+    final String result = widget.ignorePunctuationInSearch ? value.replaceAll('.', '').replaceAll(',', '') : value;
+    return result.trim().toUpperCase();
+  }
+
   Widget _buildError(BuildContext context, Object? error, StackTrace? stackTrace, [VoidCallback? onRetry]) {
     return IntrinsicHeight(
       child: ApiProviderBuilder.defaultErrorBuilder(context, error, stackTrace, onRetry),
@@ -693,13 +706,15 @@ class ComboFromZeroPopupState<T> extends State<ComboFromZeroPopup<T>> {
                   if (searchQuery == null || searchQuery!.isEmpty) {
                     contains = filtered;
                   } else {
-                    final q = searchQuery!.trim().toUpperCase();
+                    final q = _normalizeSearchText(searchQuery!);
                     for (final e in filtered) {
-                      final value = (e.id is DAO)
-                          ? (e.id! as DAO).searchName.toUpperCase()
-                          : e.id == null
-                          ? e.values[0].toString()
-                          : e.id.toString().toUpperCase();
+                      final value = _normalizeSearchText(
+                        e.id is DAO
+                            ? (e.id! as DAO).searchName
+                            : e.id == null
+                            ? e.values[0].toString()
+                            : e.id.toString(),
+                      );
                       if (value.contains(q)) {
                         if (value.startsWith(q)) {
                           starts.add(e);

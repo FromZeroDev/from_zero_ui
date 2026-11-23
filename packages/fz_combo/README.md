@@ -15,6 +15,8 @@ ComboFromZero<MyModel>(
 )
 ```
 
+Searching a fixed list of values ignores dots and commas by default, so typing `IVA` matches `I.V.A. 21%`. Pass `ignorePunctuationInSearch: false` to compare the text as-is. Filters supplied via `filteredValues`/`filteredValuesFuture`/`filteredValuesProvider` receive the raw query.
+
 Also available as a DAO field:
 
 ```dart
