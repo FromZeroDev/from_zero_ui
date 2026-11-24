@@ -331,7 +331,7 @@ class ScaffoldFromZero extends ConsumerStatefulWidget {
 }
 
 class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
-  late ScrollController drawerContentScrollController;
+  ScrollController? drawerContentScrollController;
   late bool canPop = ModalRoute.of(context)?.canPop ?? Navigator.of(context).canPop();
   final GlobalKey bodyGlobalKey = GlobalKey();
   final GlobalKey drawerGlobalKey = GlobalKey();
@@ -380,15 +380,18 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
   }
 
   void _onDrawerScroll() {
-    if (mounted && drawerContentScrollController.hasClients) {
+    // the controller only exists while the drawer content is built (the drawer is open on mobile)
+    final controller = drawerContentScrollController;
+    if (mounted && controller != null && controller.hasClients) {
       lockListenToDrawerScroll = true;
-      _changeNotifier.drawerContentScrollOffsets[pageScaffoldId]?.value = drawerContentScrollController.position.pixels;
+      _changeNotifier.drawerContentScrollOffsets[pageScaffoldId]?.value = controller.position.pixels;
     }
   }
 
   void _onDrawerScrollOffsetChanged() {
-    if (!lockListenToDrawerScroll && mounted && drawerContentScrollController.hasClients) {
-      drawerContentScrollController.jumpTo(
+    final controller = drawerContentScrollController;
+    if (!lockListenToDrawerScroll && mounted && controller != null && controller.hasClients) {
+      controller.jumpTo(
         _changeNotifier.drawerContentScrollOffsets[pageScaffoldId]?.value ?? 0,
       );
       lockListenToDrawerScroll = false;
@@ -1156,12 +1159,12 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
         final changeNotifierNotListen = ref.read(
           fromZeroScaffoldChangeNotifierProvider,
         ); // ! this used to be watch, might bring problems with drawer
-        drawerContentScrollController = ScrollController(
+        final controller = drawerContentScrollController = ScrollController(
           initialScrollOffset: widget.rememberDrawerScrollOffset
               ? _changeNotifier.drawerContentScrollOffsets[pageScaffoldId]?.value ?? 0
               : 0,
         );
-        drawerContentScrollController.addListener(_onDrawerScroll);
+        controller.addListener(_onDrawerScroll);
         final mediaQuery = MediaQuery.of(context);
         final addedPaddingWidth = isMobileLayout ? 0 : mediaQuery.padding.left;
         final calculatedDrawerWidth = widget.drawerWidth + addedPaddingWidth;
@@ -1341,12 +1344,12 @@ class ScaffoldFromZeroState extends ConsumerState<ScaffoldFromZero> {
                               scaffoldChangeNotifier: changeNotifierNotListen,
                             );
                             result = ScrollbarFromZero(
-                              controller: drawerContentScrollController,
+                              controller: controller,
                               applyOpacityGradientToChildren: false,
                               ignoreDevicePadding: false,
                               child: SingleChildScrollView(
                                 clipBehavior: Clip.none,
-                                controller: drawerContentScrollController,
+                                controller: controller,
                                 child: Padding(
                                   padding: EdgeInsets.only(
                                     top: widget.drawerPaddingTop,
