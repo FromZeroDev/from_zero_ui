@@ -2991,9 +2991,9 @@ class TableController<T> extends ChangeNotifier {
   }
 
   bool get mounted => currentState != null;
-  bool get expandableRowsExist => currentState!._expandableRowsExist ?? false;
-  List<RowModel<T>> get filtered => currentState!.filtered;
-  List<RowModel<T>> get allFiltered => currentState!.allFiltered;
+  bool get expandableRowsExist => currentState?._expandableRowsExist ?? false;
+  List<RowModel<T>> get filtered => currentState?.filtered ?? const [];
+  List<RowModel<T>> get allFiltered => currentState?.allFiltered ?? const [];
   Map<dynamic, ColModel<dynamic>>? get columns => currentState?.widget.columns;
 
   /// Call this if the rows change, to re-initialize rows
