@@ -222,6 +222,11 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
           }
         }
       } catch (e, st) {
+        // A rebuild or a disposal unmounts the Ref of the build that was awaiting here, so
+        // whatever this build produced is now irrelevant and must not be reported as an error.
+        // Note: it must not cancel() either, because _cancelTokens is shared with the current
+        // build, whose requests would be cancelled and which would then be left stuck in loading.
+        if (!mounted) return;
         if (e is DioException) {
           // // this logging should be done in DIO interceptors. That is the only way to ensure it is logged only once for each call.
           // if (err.response==null) {
@@ -248,7 +253,6 @@ class ApiState<T> extends Notifier<AsyncValue<T>> with ChangeNotifier {
           );
         }
         cancel();
-        if (!mounted) return;
         state = AsyncValue<T>.error(e, st);
       }
     } catch (e, st) {
